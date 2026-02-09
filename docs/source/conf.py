@@ -144,7 +144,11 @@ html_theme = "pydata_sphinx_theme"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "navbar_start": ["navbar-logo"],
+    "navbar_center": ["navbar-nav"],
+    "navbar_end": [],
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -169,7 +173,12 @@ html_js_files = [
 # Add custom CSS to fix .content height constraint for plotly plots
 html_css_files = [
     "fix-content-height.css",
+    "css/styles.css",
 ]
+
+html_additional_pages = {
+    "index": "index.html",
+}
 
 
 # -- Options for LaTeX output ---------------------------------------------

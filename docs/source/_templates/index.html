@@ -1,0 +1,108 @@
+{% extends "pydata_sphinx_theme/layout.html" %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+<main class="landing" style="max-width: 1100px; margin: auto; padding: 3rem 1.5rem; color: var(--pst-color-text-base); background-color: var(--pst-color-background);">
+
+  <section style="text-align: center; margin-bottom: 4rem;">
+    <h1 style="font-size: 4.0rem; margin-bottom: 0.5rem; color: var(--pst-color-text-base);">Blop</h1>
+    <p style="font-size: 1.25rem; color: var(--pst-color-text-muted);">
+      a BeamLine Optimization Package
+    </p>
+  </section>
+
+  <section style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; align-items: center; margin-bottom: 4rem;">
+    <div>
+      <h2 style="color: var(--pst-color-text-base);">What is Blop?</h2>
+      <p>
+        Blop is a Python library for performing optimization for beamline
+        experiments. It is designed to integrate nicely with the Bluesky
+        ecosystem and primarily targets rapid beamline data acquisition
+        and control.
+      </p>
+      <p>
+        Our goal is to provide a simple and practical data-driven
+        optimization interface for beamline experiments.
+      </p>
+    </div>
+
+    <div style="background: var(--pst-color-surface); border: 1px solid var(--pst-color-border); border-radius: 16px; padding: 2rem; text-align: center;">
+      <div style="height: 220px; background: var(--pst-color-background); border: 1px solid var(--pst-color-border); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+         <span style="color: var(--pst-color-text-muted);">[Visualization Placeholder]</span>
+      </div>
+    </div>
+  </section>
+
+  <hr style="border: 0; border-top: 1px solid var(--pst-color-border);">
+
+  <section style="margin: 4rem 0;">
+    <h2 style="text-align: center; color: var(--pst-color-text-base); margin-bottom: 2rem;">Learn More!</h2>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+      
+      {# We define the list outside the loop for cleaner syntax #}
+      {% set nav_items = [
+        ("Tutorials", "tutorials.html"),
+        ("How-to", "howto.html"),
+        ("References", "references.html"),
+        ("Release History", "release_history.html")
+      ] %}
+
+      {% for title, link in nav_items %}
+      <a href="{{ link }}" style="
+          background: var(--pst-color-surface);
+          border: 1px solid var(--pst-color-border);
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          text-decoration: none;
+          color: var(--pst-color-text-base);
+          font-weight: 600;
+        ">
+        {{ title }}
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+
+  <hr style="border: 0; border-top: 1px solid var(--pst-color-border);">
+
+  <section style="margin: 4rem 0;">
+    <h2 style="color: var(--pst-color-text-base);">References</h2>
+    <p>If you use this package in your work, please cite the following paper:</p>
+
+    <div style="
+      background-color: var(--pst-color-surface); 
+      border-left: 5px solid var(--pst-color-primary); 
+      padding: 20px; 
+      font-size: 14px; 
+      color: var(--pst-color-text-base); 
+      line-height: 1.6;
+      border-radius: 0 8px 8px 0;
+      margin: 1.5rem 0;
+    ">
+      Morris, T. W., Rakitin, M., Du, Y., Fedurin, M., Giles, A. C., Leshchev, D., Li, W. H., Romasky, B., Stavitski, E., Walter, A. L., Moeller, P., Nash, B., & Islegen-Wojdyla, A. (2024). A general Bayesian algorithm for the autonomous alignment of beamlines. <i>Journal of Synchrotron Radiation</i>, 31(6), 1446–1456. 
+      <a href="https://doi.org/10.1107/S1600577524008993" style="color: var(--pst-color-link); text-decoration: underline;">
+        https://doi.org/10.1107/S1600577524008993
+      </a>
+    </div>
+
+    <p style="font-weight: bold;">BibTeX:</p>
+    <pre style="background: var(--pst-color-inline-code-background); border: 1px solid var(--pst-color-border); color: var(--pst-color-text-base); padding: 1rem; border-radius: 8px; overflow-x: auto;">
+@Article{Morris2024,
+  author   = {Morris, Thomas W. and others},
+  journal  = {Journal of Synchrotron Radiation},
+  title    = {A general Bayesian algorithm for the autonomous alignment of beamlines},
+  year     = {2024},
+  doi      = {10.1107/S1600577524008993},
+  url      = {https://doi.org/10.1107/S1600577524008993},
+}
+    </pre>
+  </section>
+</main>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ pathto('_static/javascript.js', 1) }}"></script>
+{% endblock %}
