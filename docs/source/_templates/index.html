@@ -3,7 +3,151 @@
 {% block sidebar %}{% endblock %}
 
 {% block content %}
-<main class="landing" style="max-width: 1100px; margin: auto; padding: 3rem 1.5rem; color: var(--pst-color-text-base); background-color: var(--pst-color-background);">
+<header style="
+  background: var(--pst-color-surface);
+  border-bottom: 1px solid var(--pst-color-border);
+  padding: 1rem 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100vw;
+  z-index: 1000;
+  margin: 0;
+">
+  <div style="
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  ">
+    
+    {# Left side: Logo and Navigation #}
+    <div style="display: flex; align-items: center; gap: 2rem;">
+      {# Logo placeholder - you can replace this with an actual logo #}
+      <div style="
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: var(--pst-color-primary);
+        text-decoration: none;
+      ">
+        <div style="
+          width: 40px;
+          height: 40px;
+          background: var(--pst-color-primary);
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: bold;
+        ">
+          B
+        </div>
+        <a href="{{ pathto(master_doc) }}" style="color: var(--pst-color-primary); text-decoration: none;">
+          Blop
+        </a>
+      </div>
+      
+      {# Navigation Links #}
+      <nav style="display: flex; gap: 1.5rem;">
+        <a href="{{ pathto('tutorials') }}" style="
+          color: var(--pst-color-text-base);
+          text-decoration: none;
+          font-weight: 500;
+          padding: 0.5rem 0;
+          border-bottom: 2px solid transparent;
+          transition: border-color 0.2s;
+        " 
+        onmouseover="this.style.borderColor='var(--pst-color-primary)'"
+        onmouseout="this.style.borderColor='transparent'">
+          Tutorials
+        </a>
+        <a href="{{ pathto('reference/index') }}" style="
+          color: var(--pst-color-text-base);
+          text-decoration: none;
+          font-weight: 500;
+          padding: 0.5rem 0;
+          border-bottom: 2px solid transparent;
+          transition: border-color 0.2s;
+        "
+        onmouseover="this.style.borderColor='var(--pst-color-primary)'"
+        onmouseout="this.style.borderColor='transparent'">
+          Documentation
+        </a>
+        <a href="{{ pathto('release-history') }}" style="
+          color: var(--pst-color-text-base);
+          text-decoration: none;
+          font-weight: 500;
+          padding: 0.5rem 0;
+          border-bottom: 2px solid transparent;
+          transition: border-color 0.2s;
+        "
+        onmouseover="this.style.borderColor='var(--pst-color-primary)'"
+        onmouseout="this.style.borderColor='transparent'">
+          Release History
+        </a>
+      </nav>
+    </div>
+    
+    {# Right side: Search and Theme Toggle #}
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      {# Search Bar #}
+      <div id="searchbox" style="margin: 0;">
+        <div role="search" style="display: flex; align-items: center;">
+          <input type="search" 
+                 class="form-control" 
+                 id="search-input"
+                 name="q" 
+                 placeholder="Search docs..."
+                 aria-label="Search docs"
+                 style="
+                   padding: 0.5rem 1rem;
+                   border: 1px solid var(--pst-color-border);
+                   border-radius: 6px;
+                   background: var(--pst-color-background);
+                   color: var(--pst-color-text-base);
+                   width: 200px;
+                   font-size: 0.875rem;
+                 ">
+          <input type="hidden" name="check_keywords" value="yes">
+          <input type="hidden" name="area" value="default">
+        </div>
+      </div>
+      
+      {# Theme Toggle Button #}
+      <button class="btn btn-sm btn-outline-primary theme-switch-button" 
+              type="button" 
+              data-bs-toggle="tooltip" 
+              data-bs-placement="bottom" 
+              title="Toggle light/dark mode"
+              style="
+                border: 1px solid var(--pst-color-border);
+                background: var(--pst-color-background);
+                color: var(--pst-color-text-base);
+                padding: 0.5rem;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s;
+              "
+              onmouseover="this.style.background='var(--pst-color-surface)'"
+              onmouseout="this.style.background='var(--pst-color-background)'">
+        <i class="fa fa-sun" id="theme-icon" style="font-size: 1rem;"></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="landing" style="max-width: 1100px; margin: auto; padding: 1.5rem 1.5rem 3rem; padding-top: 6rem; color: var(--pst-color-text-base); background-color: var(--pst-color-background);">
 
   <section style="text-align: center; margin-bottom: 4rem;">
     <h1 style="font-size: 4.0rem; margin-bottom: 0.5rem; color: var(--pst-color-text-base);">Blop</h1>
@@ -38,36 +182,51 @@
 
   <section style="margin: 4rem 0;">
     <h2 style="text-align: center; color: var(--pst-color-text-base); margin-bottom: 2rem;">Learn More!</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
       
-      {# We define the list outside the loop for cleaner syntax #}
+      {# We define the list so additional items can be easily added #}
       {% set nav_items = [
-        ("Tutorials", "tutorials.html"),
-        ("How-to", "howto.html"),
-        ("References", "references.html"),
-        ("Release History", "release_history.html")
+        ("Tutorials", "tutorials.html", "Step-by-step guides to get started with Blop fundamentals and basic workflows"),
+        ("How-to", "howto.html", "Practical recipes and solutions for specific beamline optimization tasks"),
+        ("References", "references.html", "Complete API documentation, class references, and technical specifications"),
+        ("Release History", "release-history.html", "Version updates, new features, bug fixes, and changelog for v" + release)
       ] %}
 
-      {% for title, link in nav_items %}
-      <a href="{{ link }}" style="
-          background: var(--pst-color-surface);
-          border: 1px solid var(--pst-color-border);
-          border-radius: 16px;
-          padding: 2rem;
-          text-align: center;
-          text-decoration: none;
-          color: var(--pst-color-text-base);
-          font-weight: 600;
-        ">
-        {{ title }}
-      </a>
+      {% for title, link, description in nav_items %}
+      <div>
+        <a href="{{ link }}" style="
+            background: var(--pst-color-surface);
+            border: 1px solid var(--pst-color-border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--pst-color-text-base);
+            font-weight: 600;
+            display: block;
+          ">
+          {{ title }}
+        </a>
+        <div style="
+            background: var(--pst-color-background);
+            border: 1px solid var(--pst-color-border-muted);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 0.75rem;
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--pst-color-text-muted);
+          ">
+          {{ description }}
+        </div>
+      </div>
       {% endfor %}
     </div>
   </section>
 
   <hr style="border: 0; border-top: 1px solid var(--pst-color-border);">
 
-  <section style="margin: 4rem 0;">
+  <section style="margin: 1rem 0;">
     <h2 style="color: var(--pst-color-text-base);">References</h2>
     <p>If you use this package in your work, please cite the following paper:</p>
 
@@ -88,15 +247,25 @@
     </div>
 
     <p style="font-weight: bold;">BibTeX:</p>
-    <pre style="background: var(--pst-color-inline-code-background); border: 1px solid var(--pst-color-border); color: var(--pst-color-text-base); padding: 1rem; border-radius: 8px; overflow-x: auto;">
-@Article{Morris2024,
-  author   = {Morris, Thomas W. and others},
-  journal  = {Journal of Synchrotron Radiation},
-  title    = {A general Bayesian algorithm for the autonomous alignment of beamlines},
-  year     = {2024},
-  doi      = {10.1107/S1600577524008993},
-  url      = {https://doi.org/10.1107/S1600577524008993},
-}
+    <pre style="
+    background: var(--pst-color-inline-code-background);
+    border: 1px solid var(--pst-color-border); 
+    color: var(--pst-color-text-base); 
+    padding: 1rem; 
+    border-radius: 8px; overflow-x: auto;">
+      @Article{Morris2024,
+          author   = {Morris, Thomas W. and Rakitin, Max and Du, Yonghua and Fedurin, Mikhail and Giles, Abigail C. and Leshchev, Denis and Li, William H. and Romasky, Brianna and Stavitski, Eli and Walter, Andrew L. and Moeller, Paul and Nash, Boaz and Islegen-Wojdyla, Antoine},
+          journal  = {Journal of Synchrotron Radiation},
+          title    = {A general Bayesian algorithm for the autonomous alignment of beamlines},
+          year     = {2024},
+          month    = {Nov},
+          number   = {6},
+          pages    = {1446--1456},
+          volume   = {31},
+          doi      = {10.1107/S1600577524008993},
+          keywords = {Bayesian optimization, automated alignment, synchrotron radiation, digital twins, machine learning},
+          url      = {https://doi.org/10.1107/S1600577524008993},
+        }
     </pre>
   </section>
 </main>
@@ -104,5 +273,5 @@
 
 {% block scripts %}
   {{ super() }}
-  <script src="{{ pathto('_static/javascript.js', 1) }}"></script>
+  <script src="{{ pathto('_static/javascript/javascript.js', 1) }}"></script>
 {% endblock %}
