@@ -49,9 +49,8 @@ from tiled.server import SimpleTiledServer
 from blop.ax import Agent, RangeDOF, Objective
 from blop.protocols import EvaluationFunction
 
-
-# From https://github.com/bluesky/blop/blob/main/examples
-from simulations.xrt_kb_pair.xrt_beamline import TiledBeamline
+# Import simulation beamline (requires: pip install -e sim/)
+from blop_sim.xrt_kb_pair.xrt_beamline import TiledBeamline
 
 # Suppress noisy logs from httpx 
 logging.getLogger("httpx").setLevel(logging.WARNING)

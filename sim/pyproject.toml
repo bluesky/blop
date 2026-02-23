@@ -20,12 +20,8 @@ dependencies = [
     "numpy",
     "scipy",
     "matplotlib",
-]
-
-[project.optional-dependencies]
-xrt = [
     "xrt>=1.6.1,<2",
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["simulations", "benchmarks"]
+packages = ["blop_sim"]

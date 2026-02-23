@@ -1,4 +1,4 @@
-# Blop Examples
+# Blop Simulations
 
 This package contains example simulations and benchmarks for blop. It is **not published to PyPI** and is only meant for local development, testing, and running tutorials.
 
@@ -18,7 +18,7 @@ pip install -e ".[xrt]"
 
 ## Contents
 
-- **simulations/**: Simulated beamlines and detectors for tutorials
+- **blop_sim/**: Simulated beamlines and detectors for tutorials
   - `beamline.py`: Basic synthetic beamline
   - `handlers.py`: HDF5 handlers and utilities
   - `xrt_kb_pair/`: XRT-based KB mirror simulations
@@ -26,9 +26,9 @@ pip install -e ".[xrt]"
 
 ## Usage
 
-Once installed, you can import from the examples package in notebooks and tests:
+Once installed, you can import from the blop_sim package in notebooks and tests:
 
 ```python
-from simulations.beamline import TiledBeamline
-from simulations.xrt_kb_pair.xrt_beamline import TiledBeamline as XRTBeamline
+from blop_sim.beamline import TiledBeamline
+from blop_sim.xrt_kb_pair.xrt_beamline import TiledBeamline as XRTBeamline
 ```
