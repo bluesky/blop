@@ -118,6 +118,27 @@
                  ">
           <input type="hidden" name="check_keywords" value="yes">
           <input type="hidden" name="area" value="default">
+          <style>
+            /* Search input placeholder visibility fix */
+            #search-input::placeholder {
+              color: var(--pst-color-text-muted) !important;
+              opacity: 0.8 !important;
+            }
+            
+            #search-input:focus::placeholder {
+              opacity: 0.6 !important;
+            }
+            
+            /* Dark mode specific placeholder styling */
+            [data-theme="dark"] #search-input::placeholder {
+              color: #9ca3af !important;
+              opacity: 1 !important;
+            }
+            
+            [data-theme="dark"] #search-input:focus::placeholder {
+              opacity: 0.7 !important;
+            }
+          </style>
         </div>
       </div>
       
@@ -147,7 +168,28 @@
   </div>
 </header>
 
-<main class="landing" style="max-width: 1100px; margin: auto; padding: 1.5rem 1.5rem 3rem; padding-top: 6rem; color: var(--pst-color-text-base); background-color: var(--pst-color-background);">
+<div class="warning-banner" id="warningBanner">
+  <div class="warning-content">
+    <div class="warning-main">
+      <span class="warning-text">⚠️ Warning: This is a sample warning.</span>
+      <button class="warning-expand-btn" id="expandBtn" onclick="toggleWarningDetails()">
+        Learn More
+      </button>
+    </div>
+    <div class="warning-details" id="warningDetails">
+      <div class="warning-details-box">
+        <p>
+          This is a sample warning
+        </p>
+        <button class="warning-close-btn" onclick="closeWarningBanner()">
+          Dismiss
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="landing" style="max-width: 1100px; margin: auto; padding: 1.5rem 1.5rem 3rem; padding-top: 9rem; color: var(--pst-color-text-base); background-color: var(--pst-color-background);">
 
   <section style="text-align: center; margin-bottom: 4rem;">
     <h1 style="font-size: 4.0rem; margin-bottom: 0.5rem; color: var(--pst-color-text-base);">Blop</h1>

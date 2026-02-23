@@ -76,6 +76,53 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+function toggleWarningDetails() {
+  const details = document.getElementById('warningDetails');
+  const btn = document.getElementById('expandBtn');
+  const banner = document.getElementById('warningBanner');
+  const mainContent = document.querySelector('.landing');
+  
+  if (details.classList.contains('expanded')) {
+    details.classList.remove('expanded');
+    btn.textContent = 'Learn More';
+    
+    // Reset padding to default when collapsed
+    if (mainContent) {
+      mainContent.style.transition = 'padding-top 0.3s ease';
+      mainContent.style.paddingTop = '9rem';
+    }
+  } else {
+    details.classList.add('expanded');
+    btn.textContent = 'Show Less';
+    
+    // Wait for expansion animation, then adjust padding based on banner height
+    setTimeout(() => {
+      if (banner && mainContent) {
+        const bannerHeight = banner.offsetHeight;
+        const headerHeight = 73;
+        const totalOffset = bannerHeight + headerHeight;
+        mainContent.style.transition = 'padding-top 0.2s ease';
+        mainContent.style.paddingTop = `${totalOffset + 24}px`;
+      }
+    }, 50);
+  }
+}
+
+function closeWarningBanner() {
+  const banner = document.getElementById('warningBanner');
+  const mainContent = document.querySelector('.landing');
+  
+  banner.classList.add('hidden');
+  
+  // Adjust main content padding when banner is closed
+  setTimeout(() => {
+    if (mainContent) {
+      mainContent.style.transition = 'padding-top 0.3s ease';
+      mainContent.style.paddingTop = '6rem';
+    }
+  }, 300);
+}
+
 function copyCode(button) {
   // Find the code text relative to the button
   const container = button.parentElement;
