@@ -11,6 +11,31 @@ Sensor = Readable | EventCollectable | EventPageCollectable
 
 
 @runtime_checkable
+class CanRegisterSuggestions(Protocol):
+    """
+    A protocol for optimizers that can register suggestions. This
+    allows them to add an "_id" key to the suggestions dynamically and ensure
+    that the suggestions are unique.
+    """
+
+    def register_suggestions(self, suggestions: list[dict]) -> list[dict]:
+        """
+        Register the suggestions with the optimizer.
+
+        Parameters
+        ----------
+        suggestions: list[dict]
+            The suggestions to register. The "_id" key is optional and will be overwritten if present.
+
+        Returns
+        -------
+        list[dict]
+            The original suggestions with an "_id" key added.
+        """
+        ...
+
+
+@runtime_checkable
 class Checkpointable(Protocol):
     """
     A protocol for objects that can can write state to persistent storage.

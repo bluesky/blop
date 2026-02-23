@@ -3,10 +3,10 @@ from typing import Any
 
 from ax import ChoiceParameterConfig, Client, RangeParameterConfig
 
-from ..protocols import ID_KEY, Checkpointable, Optimizer
+from ..protocols import ID_KEY, CanRegisterSuggestions, Checkpointable, Optimizer
 
 
-class AxOptimizer(Optimizer, Checkpointable):
+class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
     """
     An optimizer that uses Ax as the backend for optimization and experiment tracking.
 
@@ -157,6 +157,37 @@ class AxOptimizer(Optimizer, Checkpointable):
             elif trial_idx == "baseline":
                 trial_idx = self._client.attach_baseline(parameters=parameters)
             self._client.complete_trial(trial_index=trial_idx, raw_data=outcomes)
+
+    def register_suggestions(self, suggestions: list[dict]) -> list[dict]:
+        """
+        Register manual suggestions with the Ax experiment.
+
+        Attaches trials to the experiment and returns the suggestions with "_id" keys
+        added for tracking. This enables manual point injection alongside optimizer-driven
+        suggestions.
+
+        Parameters
+        ----------
+        suggestions : list[dict]
+            Parameter combinations to register. The "_id" key will be overwritten if present.
+
+        Returns
+        -------
+        list[dict]
+            The same suggestions with "_id" keys added.
+        """
+        registered = []
+        for suggestion in suggestions:
+            # Extract parameters (ignore _id if present)
+            parameters = {k: v for k, v in suggestion.items() if k != ID_KEY}
+
+            # Attach trial to Ax experiment
+            trial_idx = self._client.attach_trial(parameters=parameters)
+
+            # Return with trial ID
+            registered.append({ID_KEY: trial_idx, **parameters})
+
+        return registered
 
     def checkpoint(self) -> None:
         """

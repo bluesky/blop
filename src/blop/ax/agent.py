@@ -15,7 +15,8 @@ else:
 # ===============================
 from bluesky.utils import MsgGenerator
 
-from ..plans import acquire_baseline, optimize
+from ..plans import acquire_baseline, optimize, sample_suggestions
+from ..plans.utils import InferredReadable
 from ..protocols import AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Sensor
 from .dof import DOF, DOFConstraint
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
@@ -98,6 +99,7 @@ class Agent:
             checkpoint_path=checkpoint_path,
             **kwargs,
         )
+        self._readable_cache: dict[str, InferredReadable] = {}
 
     @classmethod
     def from_checkpoint(
@@ -293,7 +295,37 @@ class Agent:
         suggest : Get point suggestions without running acquisition.
         ingest : Manually ingest evaluation results.
         """
-        yield from optimize(self.to_optimization_problem(), iterations=iterations, n_points=n_points)
+        yield from optimize(
+            self.to_optimization_problem(), iterations=iterations, n_points=n_points, readable_cache=self._readable_cache
+        )
+
+    def sample_suggestions(self, suggestions: list[dict]) -> MsgGenerator[tuple[str, list[dict], list[dict]]]:
+        """
+        Evaluate specific parameter combinations.
+
+        Acquires data for given suggestions and ingests results. Supports both
+        optimizer suggestions and manual points.
+
+        Parameters
+        ----------
+        suggestions : list[dict]
+            Either optimizer suggestions (with "_id") or manual points (without "_id").
+
+        Returns
+        -------
+        tuple[str, list[dict], list[dict]]
+            Bluesky run UID, suggestions with "_id", and outcomes.
+
+        See Also
+        --------
+        suggest : Get optimizer suggestions.
+        optimize : Run full optimization loop.
+        """
+        return (
+            yield from sample_suggestions(
+                self.to_optimization_problem(), suggestions=suggestions, readable_cache=self._readable_cache
+            )
+        )
 
     def plot_objective(
         self, x_dof_name: str, y_dof_name: str, objective_name: str, *args: Any, **kwargs: Any

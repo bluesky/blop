@@ -35,7 +35,25 @@ jobs:
           activate-environment: ${{ matrix.python-version }}
 
       - name: Run unit tests
-        run: pixi run unit-tests
+        run: |
+          if [ "${{ matrix.python-version }}" = "py313-cpu" ]; then
+            pixi run -e ${{ matrix.python-version }} pytest --cov=blop --cov-report=xml --cov-report=term src/blop/tests/unit
+          else
+            pixi run unit-tests
+          fi
 
       - name: Run integration tests
-        run: pixi run integration-tests
+        run: |
+          if [ "${{ matrix.python-version }}" = "py313-cpu" ]; then
+            pixi run -e ${{ matrix.python-version }} pytest --cov=blop --cov-append --cov-report=xml --cov-report=term src/blop/tests/integration
+          else
+            pixi run integration-tests
+          fi
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == 'py313-cpu'
+        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238  # v4
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true

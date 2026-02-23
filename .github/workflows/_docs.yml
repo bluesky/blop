@@ -6,12 +6,9 @@ on:
       deploy_key:
         required: false
 
-
 jobs:
   build_docs:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
 
     defaults:
       run:
@@ -28,19 +25,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install documentation-building requirements with apt/dpkg
-        run: |
-          set -vxeuo pipefail
-          wget --progress=dot:giga "https://github.com/jgm/pandoc/releases/download/3.1.6.1/pandoc-3.1.6.1-1-amd64.deb" -O /tmp/pandoc.deb
-          sudo dpkg -i /tmp/pandoc.deb
-          # conda install -c conda-forge -y pandoc
-          which pandoc
-          pandoc --version
-
       - name: Install pixi and activate environment
-        uses: prefix-dev/setup-pixi@v0.8.14
+        uses: prefix-dev/setup-pixi@82d477f15f3a381dbcc8adc1206ce643fe110fb7 # v0.9.3
         with:
-          pixi-version: v0.46.0
+          pixi-version: v0.60.0
           environments: docs
           cache: false
           activate-environment: docs
@@ -51,13 +39,6 @@ jobs:
       - name: Build Docs
         run: pixi run build-docs
 
-      - name: Upload JupyterLite docs artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: jupyterlite-docs
-          path: docs/build/jupyter_execute
-          if-no-files-found: error
-
       - name: Upload HTML docs artifact
         uses: actions/upload-artifact@v4
         with:
@@ -65,7 +46,6 @@ jobs:
           path: docs/build/html/
 
       - name: Deploy documentation to nsls-ii.github.io
-        # if: github.repository_owner == 'NSLS-II' && github.ref_name == 'main'
         if: github.event_name == 'release'
         # We pin to the SHA, not the tag, for security reasons.
         # https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/security-hardening-for-github-actions#using-third-party-actions

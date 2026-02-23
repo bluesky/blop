@@ -8,7 +8,7 @@ from bluesky.protocols import HasHints, HasParent, Hints, Readable, Reading
 from event_model import DataKey
 from numpy.typing import ArrayLike
 
-from ..protocols import ID_KEY
+from ..protocols import ID_KEY, OptimizationProblem
 
 
 def _infer_data_key(value: ArrayLike) -> DataKey:
@@ -133,3 +133,24 @@ def route_suggestions(suggestions: list[dict], starting_position: dict | None = 
     starting_point = np.array([starting_position[dim] for dim in dims_to_route]) if starting_position else None
 
     return [suggestions[i] for i in get_route_index(points=points, starting_point=starting_point)]
+
+
+def collect_optimization_metadata(optimization_problem: OptimizationProblem) -> dict[str, Any]:
+    """
+    Collect the metadata for the optimization problem.
+    """
+    if hasattr(optimization_problem.evaluation_function, "__name__"):
+        evaluation_function_name = optimization_problem.evaluation_function.__name__  # type: ignore[attr-defined]
+    else:
+        evaluation_function_name = optimization_problem.evaluation_function.__class__.__name__
+    if hasattr(optimization_problem.acquisition_plan, "__name__"):
+        acquisition_plan_name = optimization_problem.acquisition_plan.__name__  # type: ignore[attr-defined]
+    else:
+        acquisition_plan_name = optimization_problem.acquisition_plan.__class__.__name__
+    return {
+        "evaluation_function": evaluation_function_name,
+        "acquisition_plan": acquisition_plan_name,
+        "optimizer": optimization_problem.optimizer.__class__.__name__,
+        "sensors": [sensor.name for sensor in optimization_problem.sensors],
+        "actuators": [actuator.name for actuator in optimization_problem.actuators],
+    }
