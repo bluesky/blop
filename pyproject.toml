@@ -114,7 +114,7 @@ convention = "numpy"
 
 [tool.pyright]
 ignore = [
-    "src/blop/sim/",
+    "sim/",
     "src/blop/tests/",
     "src/blop/bayesian/",  # TODO: Remove this and fix type errors
     "src/blop/ax/qserver_agent.py",  # TODO: Remove this and fix type errors

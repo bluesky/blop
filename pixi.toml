@@ -23,7 +23,7 @@ blop-sim = { path = "sim", editable = true }
 
 [feature.dev-cpu.tasks]
 check = "pre-commit run --all-files"
-unit-tests = "pytest src/blop/tests/unit"
+tests = "pytest src/blop/tests"
 
 [feature.docs.dependencies]
 

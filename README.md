@@ -12,8 +12,6 @@
 
 ## Installation
 
-### For Users
-
 ```bash
 pip install blop
 ```
@@ -23,41 +21,6 @@ or with conda:
 ```bash
 conda install -c conda-forge blop
 ```
-
-### For Development
-
-Using Pixi (recommended):
-
-```bash
-git clone https://github.com/bluesky/blop.git
-cd blop
-pixi install -e dev-cpu
-```
-
-Or using pip:
-
-```bash
-git clone https://github.com/bluesky/blop.git
-cd blop
-pip install -e .
-```
-
-### For Running Tutorials
-
-To run the tutorial notebooks and examples, you'll also need to install the simulation package:
-
-Using Pixi:
-```bash
-pixi install -e docs  # Includes blop-sim with XRT support
-```
-
-Or using pip:
-```bash
-pip install -e sim/        # Basic simulations
-```
-
-Note: The `sim/` directory contains example simulations and is **not published to PyPI**. It's only available in the GitHub repository for running tutorials and benchmarks.
-
 
 ## Citation
 
