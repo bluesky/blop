@@ -118,27 +118,6 @@
                  ">
           <input type="hidden" name="check_keywords" value="yes">
           <input type="hidden" name="area" value="default">
-          <style>
-            /* Search input placeholder visibility fix */
-            #search-input::placeholder {
-              color: var(--pst-color-text-muted) !important;
-              opacity: 0.8 !important;
-            }
-            
-            #search-input:focus::placeholder {
-              opacity: 0.6 !important;
-            }
-            
-            /* Dark mode specific placeholder styling */
-            [data-theme="dark"] #search-input::placeholder {
-              color: #9ca3af !important;
-              opacity: 1 !important;
-            }
-            
-            [data-theme="dark"] #search-input:focus::placeholder {
-              opacity: 0.7 !important;
-            }
-          </style>
         </div>
       </div>
       
@@ -168,6 +147,7 @@
   </div>
 </header>
 
+<!-- Warning Banner -->
 <div class="warning-banner" id="warningBanner">
   <div class="warning-content">
     <div class="warning-main">
@@ -222,10 +202,122 @@
 
   <hr style="border: 0; border-top: 1px solid var(--pst-color-border);">
 
+  <section style="margin: 4rem 0; padding: 0 2rem;">
+    <h2 style="text-align: center; color: var(--pst-color-text-base); margin-bottom: 1rem;">Installation</h2>
+    
+    <!-- CPU-only Notice -->
+    <div style="
+      background: var(--pst-color-surface);
+      border: 1px solid var(--pst-color-border);
+      border-left: 4px solid var(--pst-color-primary);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      color: var(--pst-color-text-base);
+      text-align: left;
+    ">
+      <h3 style="margin: 0 0 0.75rem 0; font-size: 1.1rem; font-weight: 600; text-align: center; color: var(--pst-color-primary);">PyTorch Installation Options</h3>
+      <p style="margin: 0 0 0.5rem 0; font-size: 0.95rem; line-height: 1.4;">
+        By default, <code style="background: var(--pst-color-inline-code-background); padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: 600; color: var(--pst-color-text-base);">blop</code> installs PyTorch with GPU support (~7GB). 
+        For environments without GPU support, or to reduce installation size, you can install a CPU-only version (~900MB) using  <code style="background: var(--pst-color-inline-code-background); padding: 0.2rem 0.4rem; border-radius: 4px; font-weight: 600; color: var(--pst-color-text-base);">uv</code>.
+        This is particularly useful for containerized environments with GPU access, CI/CD pipelines, development environments on laptops without NVIDIA GPUs, or edge computing scenarios.
+      </p>
+      <p style="color: var(--pst-color-text-muted); margin: 0; font-size: 0.85rem; font-style: italic;">
+        <strong>Note:</strong> CPU-only installation requires <a href="https://docs.astral.sh/uv/" style="color: var(--pst-color-primary);">uv</a>, a fast Python package installer.
+      </p>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1rem;">
+      <!-- PyPI Installation -->
+      <div style="
+        background: var(--pst-color-surface);
+        border: 1px solid var(--pst-color-border);
+        border-radius: 12px;
+        padding: 0.5rem 1rem 1rem 1rem;
+      ">
+        <h3 style="
+          color: var(--pst-color-text-base);
+          margin: 0 0 0.5rem 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+        ">Via PyPI</h3>
+        
+        <!-- Regular installation -->
+        <p style="color: var(--pst-color-text-muted); margin-bottom: 0.25rem; font-size: 0.85rem;">Standard (GPU support):</p>
+        <div class="installation-box" style="margin-bottom: 0.75rem;">
+          <div style="position: relative; display: flex; align-items: center;">
+            <span style="display: block; width: 100%; padding-right: 4.5rem;">
+              <code style="color: #4CAF50;">$ </code><code style="color: #E0E0E0;">pip install blop</code>
+            </span>
+            <button class="copy-btn" data-copy="pip install blop" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);">Copy</button>
+          </div>
+        </div>
+        
+        <!-- CPU-only installation with uv -->
+        <p style="color: var(--pst-color-text-muted); margin-bottom: 0.25rem; font-size: 0.85rem;">CPU-only (containers, CI/CD, laptops):</p>
+        <div class="installation-box">
+          <div style="position: relative; display: flex; flex-direction: column; gap: 0.25rem;">
+            <span style="display: block; width: 100%; padding-right: 4.5rem;">
+              <code style="color: #4CAF50;">$ </code><code style="color: #E0E0E0;">pip install uv</code><br>
+              <code style="color: #4CAF50;">$ </code><code style="color: #E0E0E0;">uv pip install blop[cpu]</code>
+            </span>
+            <button class="copy-btn" data-copy="pip install uv\nuv pip install blop[cpu]" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);">Copy</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Conda-forge Installation -->
+      <div style="
+        background: var(--pst-color-surface);
+        border: 1px solid var(--pst-color-border);
+        border-radius: 12px;
+        padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+      ">
+        <h3 style="
+          color: var(--pst-color-text-base);
+          margin: 0 0 0.5rem 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+        ">Via Conda-forge</h3>
+        
+        <!-- Regular installation -->
+        <p style="color: var(--pst-color-text-muted); margin-bottom: 0.25rem; font-size: 0.85rem;">Standard:</p>
+        <div style="margin-bottom: 0.75rem;">
+          <div class="installation-box" style="position: relative; display: flex; align-items: center;">
+            <span style="display: block; width: 100%; padding-right: 4.5rem;">
+              <code style="color: #4CAF50;">$ </code><code style="color: #E0E0E0;">conda install -c conda-forge blop</code>
+            </span>
+            <button class="copy-btn" data-copy="conda install -c conda-forge blop" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);">Copy</button>
+          </div>
+        </div>
+
+        <!-- CPU-only conda installation -->
+        <p style="color: var(--pst-color-text-muted); margin-bottom: 0.25rem; font-size: 0.85rem;">CPU-only:</p>
+        <div>
+          <div class="installation-box" style="position: relative; display: flex; align-items: center;">
+            <span style="display: block; width: 100%; padding-right: 4.5rem;">
+              <code style="color: #4CAF50;">$ </code><code style="color: #E0E0E0;">conda install -c conda-forge blop pytorch cpuonly -c pytorch</code>
+            </span>
+            <button class="copy-btn" data-copy="conda install -c conda-forge blop pytorch cpuonly -c pytorch" style="position: absolute; right: 1rem; top: 50%; transform: translateY(-50%);">Copy</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+        
+    </div>
+    </div>
+  </section>
+
+  <hr style="border: 0; border-top: 1px solid var(--pst-color-border);">
+
+  
   <section style="margin: 4rem 0;">
     <h2 style="text-align: center; color: var(--pst-color-text-base); margin-bottom: 2rem;">Learn More!</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-      
+    
+    <div class="learn-more-grid">
       {# We define the list so additional items can be easily added #}
       {% set nav_items = [
         ("Tutorials", "tutorials.html", "Step-by-step guides to get started with Blop fundamentals and basic workflows"),
@@ -311,6 +403,11 @@
     </pre>
   </section>
 </main>
+{% endblock %}
+
+{% block stylesheets %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/index.css', 1) }}" />
 {% endblock %}
 
 {% block scripts %}
