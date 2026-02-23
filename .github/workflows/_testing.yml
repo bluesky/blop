@@ -37,17 +37,9 @@ jobs:
       - name: Run unit tests
         run: |
           if [ "${{ matrix.python-version }}" = "py313-cpu" ]; then
-            pixi run -e ${{ matrix.python-version }} pytest --cov=blop --cov-report=xml --cov-report=term src/blop/tests/unit
+            pixi run -e ${{ matrix.python-version }} pytest --cov=blop --cov-report=xml --cov-report=term src/blop/tests
           else
-            pixi run unit-tests
-          fi
-
-      - name: Run integration tests
-        run: |
-          if [ "${{ matrix.python-version }}" = "py313-cpu" ]; then
-            pixi run -e ${{ matrix.python-version }} pytest --cov=blop --cov-append --cov-report=xml --cov-report=term src/blop/tests/integration
-          else
-            pixi run integration-tests
+            pixi run tests
           fi
 
       - name: Upload coverage to Codecov
