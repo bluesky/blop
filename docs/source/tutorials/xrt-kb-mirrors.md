@@ -47,8 +47,11 @@ from tiled.client import from_uri  # type: ignore[import-untyped]
 from tiled.server import SimpleTiledServer
 
 from blop.ax import Agent, RangeDOF, Objective
-from blop.sim.xrt_beamline import TiledBeamline
 from blop.protocols import EvaluationFunction
+
+
+# From https://github.com/bluesky/blop/blob/main/examples
+from simulations.xrt_kb_pair.xrt_beamline import TiledBeamline
 
 # Suppress noisy logs from httpx 
 logging.getLogger("httpx").setLevel(logging.WARNING)

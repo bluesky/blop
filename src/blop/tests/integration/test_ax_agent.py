@@ -1,7 +1,7 @@
 from blop.ax.agent import Agent
 from blop.ax.dof import RangeDOF
 from blop.ax.objective import Objective
-from blop.sim.beamline import TiledBeamline
+from simulations.beamline import TiledBeamline
 
 
 def test_ax_agent_sim_beamline(RE, setup):
