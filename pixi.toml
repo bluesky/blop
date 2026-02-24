@@ -12,12 +12,14 @@ python = ">=3.10.0,<3.14"
 
 [feature.dev.pypi-dependencies]
 blop = { path = ".", editable = true, extras = ["dev"] }
+fastapi = "<0.132.0"
 
 # CPU-only variant of dev feature
 [feature.dev-cpu.dependencies]
 
 [feature.dev-cpu.pypi-dependencies]
 blop = { path = ".", editable = true, extras = ["dev", "cpu"] }
+fastapi = "<0.132.0"
 
 [feature.dev-cpu.tasks]
 check = "pre-commit run --all-files"
