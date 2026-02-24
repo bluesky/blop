@@ -39,6 +39,7 @@ pydata-sphinx-theme = "*"
 tiled = { version = ">=0.2.0", extras = ["all"] }
 bluesky-tiled-plugins = "*"
 ophyd-async = "*"
+fastapi = "<0.132.0" # TODO: Remove when Tiled is fixed
 
 [feature.py310.dependencies]
 python = "3.10.*"
