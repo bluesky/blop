@@ -75,7 +75,7 @@ To access the data for optimization, you have to connect to a Tiled server insta
 .. testcode::
 
     from bluesky.run_engine import RunEngine
-    from bluesky.callbacks.tiled_writer import TiledWriter
+    from bluesky_tiled_plugins import TiledWriter
     from tiled.client import from_uri
     from tiled.server import SimpleTiledServer
 

@@ -29,13 +29,16 @@ tests = "pytest src/blop/tests"
 
 [feature.docs.pypi-dependencies]
 blop = { path = ".", editable = true, extras = ["cpu"] }
-blop-sim = { path = "sim", editable = true, extras = ["xrt"] }
+blop-sim = { path = "sim", editable = true }
 numpydoc = "*"
 sphinx-copybutton = "*"
 myst-nb = "*"
 furo = "*"
 jupytext = "*"
 pydata-sphinx-theme = "*"
+tiled = { version = ">=0.2.0", extras = ["all"] }
+bluesky-tiled-plugins = "*"
+ophyd-async = "*"
 
 [feature.py310.dependencies]
 python = "3.10.*"

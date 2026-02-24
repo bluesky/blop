@@ -41,7 +41,7 @@ import logging
 import matplotlib.pyplot as plt
 from tiled.client.container import Container
 from bluesky.callbacks import best_effort
-from bluesky.callbacks.tiled_writer import TiledWriter
+from bluesky_tiled_plugins import TiledWriter
 from bluesky.run_engine import RunEngine
 from tiled.client import from_uri  # type: ignore[import-untyped]
 from tiled.server import SimpleTiledServer
