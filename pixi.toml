@@ -28,6 +28,7 @@ unit-tests = "pytest src/blop/tests/unit"
 
 [feature.docs.pypi-dependencies]
 blop = { path = ".", editable = true, extras = ["docs", "cpu"] }
+fastapi = "<0.132.0"
 
 [feature.py310.dependencies]
 python = "3.10.*"
