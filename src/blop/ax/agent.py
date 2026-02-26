@@ -181,9 +181,9 @@ class Agent:
 
         """
         if not fixed_dofs or all(isinstance(key, str) for key in fixed_dofs.keys()):
-            self._optimizer.fixed_parameters = fixed_dofs
-        elif all(isinstance(key, DOF) for key in fixed_dofs.keys()):
-            self._optimizer.fixed_parameters = { dof.parameter_name: value for dof, value in fixed_dofs }
+            self._optimizer.fixed_parameters = fixed_dofs  # type: ignore
+        elif all(isinstance(key, DOF) for key in list(fixed_dofs.keys())):
+            self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}  # type: ignore
         else:
             raise ValueError(f"Keys must all be either {type(DOF)} or {type(str)}")
 
