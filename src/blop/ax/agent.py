@@ -168,7 +168,7 @@ class Agent:
     @property
     def fixed_parameters(self) -> dict[str, Any] | None:
         return self._optimizer.fixed_parameters
-    
+
     @fixed_parameters.setter
     def fixed_parameters(self, fixed_parameters: dict[str, Any] | None) -> None:
         self._optimizer.fixed_parameters = fixed_parameters
