@@ -147,7 +147,8 @@ def test_agent_suggest_fixed_dofs(mock_evaluation_function):
         objectives=[objective],
         evaluation_function=mock_evaluation_function,
     )
-
+    with pytest.raises(ValueError):
+        agent.fixed_dofs = {"test_movable1": 2, dof1: 3}
     agent.fixed_dofs = {dof1: 4}
     parameterizations = agent.suggest(5)
     for i in range(5):

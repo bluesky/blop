@@ -20,8 +20,6 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
         The objective to optimize.
     parameter_constraints : Sequence[str] | None, optional
         The parameter constraints to apply to the optimization.
-    fixed_parameters : dict[str, Any] | None, optional
-        A mapping of parameter names to the values they should be fixed to.
     outcome_constraints : Sequence[str] | None, optional
         The outcome constraints to apply to the optimization.
     checkpoint_path : str | None, optional
@@ -42,7 +40,6 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
         parameters: Sequence[RangeParameterConfig | ChoiceParameterConfig],
         objective: str,
         parameter_constraints: Sequence[str] | None = None,
-        fixed_parameters: dict[str, Any] | None = None,
         outcome_constraints: Sequence[str] | None = None,
         checkpoint_path: str | None = None,
         client_kwargs: dict[str, Any] | None = None,
@@ -60,7 +57,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
             objective=objective,
             outcome_constraints=outcome_constraints,
         )
-        self.fixed_parameters = fixed_parameters
+        self._fixed_parameters = None
 
     @classmethod
     def from_checkpoint(cls, checkpoint_path: str) -> "AxOptimizer":
@@ -100,12 +97,12 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
 
     @fixed_parameters.setter
     def fixed_parameters(self, fixed_parameters: dict[str, Any] | None) -> None:
-        if fixed_parameters is None:
+        if not fixed_parameters:
             self._fixed_parameters = None
             return
         unknown_parameter_names = set(fixed_parameters) - set(self._parameter_names)
         if unknown_parameter_names:
-            raise KeyError(f"Unknown fixed parameter(s): {sorted(unknown_parameter_names)}")
+            raise KeyError(f"Unknown fixed parameter(s): {sorted(unknown_parameter_names)}, expected: {sorted(self._parameter_names)}")
         self._fixed_parameters = dict(fixed_parameters)
 
     def suggest(self, num_points: int | None = None) -> list[dict]:
