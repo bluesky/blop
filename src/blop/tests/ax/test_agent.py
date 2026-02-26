@@ -146,9 +146,9 @@ def test_agent_suggest_fixed_dofs(mock_evaluation_function):
         dofs=[dof1, dof2],
         objectives=[objective],
         evaluation_function=mock_evaluation_function,
-        fixed_dofs={"test_movable2": 4},
     )
 
+    agent.fixed_dofs = {dof1: 4}
     parameterizations = agent.suggest(5)
     for i in range(5):
         assert "test_movable2" in parameterizations[i]
