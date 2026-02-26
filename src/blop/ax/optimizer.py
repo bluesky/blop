@@ -43,6 +43,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
         outcome_constraints: Sequence[str] | None = None,
         checkpoint_path: str | None = None,
         client_kwargs: dict[str, Any] | None = None,
+        fixed_parameters: dict[str, Any] | None = None,
         **kwargs: Any,
     ):
         self._parameter_names = [parameter.name for parameter in parameters]
@@ -57,6 +58,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
             objective=objective,
             outcome_constraints=outcome_constraints,
         )
+        self.fixed_parameters = fixed_parameters
 
     @classmethod
     def from_checkpoint(cls, checkpoint_path: str) -> "AxOptimizer":
@@ -78,6 +80,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
         instance._parameter_names = list(client._experiment.parameters.keys())
         instance._checkpoint_path = checkpoint_path
         instance._client = client
+        instance.fixed_parameters = None
 
         return instance
 
@@ -88,6 +91,20 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
     @property
     def ax_client(self) -> Client:
         return self._client
+
+    @property
+    def fixed_parameters(self) -> dict[str, Any] | None:
+        return self._fixed_parameters
+
+    @fixed_parameters.setter
+    def fixed_parameters(self, fixed_parameters: dict[str, Any] | None) -> None:
+        if fixed_parameters is None:
+            self._fixed_parameters = None
+            return
+        unknown_parameter_names = set(fixed_parameters) - set(self._parameter_names)
+        if unknown_parameter_names:
+            raise KeyError(f"Unknown fixed parameter(s): {sorted(unknown_parameter_names)}")
+        self._fixed_parameters = dict(fixed_parameters)
 
     def suggest(self, num_points: int | None = None) -> list[dict]:
         """
@@ -109,7 +126,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
         """
         if num_points is None:
             num_points = 1
-        next_trials = self._client.get_next_trials(max_trials=num_points)
+        next_trials = self._client.get_next_trials(max_trials=num_points, fixed_parameters=self._fixed_parameters)
         return [
             {
                 "_id": trial_index,

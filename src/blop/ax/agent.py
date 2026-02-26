@@ -165,6 +165,14 @@ class Agent:
     def checkpoint_path(self) -> str | None:
         return self._optimizer.checkpoint_path
 
+    @property
+    def fixed_parameters(self) -> dict[str, Any] | None:
+        return self._optimizer.fixed_parameters
+    
+    @fixed_parameters.setter
+    def fixed_parameters(self, fixed_parameters: dict[str, Any] | None) -> None:
+        self._optimizer.fixed_parameters = fixed_parameters
+
     def to_optimization_problem(self) -> OptimizationProblem:
         """
         Construct an optimization problem from the agent.
