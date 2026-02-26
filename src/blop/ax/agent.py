@@ -49,6 +49,8 @@ class Agent:
         :func:`blop.plans.default_acquire` will be used.
     dof_constraints : Sequence[DOFConstraint] | None, optional
         Constraints on DOFs to refine the search space.
+    fixed_dofs : dict[str, Any] | None, optional
+        A mapping of DOF names to the values they should be fixed to.
     outcome_constraints : Sequence[OutcomeConstraint] | None, optional
         Constraints on outcomes to be satisfied during optimization.
     checkpoint_path : str | None, optional
@@ -81,6 +83,7 @@ class Agent:
         evaluation_function: EvaluationFunction,
         acquisition_plan: AcquisitionPlan | None = None,
         dof_constraints: Sequence[DOFConstraint] | None = None,
+        fixed_dofs: dict[str, Any] | None = None,
         outcome_constraints: Sequence[OutcomeConstraint] | None = None,
         checkpoint_path: str | None = None,
         **kwargs: Any,
@@ -93,6 +96,7 @@ class Agent:
             parameters=[dof.to_ax_parameter_config() for dof in dofs],
             objective=to_ax_objective_str(objectives),
             parameter_constraints=[constraint.ax_constraint for constraint in dof_constraints] if dof_constraints else None,
+            fixed_parameters=fixed_dofs,
             outcome_constraints=[constraint.ax_constraint for constraint in outcome_constraints]
             if outcome_constraints
             else None,
@@ -166,12 +170,12 @@ class Agent:
         return self._optimizer.checkpoint_path
 
     @property
-    def fixed_parameters(self) -> dict[str, Any] | None:
+    def fixed_dofs(self) -> dict[str, Any] | None:
         return self._optimizer.fixed_parameters
 
-    @fixed_parameters.setter
-    def fixed_parameters(self, fixed_parameters: dict[str, Any] | None) -> None:
-        self._optimizer.fixed_parameters = fixed_parameters
+    @fixed_dofs.setter
+    def fixed_dofs(self, fixed_dofs: dict[str, Any] | None) -> None:
+        self._optimizer.fixed_parameters = fixed_dofs
 
     def to_optimization_problem(self) -> OptimizationProblem:
         """

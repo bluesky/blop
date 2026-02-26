@@ -24,6 +24,23 @@ def test_ax_optimizer_init():
         optimizer.ax_client.configure_experiment(parameters)
 
 
+def test_ax_fixed_parameters():
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(-5.0, 5.0), parameter_type="float"),
+            RangeParameterConfig(name="x2", bounds=(-5.0, 5.0), parameter_type="float"),
+            ChoiceParameterConfig(name="x3", values=[0, 1, 2, 3, 4, 5], parameter_type="int", is_ordered=True),
+        ],
+        objective="y1,-y2",
+        parameter_constraints=["x1 + x2 <= 10"],
+        outcome_constraints=["y1 >= 0", "y2 <= 0"],
+    )
+    optimizer.fixed_parameters = {"x3": 3}
+    assert optimizer.fixed_parameters == {"x3": 3}
+    with pytest.raises(KeyError):
+        optimizer.fixed_parameters = {"x4": 3}
+
+
 def test_ax_optimizer_suggest():
     optimizer = AxOptimizer(
         parameters=[

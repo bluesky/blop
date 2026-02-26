@@ -20,6 +20,8 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
         The objective to optimize.
     parameter_constraints : Sequence[str] | None, optional
         The parameter constraints to apply to the optimization.
+    fixed_parameters : dict[str, Any] | None, optional
+        A mapping of parameter names to the values they should be fixed to.
     outcome_constraints : Sequence[str] | None, optional
         The outcome constraints to apply to the optimization.
     checkpoint_path : str | None, optional
@@ -40,10 +42,10 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
         parameters: Sequence[RangeParameterConfig | ChoiceParameterConfig],
         objective: str,
         parameter_constraints: Sequence[str] | None = None,
+        fixed_parameters: dict[str, Any] | None = None,
         outcome_constraints: Sequence[str] | None = None,
         checkpoint_path: str | None = None,
         client_kwargs: dict[str, Any] | None = None,
-        fixed_parameters: dict[str, Any] | None = None,
         **kwargs: Any,
     ):
         self._parameter_names = [parameter.name for parameter in parameters]
@@ -78,9 +80,9 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
         client = Client.load_from_json_file(checkpoint_path)
         instance = object.__new__(cls)
         instance._parameter_names = list(client._experiment.parameters.keys())
+        instance._fixed_parameters = None
         instance._checkpoint_path = checkpoint_path
         instance._client = client
-        instance.fixed_parameters = None
 
         return instance
 

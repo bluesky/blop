@@ -135,6 +135,27 @@ def test_agent_suggest_multiple(mock_evaluation_function):
         assert isinstance(parameterizations[i]["test_movable2"], (int, float))
 
 
+def test_agent_suggest_fixed_dofs(mock_evaluation_function):
+    movable1 = MovableSignal(name="test_movable1")
+    movable2 = MovableSignal(name="test_movable2")
+    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+    agent = Agent(
+        sensors=[],
+        dofs=[dof1, dof2],
+        objectives=[objective],
+        evaluation_function=mock_evaluation_function,
+        fixed_dofs={"test_movable2": 4},
+    )
+
+    parameterizations = agent.suggest(5)
+    for i in range(5):
+        assert "test_movable2" in parameterizations[i]
+        if i != 0:  # first trial will default to CenterOfSearchSpace and override any fixed parameters
+            assert parameterizations[i]["test_movable2"] == 4
+
+
 def test_agent_ingest(mock_evaluation_function):
     movable1 = MovableSignal(name="test_movable1")
     movable2 = MovableSignal(name="test_movable2")
