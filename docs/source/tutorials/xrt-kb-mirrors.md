@@ -52,7 +52,6 @@ from blop.protocols import EvaluationFunction
 # Import simulation devices (requires: pip install -e sim/)
 from blop_sim.backends.xrt import XRTBackend
 from blop_sim.devices import KBMirrorXRT, DetectorDevice, SimplePathProvider
-from blop_sim.handlers import get_beam_stats
 
 # Suppress noisy logs from httpx 
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -92,7 +91,7 @@ HORIZONTAL_BOUNDS = (15000, 35000)  # Optimal ~21000 is in lower portion
 Now we create the simulation backend and individual devices. Each `RangeDOF` wraps an actuator (something we can move) with bounds that constrain the search space:
 
 ```{code-cell} ipython3
-# Create XRT simulation backend (singleton)
+# Create XRT simulation backend
 backend = XRTBackend()
 
 # Create individual KB mirror devices
@@ -117,14 +116,14 @@ The `actuator` is the device that physically changes the parameter. The `bounds`
 
 For our KB mirrors, we have three objectives:
 - **Intensity** (`intensity`): We want *more* signal → `minimize=False`
-- **Spot width X** (`width_x`): We want a *tighter* spot → `minimize=True`
-- **Spot width Y** (`width_y`): We want a *tighter* spot → `minimize=True`
+- **Spot width** (`width`): We want a *tighter* spot → `minimize=True`
+- **Spot height** (`height`): We want a *tighter* spot → `minimize=True`
 
 ```{code-cell} ipython3
 objectives = [
     Objective(name="intensity", minimize=False),
-    Objective(name="width_x", minimize=True),
-    Objective(name="width_y", minimize=True),
+    Objective(name="width", minimize=True),
+    Objective(name="height", minimize=True),
 ]
 ```
 
@@ -139,13 +138,53 @@ The **evaluation function** is the bridge between raw experimental data and the 
 3. Computes statistics (intensity, width, centroid, etc.) from the images
 4. Returns outcome values for each suggestion
 
-This mirrors real experiments where detectors capture images and analysis code computes metrics.
-
 ```{code-cell} ipython3
 class DetectorEvaluation(EvaluationFunction):
     def __init__(self, tiled_client: Container):
         self.tiled_client = tiled_client
-    
+
+    def _compute_stats(self, image: np.array) -> dict[str, float]:
+        """Compute integrated intensity and beam width/height from a beam image."""
+        # Convert to grayscale
+        gray = image.squeeze()
+        if gray.ndim == 3:
+            gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+        
+        # Convert data type for numerical stability
+        gray = gray.astype(np.float32)
+
+        # Smooth w/ (5, 5) kernel and threshold
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        max_val = np.max(blurred)
+        if max_val == 0:
+            return 0.0, 0.0, 0.0
+
+        thresh_value = 0.2 * max_val
+        _, thresh = cv2.threshold(blurred, thresh_value, 255, cv2.THRESH_TOZERO)
+
+        # Total integrated intensity
+        total_intensity = np.sum(thresh)
+
+        # Beam width/height from intensity-weighted second moment (σ)
+        total_weight = np.sum(thresh)
+        if total_weight <= 0:
+            return total_intensity, 0.0, 0.0
+
+        h, w = thresh.shape
+        y_coords = np.arange(h, dtype=np.float32)
+        x_coords = np.arange(w, dtype=np.float32)
+
+        x_bar = np.sum(x_coords * np.sum(thresh, axis=0)) / total_weight
+        y_bar = np.sum(y_coords * np.sum(thresh, axis=1)) / total_weight
+
+        x_var = np.sum((x_coords - x_bar) ** 2 * np.sum(thresh, axis=0)) / total_weight
+        y_var = np.sum((y_coords - y_bar) ** 2 * np.sum(thresh, axis=1)) / total_weight
+
+        width = 2 * np.sqrt(x_var)   # ~2σ width
+        height = 2 * np.sqrt(y_var)   # ~2σ height
+
+        return total_intensity, width, height
+
     def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
         outcomes = []
         run = self.tiled_client[uid]
@@ -162,24 +201,22 @@ class DetectorEvaluation(EvaluationFunction):
         # Compute statistics from each image
         for idx, sid in enumerate(suggestion_ids):
             image = images[idx]
-            stats = get_beam_stats(image)
+            intensity, width, height = self._compute_stats(image)
             
             outcome = {
                 "_id": sid,
-                "intensity": stats["sum"],
-                "width_x": stats["wid_x"],
-                "width_y": stats["wid_y"],
+                "intensity": intensity,
+                "width": width,
+                "height": height,
             }
             outcomes.append(outcome)
         return outcomes
 ```
 
 Note how we:
-1. Read the image data from the detector (not pre-computed statistics)
-2. Use `get_beam_stats()` to compute beam metrics from the raw images
+1. Read the image data from the stored detector data
+2. Use image processing techniques to compute beam metrics from the raw detector images
 3. Link each outcome back to its suggestion via the `_id` field
-
-This is more realistic than having the detector compute statistics—real detectors are cameras, and analysis happens in post-processing.
 
 ## Creating and Running the Agent
 
@@ -301,3 +338,7 @@ These same components apply to any optimization problem: swap the simulated devi
 - Learn about [custom acquisition plans](../how-to-guides/acquire-baseline.rst) for more complex measurement sequences
 - Explore [DOF constraints](../how-to-guides/set-dof-constraints.rst) to encode physical limitations
 - See [outcome constraints](../how-to-guides/set-outcome-constraints.rst) to enforce requirements on your results
+
+## See Also
+
+- [`blop_sim` package](https://github.com/bluesky/blop/tree/main/sim/blop_sim) for XRT simulated beamline control
