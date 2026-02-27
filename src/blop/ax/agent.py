@@ -197,7 +197,9 @@ class Agent:
         elif _has_dof_keys(fixed_dofs):
             self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
         else:
-            raise ValueError(f"Keys must all be either {type(DOF)} or {type(str)}, but got {type(list(fixed_dofs.keys())[0])}")
+            raise ValueError(
+                f"Keys must all be either {type(DOF)} or {type(str)}, but got {type(list(fixed_dofs.keys())[0])}"
+            )
 
     def to_optimization_problem(self) -> OptimizationProblem:
         """
