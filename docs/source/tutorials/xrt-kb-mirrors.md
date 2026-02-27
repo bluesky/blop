@@ -49,8 +49,10 @@ from tiled.server import SimpleTiledServer
 from blop.ax import Agent, RangeDOF, Objective
 from blop.protocols import EvaluationFunction
 
-# Import simulation beamline (requires: pip install -e sim/)
-from blop_sim.xrt_kb_pair.xrt_beamline import TiledBeamline
+# Import simulation devices (requires: pip install -e sim/)
+from blop_sim.backends.xrt import XRTBackend
+from blop_sim.devices import KBMirrorXRT, DetectorDevice, SimplePathProvider
+from blop_sim.handlers import get_beam_stats
 
 # Suppress noisy logs from httpx 
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -87,14 +89,23 @@ VERTICAL_BOUNDS = (25000, 45000)    # Optimal ~38000 is in upper portion
 HORIZONTAL_BOUNDS = (15000, 35000)  # Optimal ~21000 is in lower portion
 ```
 
-Now we create the beamline and define our DOFs. Each `RangeDOF` wraps an actuator (something we can move) with bounds that constrain the search space:
+Now we create the simulation backend and individual devices. Each `RangeDOF` wraps an actuator (something we can move) with bounds that constrain the search space:
 
 ```{code-cell} ipython3
-beamline = TiledBeamline(name="bl")
+# Create XRT simulation backend (singleton)
+backend = XRTBackend()
 
+# Create individual KB mirror devices
+kbv = KBMirrorXRT(backend, mirror_index=0, initial_radius=38000, name="kbv")
+kbh = KBMirrorXRT(backend, mirror_index=1, initial_radius=21000, name="kbh")
+
+# Create detector device
+det = DetectorDevice(backend, SimplePathProvider(DETECTOR_STORAGE), name="det")
+
+# Define DOFs using mirror radius signals
 dofs = [
-    RangeDOF(actuator=beamline.kbv_dsv, bounds=VERTICAL_BOUNDS, parameter_type="float"),
-    RangeDOF(actuator=beamline.kbh_dsh, bounds=HORIZONTAL_BOUNDS, parameter_type="float"),
+    RangeDOF(actuator=kbv.radius, bounds=VERTICAL_BOUNDS, parameter_type="float"),
+    RangeDOF(actuator=kbh.radius, bounds=HORIZONTAL_BOUNDS, parameter_type="float"),
 ]
 ```
 
@@ -105,15 +116,15 @@ The `actuator` is the device that physically changes the parameter. The `bounds`
 **Objectives** specify what you want to optimize. Each objective has a name (matching a value your evaluation function will return) and a direction: `minimize=True` for things you want smaller, `minimize=False` for things you want larger.
 
 For our KB mirrors, we have three objectives:
-- **Intensity** (`bl_det_sum`): We want *more* signal → `minimize=False`
-- **Spot width X** (`bl_det_wid_x`): We want a *tighter* spot → `minimize=True`
-- **Spot width Y** (`bl_det_wid_y`): We want a *tighter* spot → `minimize=True`
+- **Intensity** (`intensity`): We want *more* signal → `minimize=False`
+- **Spot width X** (`width_x`): We want a *tighter* spot → `minimize=True`
+- **Spot width Y** (`width_y`): We want a *tighter* spot → `minimize=True`
 
 ```{code-cell} ipython3
 objectives = [
-    Objective(name="bl_det_sum", minimize=False),
-    Objective(name="bl_det_wid_x", minimize=True),
-    Objective(name="bl_det_wid_y", minimize=True),
+    Objective(name="intensity", minimize=False),
+    Objective(name="width_x", minimize=True),
+    Objective(name="width_y", minimize=True),
 ]
 ```
 
@@ -124,8 +135,11 @@ With multiple objectives that can conflict (maximizing intensity might increase 
 The **evaluation function** is the bridge between raw experimental data and the optimizer. After each measurement, the optimizer needs to know how well that configuration performed. Your evaluation function:
 
 1. Receives a run UID and the suggestions that were tested
-2. Reads the relevant data from Tiled
-3. Returns outcome values for each suggestion
+2. Reads the beam images from Tiled
+3. Computes statistics (intensity, width, centroid, etc.) from the images
+4. Returns outcome values for each suggestion
+
+This mirrors real experiments where detectors capture images and analysis code computes metrics.
 
 ```{code-cell} ipython3
 class DetectorEvaluation(EvaluationFunction):
@@ -135,9 +149,9 @@ class DetectorEvaluation(EvaluationFunction):
     def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
         outcomes = []
         run = self.tiled_client[uid]
-        bl_det_sum = run["primary/bl_det_sum"].read()
-        bl_det_wid_x = run["primary/bl_det_wid_x"].read()
-        bl_det_wid_y = run["primary/bl_det_wid_y"].read()
+        
+        # Read beam images from detector
+        images = run["primary/det_image"].read()
 
         # Suggestions are stored in the start document's metadata when
         # using the `blop.plans.default_acquire` plan.
@@ -145,18 +159,27 @@ class DetectorEvaluation(EvaluationFunction):
         # a custom acquisition plan.
         suggestion_ids = [suggestion["_id"] for suggestion in run.metadata["start"]["blop_suggestions"]]
 
+        # Compute statistics from each image
         for idx, sid in enumerate(suggestion_ids):
+            image = images[idx]
+            stats = get_beam_stats(image)
+            
             outcome = {
                 "_id": sid,
-                "bl_det_sum": bl_det_sum[idx],
-                "bl_det_wid_x": bl_det_wid_x[idx],
-                "bl_det_wid_y": bl_det_wid_y[idx],
+                "intensity": stats["sum"],
+                "width_x": stats["wid_x"],
+                "width_y": stats["wid_y"],
             }
             outcomes.append(outcome)
         return outcomes
 ```
 
-Note the `_id` field—this links each outcome back to the suggestion that produced it. This is essential when multiple configurations are tested in a single run.
+Note how we:
+1. Read the image data from the detector (not pre-computed statistics)
+2. Use `get_beam_stats()` to compute beam metrics from the raw images
+3. Link each outcome back to its suggestion via the `_id` field
+
+This is more realistic than having the detector compute statistics—real detectors are cameras, and analysis happens in post-processing.
 
 ## Creating and Running the Agent
 
@@ -169,7 +192,7 @@ The **Agent** brings everything together. It:
 
 ```{code-cell} ipython3
 agent = Agent(
-    sensors=[beamline.det],
+    sensors=[det],
     dofs=dofs,
     objectives=objectives,
     evaluation_function=DetectorEvaluation(tiled_client),
@@ -179,7 +202,7 @@ agent = Agent(
 )
 ```
 
-The `sensors` list contains any devices that produce data during acquisition. Here, `beamline.det` is our detector.
+The `sensors` list contains any devices that produce data during acquisition. Here, `det` is our detector device.
 
 ## Running the Optimization
 
@@ -228,7 +251,7 @@ agent.ax_client.summarize()
 The `plot_objective` method shows how an objective varies across the DOF space, based on the surrogate model the agent built:
 
 ```{code-cell} ipython3
-_ = agent.plot_objective(x_dof_name="bl_kbh_dsh", y_dof_name="bl_kbv_dsv", objective_name="bl_det_sum")
+_ = agent.plot_objective(x_dof_name="kbh_radius", y_dof_name="kbv_radius", objective_name="intensity")
 ```
 
 This plot reveals the landscape the optimizer explored. Peaks (for maximization) or valleys (for minimization) show where good configurations lie.
@@ -248,14 +271,14 @@ Now move the mirrors to these optimal positions and acquire an image:
 from bluesky.plans import list_scan
 
 uid = RE(list_scan(
-    [beamline.det],
-    beamline.kbv_dsv, [optimal_parameters[beamline.kbv_dsv.name]],
-    beamline.kbh_dsh, [optimal_parameters[beamline.kbh_dsh.name]],
+    [det],
+    kbv.radius, [optimal_parameters[kbv.radius.name]],
+    kbh.radius, [optimal_parameters[kbh.radius.name]],
 ))
 ```
 
 ```{code-cell} ipython3
-image = tiled_client[uid[0]]["primary/bl_det_image"].read().squeeze()
+image = tiled_client[uid[0]]["primary/det_image"].read().squeeze()
 plt.imshow(image)
 plt.colorbar()
 plt.show()
@@ -271,14 +294,10 @@ In this tutorial, you worked through a complete Bayesian optimization workflow:
 4. **The Agent** coordinates everything, building a model of your system and intelligently exploring the parameter space
 5. **Health checks** let you diagnose optimization progress and catch issues early
 
-These same components apply to any optimization problem: swap the simulated beamline for real hardware, adjust the DOFs and objectives for your system, and write an evaluation function that extracts your metrics.
+These same components apply to any optimization problem: swap the simulated devices for real hardware, adjust the DOFs and objectives for your system, and write an evaluation function that extracts your metrics.
 
 ## Next Steps
 
 - Learn about [custom acquisition plans](../how-to-guides/acquire-baseline.rst) for more complex measurement sequences
 - Explore [DOF constraints](../how-to-guides/set-dof-constraints.rst) to encode physical limitations
 - See [outcome constraints](../how-to-guides/set-outcome-constraints.rst) to enforce requirements on your results
-
-For the beamline setup code used in this tutorial, see:
-- [xrt_beamline.py](https://github.com/NSLS-II/blop/blob/main/src/blop/sim/xrt_beamline.py)
-- [xrt_kb_model.py](https://github.com/NSLS-II/blop/blob/main/src/blop/sim/xrt_kb_model.py)
