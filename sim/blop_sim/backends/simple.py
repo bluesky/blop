@@ -9,7 +9,7 @@ from . import SimBackend
 class SimpleBackend(SimBackend):
     """Mathematical Gaussian beam simulation with 4th power falloff."""
     
-    def generate_beam(self, noise: bool = True) -> np.ndarray:
+    async def generate_beam(self, noise: bool = True) -> np.ndarray:
         """Generate beam using mathematical Gaussian model.
         
         The beam is affected by:
@@ -26,8 +26,8 @@ class SimpleBackend(SimBackend):
         nx, ny = self._image_shape
         
         # Get device states
-        kb_states = self._get_kb_states()
-        slit_state = self._get_slit_state()
+        kb_states = await self._get_kb_states()
+        slit_state = await self._get_slit_state()
         
         # Create meshgrid
         x = np.linspace(-10, 10, ny)
@@ -73,14 +73,14 @@ class SimpleBackend(SimBackend):
         
         return image
     
-    def _get_kb_states(self) -> dict:
+    async def _get_kb_states(self) -> dict:
         """Get KB mirror states from registered devices."""
         kbh_state = {"ush": 0.0, "dsh": 0.0}
         kbv_state = {"usv": 0.0, "dsv": 0.0}
         
         for name, device in self._device_states.items():
             if device["type"] == "kb_mirror_simple":
-                state = device["get_state"]()
+                state = await self._get_device_state(name)
                 if state["orientation"] == "horizontal":
                     kbh_state["ush"] = state["upstream"]
                     kbh_state["dsh"] = state["downstream"]
@@ -90,13 +90,13 @@ class SimpleBackend(SimBackend):
         
         return {"kbh": kbh_state, "kbv": kbv_state}
     
-    def _get_slit_state(self) -> dict:
+    async def _get_slit_state(self) -> dict:
         """Get slit state from registered devices."""
         slit_state = {"inboard": -5.0, "outboard": 5.0, "lower": -5.0, "upper": 5.0}
         
         for name, device in self._device_states.items():
             if device["type"] == "slit":
-                slit_state = device["get_state"]()
+                slit_state = await self._get_device_state(name)
                 break
         
         return slit_state

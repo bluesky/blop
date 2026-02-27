@@ -36,13 +36,13 @@ class SlitDevice(StandardReadable):
             get_state_callback=self._get_state,
         )
     
-    def _get_state(self) -> dict:
-        """Get current slit state for backend."""
+    async def _get_state(self) -> dict:
+        """Get current slit state for backend (async)."""
         return {
-            "inboard": self.inboard._backend_value,
-            "outboard": self.outboard._backend_value,
-            "lower": self.lower._backend_value,
-            "upper": self.upper._backend_value,
+            "inboard": await self.inboard.get_value(),
+            "outboard": await self.outboard.get_value(),
+            "lower": await self.lower.get_value(),
+            "upper": await self.upper.get_value(),
         }
 
 

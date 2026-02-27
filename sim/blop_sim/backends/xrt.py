@@ -2,38 +2,30 @@
 
 import numpy as np
 
-from ..xrt_kb_pair.xrt_kb_model import build_beamline, build_histRGB, run_process
 from . import SimBackend
+from ..xrt_kb_pair.xrt_kb_model import build_histRGB, build_beamline, run_process
 
 
 class XRTBackend(SimBackend):
-    """XRT ray-tracing beam simulation."""
+    """XRT ray-tracing simulation backend.
+    
+    Uses the XRT package to perform realistic ray-tracing through a KB mirror pair.
+    Much slower than SimpleBackend but more physically accurate.
+    """
     
     def __init__(self):
-        """Initialize XRT backend with beamline."""
+        """Initialize XRT backend."""
         super().__init__()
-        
-        if not self._initialized:
-            return
-        
-        # Build XRT beamline (lazy initialization)
         self._beamline = None
         self._limits = [[-0.6, 0.6], [-0.45, 0.45]]
-        # Override image shape for XRT (matches histogram dimensions)
-        self._image_shape = (300, 400)
     
     def _ensure_beamline(self):
-        """Lazy initialization of XRT beamline."""
+        """Build XRT beamline if not already built."""
         if self._beamline is None:
             self._beamline = build_beamline()
     
-    def generate_beam(self, noise: bool = True) -> np.ndarray:
-        """Generate beam using XRT ray tracing.
-        
-        The beam is affected by:
-        - KB mirror curvature radii (R parameters)
-        - XRT optical system (toroidal mirrors, screen)
-        - Optional noise
+    async def generate_beam(self, noise: bool = False) -> np.ndarray:
+        """Generate beam using XRT ray-tracing.
         
         Args:
             noise: Whether to add noise to the image
@@ -44,7 +36,7 @@ class XRTBackend(SimBackend):
         self._ensure_beamline()
         
         # Get KB mirror radii from devices
-        mirror_radii = self._get_mirror_radii()
+        mirror_radii = await self._get_mirror_radii()
         
         # Update XRT beamline mirror parameters
         self._beamline.toroidMirror01.R = mirror_radii[0]  # Vertical mirror
@@ -64,7 +56,7 @@ class XRTBackend(SimBackend):
         
         return image
     
-    def _get_mirror_radii(self) -> list[float]:
+    async def _get_mirror_radii(self) -> list[float]:
         """Get KB mirror radii from registered devices.
         
         Returns:
@@ -75,7 +67,7 @@ class XRTBackend(SimBackend):
         
         for name, device in self._device_states.items():
             if device["type"] == "kb_mirror_xrt":
-                state = device["get_state"]()
+                state = await self._get_device_state(name)
                 mirror_index = state["mirror_index"]
                 radius = state["radius"]
                 if mirror_index < len(radii):

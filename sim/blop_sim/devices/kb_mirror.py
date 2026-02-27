@@ -23,7 +23,7 @@ class KBMirrorSimple(StandardReadable):
         self._orientation = orientation
         
         # Jack position signals (CONFIG since they're not measurement outputs)
-        with self.add_children_as_readables(Format.CONFIG_SIGNAL):
+        with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.upstream = soft_signal_rw(float, 0.0)
             self.downstream = soft_signal_rw(float, 0.0)
         
@@ -36,12 +36,12 @@ class KBMirrorSimple(StandardReadable):
             get_state_callback=self._get_state,
         )
     
-    def _get_state(self) -> dict:
-        """Get current mirror state for backend."""
+    async def _get_state(self) -> dict:
+        """Get current mirror state for backend (async)."""
         return {
             "orientation": self._orientation,
-            "upstream": self.upstream._backend_value,  # Direct access to avoid async
-            "downstream": self.downstream._backend_value,
+            "upstream": await self.upstream.get_value(),
+            "downstream": await self.downstream.get_value(),
         }
 
 
@@ -69,7 +69,7 @@ class KBMirrorXRT(StandardReadable):
         self._mirror_index = mirror_index
         
         # Curvature radius signal
-        with self.add_children_as_readables(Format.CONFIG_SIGNAL):
+        with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.radius = soft_signal_rw(float, initial_radius)
         
         super().__init__(name=name)
@@ -81,11 +81,11 @@ class KBMirrorXRT(StandardReadable):
             get_state_callback=self._get_state,
         )
     
-    def _get_state(self) -> dict:
-        """Get current mirror state for backend."""
+    async def _get_state(self) -> dict:
+        """Get current mirror state for backend (async)."""
         return {
             "mirror_index": self._mirror_index,
-            "radius": self.radius._backend_value,
+            "radius": await self.radius.get_value(),
         }
 
 

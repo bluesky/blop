@@ -1,7 +1,7 @@
 """Backend simulation infrastructure for blop_sim."""
 
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Any, Callable, Awaitable
 
 import numpy as np
 
@@ -10,6 +10,7 @@ class SimBackend(ABC):
     """Base class for simulation backends.
     
     Uses singleton pattern - only one instance per backend type exists.
+    All device callbacks are expected to be async.
     """
     
     _instances: dict[type, "SimBackend"] = {}
@@ -31,21 +32,47 @@ class SimBackend(ABC):
         self._image_shape = (300, 400)
         self._initialized = True
     
-    def register_device(self, device_name: str, device_type: str, get_state_callback: Any):
+    def register_device(
+        self, 
+        device_name: str, 
+        device_type: str, 
+        get_state_callback: Callable[[], Awaitable[dict]]
+    ):
         """Register a device with the backend.
         
         Args:
             device_name: Unique name for the device
             device_type: Type of device ("kb_mirror_simple", "kb_mirror_xrt", "slit", "detector")
-            get_state_callback: Callable that returns current device state as dict
+            get_state_callback: Async callable that returns current device state as dict
+            
+        Example::
+        
+            async def _get_state(self) -> dict:
+                return {
+                    "radius": await self.radius.get_value(),
+                    "position": await self.position.get_value(),
+                }
         """
         self._device_states[device_name] = {
             "type": device_type,
             "get_state": get_state_callback,
         }
     
+    async def _get_device_state(self, device_name: str) -> dict:
+        """Get device state asynchronously.
+        
+        Args:
+            device_name: Name of the device
+            
+        Returns:
+            Device state dictionary
+        """
+        device = self._device_states[device_name]
+        callback = device["get_state"]
+        return await callback()
+    
     @abstractmethod
-    def generate_beam(self, noise: bool = True) -> np.ndarray:
+    async def generate_beam(self, noise: bool = True) -> np.ndarray:
         """Generate beam image based on current device states.
         
         Args:
@@ -61,4 +88,7 @@ class SimBackend(ABC):
         return self._image_shape
 
 
-__all__ = ["SimBackend"]
+from .simple import SimpleBackend
+from .xrt import XRTBackend
+
+__all__ = ["SimBackend", "SimpleBackend", "XRTBackend"]

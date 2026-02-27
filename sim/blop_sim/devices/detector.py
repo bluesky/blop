@@ -38,7 +38,6 @@ class SimDetectorController(DetectorController):
     
     def __init__(self, backend: SimBackend):
         self._backend = backend
-        self._arm_status: asyncio.Event | None = None
     
     def get_deadtime(self, exposure: float | None) -> float:
         """Detector has no deadtime (instant acquisition)."""
@@ -51,16 +50,17 @@ class SimDetectorController(DetectorController):
     
     async def arm(self) -> None:
         """Prepare for acquisition."""
-        self._arm_status = asyncio.Event()
+        # Software triggered, no arming needed
+        pass
     
     async def wait_for_idle(self):
         """Wait for acquisition to complete."""
-        if self._arm_status:
-            await self._arm_status.wait()
+        # Software triggered, always idle
+        pass
     
     async def disarm(self):
         """Clean up after acquisition."""
-        self._arm_status = None
+        pass
 
 
 class SimDetectorWriter(DetectorWriter):
@@ -86,12 +86,21 @@ class SimDetectorWriter(DetectorWriter):
         self._stream_datum_factory: Any | None = None
         self._last_index = 0
     
-    async def open(self, multiplier: int = 1) -> dict[str, DataKey]:
-        """Open HDF5 file and setup stream resources."""
+    async def open(self, detector_name: str | None = None, multiplier: int = 1) -> dict[str, DataKey]:
+        """Open HDF5 file and setup stream resources.
+        
+        Args:
+            detector_name: Name of detector (optional, uses name_provider if not given)
+            multiplier: Number of exposures per event
+        """
         # Generate file path
         date = datetime.now()
         assets_dir = date.strftime("%Y/%m/%d")
-        filename = f"{self._name_provider()}.h5"
+        name = detector_name or self._name_provider()
+        
+        # Create unique filename with timestamp to avoid conflicts
+        timestamp = date.strftime("%Y%m%d_%H%M%S_%f")
+        filename = f"{name}_{timestamp}.h5"
         
         # Create directory structure
         directory_path = self.path_provider.directory_path
@@ -147,26 +156,25 @@ class SimDetectorWriter(DetectorWriter):
         self, timeout: float = float("inf")
     ) -> AsyncGenerator[int, None]:
         """Observe indices as they're written - yield after each frame is generated."""
-        # Wait for controller to be armed and then generate one frame
-        while self._controller._arm_status is None:
-            await asyncio.sleep(0.01)
-        
-        # Generate one image (software-triggered, one per trigger call)
+        # Generate one image immediately (software-triggered, instant acquisition)
         await self._write_single_frame()
-        yield self._last_index
         
-        # Signal that we're done
-        if self._controller._arm_status:
-            self._controller._arm_status.set()
+        # Yield the index to signal completion
+        yield self._last_index
     
     async def get_indices_written(self) -> int:
         """Get number of indices written so far."""
         return self._last_index
     
     async def collect_stream_docs(
-        self, indices_written: int
+        self, detector_name: str, indices_written: int
     ) -> AsyncGenerator[tuple[str, dict[str, Any]], None]:
-        """Collect stream datum documents."""
+        """Collect stream datum documents.
+        
+        Args:
+            detector_name: Name of the detector device
+            indices_written: Number of indices written
+        """
         # Yield all cached asset docs
         for doc in list(self._asset_docs_cache):
             yield doc
@@ -186,8 +194,8 @@ class SimDetectorWriter(DetectorWriter):
         # Get noise setting (simple attribute access)
         noise = self._noise_signal.noise
         
-        # Generate beam image from backend
-        image = self._backend.generate_beam(noise=noise)
+        # Generate beam image from backend (async)
+        image = await self._backend.generate_beam(noise=noise)
         
         # Store image
         current_frame = next(self._counter)
@@ -253,7 +261,7 @@ class DetectorDevice(StandardDetector):
             get_state_callback=self._get_state,
         )
     
-    def _get_state(self) -> dict:
+    async def _get_state(self) -> dict:
         """Get current detector state for backend."""
         return {
             "noise": self.noise,
