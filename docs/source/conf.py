@@ -172,12 +172,13 @@ html_js_files = [
 
 # Add custom CSS to fix .content height constraint for plotly plots
 html_css_files = [
-    "fix-content-height.css",
+    "css/fix-content-height.css",
     "css/styles.css",
 ]
 
 html_additional_pages = {
     "index": "index.html",
+    "documentation": "documentation.html",
 }
 
 
