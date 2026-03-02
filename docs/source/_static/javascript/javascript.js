@@ -123,28 +123,56 @@ function closeWarningBanner() {
   }, 300);
 }
 
-function copyCode(button) {
-  // Find the code text relative to the button
-  const container = button.parentElement;
-  const codeText = container.querySelector('code').innerText;
+// Code copying functions
+function copyCode(text, btn) {
+    // Attempt modern Clipboard API
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text)
+            .then(() => animateButton(btn))
+            .catch(() => fallbackCopy(text, btn));
+    } else {
+        fallbackCopy(text, btn);
+    }
+}
+function fallbackCopy(text, btn) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    
+    // Ensure the textarea is off-screen
+    textArea.style.position = "fixed";
+    textArea.style.left = "-9999px";
+    textArea.style.top = "0";
+    document.body.appendChild(textArea);
+    
+    textArea.focus();
+    textArea.select();
 
-  // Use the Clipboard API
-  navigator.clipboard.writeText(codeText).then(() => {
-    // Visual feedback
-    const originalText = button.innerText;
-    button.innerText = 'Copied!';
-    button.classList.add('copied');
+    try {
+        const successful = document.execCommand('copy');
+    } catch (err) {
+        console.error('Fallback: Unable to copy', err);
+    }
 
-    // Reset button after 2 seconds
-    setTimeout(() => {
-      button.innerText = originalText;
-      button.classList.remove('copied');
-    }, 2000);
-  }).catch(err => {
-    console.error('Failed to copy: ', err);
-  });
+    document.body.removeChild(textArea);
 }
 
-document.querySelectorAll('.copy-btn').forEach(button => {
-  button.addEventListener('click', () => copyCode(button));
+function animateButton(btn) {
+    const originalText = btn.innerHTML;
+    
+    // Change to Checkmark
+    btn.innerHTML = "&#10003;"; // Unicode Checkmark
+    btn.classList.add('success');
+    
+    // Reset after 2 seconds
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.remove('success');
+    }, 2000);
+}
+
+// Add click event listeners to all copy buttons
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.copy-btn').forEach(button => {
+    button.addEventListener('click', () => copyCode(button));
+  });
 });
