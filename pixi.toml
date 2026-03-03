@@ -1,5 +1,8 @@
 [workspace]
-authors = ["jessica-moylan <jessicamoylan10@gmail.com>", "Thomas Hopkins <thopkins1@bnl.gov>"]
+authors = [
+  "jessica-moylan <jessicamoylan10@gmail.com>",
+  "Thomas Hopkins <thopkins1@bnl.gov>",
+]
 channels = ["conda-forge"]
 name = "blop"
 platforms = ["linux-64", "osx-arm64"]
@@ -39,6 +42,7 @@ pydata-sphinx-theme = "*"
 tiled = { version = ">=0.2.0", extras = ["all"] }
 bluesky-tiled-plugins = "*"
 ophyd-async = "*"
+opencv-python = "*"
 
 [feature.py310.dependencies]
 python = "3.10.*"

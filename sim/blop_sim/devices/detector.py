@@ -74,8 +74,9 @@ class SimDetectorWriter(DetectorWriter):
             exposures_per_event: Number of exposures per event
         """
         # Create directory structure
-        full_path = self.path_provider()
-        full_path.parent.mkdir(parents=True, exist_ok=True)
+        path_info = self.path_provider()
+        full_path = path_info.directory_path / path_info.filename
+        Path(path_info.directory_path).mkdir(parents=True, exist_ok=True)
 
         # Get image shape from backend
         image_shape = self._backend.get_image_shape()
@@ -93,6 +94,7 @@ class SimDetectorWriter(DetectorWriter):
         )
 
         self._counter = itertools.count()
+        data_key = f"{name}_image"
 
         # Create stream resource
         uri = f"file://localhost/{str(full_path).strip('/')}"
@@ -102,7 +104,7 @@ class SimDetectorWriter(DetectorWriter):
         ) = compose_stream_resource(
             mimetype="application/x-hdf5",
             uri=uri,
-            data_key="image",
+            data_key=data_key,
             parameters={
                 "chunk_shape": (1, *image_shape),
                 "dataset": "/entry/image",
@@ -113,7 +115,7 @@ class SimDetectorWriter(DetectorWriter):
 
         # Return describe dictionary
         return {
-            "image": {
+            data_key: {
                 "source": "sim",
                 "shape": [1, *image_shape],
                 "dtype": "array",

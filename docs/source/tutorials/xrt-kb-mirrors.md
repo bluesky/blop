@@ -37,7 +37,10 @@ Before we can optimize, we need to set up the data infrastructure. Blop uses [Bl
 
 ```{code-cell} ipython3
 import logging
+from pathlib import PurePath
 
+import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 from tiled.client.container import Container
 from bluesky.callbacks import best_effort
@@ -45,6 +48,7 @@ from bluesky_tiled_plugins import TiledWriter
 from bluesky.run_engine import RunEngine
 from tiled.client import from_uri  # type: ignore[import-untyped]
 from tiled.server import SimpleTiledServer
+from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
 
 from blop.ax import Agent, RangeDOF, Objective
 from blop.protocols import EvaluationFunction
@@ -52,7 +56,7 @@ from blop.protocols import EvaluationFunction
 # Import simulation devices (requires: pip install -e sim/)
 from blop_sim.backends.xrt import XRTBackend
 from blop_sim.devices.xrt import KBMirror
-from blop_sim.devices import DetectorDevice, SimplePathProvider
+from blop_sim.devices import DetectorDevice
 
 # Suppress noisy logs from httpx 
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -100,7 +104,7 @@ kbv = KBMirror(backend, mirror_index=0, initial_radius=38000, name="kbv")
 kbh = KBMirror(backend, mirror_index=1, initial_radius=21000, name="kbh")
 
 # Create detector device
-det = DetectorDevice(backend, SimplePathProvider(DETECTOR_STORAGE), name="det")
+det = DetectorDevice(backend, StaticPathProvider(UUIDFilenameProvider(), PurePath(DETECTOR_STORAGE)), name="det")
 
 # Define DOFs using mirror radius signals
 dofs = [
