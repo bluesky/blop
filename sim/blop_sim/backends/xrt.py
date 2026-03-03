@@ -3,7 +3,7 @@
 import numpy as np
 
 from . import SimBackend
-from ..xrt_kb_pair.xrt_kb_model import build_histRGB, build_beamline, run_process
+from .models.xrt_kb_model import build_histRGB, build_beamline, run_process
 
 
 class XRTBackend(SimBackend):

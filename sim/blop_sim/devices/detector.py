@@ -19,22 +19,6 @@ from ophyd_async.core import (
 from ..backends import SimBackend
 
 
-class SimplePathProvider(PathProvider):
-    """Simple path provider for detector files.
-
-    Args:
-        directory_path: Base directory for detector files
-    """
-
-    def __init__(self, directory_path: Path | str):
-        self.directory_path = Path(directory_path)
-        self._counter = itertools.count()
-
-    def __call__(self, device_name: str | None = None) -> Path:
-        """Generate path for next detector file."""
-        return self.directory_path / f"det_{next(self._counter):06d}.h5"
-
-
 class SimDetectorController(DetectorController):
     """Controller for simulated detector - generates images only."""
 
@@ -233,4 +217,4 @@ class DetectorDevice(StandardDetector):
         return {}
 
 
-__all__ = ["DetectorDevice", "SimplePathProvider"]
+__all__ = ["DetectorDevice"]
