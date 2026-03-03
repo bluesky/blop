@@ -51,7 +51,8 @@ from blop.protocols import EvaluationFunction
 
 # Import simulation devices (requires: pip install -e sim/)
 from blop_sim.backends.xrt import XRTBackend
-from blop_sim.devices import KBMirrorXRT, DetectorDevice, SimplePathProvider
+from blop_sim.devices.xrt import KBMirror
+from blop_sim.devices import DetectorDevice, SimplePathProvider
 
 # Suppress noisy logs from httpx 
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -95,8 +96,8 @@ Now we create the simulation backend and individual devices. Each `RangeDOF` wra
 backend = XRTBackend()
 
 # Create individual KB mirror devices
-kbv = KBMirrorXRT(backend, mirror_index=0, initial_radius=38000, name="kbv")
-kbh = KBMirrorXRT(backend, mirror_index=1, initial_radius=21000, name="kbh")
+kbv = KBMirror(backend, mirror_index=0, initial_radius=38000, name="kbv")
+kbh = KBMirror(backend, mirror_index=1, initial_radius=21000, name="kbh")
 
 # Create detector device
 det = DetectorDevice(backend, SimplePathProvider(DETECTOR_STORAGE), name="det")

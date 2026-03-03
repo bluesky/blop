@@ -11,23 +11,25 @@ Bayesian optimization with BLOP. It includes:
 Example usage with XRT backend:
 
     from blop_sim.backends.xrt import XRTBackend
-    from blop_sim.devices import KBMirrorXRT, DetectorDevice
+    from blop_sim.devices.xrt import KBMirror
+    from blop_sim.devices import DetectorDevice
     from ophyd_async.core import DirectoryProvider
     
     backend = XRTBackend()
-    kbv = KBMirrorXRT(backend, mirror_index=0, initial_radius=38000, name="kbv")
-    kbh = KBMirrorXRT(backend, mirror_index=1, initial_radius=21000, name="kbh")
+    kbv = KBMirror(backend, mirror_index=0, initial_radius=38000, name="kbv")
+    kbh = KBMirror(backend, mirror_index=1, initial_radius=21000, name="kbh")
     det = DetectorDevice(backend, DirectoryProvider("/tmp/blop/sim"), name="det")
 
 Example usage with Simple backend:
 
     from blop_sim.backends.simple import SimpleBackend
-    from blop_sim.devices import KBMirrorSimple, SlitDevice, DetectorDevice
+    from blop_sim.devices.simple import KBMirror
+    from blop_sim.devices import SlitDevice, DetectorDevice
     from ophyd_async.core import DirectoryProvider
     
     backend = SimpleBackend()
-    kbh = KBMirrorSimple(backend, orientation="horizontal", name="kbh")
-    kbv = KBMirrorSimple(backend, orientation="vertical", name="kbv")
+    kbh = KBMirror(backend, orientation="horizontal", name="kbh")
+    kbv = KBMirror(backend, orientation="vertical", name="kbv")
     slit = SlitDevice(backend, name="ssa")
     det = DetectorDevice(backend, DirectoryProvider("/tmp/blop/sim"), name="det")
 """

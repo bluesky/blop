@@ -19,8 +19,10 @@ The package uses a component-based architecture with individual devices:
   - `XRTBackend`: Full ray-tracing simulation using XRT
   
 - **Devices**: Individual ophyd-async devices
-  - `KBMirrorSimple`: KB mirror with jack positions (for SimpleBackend)
-  - `KBMirrorXRT`: KB mirror with curvature radius (for XRTBackend)
-  - `SlitDevice`: Four-blade aperture slit
-  - `DetectorDevice`: Generates beam images (from the backend API)
+  - Backend-agnostic:
+    - `DetectorDevice`: Generates beam images (from the backend API)
+    - `SlitDevice`: Four-blade aperture slit
+  - Backend-specific (available in submodules):
+    - `blop_sim.devices.simple.KBMirror`: KB mirror with jack positions (for SimpleBackend)
+    - `blop_sim.devices.xrt.KBMirror`: KB mirror with curvature radius (for XRTBackend)
 
