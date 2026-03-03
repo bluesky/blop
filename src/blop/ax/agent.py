@@ -16,8 +16,8 @@ else:
 from bluesky.utils import MsgGenerator
 
 from ..plans import acquire_baseline, optimize, sample_suggestions
-from ..plans.utils import InferredReadable
 from ..protocols import AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Sensor
+from ..utils import InferredReadable
 from .dof import DOF, DOFConstraint
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer
