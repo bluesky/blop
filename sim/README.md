@@ -25,4 +25,3 @@ The package uses a component-based architecture with individual devices:
   - Backend-specific (available in submodules):
     - `blop_sim.devices.simple.KBMirror`: KB mirror with jack positions (for SimpleBackend)
     - `blop_sim.devices.xrt.KBMirror`: KB mirror with curvature radius (for XRTBackend)
-

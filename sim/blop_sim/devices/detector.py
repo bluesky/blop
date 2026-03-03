@@ -8,7 +8,13 @@ from typing import Any
 
 import h5py  # type: ignore[import-untyped]
 import numpy as np
-from event_model import DataKey, StreamDatum, StreamRange, StreamResource, compose_stream_resource  # type: ignore[import-untyped]
+from event_model import (  # type: ignore[import-untyped]
+    DataKey,
+    StreamDatum,
+    StreamRange,
+    StreamResource,
+    compose_stream_resource,
+)
 from ophyd_async.core import (
     DetectorController,
     DetectorWriter,
