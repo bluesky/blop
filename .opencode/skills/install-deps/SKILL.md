@@ -11,6 +11,7 @@ Install project dependencies.
 ## Commands
 
 **Using pixi:**
+
 ```bash
 pixi install
 ```

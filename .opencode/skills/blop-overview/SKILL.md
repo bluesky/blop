@@ -18,11 +18,11 @@ Blop (Beamline Optimization Package) is a Python library for Bayesian optimizati
 ## Basic Workflow
 
 1. **Define DOFs** - Specify degrees of freedom (parameters to optimize) using `RangeDOF` or `ChoiceDOF`
-2. **Define Objectives** - Specify what to maximize or minimize with `Objective` or `ScalarizedObjective`
-3. **Add Constraints** (optional) - Set boundaries with `DOFConstraint` or `OutcomeConstraint`
-4. **Create Agent** - Instantiate the optimization agent with DOFs, objectives, and an evaluation function
-5. **Run Optimization** - Execute iterations using Bluesky's RunEngine to collect data and update models
-6. **Analyze Results** - Review health metrics, convergence, and Pareto frontiers for multi-objective problems
+1. **Define Objectives** - Specify what to maximize or minimize with `Objective` or `ScalarizedObjective`
+1. **Add Constraints** (optional) - Set boundaries with `DOFConstraint` or `OutcomeConstraint`
+1. **Create Agent** - Instantiate the optimization agent with DOFs, objectives, and an evaluation function
+1. **Run Optimization** - Execute iterations using Bluesky's RunEngine to collect data and update models
+1. **Analyze Results** - Review health metrics, convergence, and Pareto frontiers for multi-objective problems
 
 ## Common Use-Cases
 

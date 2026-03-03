@@ -120,6 +120,7 @@ The `actuator` is the device that physically changes the parameter. The `bounds`
 **Objectives** specify what you want to optimize. Each objective has a name (matching a value your evaluation function will return) and a direction: `minimize=True` for things you want smaller, `minimize=False` for things you want larger.
 
 For our KB mirrors, we have three objectives:
+
 - **Intensity** (`intensity`): We want *more* signal → `minimize=False`
 - **Spot width** (`width`): We want a *tighter* spot → `minimize=True`
 - **Spot height** (`height`): We want a *tighter* spot → `minimize=True`
@@ -139,9 +140,9 @@ With multiple objectives that can conflict (maximizing intensity might increase 
 The **evaluation function** is the bridge between raw experimental data and the optimizer. After each measurement, the optimizer needs to know how well that configuration performed. Your evaluation function:
 
 1. Receives a run UID and the suggestions that were tested
-2. Reads the beam images from Tiled
-3. Computes statistics (intensity, width, centroid, etc.) from the images
-4. Returns outcome values for each suggestion
+1. Reads the beam images from Tiled
+1. Computes statistics (intensity, width, centroid, etc.) from the images
+1. Returns outcome values for each suggestion
 
 ```{code-cell} ipython3
 class DetectorEvaluation(EvaluationFunction):
@@ -219,13 +220,15 @@ class DetectorEvaluation(EvaluationFunction):
 ```
 
 Note how we:
+
 1. Read the image data from the stored detector data
-2. Use image processing techniques to compute beam metrics from the raw detector images
-3. Link each outcome back to its suggestion via the `_id` field
+1. Use image processing techniques to compute beam metrics from the raw detector images
+1. Link each outcome back to its suggestion via the `_id` field
 
 ## Creating and Running the Agent
 
 The **Agent** brings everything together. It:
+
 - Uses DOFs to know what parameters to adjust
 - Uses objectives to know what to optimize
 - Calls the evaluation function to assess each configuration
@@ -331,10 +334,10 @@ plt.show()
 In this tutorial, you worked through a complete Bayesian optimization workflow:
 
 1. **DOFs** define the search space—the parameters you can control and their allowed ranges
-2. **Objectives** specify your goals and whether to minimize or maximize each one
-3. **Evaluation functions** extract meaningful metrics from experimental data
-4. **The Agent** coordinates everything, building a model of your system and intelligently exploring the parameter space
-5. **Health checks** let you diagnose optimization progress and catch issues early
+1. **Objectives** specify your goals and whether to minimize or maximize each one
+1. **Evaluation functions** extract meaningful metrics from experimental data
+1. **The Agent** coordinates everything, building a model of your system and intelligently exploring the parameter space
+1. **Health checks** let you diagnose optimization progress and catch issues early
 
 These same components apply to any optimization problem: swap the simulated devices for real hardware, adjust the DOFs and objectives for your system, and write an evaluation function that extracts your metrics.
 

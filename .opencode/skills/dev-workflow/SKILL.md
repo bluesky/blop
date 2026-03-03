@@ -11,11 +11,13 @@ Run fast development checks using pixi tasks.
 ## Commands
 
 **Run tests:**
+
 ```bash
 pixi run tests
 ```
 
 **Run all checks (lint, format, typecheck):**
+
 ```bash
 pixi run check
 ```

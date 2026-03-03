@@ -1,6 +1,5 @@
 # GitHub Actions CI Overview
 
-
 ## Workflow
 
 ### `ci.yml`
@@ -20,7 +19,6 @@ If one of these conditions are met, than the following occurs:
 - **`scheduled-job`**: Runs `_testing.yml` on a specific schedule.
 
 This structure avoids duplicate CI jobs when both a PR and a branch push happen.
-
 
 ### `_check.yml`
 

@@ -11,11 +11,13 @@ Build Sphinx documentation using pixi tasks.
 ## Commands
 
 **Build HTML docs:**
+
 ```bash
 pixi run build-docs
 ```
 
 **Run doctests:**
+
 ```bash
 pixi run doc-tests
 ```
