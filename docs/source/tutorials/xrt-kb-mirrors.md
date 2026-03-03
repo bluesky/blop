@@ -46,6 +46,7 @@ from tiled.client.container import Container
 from bluesky.callbacks import best_effort
 from bluesky_tiled_plugins import TiledWriter
 from bluesky.run_engine import RunEngine
+from event_model import RunRouter
 from tiled.client import from_uri  # type: ignore[import-untyped]
 from tiled.server import SimpleTiledServer
 from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
@@ -73,11 +74,16 @@ Next, we create a local Tiled server. The `TiledWriter` callback will save exper
 tiled_server = SimpleTiledServer(readable_storage=[DETECTOR_STORAGE])
 tiled_client = from_uri(tiled_server.uri)
 tiled_writer = TiledWriter(tiled_client)
-bec = best_effort.BestEffortCallback()
-bec.disable_plots()
+
+def bec_factory(name, doc):
+    bec = best_effort.BestEffortCallback()
+    bec.disable_plots()
+    return [bec], []
+
+rr = RunRouter([bec_factory])
 
 RE = RunEngine({})
-RE.subscribe(bec)
+RE.subscribe(rr)
 RE.subscribe(tiled_writer)
 ```
 
@@ -149,7 +155,7 @@ class DetectorEvaluation(EvaluationFunction):
     def __init__(self, tiled_client: Container):
         self.tiled_client = tiled_client
 
-    def _compute_stats(self, image: np.array) -> dict[str, float]:
+    def _compute_stats(self, image: np.array) -> tuple[str, str, str]:
         """Compute integrated intensity and beam width/height from a beam image."""
         # Convert to grayscale
         gray = image.squeeze()
@@ -296,7 +302,7 @@ agent.ax_client.summarize()
 The `plot_objective` method shows how an objective varies across the DOF space, based on the surrogate model the agent built:
 
 ```{code-cell} ipython3
-_ = agent.plot_objective(x_dof_name="kbh_radius", y_dof_name="kbv_radius", objective_name="intensity")
+_ = agent.plot_objective(x_dof_name="kbh-radius", y_dof_name="kbv-radius", objective_name="intensity")
 ```
 
 This plot reveals the landscape the optimizer explored. Peaks (for maximization) or valleys (for minimization) show where good configurations lie.
