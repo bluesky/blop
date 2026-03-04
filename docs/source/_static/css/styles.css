@@ -113,6 +113,7 @@ body {
   --warning-btn-bg: white;
   --warning-btn-text: #ff3300;
   --warning-btn-hover-bg: #f0f0f0;
+  --install-card-bg: #f0f0f0; /* Light mode color */
 }
 
 /* Dark mode colors */
@@ -124,6 +125,7 @@ html[data-theme="dark"] {
   --warning-btn-bg: #2d2d2d;
   --warning-btn-text: #ff6633;
   --warning-btn-hover-bg: #3d3d3d;
+  --install-card-bg: #222; /* Dark mode color */
 }
 
 .warning-banner {
@@ -337,6 +339,7 @@ pre, .command-block pre {
   background: #1e1e1e;
   border: 2px solid #333;
   border-radius: 8px;
+  color: var(--pst-color-text-base);
   padding: 1rem;
   position: relative;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
@@ -713,8 +716,8 @@ body.pagename-index .bd-content { max-width: 100% !important; }
 }
 
 .install-card {
-  background: white;
-  border: 1px solid #ddd;
+  background: var(--install-card-bg, white);
+  border: 1px solid var(--install-card-border, rgb(178, 175, 175));
   border-radius: 12px;
   padding: 1rem;
 }
@@ -725,10 +728,11 @@ body.pagename-index .bd-content { max-width: 100% !important; }
 }
 
 .install-label {
-  color: #666;
+  background: var(--install-card-bg, white);
   margin-bottom: 0.25rem;
   font-size: 0.85rem;
 }
+
 
 .install-box-single {
   margin-bottom: 0.75rem;
