@@ -4,7 +4,7 @@ This repository contains tutorials that are designed to be run using Jupyter Lab
 
 ## Running the Tutorials
 
-To run and experiment with the tutorial code, you'll need to open them inside Jupyter Lab. To do this, run: 
+To run and experiment with the tutorial code, you'll need to open them inside Jupyter Lab. To do this, run:
 
 ```bash
 pixi run start-jupyter
@@ -13,6 +13,7 @@ pixi run start-jupyter
 This will launch Jupyter Lab in your browser, where you can navigate to and run the tutorial notebooks.
 
 If you prefer to work with the tutorials in your local editor as standard notebooks, you can convert them back to the .ipynb format:
+
 ```bash
 jupytext --to notebook <path_to_tutorial>
 ```

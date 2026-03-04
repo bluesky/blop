@@ -8,7 +8,7 @@ from bluesky.protocols import HasHints, HasParent, Hints, Readable, Reading
 from event_model import DataKey
 from numpy.typing import ArrayLike
 
-from ..protocols import ID_KEY, OptimizationProblem
+from .protocols import ID_KEY, OptimizationProblem
 
 
 def _infer_data_key(value: ArrayLike) -> DataKey:

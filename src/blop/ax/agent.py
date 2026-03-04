@@ -1,7 +1,7 @@
 import importlib.util
 import logging
 from collections.abc import Sequence
-from typing import Any
+from typing import Any, TypeGuard
 
 from ax import Client
 from ax.analysis import ContourPlot
@@ -16,13 +16,21 @@ else:
 from bluesky.utils import MsgGenerator
 
 from ..plans import acquire_baseline, optimize, sample_suggestions
-from ..plans.utils import InferredReadable
 from ..protocols import AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Sensor
+from ..utils import InferredReadable
 from .dof import DOF, DOFConstraint
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer
 
 logger = logging.getLogger(__name__)
+
+
+def _has_str_keys(d: dict[DOF, Any] | dict[str, Any]) -> TypeGuard[dict[str, Any]]:
+    return all(isinstance(key, str) for key in d.keys())
+
+
+def _has_dof_keys(d: dict[DOF, Any] | dict[str, Any]) -> TypeGuard[dict[DOF, Any]]:
+    return all(isinstance(key, DOF) for key in d.keys())
 
 
 class Agent:
@@ -164,6 +172,34 @@ class Agent:
     @property
     def checkpoint_path(self) -> str | None:
         return self._optimizer.checkpoint_path
+
+    @property
+    def fixed_dofs(self) -> dict[str, Any] | None:
+        return self._optimizer.fixed_parameters
+
+    @fixed_dofs.setter
+    def fixed_dofs(self, fixed_dofs: dict[DOF, Any] | dict[str, Any] | None) -> None:
+        """
+        Fix degrees of freedom to a certain value for future optimizations.
+
+        Parameters
+        ----------
+        fixed_dofs : dict[DOF, Any] | dict[str, Any] | None
+            A mapping of DOFs or DOF names to the values they should be fixed to.
+
+        """
+        if not fixed_dofs:
+            self._optimizer.fixed_parameters = None
+            return
+
+        if _has_str_keys(fixed_dofs):
+            self._optimizer.fixed_parameters = fixed_dofs
+        elif _has_dof_keys(fixed_dofs):
+            self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
+        else:
+            raise ValueError(
+                f"Keys must all be either {type(DOF)} or {type(str)}, but got {type(list(fixed_dofs.keys())[0])}"
+            )
 
     def to_optimization_problem(self) -> OptimizationProblem:
         """

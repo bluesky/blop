@@ -1,0 +1,12 @@
+services:
+  devcontainer:
+    build:
+      context: .devcontainer
+      dockerfile: Dockerfile
+    volumes:
+      - .:/workspace
+      - ${HOME}/.cache/rattler:/root/.cache/rattler:cached
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    command: /bin/bash

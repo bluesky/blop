@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "blop-sim"
+version = "0.0.0"
+description = "Example simulations and benchmarks for blop (not published to PyPI)"
+readme = "README.md"
+authors = [{ name = "Thomas Hopkins", email = "thopkins1@bnl.gov" }]
+requires-python = ">=3.10"
+dependencies = [
+  "blop",
+  "ophyd-async",
+  "h5py",
+  "area-detector-handlers",
+  "bluesky-tiled-plugins",
+  "numpy",
+  "scipy",
+  "matplotlib",
+  "xrt>=1.6.1,<2",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["blop_sim"]

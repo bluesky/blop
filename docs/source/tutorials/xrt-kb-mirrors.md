@@ -37,18 +37,27 @@ Before we can optimize, we need to set up the data infrastructure. Blop uses [Bl
 
 ```{code-cell} ipython3
 import logging
+from pathlib import PurePath
 
+import cv2
+import numpy as np
 import matplotlib.pyplot as plt
 from tiled.client.container import Container
 from bluesky.callbacks import best_effort
-from bluesky.callbacks.tiled_writer import TiledWriter
+from bluesky_tiled_plugins import TiledWriter
 from bluesky.run_engine import RunEngine
+from event_model import RunRouter
 from tiled.client import from_uri  # type: ignore[import-untyped]
 from tiled.server import SimpleTiledServer
+from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
 
 from blop.ax import Agent, RangeDOF, Objective
-from blop.sim.xrt_beamline import TiledBeamline
 from blop.protocols import EvaluationFunction
+
+# Import simulation devices (requires: pip install -e sim/)
+from blop_sim.backends.xrt import XRTBackend
+from blop_sim.devices.xrt import KBMirror
+from blop_sim.devices import DetectorDevice
 
 # Suppress noisy logs from httpx 
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -65,11 +74,16 @@ Next, we create a local Tiled server. The `TiledWriter` callback will save exper
 tiled_server = SimpleTiledServer(readable_storage=[DETECTOR_STORAGE])
 tiled_client = from_uri(tiled_server.uri)
 tiled_writer = TiledWriter(tiled_client)
-bec = best_effort.BestEffortCallback()
-bec.disable_plots()
+
+def bec_factory(name, doc):
+    bec = best_effort.BestEffortCallback()
+    bec.disable_plots()
+    return [bec], []
+
+rr = RunRouter([bec_factory])
 
 RE = RunEngine({})
-RE.subscribe(bec)
+RE.subscribe(rr)
 RE.subscribe(tiled_writer)
 ```
 
@@ -85,14 +99,23 @@ VERTICAL_BOUNDS = (25000, 45000)    # Optimal ~38000 is in upper portion
 HORIZONTAL_BOUNDS = (15000, 35000)  # Optimal ~21000 is in lower portion
 ```
 
-Now we create the beamline and define our DOFs. Each `RangeDOF` wraps an actuator (something we can move) with bounds that constrain the search space:
+Now we create the simulation backend and individual devices. Each `RangeDOF` wraps an actuator (something we can move) with bounds that constrain the search space:
 
 ```{code-cell} ipython3
-beamline = TiledBeamline(name="bl")
+# Create XRT simulation backend
+backend = XRTBackend()
 
+# Create individual KB mirror devices
+kbv = KBMirror(backend, mirror_index=0, initial_radius=38000, name="kbv")
+kbh = KBMirror(backend, mirror_index=1, initial_radius=21000, name="kbh")
+
+# Create detector device
+det = DetectorDevice(backend, StaticPathProvider(UUIDFilenameProvider(), PurePath(DETECTOR_STORAGE)), name="det")
+
+# Define DOFs using mirror radius signals
 dofs = [
-    RangeDOF(actuator=beamline.kbv_dsv, bounds=VERTICAL_BOUNDS, parameter_type="float"),
-    RangeDOF(actuator=beamline.kbh_dsh, bounds=HORIZONTAL_BOUNDS, parameter_type="float"),
+    RangeDOF(actuator=kbv.radius, bounds=VERTICAL_BOUNDS, parameter_type="float"),
+    RangeDOF(actuator=kbh.radius, bounds=HORIZONTAL_BOUNDS, parameter_type="float"),
 ]
 ```
 
@@ -103,15 +126,16 @@ The `actuator` is the device that physically changes the parameter. The `bounds`
 **Objectives** specify what you want to optimize. Each objective has a name (matching a value your evaluation function will return) and a direction: `minimize=True` for things you want smaller, `minimize=False` for things you want larger.
 
 For our KB mirrors, we have three objectives:
-- **Intensity** (`bl_det_sum`): We want *more* signal → `minimize=False`
-- **Spot width X** (`bl_det_wid_x`): We want a *tighter* spot → `minimize=True`
-- **Spot width Y** (`bl_det_wid_y`): We want a *tighter* spot → `minimize=True`
+
+- **Intensity** (`intensity`): We want *more* signal → `minimize=False`
+- **Spot width** (`width`): We want a *tighter* spot → `minimize=True`
+- **Spot height** (`height`): We want a *tighter* spot → `minimize=True`
 
 ```{code-cell} ipython3
 objectives = [
-    Objective(name="bl_det_sum", minimize=False),
-    Objective(name="bl_det_wid_x", minimize=True),
-    Objective(name="bl_det_wid_y", minimize=True),
+    Objective(name="intensity", minimize=False),
+    Objective(name="width", minimize=True),
+    Objective(name="height", minimize=True),
 ]
 ```
 
@@ -122,20 +146,63 @@ With multiple objectives that can conflict (maximizing intensity might increase 
 The **evaluation function** is the bridge between raw experimental data and the optimizer. After each measurement, the optimizer needs to know how well that configuration performed. Your evaluation function:
 
 1. Receives a run UID and the suggestions that were tested
-2. Reads the relevant data from Tiled
-3. Returns outcome values for each suggestion
+1. Reads the beam images from Tiled
+1. Computes statistics (intensity, width, centroid, etc.) from the images
+1. Returns outcome values for each suggestion
 
 ```{code-cell} ipython3
 class DetectorEvaluation(EvaluationFunction):
     def __init__(self, tiled_client: Container):
         self.tiled_client = tiled_client
-    
+
+    def _compute_stats(self, image: np.array) -> tuple[str, str, str]:
+        """Compute integrated intensity and beam width/height from a beam image."""
+        # Convert to grayscale
+        gray = image.squeeze()
+        if gray.ndim == 3:
+            gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+        
+        # Convert data type for numerical stability
+        gray = gray.astype(np.float32)
+
+        # Smooth w/ (5, 5) kernel and threshold
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        max_val = np.max(blurred)
+        if max_val == 0:
+            return 0.0, 0.0, 0.0
+
+        thresh_value = 0.2 * max_val
+        _, thresh = cv2.threshold(blurred, thresh_value, 255, cv2.THRESH_TOZERO)
+
+        # Total integrated intensity
+        total_intensity = np.sum(thresh)
+
+        # Beam width/height from intensity-weighted second moment (σ)
+        total_weight = np.sum(thresh)
+        if total_weight <= 0:
+            return total_intensity, 0.0, 0.0
+
+        h, w = thresh.shape
+        y_coords = np.arange(h, dtype=np.float32)
+        x_coords = np.arange(w, dtype=np.float32)
+
+        x_bar = np.sum(x_coords * np.sum(thresh, axis=0)) / total_weight
+        y_bar = np.sum(y_coords * np.sum(thresh, axis=1)) / total_weight
+
+        x_var = np.sum((x_coords - x_bar) ** 2 * np.sum(thresh, axis=0)) / total_weight
+        y_var = np.sum((y_coords - y_bar) ** 2 * np.sum(thresh, axis=1)) / total_weight
+
+        width = 2 * np.sqrt(x_var)   # ~2σ width
+        height = 2 * np.sqrt(y_var)   # ~2σ height
+
+        return total_intensity, width, height
+
     def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
         outcomes = []
         run = self.tiled_client[uid]
-        bl_det_sum = run["primary/bl_det_sum"].read()
-        bl_det_wid_x = run["primary/bl_det_wid_x"].read()
-        bl_det_wid_y = run["primary/bl_det_wid_y"].read()
+        
+        # Read beam images from detector
+        images = run["primary/det_image"].read()
 
         # Suggestions are stored in the start document's metadata when
         # using the `blop.plans.default_acquire` plan.
@@ -143,22 +210,31 @@ class DetectorEvaluation(EvaluationFunction):
         # a custom acquisition plan.
         suggestion_ids = [suggestion["_id"] for suggestion in run.metadata["start"]["blop_suggestions"]]
 
+        # Compute statistics from each image
         for idx, sid in enumerate(suggestion_ids):
+            image = images[idx]
+            intensity, width, height = self._compute_stats(image)
+            
             outcome = {
                 "_id": sid,
-                "bl_det_sum": bl_det_sum[idx],
-                "bl_det_wid_x": bl_det_wid_x[idx],
-                "bl_det_wid_y": bl_det_wid_y[idx],
+                "intensity": intensity,
+                "width": width,
+                "height": height,
             }
             outcomes.append(outcome)
         return outcomes
 ```
 
-Note the `_id` field—this links each outcome back to the suggestion that produced it. This is essential when multiple configurations are tested in a single run.
+Note how we:
+
+1. Read the image data from the stored detector data
+1. Use image processing techniques to compute beam metrics from the raw detector images
+1. Link each outcome back to its suggestion via the `_id` field
 
 ## Creating and Running the Agent
 
 The **Agent** brings everything together. It:
+
 - Uses DOFs to know what parameters to adjust
 - Uses objectives to know what to optimize
 - Calls the evaluation function to assess each configuration
@@ -167,7 +243,7 @@ The **Agent** brings everything together. It:
 
 ```{code-cell} ipython3
 agent = Agent(
-    sensors=[beamline.det],
+    sensors=[det],
     dofs=dofs,
     objectives=objectives,
     evaluation_function=DetectorEvaluation(tiled_client),
@@ -177,7 +253,7 @@ agent = Agent(
 )
 ```
 
-The `sensors` list contains any devices that produce data during acquisition. Here, `beamline.det` is our detector.
+The `sensors` list contains any devices that produce data during acquisition. Here, `det` is our detector device.
 
 ## Running the Optimization
 
@@ -226,7 +302,7 @@ agent.ax_client.summarize()
 The `plot_objective` method shows how an objective varies across the DOF space, based on the surrogate model the agent built:
 
 ```{code-cell} ipython3
-_ = agent.plot_objective(x_dof_name="bl_kbh_dsh", y_dof_name="bl_kbv_dsv", objective_name="bl_det_sum")
+_ = agent.plot_objective(x_dof_name="kbh-radius", y_dof_name="kbv-radius", objective_name="intensity")
 ```
 
 This plot reveals the landscape the optimizer explored. Peaks (for maximization) or valleys (for minimization) show where good configurations lie.
@@ -246,14 +322,14 @@ Now move the mirrors to these optimal positions and acquire an image:
 from bluesky.plans import list_scan
 
 uid = RE(list_scan(
-    [beamline.det],
-    beamline.kbv_dsv, [optimal_parameters[beamline.kbv_dsv.name]],
-    beamline.kbh_dsh, [optimal_parameters[beamline.kbh_dsh.name]],
+    [det],
+    kbv.radius, [optimal_parameters[kbv.radius.name]],
+    kbh.radius, [optimal_parameters[kbh.radius.name]],
 ))
 ```
 
 ```{code-cell} ipython3
-image = tiled_client[uid[0]]["primary/bl_det_image"].read().squeeze()
+image = tiled_client[uid[0]]["primary/det_image"].read().squeeze()
 plt.imshow(image)
 plt.colorbar()
 plt.show()
@@ -264,12 +340,12 @@ plt.show()
 In this tutorial, you worked through a complete Bayesian optimization workflow:
 
 1. **DOFs** define the search space—the parameters you can control and their allowed ranges
-2. **Objectives** specify your goals and whether to minimize or maximize each one
-3. **Evaluation functions** extract meaningful metrics from experimental data
-4. **The Agent** coordinates everything, building a model of your system and intelligently exploring the parameter space
-5. **Health checks** let you diagnose optimization progress and catch issues early
+1. **Objectives** specify your goals and whether to minimize or maximize each one
+1. **Evaluation functions** extract meaningful metrics from experimental data
+1. **The Agent** coordinates everything, building a model of your system and intelligently exploring the parameter space
+1. **Health checks** let you diagnose optimization progress and catch issues early
 
-These same components apply to any optimization problem: swap the simulated beamline for real hardware, adjust the DOFs and objectives for your system, and write an evaluation function that extracts your metrics.
+These same components apply to any optimization problem: swap the simulated devices for real hardware, adjust the DOFs and objectives for your system, and write an evaluation function that extracts your metrics.
 
 ## Next Steps
 
@@ -277,6 +353,6 @@ These same components apply to any optimization problem: swap the simulated beam
 - Explore [DOF constraints](../how-to-guides/set-dof-constraints.rst) to encode physical limitations
 - See [outcome constraints](../how-to-guides/set-outcome-constraints.rst) to enforce requirements on your results
 
-For the beamline setup code used in this tutorial, see:
-- [xrt_beamline.py](https://github.com/NSLS-II/blop/blob/main/src/blop/sim/xrt_beamline.py)
-- [xrt_kb_model.py](https://github.com/NSLS-II/blop/blob/main/src/blop/sim/xrt_kb_model.py)
+## See Also
+
+- [`blop_sim` package](https://github.com/bluesky/blop/tree/main/sim/blop_sim) for XRT simulated beamline control

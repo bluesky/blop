@@ -6,7 +6,7 @@
 
     from bluesky.protocols import NamedMovable, Readable, Status, Hints, HasHints, HasParent
     from bluesky.run_engine import RunEngine
-    from bluesky.callbacks.tiled_writer import TiledWriter
+    from bluesky_tiled_plugins import TiledWriter
     from tiled.client import from_uri
     from tiled.server import SimpleTiledServer
 

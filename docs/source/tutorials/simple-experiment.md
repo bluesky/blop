@@ -28,7 +28,7 @@ from blop.ax import Agent, RangeDOF, Objective
 
 from bluesky.protocols import NamedMovable, Readable, Status, Hints, HasHints, HasParent
 from bluesky.run_engine import RunEngine
-from bluesky.callbacks.tiled_writer import TiledWriter
+from bluesky_tiled_plugins import TiledWriter
 from bluesky.callbacks.best_effort import BestEffortCallback
 from tiled.client import from_uri
 from tiled.client.container import Container

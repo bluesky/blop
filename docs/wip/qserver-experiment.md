@@ -25,9 +25,9 @@ The Queueserver should have a RE which sends documents to a ZMQ buffer and then 
 We will:
 
 - Use the ZMQ buffer to find a stop document that will tell us a trial point has been measured
-- Use the Tiled client to access the data 
+- Use the Tiled client to access the data
 
-You will need: 
+You will need:
 
 - The Queueserver IP and control port e.g. `tcp://localhost:60615`
 - The Queueserver IP and info port e.g. `tcp://localhost:60625`
@@ -36,21 +36,19 @@ You will need:
 
 +++
 
-
 ### The Ophyd devices in the Queueserver Environment
 
 The following devices should be made available in the Queueserver Environment.
 
 ```python
-
 from ophyd import Device, Component as Cpt, Signal
 from blop.utils.functions import himmelblau
 from ophyd.sim import motor1, motor2
 from ophyd.sim import SynGauss, SynSignal, EnumSignal
 import numpy as np
 
+
 class SynHimmelblauDetector(Device):
-    
     """
     Evaluate a point on a Gaussian based on the value of a motor.
 
@@ -93,16 +91,16 @@ class SynHimmelblauDetector(Device):
     noise_multiplier = Cpt(Signal, value=1, kind="config")
 
     def _compute(self):
-        
+
         # Get the current values of the motors
         x = self._motor0.read()[self._motor_field0]["value"]
         y = self._motor1.read()[self._motor_field1]["value"]
         m = np.array([x, y])
-    
+
         noise = self.noise.get()
         noise_multiplier = self.noise_multiplier.get()
-        
-        v = himmelblau(x,y)
+
+        v = himmelblau(x, y)
         if noise == "poisson":
             v = int(self.random_state.poisson(np.round(v), 1))
         elif noise == "uniform":
@@ -139,21 +137,14 @@ class SynHimmelblauDetector(Device):
 
     def trigger(self, *args, **kwargs):
         return self.val.trigger(*args, **kwargs)
-    
-himmel_det = SynHimmelblauDetector( "himmel_det",
-        motor1,
-        "motor1",
-        motor2,
-        "motor2",
-        labels={"detectors"},
-        noise='uniform',
-        noise_multiplier=0.01
-    )
 
+
+himmel_det = SynHimmelblauDetector(
+    "himmel_det", motor1, "motor1", motor2, "motor2", labels={"detectors"}, noise="uniform", noise_multiplier=0.01
+)
 ```
 
 +++
-
 
 ### Plans in the Queueserver Environment
 
@@ -162,9 +153,8 @@ The Queueserver environment has the plan `acquire` which wraps the `list_scan` p
 ```python
 from blop.plans import TParameterization, Movable, TParameterValue, defaultdict
 
-def _unpack_parameters(dofs: list[Movable], parameterizations: list[TParameterization]) -> list[Movable | TParameterValue]:
-    
 
+def _unpack_parameters(dofs: list[Movable], parameterizations: list[TParameterization]) -> list[Movable | TParameterValue]:
     """Unpack the parameterizations into Bluesky plan arguments."""
     unpacked_dict = defaultdict(list)
     for parameterization in parameterizations:
@@ -175,11 +165,11 @@ def _unpack_parameters(dofs: list[Movable], parameterizations: list[TParameteriz
                 raise ValueError(f"Parameter {dof.name} not found in parameterization. Parameterization: {parameterization}")
 
     """ create a dict of dofs"""
-    
+
     dofs_dict = {}
     for dof in dofs:
         dofs_dict[dof.name] = dof
-        
+
     """ Finally, create a list of dofs and setpoints """
     unpacked_list = []
     for dof_name, values in unpacked_dict.items():
@@ -188,14 +178,13 @@ def _unpack_parameters(dofs: list[Movable], parameterizations: list[TParameteriz
 
     return unpacked_list
 
-def acquire(readables, dofs, trials:dict, md=None):
-    
+
+def acquire(readables, dofs, trials: dict, md=None):
+
     plan_args = _unpack_parameters(dofs, trials.values())
-    
-    yield from list_scan(readables, *plan_args,per_step=None, md=md)
 
+    yield from list_scan(readables, *plan_args, per_step=None, md=md)
 ```
-
 
 +++
 
@@ -218,7 +207,7 @@ tiled_client = from_uri("http://localhost:8000", api_key='secret')
 
 ### Configuration of the Blop Agent
 
-Just as in the other tutorials, we have to configure the DOFS, Objectives and Sensors. 
+Just as in the other tutorials, we have to configure the DOFS, Objectives and Sensors.
 
 Unlike the other tutorials, all of these are now just strings because the objects to the real devices exist only in the Queueserver environment.
 
@@ -243,7 +232,7 @@ sensors = ['himmel_det']
 
 ### Making an Evaluation Function
 
-After the agent has suggested points and run them on the Queueserver, we want to update our model with the results. The EvaluationFunction defines how data is read from a bluesky run and the objective values are created. Unlike the blop agent which produces messages to be consumed by a run engine, the blop Queueserver agent is operating with a process which it doesn't, or at least might not, solely control. It's possible that the agent will submit plans to a queue that is not empty. We therefore have to search for a specific key value pair in a stop document. 
+After the agent has suggested points and run them on the Queueserver, we want to update our model with the results. The EvaluationFunction defines how data is read from a bluesky run and the objective values are created. Unlike the blop agent which produces messages to be consumed by a run engine, the blop Queueserver agent is operating with a process which it doesn't, or at least might not, solely control. It's possible that the agent will submit plans to a queue that is not empty. We therefore have to search for a specific key value pair in a stop document.
 
 The EvaluationFunction is called every time a stop document is recieved. It must include some check to see if this particular stop document is from the plan that was submitted previously by the agent. The `BlopQserverAgent` adds a key `agent_suggestion_uid` to the start document `md` dict. This `agent_suggestion_uid` is passed to the `EvaluationFunction` as the argument `uid`.
 
@@ -295,7 +284,7 @@ class DetectorEvaluation(EvaluationFunction):
 
 ### Create the agent
 
-Finally we put everything together, instantiate the agent and start an optimization. 
+Finally we put everything together, instantiate the agent and start an optimization.
 
 ```{code-cell} ipython3
 

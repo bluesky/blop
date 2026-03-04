@@ -34,3 +34,11 @@ repos:
     rev: 0.8.1
     hooks:
       - id: nbstripout
+
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.21
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-ruff
+          - mdformat-frontmatter

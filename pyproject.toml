@@ -53,34 +53,16 @@ dev = [
   "pre-commit",
   "pandas-stubs",
   "coverage",
-  "tiled[all]>=0.2.0",
-  "matplotlib",
-  "pyqt5",
   "pyright",
-  "ophyd",
-  "ophyd-async",
-  "h5py",
-  "area-detector-handlers",
-  "bluesky-tiled-plugins",
-  "xrt>=1.6.1,<2",
-]
-docs = [
-  "numpydoc",
-  "sphinx-copybutton",
-  "myst-nb",
-  "furo",
-  "jupytext",
-  "pydata-sphinx-theme",
-  "blop[dev,cpu]"
 ]
 cpu = [
   # Empty extra - the source configuration below routes to CPU-only index
 ]
 
 [project.urls]
-Homepage = "https://github.com/NSLS-II/blop"
+Homepage = "https://github.com/bluesky/blop"
 Documentation = "https://nsls-ii.github.io/blop"
-"Bug Reports" = "https://github.com/NSLS-II/blop/issues"
+"Bug Reports" = "https://github.com/bluesky/blop/issues"
 
 [tool.hatch]
 version.source = "vcs"
@@ -132,7 +114,7 @@ convention = "numpy"
 
 [tool.pyright]
 ignore = [
-    "src/blop/sim/",
+    "sim/",
     "src/blop/tests/",
     "src/blop/bayesian/",  # TODO: Remove this and fix type errors
     "src/blop/ax/qserver_agent.py",  # TODO: Remove this and fix type errors

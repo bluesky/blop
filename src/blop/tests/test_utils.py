@@ -1,7 +1,7 @@
 import numpy as np
 
-from blop.plans.utils import InferredReadable, get_route_index, route_suggestions
 from blop.protocols import ID_KEY
+from blop.utils import InferredReadable, get_route_index, route_suggestions
 
 # InferredReadable tests
 

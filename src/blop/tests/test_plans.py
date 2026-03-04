@@ -1,11 +1,11 @@
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import bluesky.plan_stubs as bps
 import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import plan
 
-from blop.plans import acquire_baseline, acquire_with_background, default_acquire, optimize, optimize_step
+from blop.plans import acquire_baseline, default_acquire, optimize, optimize_step
 from blop.protocols import AcquisitionPlan, Checkpointable, EvaluationFunction, OptimizationProblem, Optimizer
 
 from .conftest import MovableSignal, ReadableSignal
@@ -392,39 +392,6 @@ def test_default_acquire_multiple_movables_readables(RE):
     # Verify final positions
     assert movable1.read()["x1"]["value"] == 0.1
     assert movable2.read()["x2"]["value"] == 0.1
-
-
-def test_acquire_with_background(RE):
-    """Test background acquisition with multiple movables, positions, and readables"""
-
-    def block_beam():
-        yield from bps.null()
-
-    def unblock_beam():
-        yield from bps.null()
-
-    movable = MovableSignal("x1", initial_value=-1.0)
-    readable = ReadableSignal("objective")
-
-    mock_block_beam = Mock(wraps=block_beam)
-    mock_unblock_beam = Mock(wraps=unblock_beam)
-
-    with patch.object(readable, "read", wraps=readable.read) as mock_read:
-        RE(
-            acquire_with_background(
-                [{"x1": 0.0, "_id": 0}],
-                [movable],
-                sensors=[readable],
-                block_beam=mock_block_beam,
-                unblock_beam=mock_unblock_beam,
-            )
-        )
-        # Two reads, one blocked, one unblocked
-        assert mock_read.call_count == 2
-        assert mock_block_beam.call_count == 1
-        assert mock_unblock_beam.call_count == 1
-
-    assert movable.read()["x1"]["value"] == 0.0
 
 
 def test_acquire_baseline(RE):
