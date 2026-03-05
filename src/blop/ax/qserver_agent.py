@@ -140,6 +140,9 @@ class BlopQserverAgent(BlopAxAgent):
             **kwargs,
         )
 
+        # Store dofs for qserver-specific operations (parent class only stores actuators)
+        self._dofs = list(dofs)
+
         # Instantiate an object that can communicate with the queueserver
         self.RM = REManagerAPI(
             zmq_control_addr=qserver_control_addr, zmq_info_addr=qserver_info_addr
@@ -168,6 +171,11 @@ class BlopQserverAgent(BlopAxAgent):
         self.trials = None
         self.acquisition_finished = False
         self.optimization_problem = None
+
+    @property
+    def dofs(self) -> Sequence[DOF]:
+        """The degrees of freedom for this agent."""
+        return self._dofs
 
     def _stop_doc_callback(self, start_doc, stop_doc):
         """
@@ -212,12 +220,14 @@ class BlopQserverAgent(BlopAxAgent):
         # Check that the devices we want to interact with are in the queueserver environment
         res = self.RM.devices_allowed()
         for dof in self.dofs:
-            if dof.name not in res["devices_allowed"]:
-                raise ValueError(f"The device {dof.name} is not in the Queueserver Environment")
+            if dof.parameter_name not in res["devices_allowed"]:
+                raise ValueError(f"The device {dof.parameter_name} is not in the Queueserver Environment")
 
         for sensor in self.sensors:
-            if sensor not in res["devices_allowed"]:
-                raise ValueError(f"The device {sensor} is not in the Queueserver Environment")
+            # Handle both sensor objects (with .name) and string sensor names
+            sensor_name = sensor.name if hasattr(sensor, "name") else sensor
+            if sensor_name not in res["devices_allowed"]:
+                raise ValueError(f"The device {sensor_name} is not in the Queueserver Environment")
 
         # Check that the plan we want to call is in the queueserver environment
         res = self.RM.plans_allowed()
@@ -292,7 +302,7 @@ class BlopQserverAgent(BlopAxAgent):
             item = BPlan(
                 self.acquisition_plan,
                 readables=self.sensors,
-                dofs=[dof.name for dof in self.dofs],
+                dofs=[dof.parameter_name for dof in self.dofs],
                 trials=trials,
                 md=kwargs["md"],
             )
