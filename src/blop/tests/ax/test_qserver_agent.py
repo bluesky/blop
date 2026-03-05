@@ -36,7 +36,9 @@ def basic_objective():
 
 @patch("blop.ax.qserver_agent.REManagerAPI")
 @patch("blop.ax.qserver_agent.ZMQConsumer")
-def test_qserver_agent_init(mock_zmq_consumer, mock_re_manager, mock_evaluation_function, basic_dofs, basic_sensors, basic_objective):
+def test_qserver_agent_init(
+    mock_zmq_consumer, mock_re_manager, mock_evaluation_function, basic_dofs, basic_sensors, basic_objective
+):
     """Test that the qserver agent can be initialized with proper components."""
     agent = BlopQserverAgent(
         sensors=basic_sensors,
@@ -70,7 +72,9 @@ def test_qserver_agent_init(mock_zmq_consumer, mock_re_manager, mock_evaluation_
 
 @patch("blop.ax.qserver_agent.REManagerAPI")
 @patch("blop.ax.qserver_agent.ZMQConsumer")
-def test_qserver_agent_optimize_validation(mock_zmq_consumer, mock_re_manager, mock_evaluation_function, basic_dofs, basic_sensors, basic_objective):
+def test_qserver_agent_optimize_validation(
+    mock_zmq_consumer, mock_re_manager, mock_evaluation_function, basic_dofs, basic_sensors, basic_objective
+):
     """Test that optimize validates qserver environment, devices, and plans."""
     # Test 1: Error when qserver environment is not open
     agent = BlopQserverAgent(
@@ -117,7 +121,9 @@ def test_qserver_agent_optimize_validation(mock_zmq_consumer, mock_re_manager, m
 
 @patch("blop.ax.qserver_agent.REManagerAPI")
 @patch("blop.ax.qserver_agent.ZMQConsumer")
-def test_qserver_agent_acquire(mock_zmq_consumer, mock_re_manager, mock_evaluation_function, basic_dofs, basic_sensors, basic_objective):
+def test_qserver_agent_acquire(
+    mock_zmq_consumer, mock_re_manager, mock_evaluation_function, basic_dofs, basic_sensors, basic_objective
+):
     """Test that acquire submits a plan to the qserver with proper metadata and starts queue."""
     agent = BlopQserverAgent(
         sensors=basic_sensors,
@@ -150,7 +156,9 @@ def test_qserver_agent_acquire(mock_zmq_consumer, mock_re_manager, mock_evaluati
 
 @patch("blop.ax.qserver_agent.REManagerAPI")
 @patch("blop.ax.qserver_agent.ZMQConsumer")
-def test_qserver_agent_stop(mock_zmq_consumer, mock_re_manager, mock_evaluation_function, basic_dofs, basic_sensors, basic_objective):
+def test_qserver_agent_stop(
+    mock_zmq_consumer, mock_re_manager, mock_evaluation_function, basic_dofs, basic_sensors, basic_objective
+):
     """Test that stop prevents the agent from auto-starting the queue on acquire."""
     agent = BlopQserverAgent(
         sensors=basic_sensors,
