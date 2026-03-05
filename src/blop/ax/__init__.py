@@ -2,11 +2,10 @@ from .agent import Agent as Agent
 from .dof import DOF, ChoiceDOF, DOFConstraint, RangeDOF
 from .objective import Objective, OutcomeConstraint, ScalarizedObjective, to_ax_objective_str
 from .optimizer import AxOptimizer
-from .qserver_agent import BlopQserverAgent as QserverAgent
+from .queueserver import ConsumerCallback, QServerClient, QServerOptimizationRunner
 
 __all__ = [
     "Agent",
-    "QserverAgent",
     "DOF",
     "RangeDOF",
     "ChoiceDOF",
@@ -16,4 +15,7 @@ __all__ = [
     "ScalarizedObjective",
     "to_ax_objective_str",
     "AxOptimizer",
+    "QServerClient",
+    "QServerOptimizationRunner",
+    "ConsumerCallback",
 ]
