@@ -8,13 +8,15 @@ a queueserver, rather than directly through a RunEngine.
 import logging
 import threading
 import uuid
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
+from typing import Any
 
 from bluesky.callbacks import CallbackBase
 from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky_queueserver_api import BPlan
 from bluesky_queueserver_api.zmq import REManagerAPI
+from event_model import RunStart, RunStop
 
 from ..protocols import OptimizationProblem
 
@@ -32,15 +34,15 @@ class ConsumerCallback(CallbackBase):
         Signature: callback(start_doc, stop_doc)
     """
 
-    def __init__(self, callback: callable = None):
+    def __init__(self, callback: Callable[[RunStart, RunStop], None] | None = None):
         super().__init__()
-        self._start_doc_cache = None
+        self._start_doc_cache: RunStart | None = None
         self._callback = callback
 
-    def start(self, doc):
+    def start(self, doc: RunStart) -> None:
         self._start_doc_cache = doc
 
-    def stop(self, doc):
+    def stop(self, doc: RunStop) -> None:
         if self._callback is not None and self._start_doc_cache is not None:
             self._callback(self._start_doc_cache, doc)
         self._start_doc_cache = None
@@ -88,7 +90,7 @@ class QServerClient:
             If the queueserver environment is not open.
         """
         status = self._rm.status()
-        if not status["worker_environment_exists"]:
+        if status is None or not status.get("worker_environment_exists", False):
             raise RuntimeError("The queueserver environment is not open")
 
     def check_devices_available(self, device_names: Sequence[str]) -> None:
@@ -129,7 +131,7 @@ class QServerClient:
         if plan_name not in res["plans_allowed"]:
             raise ValueError(f"Plan '{plan_name}' is not available in the queueserver environment")
 
-    def submit_plan(self, plan: BPlan, autostart: bool = True, timeout: float = 600) -> None:
+    def submit_plan(self, plan: BPlan, autostart: bool = True, timeout: int = 600) -> None:
         """
         Submit a plan to the queueserver queue.
 
@@ -151,7 +153,7 @@ class QServerClient:
             response = self._rm.queue_start()
             logger.debug(f"Started queue. Response: {response}")
 
-    def start_listener(self, on_stop: callable) -> None:
+    def start_listener(self, on_stop: Callable[[RunStart, RunStop], None]) -> None:
         """
         Start listening for document events from the queueserver.
 
@@ -165,17 +167,18 @@ class QServerClient:
             logger.warning("Listener already running")
             return
 
-        self._dispatcher = RemoteDispatcher(self._zmq_consumer_addr)
+        dispatcher = RemoteDispatcher(self._zmq_consumer_addr)
         self._consumer_callback = ConsumerCallback(callback=on_stop)
-        self._dispatcher.subscribe(self._consumer_callback)
+        dispatcher.subscribe(self._consumer_callback)
 
         logger.info("Starting ZMQ listener thread")
         self._listener_thread = threading.Thread(
-            target=self._dispatcher.start,
+            target=dispatcher.start,
             name="qserver-zmq-consumer",
             daemon=True,
         )
         self._listener_thread.start()
+        self._dispatcher = dispatcher
 
     def stop_listener(self) -> None:
         """Stop the ZMQ listener thread."""
@@ -319,6 +322,8 @@ class QServerOptimizationRunner:
 
     def _submit_next(self) -> None:
         """Get suggestions from optimizer and submit plan to queueserver."""
+        if self._state is None:
+            raise RuntimeError("_submit_next called before run()")
         self._state.current_iteration += 1
         self._state.current_trials = self._problem.optimizer.suggest(self._state.num_points)
         self._state.current_uid = str(uuid.uuid4())
@@ -333,8 +338,10 @@ class QServerOptimizationRunner:
 
     def _build_plan(self) -> BPlan:
         """Construct a BPlan from the current suggestions."""
+        if self._state is None:
+            raise RuntimeError("_build_plan called before run()")
         # Build metadata
-        md = {
+        md: dict[str, Any] = {
             "agent_suggestion_uid": self._state.current_uid,
             "blop_suggestions": self._state.current_trials,
         }
@@ -355,8 +362,12 @@ class QServerOptimizationRunner:
             md=md,
         )
 
-    def _on_acquisition_complete(self, start_doc: dict, stop_doc: dict) -> None:
+    def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Callback when acquisition finishes. Ingest results and maybe continue."""
+        if self._state is None:
+            raise RuntimeError("_on_acquisition_complete called before run()")
+        if self._state.current_uid is None:
+            raise RuntimeError("current_uid not set")
         logger.info(f"Acquisition complete for uid: {self._state.current_uid}")
 
         # Evaluate the results
