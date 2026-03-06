@@ -5,58 +5,53 @@
 {% block content %}
 <header class="index-header">
   <div class="index-header-container">
-    
-    {# Left side: Logo and Navigation #}
+
     <div class="index-header-left">
-      {# Logo placeholder - you can replace this with an actual logo #}
+
       <div class="index-logo">
         <div class="index-logo-icon">
           B
         </div>
+
         <a href="{{ pathto(master_doc) }}">
           Blop
         </a>
       </div>
-      
-      {# Navigation Links #}
+
       <nav class="index-nav">
-        <a href="{{ pathto('tutorials') }}">
-          Tutorials
-        </a>
-        <a href="{{ pathto('reference/index') }}">
-          Documentation
-        </a>
-        <a href="{{ pathto('release-history') }}">
-          Release History
-        </a>
+        <a href="{{ pathto('tutorials') }}">Tutorials</a>
+        <a href="{{ pathto('documentation') }}">Documentation</a>
+        <a href="{{ pathto('release-history') }}">Release History</a>
       </nav>
+
     </div>
-    
-    {# Right side: Search and Theme Toggle #}
+
     <div class="index-header-right">
-      {# Search Bar #}
-      <div id="searchbox" class="index-searchbox">
-        <div role="search" style="display: flex; align-items: center;">
-          <input type="search" 
-                 class="form-control index-search-input" 
-                 id="search-input"
-                 name="q" 
-                 placeholder="Search docs..."
-                 aria-label="Search docs">
-          <input type="hidden" name="check_keywords" value="yes">
-          <input type="hidden" name="area" value="default">
-        </div>
-      </div>
-      
-      {# Theme Toggle Button #}
-      <button class="btn btn-sm btn-outline-primary theme-switch-button index-theme-btn" 
-              type="button" 
-              data-bs-toggle="tooltip" 
-              data-bs-placement="bottom" 
-              title="Toggle light/dark mode">
-        <i class="fa fa-sun index-theme-icon" id="theme-icon"></i>
-      </button>
+
+      <!-- Working sphinx search -->
+      <form class="index-searchbox"
+            action="{{ pathto('search') }}"
+            method="get"
+            role="search">
+
+        <input type="search"
+               class="form-control index-search-input"
+               name="q"
+               placeholder="Search docs..."
+               aria-label="Search docs">
+
+        <input type="hidden" name="check_keywords" value="yes">
+        <input type="hidden" name="area" value="default">
+      </form>
+
+      <!-- PyData theme search modal -->
+      {% include "components/search-button.html" %}
+
+      <!-- PyData theme dark/light toggle -->
+      {% include "components/theme-switcher.html" %}
+
     </div>
+
   </div>
 </header>
 
