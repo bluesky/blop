@@ -1,0 +1,120 @@
+{% extends "!layout.html" %}
+
+{% block sidebar %}{% endblock %}
+
+{% block content %}
+<header class="index-header">
+  <div class="index-header-container">
+
+    <div class="index-header-left">
+
+      <div class="index-logo">
+        <div class="index-logo-icon">
+          B
+        </div>
+
+        <a href="{{ pathto(master_doc) }}">
+          Blop
+        </a>
+      </div>
+
+      <nav class="index-nav">
+        <a href="{{ pathto('tutorials') }}">Tutorials</a>
+        <a href="{{ pathto('documentation') }}">Documentation</a>
+        <a href="{{ pathto('release-history') }}">Release History</a>
+      </nav>
+
+    </div>
+
+    <div class="index-header-right">
+
+      <!-- Working sphinx search -->
+      <form class="index-searchbox"
+            action="{{ pathto('search') }}"
+            method="get"
+            role="search">
+
+        <input type="search"
+               class="form-control index-search-input"
+               name="q"
+               placeholder="Search docs..."
+               aria-label="Search docs">
+
+        <input type="hidden" name="check_keywords" value="yes">
+        <input type="hidden" name="area" value="default">
+      </form>
+
+      <!-- PyData theme search modal -->
+      {% include "components/search-button.html" %}
+
+      <!-- PyData theme dark/light toggle -->
+      {% include "components/theme-switcher.html" %}
+
+    </div>
+
+  </div>
+</header>
+
+<main style="max-width: 1100px; margin: auto; padding: 1.5rem 1.5rem 3rem; padding-top: 9rem;">
+  <section style="margin-bottom: 4rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Installation</h1>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+      <div>
+        <h2>Running Tutorials</h2>
+        <p>You can run the tutorials in <a href="https://jupyter.org/">Jupyter Lab</a> locally or in a browser using <a href="https://mybinder.org/">Binder</a>:</p>
+        <ul>
+          <li><a href="https://mybinder.org/v2/gh/NSLS-II/blop/HEAD">Binder Blop Tutorials</a></li>
+        </ul>
+        <p>If you are using Pixi, you can start a local Jupyter Lab instance:</p>
+        <pre><code>$ pixi run start-jupyter</code></pre>
+        <p>Or convert the tutorials to ipynb format and use your preferred tool:</p>
+        <pre><code>$ jupytext --to ipynb docs/source/tutorials/*.md</code></pre>
+      </div>
+      <div>
+        <h2>Developer Installation</h2>
+        <p>We recommend using <a href="https://pixi.sh/latest/installation/">Pixi</a> to manage your development environments. If you prefer not to use Pixi, you can view the configuration in <code>pixi.toml</code> and create your own environment.</p>
+        <h3>Static Checks</h3>
+        <p>For linting, formatting, and static code analysis:</p>
+        <pre><code>$ pixi run check</code></pre>
+        <h3>Run Tests</h3>
+        <p>For running the tests:</p>
+        <pre><code>$ pixi run unit-tests
+$ pixi run test-docs</code></pre>
+        <h3>Build Documentation</h3>
+        <p>For building this documentation:</p>
+        <pre><code>$ pixi run build-docs</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <hr class="section-divider">
+
+  <section style="margin-bottom: 4rem;">
+    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Documentation Overview</h1>
+    <div class="learn-more-grid">
+      <div>
+        <a href="{{ pathto('reference/index') }}" style="background: var(--pst-color-surface); border: 1px solid var(--pst-color-border); border-radius: 16px; padding: 2rem; text-align: center; text-decoration: none; color: var(--pst-color-text-base); font-weight: 600; display: block;">API Reference</a>
+        <div style="background: var(--pst-color-background); border-radius: 8px; padding: 1rem; margin-top: 0.75rem; text-align: center; font-size: 0.875rem; color: var(--pst-color-text-muted);">Learn about the core classes, functions, and modules in Blop. This section provides technical details and usage examples for developers and advanced users.</div>
+      </div>
+      <div>
+        <a href="{{ pathto('how-to-guides') }}" style="background: var(--pst-color-surface); border: 1px solid var(--pst-color-border); border-radius: 16px; padding: 2rem; text-align: center; text-decoration: none; color: var(--pst-color-text-base); font-weight: 600; display: block;">How-to Guide</a>
+        <div style="background: var(--pst-color-background); border-radius: 8px; padding: 1rem; margin-top: 0.75rem; text-align: center; font-size: 0.875rem; color: var(--pst-color-text-muted);">Step-by-step instructions for common tasks and workflows. Use this section to solve specific problems and get practical tips for using Blop effectively.</div>
+      </div>
+      <div>
+        <a href="{{ pathto('explanation') }}" style="background: var(--pst-color-surface); border: 1px solid var(--pst-color-border); border-radius: 16px; padding: 2rem; text-align: center; text-decoration: none; color: var(--pst-color-text-base); font-weight: 600; display: block;">Explanations</a>
+        <div style="background: var(--pst-color-background); border-radius: 8px; padding: 1rem; margin-top: 0.75rem; text-align: center; font-size: 0.875rem; color: var(--pst-color-text-muted);">Understand the concepts, design decisions, and theory behind Blop. This section helps you build intuition and deeper knowledge about the package.</div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
+
+{% block stylesheets %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css" href="{{ pathto('_static/css/styles.css', 1) }}" />
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="{{ pathto('_static/javascript/javascript.js', 1) }}"></script>
+{% endblock %}

@@ -144,11 +144,11 @@ html_theme = "pydata_sphinx_theme"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-html_theme_options = {
-    "navbar_start": ["navbar-logo"],
-    "navbar_center": ["navbar-nav"],
-    "navbar_end": [],
-}
+# html_theme_options = {
+#     "navbar_start": ["navbar-logo"],
+#     "navbar_center": ["navbar-nav"],
+#     "navbar_end": [],
+# }
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
