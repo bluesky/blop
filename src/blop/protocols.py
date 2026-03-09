@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal, Protocol, runtime_checkable
+from typing import Any, Literal, Protocol, runtime_checkable
 
 from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, NamedMovable, Readable
 from bluesky.utils import MsgGenerator, plan
@@ -175,6 +175,7 @@ class AcquisitionPlan(Protocol):
         suggestions: list[dict],
         actuators: Sequence[Actuator],
         sensors: Sequence[Sensor] | None = None,
+        md: dict[str, Any] | None = None,
     ) -> MsgGenerator[str]:
         """
         Acquire data for optimization.
@@ -192,6 +193,8 @@ class AcquisitionPlan(Protocol):
             The actuators to move to their suggested positions.
         sensors: Sequence[Sensor], optional
             The sensors that produce data to evaluate.
+        md : dict[str, Any] | None, optional
+            Metadata to attach to the start document
 
         Returns
         -------
@@ -235,3 +238,42 @@ class OptimizationProblem:
     sensors: Sequence[Sensor]
     evaluation_function: EvaluationFunction
     acquisition_plan: AcquisitionPlan | None = None
+
+
+@dataclass(frozen=True)
+class RemoteOptimizationProblem:
+    """
+    An optimization problem to solve. Immutable once initialized.
+
+    This dataclass encapsulates all components needed for optimization into a single
+    immutable structure. It is typically used with optimization plans that exist on
+    a remote server (e.g. bluesky-queueserver).
+
+    Since the remote server manages the instances of the actuators, sensors, and acquistion_plan,
+    we only refer to them by their names here.
+
+    Attributes
+    ----------
+    optimizer : Optimizer
+        Suggests points to evaluate and ingests outcomes to inform the optimization.
+    actuators : Sequence[str]
+        Names of objects that can be moved.
+    sensors : Sequence[str]
+        Names of objects that can produce data.
+    evaluation_function : EvaluationFunction
+        A callable to evaluate data from a Bluesky run and produce outcomes.
+    acquisition_plan: str, optional
+        Name of a Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.
+        Function signature must match `blop.protocols.AcquisitionPlan`.
+
+    See Also
+    --------
+    OptimizationProblem : Alternative configuration when control is local.
+    blop.queueserver.QueueserverOptimizationRunner : Runner for remote optimization problems using bluesky-queueserver
+    """
+
+    optimizer: Optimizer
+    actuators: Sequence[str]
+    sensors: Sequence[str]
+    evaluation_function: EvaluationFunction
+    acquisition_plan: str | None = None

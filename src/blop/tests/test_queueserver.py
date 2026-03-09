@@ -2,8 +2,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from blop.ax.queueserver import ConsumerCallback, QServerClient, QServerOptimizationRunner
 from blop.protocols import OptimizationProblem
+from blop.queueserver import ConsumerCallback, QServerClient, QServerOptimizationRunner
 
 
 @pytest.fixture(scope="function")
@@ -41,8 +41,9 @@ def test_consumer_callback_caches_start_and_calls_on_stop():
     stop_doc = {"uid": "test-uid", "exit_status": "success"}
 
     callback.start(start_doc)
-    callback.stop(stop_doc)
+    mock_callback.assert_not_called()
 
+    callback.stop(stop_doc)
     mock_callback.assert_called_once_with(start_doc, stop_doc)
 
 
@@ -60,7 +61,7 @@ def test_consumer_callback_clears_cache_after_stop():
     assert callback._callback.call_count == 1
 
 
-@patch("blop.ax.queueserver.REManagerAPI")
+@patch("blop.queueserver.REManagerAPI")
 def test_qserver_client_check_environment_raises_when_not_ready(mock_re_manager):
     """Test check_environment raises RuntimeError when environment not open."""
     client = QServerClient()

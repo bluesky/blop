@@ -18,9 +18,13 @@ from bluesky_queueserver_api import BPlan
 from bluesky_queueserver_api.zmq import REManagerAPI
 from event_model import RunStart, RunStop
 
-from ..protocols import OptimizationProblem
+from .plans import default_acquire
+from .protocols import RemoteOptimizationProblem
 
 logger = logging.getLogger("blop")
+
+
+DEFAULT_ACQUIRE_PLAN_NAME: str = default_acquire.__name__
 
 
 class ConsumerCallback(CallbackBase):
@@ -40,15 +44,20 @@ class ConsumerCallback(CallbackBase):
         self._callback = callback
 
     def start(self, doc: RunStart) -> None:
-        self._start_doc_cache = doc
+        """Caches the start document if it came from Blop"""
+        if doc.get("blop_correlation_id", None):
+            self._start_doc_cache = doc
+        else:
+            self._start_doc_cache = None
 
     def stop(self, doc: RunStop) -> None:
-        if self._callback is not None and self._start_doc_cache is not None:
+        """Executes the callback if the cached start and stop document match"""
+        if self._callback is not None and self._start_doc_cache is not None and self._start_doc_cache["uid"] == doc["uid"]:
             self._callback(self._start_doc_cache, doc)
         self._start_doc_cache = None
 
 
-class QServerClient:
+class QueueserverClient:
     """
     Handles communication with a Bluesky queueserver.
 
@@ -57,25 +66,20 @@ class QServerClient:
 
     Parameters
     ----------
-    control_addr : str
-        ZMQ address for queueserver control (e.g., "tcp://localhost:60615").
-    info_addr : str
-        ZMQ address for queueserver info (e.g., "tcp://localhost:60625").
+    re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI
+        Manager instance for communication with Bluesky Queueserver
     zmq_consumer_addr : str
         Address for ZMQ document consumer (e.g., "localhost:5578").
     """
 
     def __init__(
         self,
-        control_addr: str = "tcp://localhost:60615",
-        info_addr: str = "tcp://localhost:60625",
-        zmq_consumer_addr: str = "localhost:5578",
+        re_manager_api: REManagerAPI,
+        zmq_consumer_addr: str,
     ):
-        self._control_addr = control_addr
-        self._info_addr = info_addr
         self._zmq_consumer_addr = zmq_consumer_addr
 
-        self._rm = REManagerAPI(zmq_control_addr=control_addr, zmq_info_addr=info_addr)
+        self._rm = re_manager_api
         self._dispatcher: RemoteDispatcher | None = None
         self._consumer_callback: ConsumerCallback | None = None
         self._listener_thread: threading.Thread | None = None
@@ -139,9 +143,9 @@ class QServerClient:
         ----------
         plan : BPlan
             The plan to submit.
-        autostart : bool
+        autostart : bool, optional
             If True, start the queue after adding the plan.
-        timeout : float
+        timeout : float, optional
             Timeout in seconds when waiting for queue to be idle.
         """
         response = self._rm.item_add(plan)
@@ -197,12 +201,12 @@ class _OptimizationState:
     max_iterations: int = 1
     num_points: int = 1
     current_iteration: int = 0
-    current_trials: list[dict] = field(default_factory=list)
+    current_suggestions: list[dict] = field(default_factory=list)
     current_uid: str | None = None
     finished: bool = False
 
 
-class QServerOptimizationRunner:
+class QueueserverOptimizationRunner:
     """
     Runs optimization loops through a Bluesky queueserver.
 
@@ -212,40 +216,20 @@ class QServerOptimizationRunner:
 
     Parameters
     ----------
-    optimization_problem : OptimizationProblem
+    optimization_problem : RemoteOptimizationProblem
         The optimization problem to solve, containing the optimizer, actuators,
         sensors, and evaluation function.
-    qserver_client : QServerClient
+    qserver_client : QueueserverClient
         Client for communicating with the queueserver.
     acquisition_plan_name : str
         Name of the acquisition plan registered in the queueserver.
-
-    Examples
-    --------
-    >>> from blop.protocols import OptimizationProblem
-    >>> from blop.ax import AxOptimizer
-    >>>
-    >>> # Create optimization problem
-    >>> problem = OptimizationProblem(
-    ...     optimizer=optimizer,
-    ...     actuators=[motor1, motor2],
-    ...     sensors=[detector],
-    ...     evaluation_function=my_eval_func,
-    ... )
-    >>>
-    >>> # Create qserver client and runner
-    >>> client = QServerClient()
-    >>> runner = QServerOptimizationRunner(problem, client, "my_acquire_plan")
-    >>>
-    >>> # Run optimization
-    >>> runner.run(iterations=10, num_points=1)
     """
 
     def __init__(
         self,
-        optimization_problem: OptimizationProblem,
-        qserver_client: QServerClient,
-        acquisition_plan_name: str = "acquire",
+        optimization_problem: RemoteOptimizationProblem,
+        qserver_client: QueueserverClient,
+        acquisition_plan_name: str = DEFAULT_ACQUIRE_PLAN_NAME,
     ):
         self._problem = optimization_problem
         self._client = qserver_client
@@ -255,7 +239,7 @@ class QServerOptimizationRunner:
         self._autostart = True
 
     @property
-    def optimization_problem(self) -> OptimizationProblem:
+    def optimization_problem(self) -> RemoteOptimizationProblem:
         """The optimization problem being solved."""
         return self._problem
 
@@ -291,6 +275,7 @@ class QServerOptimizationRunner:
         ValueError
             If required devices or plans are not available.
         """
+        # TODO: What if there is already a run?
         self._validate()
         self._state = _OptimizationState(max_iterations=iterations, num_points=num_points)
         self._continuous = True
@@ -314,8 +299,8 @@ class QServerOptimizationRunner:
         self._client.check_environment()
 
         # Collect device names from actuators and sensors
-        actuator_names = [a.name for a in self._problem.actuators]
-        sensor_names = [s.name for s in self._problem.sensors]
+        actuator_names = list(self._problem.actuators)
+        sensor_names = list(self._problem.sensors)
         self._client.check_devices_available(actuator_names + sensor_names)
 
         self._client.check_plan_available(self._plan_name)
@@ -325,7 +310,7 @@ class QServerOptimizationRunner:
         if self._state is None:
             raise RuntimeError("_submit_next called before run()")
         self._state.current_iteration += 1
-        self._state.current_trials = self._problem.optimizer.suggest(self._state.num_points)
+        self._state.current_suggestions = self._problem.optimizer.suggest(self._state.num_points)
         self._state.current_uid = str(uuid.uuid4())
 
         logger.info(
@@ -342,23 +327,15 @@ class QServerOptimizationRunner:
             raise RuntimeError("_build_plan called before run()")
         # Build metadata
         md: dict[str, Any] = {
-            "agent_suggestion_uid": self._state.current_uid,
-            "blop_suggestions": self._state.current_trials,
+            "blop_correlation_id": self._state.current_uid,
+            "blop_suggestions": self._state.current_suggestions,
         }
-
-        # Convert trials list to dict format expected by the plan
-        # The plan expects {trial_index: parameterization}
-        trials_dict = {trial["_id"]: {k: v for k, v in trial.items() if k != "_id"} for trial in self._state.current_trials}
-
-        # Get device names
-        actuator_names = [a.name for a in self._problem.actuators]
-        sensor_names = [s.name for s in self._problem.sensors]
 
         return BPlan(
             self._plan_name,
-            readables=sensor_names,
-            dofs=actuator_names,
-            trials=trials_dict,
+            self._state.current_suggestions,
+            list(self._problem.actuators),
+            list(self._problem.sensors),
             md=md,
         )
 
@@ -368,12 +345,17 @@ class QServerOptimizationRunner:
             raise RuntimeError("_on_acquisition_complete called before run()")
         if self._state.current_uid is None:
             raise RuntimeError("current_uid not set")
+        if self._state.current_uid != start_doc.get("blop_correlation_uid", None):
+            raise RuntimeError(
+                "current_uid did not match start document. "
+                f"Got: {start_doc.get('blop_correlation_uid', None)}, Expected: {self._state.current_uid}"
+            )
         logger.info(f"Acquisition complete for uid: {self._state.current_uid}")
 
         # Evaluate the results
         outcomes = self._problem.evaluation_function(
-            uid=self._state.current_uid,
-            suggestions=self._state.current_trials,
+            uid=start_doc["uid"],
+            suggestions=self._state.current_suggestions,
         )
 
         logger.info(f"Evaluated {len(outcomes)} outcomes")
