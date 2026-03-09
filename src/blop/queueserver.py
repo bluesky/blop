@@ -10,7 +10,7 @@ import threading
 import uuid
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 from bluesky.callbacks import CallbackBase
 from bluesky.callbacks.zmq import RemoteDispatcher
@@ -25,6 +25,7 @@ logger = logging.getLogger("blop")
 
 
 DEFAULT_ACQUIRE_PLAN_NAME: str = default_acquire.__name__
+CORRELATION_UID_KEY: Literal["blop_correlation_uid"] = "blop_correlation_uid"
 
 
 class ConsumerCallback(CallbackBase):
@@ -45,7 +46,7 @@ class ConsumerCallback(CallbackBase):
 
     def start(self, doc: RunStart) -> None:
         """Caches the start document if it came from Blop"""
-        if doc.get("blop_correlation_id", None):
+        if doc.get(CORRELATION_UID_KEY, None):
             self._start_doc_cache = doc
         else:
             self._start_doc_cache = None
@@ -327,7 +328,7 @@ class QueueserverOptimizationRunner:
             raise RuntimeError("_build_plan called before run()")
         # Build metadata
         md: dict[str, Any] = {
-            "blop_correlation_id": self._state.current_uid,
+            CORRELATION_UID_KEY: self._state.current_uid,
             "blop_suggestions": self._state.current_suggestions,
         }
 
