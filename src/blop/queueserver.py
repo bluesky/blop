@@ -220,7 +220,7 @@ class QueueserverOptimizationRunner:
     optimization_problem : RemoteOptimizationProblem
         The optimization problem to solve, containing the optimizer, actuators,
         sensors, and evaluation function.
-    qserver_client : QueueserverClient
+    queueserver_client : QueueserverClient
         Client for communicating with the queueserver.
     acquisition_plan_name : str
         Name of the acquisition plan registered in the queueserver.
@@ -229,11 +229,11 @@ class QueueserverOptimizationRunner:
     def __init__(
         self,
         optimization_problem: RemoteOptimizationProblem,
-        qserver_client: QueueserverClient,
+        queueserver_client: QueueserverClient,
         acquisition_plan_name: str = DEFAULT_ACQUIRE_PLAN_NAME,
     ):
         self._problem = optimization_problem
-        self._client = qserver_client
+        self._client = queueserver_client
         self._plan_name = acquisition_plan_name
         self._state: _OptimizationState | None = None
         self._continuous = True

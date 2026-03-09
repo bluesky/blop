@@ -55,7 +55,7 @@ def test_consumer_callback_clears_cache_after_stop():
 
 
 @patch("blop.queueserver.REManagerAPI")
-def test_qserver_client_check_environment_raises_when_not_ready(mock_re_manager):
+def test_queueserver_client_check_environment_raises_when_not_ready(mock_re_manager):
     """Test check_environment raises RuntimeError when environment not open."""
     mock_re_manager.status.return_value = {"worker_environment_exists": False}
     client = QueueserverClient(mock_re_manager, "inproc://test")
@@ -65,7 +65,7 @@ def test_qserver_client_check_environment_raises_when_not_ready(mock_re_manager)
 
 
 @patch("blop.queueserver.REManagerAPI")
-def test_qserver_client_check_devices_raises_for_missing_device(mock_re_manager):
+def test_queueserver_client_check_devices_raises_for_missing_device(mock_re_manager):
     """Test check_devices_available raises ValueError for missing devices."""
     mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}}}
     client = QueueserverClient(mock_re_manager, "inproc://test")
@@ -75,7 +75,7 @@ def test_qserver_client_check_devices_raises_for_missing_device(mock_re_manager)
 
 
 @patch("blop.queueserver.REManagerAPI")
-def test_qserver_client_check_plan_raises_for_missing_plan(mock_re_manager):
+def test_queueserver_client_check_plan_raises_for_missing_plan(mock_re_manager):
     """Test check_plan_available raises ValueError for missing plan."""
     mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"other_plan": {}}}
     client = QueueserverClient(mock_re_manager, "inproc://test")
@@ -85,7 +85,7 @@ def test_qserver_client_check_plan_raises_for_missing_plan(mock_re_manager):
 
 
 @patch("blop.queueserver.REManagerAPI")
-def test_qserver_client_submit_plan_with_autostart(mock_re_manager):
+def test_queueserver_client_submit_plan_with_autostart(mock_re_manager):
     """Test submit_plan adds item and starts queue when autostart=True."""
     client = QueueserverClient(mock_re_manager, "inproc://test")
     mock_plan = MagicMock()
@@ -98,7 +98,7 @@ def test_qserver_client_submit_plan_with_autostart(mock_re_manager):
 
 
 @patch("blop.queueserver.REManagerAPI")
-def test_qserver_client_submit_plan_without_autostart(mock_re_manager):
+def test_queueserver_client_submit_plan_without_autostart(mock_re_manager):
     """Test submit_plan only adds item when autostart=False."""
     client = QueueserverClient(mock_re_manager, "inproc://test")
     mock_plan = MagicMock()
@@ -110,13 +110,13 @@ def test_qserver_client_submit_plan_without_autostart(mock_re_manager):
 
 
 def test_runner_run_validates_environment(mock_remote_optimization_problem):
-    """Test run() validates qserver environment before starting."""
+    """Test run() validates queueserver environment before starting."""
     mock_client = MagicMock(spec=QueueserverClient)
     mock_client.check_environment.side_effect = RuntimeError("not open")
 
     runner = QueueserverOptimizationRunner(
         optimization_problem=mock_remote_optimization_problem,
-        qserver_client=mock_client,
+        queueserver_client=mock_client,
     )
 
     with pytest.raises(RuntimeError, match="not open"):
@@ -125,12 +125,12 @@ def test_runner_run_validates_environment(mock_remote_optimization_problem):
     mock_client.check_environment.assert_called_once()
 
 
-def test_runner_run_submits_suggestions_to_qserver(mock_remote_optimization_problem):
-    """Test run() gets suggestions from optimizer and submits plan to qserver."""
+def test_runner_run_submits_suggestions_to_queueserver(mock_remote_optimization_problem):
+    """Test run() gets suggestions from optimizer and submits plan to queueserver."""
     mock_client = MagicMock(spec=QueueserverClient)
     runner = QueueserverOptimizationRunner(
         optimization_problem=mock_remote_optimization_problem,
-        qserver_client=mock_client,
+        queueserver_client=mock_client,
         acquisition_plan_name="my_acquire",
     )
 
@@ -150,7 +150,7 @@ def test_runner_stop_sets_finished_state(mock_remote_optimization_problem):
     mock_client = MagicMock(spec=QueueserverClient)
     runner = QueueserverOptimizationRunner(
         optimization_problem=mock_remote_optimization_problem,
-        qserver_client=mock_client,
+        queueserver_client=mock_client,
     )
 
     # The acquisiton completion callback never fires here due to the mocked client, therefore
