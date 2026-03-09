@@ -33,6 +33,10 @@ html[data-theme="dark"] #search-input:focus::placeholder {
   margin-top: 90px;
 }
 
+.bd-page-width {
+  max-width: 100%;  /* default is 88rem */
+}
+
 .custom-header-inner {
   width: 100%;
   padding: 0 2rem;

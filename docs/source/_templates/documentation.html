@@ -20,7 +20,7 @@
 
       <nav class="index-nav">
         <a href="{{ pathto('tutorials') }}">Tutorials</a>
-        <a href="{{ pathto('documentation') }}">Documentation</a>
+        <a href="{{ pathto('reference/index') }}">Documentation</a>
         <a href="{{ pathto('release-history') }}">Release History</a>
       </nav>
 
@@ -56,33 +56,29 @@
 </header>
 
 <main style="max-width: 1100px; margin: auto; padding: 1.5rem 1.5rem 3rem; padding-top: 9rem;">
-  <section style="margin-bottom: 4rem;">
-    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Installation</h1>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-      <div>
-        <h2>Running Tutorials</h2>
-        <p>You can run the tutorials in <a href="https://jupyter.org/">Jupyter Lab</a> locally or in a browser using <a href="https://mybinder.org/">Binder</a>:</p>
-        <ul>
-          <li><a href="https://mybinder.org/v2/gh/NSLS-II/blop/HEAD">Binder Blop Tutorials</a></li>
-        </ul>
-        <p>If you are using Pixi, you can start a local Jupyter Lab instance:</p>
-        <pre><code>$ pixi run start-jupyter</code></pre>
-        <p>Or convert the tutorials to ipynb format and use your preferred tool:</p>
-        <pre><code>$ jupytext --to ipynb docs/source/tutorials/*.md</code></pre>
-      </div>
-      <div>
-        <h2>Developer Installation</h2>
-        <p>We recommend using <a href="https://pixi.sh/latest/installation/">Pixi</a> to manage your development environments. If you prefer not to use Pixi, you can view the configuration in <code>pixi.toml</code> and create your own environment.</p>
-        <h3>Static Checks</h3>
-        <p>For linting, formatting, and static code analysis:</p>
-        <pre><code>$ pixi run check</code></pre>
-        <h3>Run Tests</h3>
-        <p>For running the tests:</p>
-        <pre><code>$ pixi run unit-tests
+  <section style="margin-bottom: 2rem;">
+    <h1 style="font-size: 2rem; margin-bottom: 1rem; text-align: center;">Developer Installation</h1>
+    <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+      <div class="install-card" style="background: var(--pst-color-surface); border: 1px solid var(--pst-color-border); border-radius: 16px; padding: 1.2rem 1.5rem;">
+        <p style="margin-bottom: 0.7rem;">We recommend using <a href="https://pixi.sh/latest/installation/">Pixi</a> to manage your development environments. If you prefer not to use Pixi, you can view the configuration in <code>pixi.toml</code> and create your own environment.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 1.2rem; justify-content: space-between;">
+          <div style="min-width: 180px; flex: 1;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Static Checks</h3>
+            <p style="margin-bottom: 0.3rem;">Pre-commit run for formatting</p>
+            <pre style="margin-bottom: 0.3rem;"><code>$ pixi run check</code></pre>
+          </div>
+          <div style="min-width: 180px; flex: 1;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Run Tests</h3>
+            <p style="margin-bottom: 2.5rem;"> </p>
+            <pre style="margin-bottom: 0.3rem;"><code>$ pixi run unit-tests
 $ pixi run test-docs</code></pre>
-        <h3>Build Documentation</h3>
-        <p>For building this documentation:</p>
-        <pre><code>$ pixi run build-docs</code></pre>
+          </div>
+          <div style="min-width: 180px; flex: 1;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Build Documentation</h3>
+            <p style="margin-bottom: 2.5rem;"> </p>
+            <pre style="margin-bottom: 0.3rem;"><code>$ pixi run build-docs</code></pre>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -90,17 +86,17 @@ $ pixi run test-docs</code></pre>
   <hr class="section-divider">
 
   <section style="margin-bottom: 4rem;">
-    <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem;">Documentation Overview</h1>
-    <div class="learn-more-grid">
-      <div>
-        <a href="{{ pathto('reference/index') }}" style="background: var(--pst-color-surface); border: 1px solid var(--pst-color-border); border-radius: 16px; padding: 2rem; text-align: center; text-decoration: none; color: var(--pst-color-text-base); font-weight: 600; display: block;">API Reference</a>
-        <div style="background: var(--pst-color-background); border-radius: 8px; padding: 1rem; margin-top: 0.75rem; text-align: center; font-size: 0.875rem; color: var(--pst-color-text-muted);">Learn about the core classes, functions, and modules in Blop. This section provides technical details and usage examples for developers and advanced users.</div>
+    <h1 style="font-size: 2.5rem; margin-bottom: 1rem; text-align:center;">Documentation Overview</h1>
+    <div class="learn-more-flex" style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;">
+      <div style="flex: 1 1 300px; max-width: 350px; min-width: 220px; display: flex; flex-direction: column;">
+        <a href="{{ pathto('references') }}" style="background: var(--pst-color-surface); border: 1px solid var(--pst-color-border); border-radius: 16px; padding: 2rem; text-align: center; text-decoration: none; color: var(--pst-color-text-base); font-weight: 600; display: block;">API Reference</a>
+        <div style="background: var(--pst-color-background); border-radius: 8px; padding: 1rem; margin-top: 0.75rem; text-align: center; font-size: 0.875rem; color: var(--pst-color-text-muted);">Complete API documentation, class references, and technical specifications.</div>
       </div>
-      <div>
+      <div style="flex: 1 1 300px; max-width: 350px; min-width: 220px; display: flex; flex-direction: column;">
         <a href="{{ pathto('how-to-guides') }}" style="background: var(--pst-color-surface); border: 1px solid var(--pst-color-border); border-radius: 16px; padding: 2rem; text-align: center; text-decoration: none; color: var(--pst-color-text-base); font-weight: 600; display: block;">How-to Guide</a>
-        <div style="background: var(--pst-color-background); border-radius: 8px; padding: 1rem; margin-top: 0.75rem; text-align: center; font-size: 0.875rem; color: var(--pst-color-text-muted);">Step-by-step instructions for common tasks and workflows. Use this section to solve specific problems and get practical tips for using Blop effectively.</div>
+        <div style="background: var(--pst-color-background); border-radius: 8px; padding: 1rem; margin-top: 0.75rem; text-align: center; font-size: 0.875rem; color: var(--pst-color-text-muted);">Use this section to solve specific problems and get practical tips for using Blop effectively.</div>
       </div>
-      <div>
+      <div style="flex: 1 1 300px; max-width: 350px; min-width: 220px; display: flex; flex-direction: column;">
         <a href="{{ pathto('explanation') }}" style="background: var(--pst-color-surface); border: 1px solid var(--pst-color-border); border-radius: 16px; padding: 2rem; text-align: center; text-decoration: none; color: var(--pst-color-text-base); font-weight: 600; display: block;">Explanations</a>
         <div style="background: var(--pst-color-background); border-radius: 8px; padding: 1rem; margin-top: 0.75rem; text-align: center; font-size: 0.875rem; color: var(--pst-color-text-muted);">Understand the concepts, design decisions, and theory behind Blop. This section helps you build intuition and deeper knowledge about the package.</div>
       </div>
