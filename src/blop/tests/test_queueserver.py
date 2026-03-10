@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from blop.protocols import RemoteOptimizationProblem
+from blop.protocols import QueueserverOptimizationProblem
 from blop.queueserver import CORRELATION_UID_KEY, ConsumerCallback, QueueserverClient, QueueserverOptimizationRunner
 
 
@@ -17,7 +17,7 @@ def mock_remote_optimization_problem():
     mock_eval_func = MagicMock()
     mock_eval_func.return_value = [{"_id": 0, "objective": 1.0}]
 
-    return RemoteOptimizationProblem(
+    return QueueserverOptimizationProblem(
         optimizer=mock_optimizer,
         actuators=["motor1", "motor2"],
         sensors=["detector"],

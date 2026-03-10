@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any, Literal, Protocol, runtime_checkable
+from typing import Any, Literal, Protocol, runtime_checkable, TypeVar, Generic
 
 from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, NamedMovable, Readable
 from bluesky.utils import MsgGenerator, plan
@@ -8,6 +8,13 @@ from bluesky.utils import MsgGenerator, plan
 ID_KEY: Literal["_id"] = "_id"
 Actuator = NamedMovable | Flyable
 Sensor = Readable | EventCollectable | EventPageCollectable
+
+TActuator = TypeVar("TActuator")
+"""Actuator generic type"""
+TSensor = TypeVar("TSensor")
+"""Sensor generic type"""
+TPlan = TypeVar("TPlan")
+"""Plan generic type"""
 
 
 @runtime_checkable
@@ -205,7 +212,15 @@ class AcquisitionPlan(Protocol):
 
 
 @dataclass(frozen=True)
-class OptimizationProblem:
+class BaseOptimizationProblem(Generic[TActuator, TSensor, TPlan]):
+    optimizer: Optimizer
+    actuators: Sequence[TActuator]
+    sensors: Sequence[TSensor]
+    evaluation_function: EvaluationFunction
+    acquisition_plan: TPlan | None = None
+
+
+class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionPlan]):
     """
     An optimization problem to solve. Immutable once initialized.
 
@@ -233,47 +248,37 @@ class OptimizationProblem:
     blop.plans.optimize : Bluesky plan that uses an OptimizationProblem.
     """
 
-    optimizer: Optimizer
-    actuators: Sequence[Actuator]
-    sensors: Sequence[Sensor]
-    evaluation_function: EvaluationFunction
-    acquisition_plan: AcquisitionPlan | None = None
+    ...
 
 
-@dataclass(frozen=True)
-class RemoteOptimizationProblem:
+class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
     """
     An optimization problem to solve. Immutable once initialized.
 
     This dataclass encapsulates all components needed for optimization into a single
-    immutable structure. It is typically used with optimization plans that exist on
-    a remote server (e.g. bluesky-queueserver).
-
-    Since the remote server manages the instances of the actuators, sensors, and acquistion_plan,
-    we only refer to them by their names here.
+    immutable structure. It is typically created via :meth:`blop.ax.QueueserverAgent.to_optimization_problem`
+    and used with bluesky-queueserver-api. Actuators, sensors, and the acquisition plan are referenced
+    by their names, since their instances live on a remote server.
 
     Attributes
     ----------
-    optimizer : Optimizer
+    optimizer: Optimizer
         Suggests points to evaluate and ingests outcomes to inform the optimization.
-    actuators : Sequence[str]
-        Names of objects that can be moved.
-    sensors : Sequence[str]
-        Names of objects that can produce data.
-    evaluation_function : EvaluationFunction
+    actuators: Sequence[str]
+        Names of objects that can be moved to control the beamline using the Bluesky RunEngine.
+        A subset of the actuators' names must match the names of suggested parameterizations.
+    sensors: Sequence[str]
+        Names of objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.
+    evaluation_function: EvaluationFunction
         A callable to evaluate data from a Bluesky run and produce outcomes.
     acquisition_plan: str, optional
-        Name of a Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.
-        Function signature must match `blop.protocols.AcquisitionPlan`.
+        The name of a Bluesky plan to acquire data from the beamline. If not provided, a default plan name will be used.
+        The plan must match the arguments of :ref:`AcquisitionPlan`.
 
     See Also
     --------
-    OptimizationProblem : Alternative configuration when control is local.
-    blop.queueserver.QueueserverOptimizationRunner : Runner for remote optimization problems using bluesky-queueserver
+    blop.ax.QueueserverAgent.to_optimization_problem : Creates a QueueserverOptimizationProblem from an agent.
+    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.
     """
 
-    optimizer: Optimizer
-    actuators: Sequence[str]
-    sensors: Sequence[str]
-    evaluation_function: EvaluationFunction
-    acquisition_plan: str | None = None
+    ...

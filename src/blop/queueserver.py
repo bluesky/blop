@@ -19,7 +19,7 @@ from bluesky_queueserver_api.zmq import REManagerAPI
 from event_model import RunStart, RunStop
 
 from .plans import default_acquire
-from .protocols import RemoteOptimizationProblem
+from .protocols import QueueserverOptimizationProblem
 
 logger = logging.getLogger("blop")
 
@@ -217,7 +217,7 @@ class QueueserverOptimizationRunner:
 
     Parameters
     ----------
-    optimization_problem : RemoteOptimizationProblem
+    optimization_problem : QueueserverOptimizationProblem
         The optimization problem to solve, containing the optimizer, actuators,
         sensors, and evaluation function.
     queueserver_client : QueueserverClient
@@ -228,19 +228,18 @@ class QueueserverOptimizationRunner:
 
     def __init__(
         self,
-        optimization_problem: RemoteOptimizationProblem,
+        optimization_problem: QueueserverOptimizationProblem,
         queueserver_client: QueueserverClient,
-        acquisition_plan_name: str = DEFAULT_ACQUIRE_PLAN_NAME,
     ):
         self._problem = optimization_problem
         self._client = queueserver_client
-        self._plan_name = acquisition_plan_name
+        self._plan_name = optimization_problem.acquisition_plan or DEFAULT_ACQUIRE_PLAN_NAME
         self._state: _OptimizationState | None = None
         self._continuous = True
         self._autostart = True
 
     @property
-    def optimization_problem(self) -> RemoteOptimizationProblem:
+    def optimization_problem(self) -> QueueserverOptimizationProblem:
         """The optimization problem being solved."""
         return self._problem
 
@@ -276,7 +275,7 @@ class QueueserverOptimizationRunner:
         ValueError
             If required devices or plans are not available.
         """
-        # TODO: What if there is already a run?
+        # TODO: What if there is already a run in-progress?
         self._validate()
         self._state = _OptimizationState(max_iterations=iterations, num_points=num_points)
         self._continuous = True
