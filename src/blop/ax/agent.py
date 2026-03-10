@@ -519,6 +519,22 @@ class QueueserverAgent(_AxAgentMixin):
             QueueserverClient(re_manager_api, zmq_consumer_addr),
         )
 
+    @property
+    def evaluation_function(self) -> EvaluationFunction:
+        return self._evaluation_function
+
+    @property
+    def actuators(self) -> Sequence[str]:
+        return self._actuators
+
+    @property
+    def sensors(self) -> Sequence[str]:
+        return self._sensors
+
+    @property
+    def acquisition_plan(self) -> str | None:
+        return self._acquisition_plan
+
     def to_optimization_problem(self) -> QueueserverOptimizationProblem:
         return QueueserverOptimizationProblem(
             optimizer=self._optimizer,
