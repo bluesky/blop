@@ -19,7 +19,7 @@ from bluesky_queueserver_api.zmq import REManagerAPI
 from event_model import RunStart, RunStop
 
 from .plans import default_acquire
-from .protocols import QueueserverOptimizationProblem
+from .protocols import QueueserverOptimizationProblem, CanRegisterSuggestions, ID_KEY
 
 logger = logging.getLogger("blop")
 
@@ -282,6 +282,25 @@ class QueueserverOptimizationRunner:
         self._client.start_listener(on_stop=self._on_acquisition_complete)
         self._submit_next()
 
+    def submit_suggestions(self, suggestions: list[dict]) -> None:
+        """
+        Manually submit suggestions to the queue. This method returns immediately; the
+        optimization runs asynchronously via callbacks.
+
+        Parameters
+        ----------
+        suggestions : list[dict]
+            Parameter combinations to evaluate. Can be:
+
+            - Optimizer suggestions (with "_id" keys from suggest())
+            - Manual points (without "_id", requires CanRegisterSuggestions protocol)
+        """
+        self._validate()
+        self._state = _OptimizationState(max_iterations=1, num_points=len(suggestions))
+        self._continuous = False
+        self._client.start_listener(on_stop=self._on_acquisition_complete)
+        self._submit_next_manual(suggestions)
+
     def stop(self) -> None:
         """
         Stop the optimization loop gracefully.
@@ -305,6 +324,32 @@ class QueueserverOptimizationRunner:
 
         self._client.check_plan_available(self._plan_name)
 
+    def _submit_next_manual(self, suggestions: list[dict]) -> None:
+        """Get suggestions from optimizer and submit plan to queueserver."""
+        if self._state is None:
+            raise RuntimeError("_submit_next called before run()")
+
+        # Ensure the suggestions have an ID_KEY or register them with the optimizer
+        if not isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions) and any(
+            ID_KEY not in suggestion for suggestion in suggestions
+        ):
+            raise ValueError(
+                f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes or your optimizer must "
+                "implement the `blop.protocols.CanRegisterSuggestions` protocol. Please review your optimizer "
+                f"implementation. Got suggestions: {suggestions}"
+            )
+        elif isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions):
+            suggestions = self.optimization_problem.optimizer.register_suggestions(suggestions)
+
+        self._state.current_iteration += 1
+        self._state.current_suggestions = suggestions
+        self._state.current_uid = str(uuid.uuid4())
+
+        logger.info(f"Submitting manually specified suggestion(s) with correlation uid: {self._state.current_uid}")
+
+        plan = self._build_plan()
+        self._client.submit_plan(plan, autostart=self._autostart)
+
     def _submit_next(self) -> None:
         """Get suggestions from optimizer and submit plan to queueserver."""
         if self._state is None:
@@ -315,7 +360,7 @@ class QueueserverOptimizationRunner:
 
         logger.info(
             f"Submitting iteration {self._state.current_iteration}/{self._state.max_iterations} "
-            f"with suggestion uid: {self._state.current_uid}"
+            f"with correlation uid: {self._state.current_uid}"
         )
 
         plan = self._build_plan()

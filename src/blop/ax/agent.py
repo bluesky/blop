@@ -529,4 +529,44 @@ class QueueserverAgent(_AxAgentMixin):
         )
 
     def run(self, iterations=1, n_points=1) -> None:
+        """
+        Start the optimization loop.
+
+        Validates the queueserver state, then begins the suggest -> acquire -> ingest
+        cycle. This method returns immediately; the optimization runs asynchronously
+        via callbacks.
+
+        Parameters
+        ----------
+        iterations : int
+            Number of optimization iterations to run.
+        num_points : int
+            Number of points to suggest per iteration.
+
+        Raises
+        ------
+        RuntimeError
+            If the queueserver environment is not ready.
+        ValueError
+            If required devices or plans are not available.
+        """
+
         self._runner.run(iterations, n_points)
+
+    def submit_suggestions(self, suggestions: list[dict]) -> None:
+        """
+        Evaluate specific parameter combinations.
+
+        Acquires data for given suggestions and ingests results. Supports both
+        optimizer suggestions and manual points.
+
+        Parameters
+        ----------
+        suggestions : list[dict]
+            Either optimizer suggestions (with "_id") or manual points (without "_id").
+
+        See Also
+        --------
+        suggest : Get optimizer suggestions.
+        """
+        self._runner.submit_suggestions(suggestions)
