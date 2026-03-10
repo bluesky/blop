@@ -7,7 +7,7 @@ from blop.queueserver import CORRELATION_UID_KEY, ConsumerCallback, QueueserverC
 
 
 @pytest.fixture(scope="function")
-def mock_remote_optimization_problem():
+def mock_optimization_problem():
     """Create a mock OptimizationProblem with necessary components."""
     mock_optimizer = MagicMock()
     mock_optimizer.suggest.return_value = [
@@ -109,13 +109,13 @@ def test_queueserver_client_submit_plan_without_autostart(mock_re_manager):
     mock_re_manager.queue_start.assert_not_called()
 
 
-def test_runner_run_validates_environment(mock_remote_optimization_problem):
+def test_runner_run_validates_environment(mock_optimization_problem):
     """Test run() validates queueserver environment before starting."""
     mock_client = MagicMock(spec=QueueserverClient)
     mock_client.check_environment.side_effect = RuntimeError("not open")
 
     runner = QueueserverOptimizationRunner(
-        optimization_problem=mock_remote_optimization_problem,
+        optimization_problem=mock_optimization_problem,
         queueserver_client=mock_client,
     )
 
@@ -125,19 +125,25 @@ def test_runner_run_validates_environment(mock_remote_optimization_problem):
     mock_client.check_environment.assert_called_once()
 
 
-def test_runner_run_submits_suggestions_to_queueserver(mock_remote_optimization_problem):
+def test_runner_run_submits_suggestions_to_queueserver():
     """Test run() gets suggestions from optimizer and submits plan to queueserver."""
     mock_client = MagicMock(spec=QueueserverClient)
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=MagicMock(),
+        actuators=["motor1"],
+        sensors=["det"],
+        evaluation_function=MagicMock(),
+        acquisition_plan="my_acquire",
+    )
     runner = QueueserverOptimizationRunner(
-        optimization_problem=mock_remote_optimization_problem,
+        optimization_problem=mock_optimization_problem,
         queueserver_client=mock_client,
-        acquisition_plan_name="my_acquire",
     )
 
     runner.run(iterations=1, num_points=1)
 
     # Verify optimizer.suggest was called
-    mock_remote_optimization_problem.optimizer.suggest.assert_called_once_with(1)
+    mock_optimization_problem.optimizer.suggest.assert_called_once_with(1)
 
     # Verify plan was submitted
     mock_client.submit_plan.assert_called_once()
@@ -145,11 +151,11 @@ def test_runner_run_submits_suggestions_to_queueserver(mock_remote_optimization_
     assert submitted_plan.name == "my_acquire"
 
 
-def test_runner_stop_sets_finished_state(mock_remote_optimization_problem):
+def test_runner_stop_sets_finished_state(mock_optimization_problem):
     """Test stop() marks the runner as finished and stops listener."""
     mock_client = MagicMock(spec=QueueserverClient)
     runner = QueueserverOptimizationRunner(
-        optimization_problem=mock_remote_optimization_problem,
+        optimization_problem=mock_optimization_problem,
         queueserver_client=mock_client,
     )
 

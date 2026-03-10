@@ -25,8 +25,8 @@ from ..protocols import (
     QueueserverOptimizationProblem,
     Sensor,
 )
-from ..utils import InferredReadable
 from ..queueserver import QueueserverClient, QueueserverOptimizationRunner
+from ..utils import InferredReadable
 from .dof import DOF, DOFConstraint
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer

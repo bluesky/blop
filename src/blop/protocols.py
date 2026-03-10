@@ -1,6 +1,6 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Any, Literal, Protocol, runtime_checkable, TypeVar, Generic
+from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
 from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, NamedMovable, Readable
 from bluesky.utils import MsgGenerator, plan

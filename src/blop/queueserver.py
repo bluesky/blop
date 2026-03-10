@@ -19,7 +19,7 @@ from bluesky_queueserver_api.zmq import REManagerAPI
 from event_model import RunStart, RunStop
 
 from .plans import default_acquire
-from .protocols import QueueserverOptimizationProblem, CanRegisterSuggestions, ID_KEY
+from .protocols import ID_KEY, CanRegisterSuggestions, QueueserverOptimizationProblem
 
 logger = logging.getLogger("blop")
 
