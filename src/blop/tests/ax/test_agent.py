@@ -219,6 +219,15 @@ def test_ingest_baseline(mock_evaluation_function):
     assert summary_df["arm_name"].values[0] == "baseline"
 
 
+def test_agent_init_actuator_string_raises(mock_evaluation_function):
+    dof1 = RangeDOF(actuator="test_movable1", bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator="test_movable2", bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+
+    with pytest.raises(ValueError, match="not strings"):
+        Agent(sensors=[], dofs=[dof1, dof2], objectives=[objective], evaluation_function=mock_evaluation_function)
+
+
 def test_queueserver_agent_init(mock_re_manager_api, mock_evaluation_function):
     dof1 = RangeDOF(actuator="test_motor1", bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator="test_motor2", bounds=(0, 10), parameter_type="float")
@@ -241,6 +250,22 @@ def test_queueserver_agent_init(mock_re_manager_api, mock_evaluation_function):
     assert problem.actuators == [dof1.parameter_name, dof2.parameter_name]
     assert problem.sensors == ["det"]
     assert problem.evaluation_function == mock_evaluation_function
+
+
+def test_queueserver_agent_init_actuator_instance(mock_re_manager_api, mock_evaluation_function):
+    movable1 = MovableSignal(name="test_movable1")
+    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator="test_movable2", bounds=(0, 10), parameter_type="float")
+    agent = QueueserverAgent(
+        mock_re_manager_api,
+        "inproc://test",
+        ["det"],
+        [dof1, dof2],
+        [Objective(name="obj1", minimize=False)],
+        mock_evaluation_function,
+    )
+
+    assert agent.actuators == [movable1.name, dof2.parameter_name]
 
 
 @patch("blop.ax.agent.QueueserverClient")
