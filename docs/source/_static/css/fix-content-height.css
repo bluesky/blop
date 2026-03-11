@@ -1,0 +1,29 @@
+/* Let notebook Plotly outputs fill available space */
+.content {
+    overflow: hidden;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+}
+
+.content > * {
+    max-height: none;
+    width: 100%;
+    max-width: none;
+}
+
+.content .js-plotly-plot,
+.content .plotly-graph-div,
+.content .plotly,
+.content .plot-container {
+    width: 100% !important;
+    max-width: none;
+}
+
+.card-box > * {
+    overflow: hidden;
+    left: 0;
+}
