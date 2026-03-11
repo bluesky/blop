@@ -1,13 +1,36 @@
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import Literal, Protocol, runtime_checkable
+from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
-from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, NamedMovable, Readable
+from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, HasName, Movable, Readable
 from bluesky.utils import MsgGenerator, plan
+from event_model import RunStart, RunStop
+
+
+@runtime_checkable
+class MovableHasName(Movable, HasName, Protocol):
+    """
+    A movable that has a name.
+
+    We use this instead of `bluesky.protocols.NamedMovable` since
+    we do not want to require `HasHints` on the movable.
+
+    A `Movable` and `HasName` is sufficient. `HasHints` should be optional.
+    """
+
+    ...
+
 
 ID_KEY: Literal["_id"] = "_id"
-Actuator = NamedMovable | Flyable
+Actuator = MovableHasName | Flyable
 Sensor = Readable | EventCollectable | EventPageCollectable
+
+TActuator = TypeVar("TActuator")
+"""Actuator generic type"""
+TSensor = TypeVar("TSensor")
+"""Sensor generic type"""
+TPlan = TypeVar("TPlan")
+"""Plan generic type"""
 
 
 @runtime_checkable
@@ -175,6 +198,7 @@ class AcquisitionPlan(Protocol):
         suggestions: list[dict],
         actuators: Sequence[Actuator],
         sensors: Sequence[Sensor] | None = None,
+        md: dict[str, Any] | None = None,
     ) -> MsgGenerator[str]:
         """
         Acquire data for optimization.
@@ -192,6 +216,8 @@ class AcquisitionPlan(Protocol):
             The actuators to move to their suggested positions.
         sensors: Sequence[Sensor], optional
             The sensors that produce data to evaluate.
+        md : dict[str, Any] | None, optional
+            Metadata to attach to the start document
 
         Returns
         -------
@@ -201,8 +227,79 @@ class AcquisitionPlan(Protocol):
         ...
 
 
+@runtime_checkable
+class REManagerAPIProtocol(Protocol):
+    """
+    Protocol for queue server manager API.
+
+    Defines the methods that QueueserverClient calls on the manager API.
+    The default implementation is bluesky_queueserver_api.zmq.REManagerAPI (ZMQ),
+    but any HTTP or other transport can implement this protocol.
+    """
+
+    def status(self) -> dict[str, Any]:
+        """Return environment status. Must include 'worker_environment_exists' key."""
+        ...
+
+    def devices_allowed(self) -> dict[str, Any]:
+        """Return allowed devices. Must include 'devices_allowed' key."""
+        ...
+
+    def plans_allowed(self) -> dict[str, Any]:
+        """Return allowed plans. Must include 'plans_allowed' key."""
+        ...
+
+    def item_add(self, plan: Any) -> dict[str, Any]:
+        """Submit a plan to the queue."""
+        ...
+
+    def wait_for_idle_or_paused(self, timeout: float = 600) -> None:
+        """Block until the queue is idle or paused."""
+        ...
+
+    def queue_start(self) -> dict[str, Any]:
+        """Start queue processing."""
+        ...
+
+
+@runtime_checkable
+class DocumentListener(Protocol):
+    """
+    Protocol for listening to Bluesky document streams.
+
+    Defines start/stop for a background listener that invokes a callback
+    when a matching stop document is received. The default implementation
+    uses ZMQ RemoteDispatcher, but WebSocket or HTTP polling can also
+    implement this protocol.
+    """
+
+    def start(self, on_stop: Callable[[RunStart, RunStop], None]) -> None:
+        """
+        Start listening for document events.
+
+        Parameters
+        ----------
+        on_stop : callable
+            Callback invoked when a stop document is received.
+            Signature: on_stop(start_doc, stop_doc)
+        """
+        ...
+
+    def stop(self) -> None:
+        """Stop listening for document events."""
+        ...
+
+
 @dataclass(frozen=True)
-class OptimizationProblem:
+class BaseOptimizationProblem(Generic[TActuator, TSensor, TPlan]):
+    optimizer: Optimizer
+    actuators: Sequence[TActuator]
+    sensors: Sequence[TSensor]
+    evaluation_function: EvaluationFunction
+    acquisition_plan: TPlan | None = None
+
+
+class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionPlan]):
     """
     An optimization problem to solve. Immutable once initialized.
 
@@ -230,8 +327,37 @@ class OptimizationProblem:
     blop.plans.optimize : Bluesky plan that uses an OptimizationProblem.
     """
 
+    ...
+
+
+class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
+    """
+    An optimization problem to solve. Immutable once initialized.
+
+    This dataclass encapsulates all components needed for optimization into a single
+    immutable structure. It is typically created via :meth:`blop.ax.QueueserverAgent.to_optimization_problem`
+    and used with bluesky-queueserver-api. Actuators, sensors, and the acquisition plan are referenced
+    by their names, since their instances live on a remote server.
+
+    Attributes
+    ----------
     optimizer: Optimizer
-    actuators: Sequence[Actuator]
-    sensors: Sequence[Sensor]
+        Suggests points to evaluate and ingests outcomes to inform the optimization.
+    actuators: Sequence[str]
+        Names of objects that can be moved to control the beamline using the Bluesky RunEngine.
+        A subset of the actuators' names must match the names of suggested parameterizations.
+    sensors: Sequence[str]
+        Names of objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.
     evaluation_function: EvaluationFunction
-    acquisition_plan: AcquisitionPlan | None = None
+        A callable to evaluate data from a Bluesky run and produce outcomes.
+    acquisition_plan: str, optional
+        The name of a Bluesky plan to acquire data from the beamline. If not provided, a default plan name will be used.
+        The plan must match the arguments of :ref:`AcquisitionPlan`.
+
+    See Also
+    --------
+    blop.ax.QueueserverAgent.to_optimization_problem : Creates a QueueserverOptimizationProblem from an agent.
+    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.
+    """
+
+    ...
