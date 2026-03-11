@@ -2,11 +2,26 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
-from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, NamedMovable, Readable
+from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, HasName, Movable, Readable
 from bluesky.utils import MsgGenerator, plan
 
+
+@runtime_checkable
+class MovableHasName(Movable, HasName, Protocol):
+    """
+    A movable that has a name.
+
+    We use this instead of `bluesky.protocols.NamedMovable` since
+    we do not want to require `HasHints` on the movable.
+
+    A `Movable` and `HasName` is sufficient. `HasHints` should be optional.
+    """
+
+    ...
+
+
 ID_KEY: Literal["_id"] = "_id"
-Actuator = NamedMovable | Flyable
+Actuator = MovableHasName | Flyable
 Sensor = Readable | EventCollectable | EventPageCollectable
 
 TActuator = TypeVar("TActuator")
