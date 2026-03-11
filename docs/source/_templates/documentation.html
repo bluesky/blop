@@ -65,18 +65,39 @@
           <div style="min-width: 180px; flex: 1;">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Static Checks</h3>
             <p style="margin-bottom: 0.3rem;">Pre-commit run for formatting</p>
-            <pre style="margin-bottom: 0.3rem;"><code>$ pixi run check</code></pre>
+            <div class="installation-box">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <span style="display: block; width: 100%; padding-right: 4.5rem;">
+                        <code class="code-prompt">$ </code><code class="code-command">pixi run check</code>
+                    </span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+            </div>
           </div>
           <div style="min-width: 180px; flex: 1;">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Run Tests</h3>
             <p style="margin-bottom: 2.5rem;"> </p>
-            <pre style="margin-bottom: 0.3rem;"><code>$ pixi run unit-tests
-$ pixi run test-docs</code></pre>
+            <div class="installation-box">
+                <div style="position: relative; display: flex; flex-direction: column; gap: 0.25rem;">
+                    <span style="display: block; width: 100%; padding-right: 4.5rem;">
+                        <code class="code-prompt">$ </code><code class="code-command">pixi run unit-tests</code><br>
+                        <code class="code-prompt">$ </code><code class="code-command">pixi run test-docs</code>
+                    </span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+            </div>
           </div>
           <div style="min-width: 180px; flex: 1;">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.3rem;">Build Documentation</h3>
             <p style="margin-bottom: 2.5rem;"> </p>
-            <pre style="margin-bottom: 0.3rem;"><code>$ pixi run build-docs</code></pre>
+            <div class="installation-box">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <span style="display: block; width: 100%; padding-right: 4.5rem;">
+                        <code class="code-prompt">$ </code><code class="code-command">pixi run build-docs</code>
+                    </span>
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                </div>
+            </div>
           </div>
         </div>
       </div>

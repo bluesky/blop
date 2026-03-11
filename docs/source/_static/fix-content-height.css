@@ -4,12 +4,21 @@
  * which is too small
  */
  .content {
-    height: auto !important;
+    height: auto;
     min-height: 500px; /* Keep a minimum height for layout purposes */
-    max-height: none !important;
+    max-height: none;
+    width: none;
+    min-width: 500px
 }
 
 /* Ensure content can expand as needed for interactive plots */
 .content > * {
-    max-height: none !important;
+    max-height: none;
+    width: none
 } 
+
+.card-box > * {
+    overflow: hidden;
+    left: 0;
+    top: 0
+}

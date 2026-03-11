@@ -123,51 +123,35 @@ function closeWarningBanner() {
   }, 300);
 }
 
-// Code copying functions
-function copyCode(text, btn) {
-    // Attempt modern Clipboard API
+function copyCode(btn) {
+    const text = btn.parentElement.querySelector(".code-block").innerText;
+
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(text)
-            .then(() => animateButton(btn))
-            .catch(() => fallbackCopy(text, btn));
+            .catch(() => fallbackCopy(text));
     } else {
-        fallbackCopy(text, btn);
+        fallbackCopy(text);
     }
 }
-function fallbackCopy(text, btn) {
+
+function fallbackCopy(text) {
     const textArea = document.createElement("textarea");
     textArea.value = text;
-    
-    // Ensure the textarea is off-screen
+
     textArea.style.position = "fixed";
     textArea.style.left = "-9999px";
-    textArea.style.top = "0";
+
     document.body.appendChild(textArea);
-    
     textArea.focus();
     textArea.select();
 
     try {
-        const successful = document.execCommand('copy');
+        document.execCommand("copy");
     } catch (err) {
-        console.error('Fallback: Unable to copy', err);
+        console.error("Fallback: Unable to copy", err);
     }
 
     document.body.removeChild(textArea);
-}
-
-function animateButton(btn) {
-    const originalText = btn.innerHTML;
-    
-    // Change to Checkmark
-    btn.innerHTML = "&#10003;"; // Unicode Checkmark
-    btn.classList.add('success');
-    
-    // Reset after 2 seconds
-    setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.classList.remove('success');
-    }, 2000);
 }
 
 // Add click event listeners to all copy buttons
