@@ -33,6 +33,33 @@ html[data-theme="dark"] #search-input:focus::placeholder {
   margin-top: 90px;
 }
 
+.bd-sidebar-primary {
+	background-color: var(--pst-color-background);
+	border-right: 1px solid var(--pst-color-border);
+	display: flex;
+	flex: 0 0 auto;
+	flex-direction: column;
+	font-size: var(--pst-sidebar-font-size-mobile);
+	gap: 1rem;
+	max-height: calc(100vh - var(--pst-header-height));
+	overflow-y: auto;
+	padding: 2rem 1rem 1rem;
+	position: sticky;
+	top: var(--pst-header-height);
+	width: 15%;
+  max-width: 300px;
+}
+
+.bd-main .bd-content .bd-article-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  max-width: none;
+  overflow-x: auto;
+  padding: 1rem;
+  width: 100%;
+}
+
 .bd-page-width {
   max-width: 100%;  /* default is 88rem */
 }
