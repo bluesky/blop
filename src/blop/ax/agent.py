@@ -14,15 +14,15 @@ else:
     from ax.analysis.analysis_card import AnalysisCardBase  # type: ignore[import-untyped]
 # ===============================
 from bluesky.utils import MsgGenerator
-from bluesky_queueserver_api.zmq import REManagerAPI
-
 from ..plans import acquire_baseline, optimize, sample_suggestions
 from ..protocols import (
     AcquisitionPlan,
     Actuator,
+    DocumentListener,
     EvaluationFunction,
     OptimizationProblem,
     QueueserverOptimizationProblem,
+    REManagerAPIProtocol,
     Sensor,
 )
 from ..queueserver import QueueserverClient, QueueserverOptimizationRunner
@@ -440,15 +440,18 @@ class Agent(_AxAgentMixin):
 class QueueserverAgent(_AxAgentMixin):
     """
     An asynchronous interface that uses Ax as the backend for optimization and experiment tracking
-    and the bluesky-queueserver-api for scheduling plan execution.
+    and a queueserver for scheduling plan execution.
 
     Parameters
     ----------
-    re_manager_api : REManagerAPI
-        The manager API for interaction with Bluesky queueserver.
-    zmq_consumer_addr : str
-        A ZMQ address to consume Bluesky messages from, to react to plan execution on the
-        remote server.
+    re_manager_api : REManagerAPIProtocol
+        The manager API for interaction with the queueserver. Can be the default
+        ZMQ-based ``bluesky_queueserver_api.zmq.REManagerAPI`` or any HTTP/REST
+        implementation that satisfies the ``REManagerAPIProtocol``.
+    document_listener : DocumentListener
+        Listener for Bluesky document streams. Can be the default
+        ``ZMQDocumentListener`` or any WebSocket/HTTP implementation that
+        satisfies the ``DocumentListener`` protocol.
     sensors : Sequence[str]
         The sensors to use for acquisition. These should be the minimal set
         of sensors that are needed to compute the objectives.
@@ -477,13 +480,15 @@ class QueueserverAgent(_AxAgentMixin):
     blop.ax.dof.ChoiceDOF : For discrete parameters.
     blop.ax.objective.Objective : For defining objectives.
     blop.ax.optimizer.AxOptimizer : The optimizer used internally.
-    blop.queueserver.QueueservverOptimizatonRunner : Runner that handles interaction with bluesky-queueserver.
+    blop.queueserver.QueueserverOptimizationRunner : Runner that handles interaction with the queueserver.
+    blop.protocols.REManagerAPIProtocol : Protocol for queue server manager API.
+    blop.protocols.DocumentListener : Protocol for document event listeners.
     """
 
     def __init__(
         self,
-        re_manager_api: REManagerAPI,
-        zmq_consumer_addr: str,
+        re_manager_api: REManagerAPIProtocol,
+        document_listener: DocumentListener,
         sensors: Sequence[str],
         dofs: Sequence[DOF],
         objectives: Sequence[Objective],
@@ -516,7 +521,7 @@ class QueueserverAgent(_AxAgentMixin):
         )
         self._runner = QueueserverOptimizationRunner(
             self.to_optimization_problem(),
-            QueueserverClient(re_manager_api, zmq_consumer_addr),
+            QueueserverClient(re_manager_api, document_listener),
         )
 
     @property

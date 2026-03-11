@@ -1,9 +1,15 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
-from blop.protocols import CanRegisterSuggestions, Optimizer, QueueserverOptimizationProblem
+from blop.protocols import CanRegisterSuggestions, DocumentListener, Optimizer, QueueserverOptimizationProblem
 from blop.queueserver import CORRELATION_UID_KEY, ConsumerCallback, QueueserverClient, QueueserverOptimizationRunner
+
+
+@pytest.fixture(scope="function")
+def mock_listener():
+    """Create a mock DocumentListener."""
+    return MagicMock(spec=DocumentListener)
 
 
 @pytest.fixture(scope="function")
@@ -54,40 +60,40 @@ def test_consumer_callback_clears_cache_after_stop():
     assert mock_callback.call_count == 1
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_check_environment_raises_when_not_ready(mock_re_manager):
+def test_queueserver_client_check_environment_raises_when_not_ready(mock_listener):
     """Test check_environment raises RuntimeError when environment not open."""
+    mock_re_manager = MagicMock()
     mock_re_manager.status.return_value = {"worker_environment_exists": False}
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    client = QueueserverClient(mock_re_manager, mock_listener)
 
     with pytest.raises(RuntimeError, match="queueserver environment is not open"):
         client.check_environment()
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_check_devices_raises_for_missing_device(mock_re_manager):
+def test_queueserver_client_check_devices_raises_for_missing_device(mock_listener):
     """Test check_devices_available raises ValueError for missing devices."""
+    mock_re_manager = MagicMock()
     mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}}}
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    client = QueueserverClient(mock_re_manager, mock_listener)
 
     with pytest.raises(ValueError, match="Device 'motor2' is not available"):
         client.check_devices_available(["motor1", "motor2"])
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_check_plan_raises_for_missing_plan(mock_re_manager):
+def test_queueserver_client_check_plan_raises_for_missing_plan(mock_listener):
     """Test check_plan_available raises ValueError for missing plan."""
+    mock_re_manager = MagicMock()
     mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"other_plan": {}}}
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    client = QueueserverClient(mock_re_manager, mock_listener)
 
     with pytest.raises(ValueError, match="Plan 'my_plan' is not available"):
         client.check_plan_available("my_plan")
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_submit_plan_with_autostart(mock_re_manager):
+def test_queueserver_client_submit_plan_with_autostart(mock_listener):
     """Test submit_plan adds item and starts queue when autostart=True."""
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    mock_re_manager = MagicMock()
+    client = QueueserverClient(mock_re_manager, mock_listener)
     mock_plan = MagicMock()
 
     client.submit_plan(mock_plan, autostart=True)
@@ -97,10 +103,10 @@ def test_queueserver_client_submit_plan_with_autostart(mock_re_manager):
     mock_re_manager.queue_start.assert_called_once()
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_submit_plan_without_autostart(mock_re_manager):
+def test_queueserver_client_submit_plan_without_autostart(mock_listener):
     """Test submit_plan only adds item when autostart=False."""
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    mock_re_manager = MagicMock()
+    client = QueueserverClient(mock_re_manager, mock_listener)
     mock_plan = MagicMock()
 
     client.submit_plan(mock_plan, autostart=False)
@@ -109,82 +115,35 @@ def test_queueserver_client_submit_plan_without_autostart(mock_re_manager):
     mock_re_manager.queue_start.assert_not_called()
 
 
-@patch("blop.queueserver.threading.Thread")
-@patch("blop.queueserver.RemoteDispatcher")
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_start_listener(mock_re_manager, mock_dispatcher_cls, mock_thread_cls):
-    """Test start_listener creates dispatcher, subscribes callback, and starts thread."""
-    mock_re_manager.status.return_value = {"worker_environment_exists": True}
-    mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}, "detector": {}}}
-    mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"default_acquire": {}}}
-
-    client = QueueserverClient(mock_re_manager, "tcp://localhost:5578")
+def test_queueserver_client_start_listener_delegates_to_listener(mock_listener):
+    """Test start_listener delegates to the document listener."""
+    mock_re_manager = MagicMock()
+    client = QueueserverClient(mock_re_manager, mock_listener)
     mock_callback = MagicMock()
 
     client.start_listener(on_stop=mock_callback)
 
-    mock_dispatcher_cls.assert_called_once_with("tcp://localhost:5578")
-    mock_dispatcher = mock_dispatcher_cls.return_value
-    mock_dispatcher.subscribe.assert_called_once()
-    subscribed_callback = mock_dispatcher.subscribe.call_args[0][0]
-    assert isinstance(subscribed_callback, ConsumerCallback)
-    assert subscribed_callback._callback is mock_callback
-
-    mock_thread_cls.assert_called_once()
-    call_kwargs = mock_thread_cls.call_args[1]
-    assert call_kwargs["target"] == mock_dispatcher.start
-    mock_thread_cls.return_value.start.assert_called_once()
+    mock_listener.start.assert_called_once_with(mock_callback)
 
 
-@patch("blop.queueserver.threading.Thread")
-@patch("blop.queueserver.RemoteDispatcher")
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_start_listener_already_running_returns_early(
-    mock_re_manager, mock_dispatcher_cls, mock_thread_cls
-):
-    """Test start_listener returns early when listener is already running."""
-    mock_re_manager.status.return_value = {"worker_environment_exists": True}
-    mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}, "detector": {}}}
-    mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"default_acquire": {}}}
-
-    client = QueueserverClient(mock_re_manager, "tcp://localhost:5578")
-    client._listener_thread = MagicMock()  # Simulate already running
-
-    client.start_listener(on_stop=MagicMock())
-
-    mock_dispatcher_cls.assert_not_called()
-    mock_thread_cls.assert_not_called()
-
-
-@patch("blop.queueserver.threading.Thread")
-@patch("blop.queueserver.RemoteDispatcher")
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_stop_listener(mock_re_manager, mock_dispatcher_cls, mock_thread_cls):
-    """Test stop_listener stops dispatcher and clears state."""
-    mock_re_manager.status.return_value = {"worker_environment_exists": True}
-    mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}, "detector": {}}}
-    mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"default_acquire": {}}}
-
-    client = QueueserverClient(mock_re_manager, "tcp://localhost:5578")
-    client.start_listener(on_stop=MagicMock())
+def test_queueserver_client_stop_listener_delegates_to_listener(mock_listener):
+    """Test stop_listener delegates to the document listener."""
+    mock_re_manager = MagicMock()
+    client = QueueserverClient(mock_re_manager, mock_listener)
 
     client.stop_listener()
 
-    mock_dispatcher_cls.return_value.stop.assert_called_once()
-    assert client._dispatcher is None
-    assert client._consumer_callback is None
-    assert client._listener_thread is None
+    mock_listener.stop.assert_called_once()
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_stop_listener_when_not_started(mock_re_manager):
+def test_queueserver_client_stop_listener_when_not_started(mock_listener):
     """Test stop_listener is safe to call when listener was never started."""
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    mock_re_manager = MagicMock()
+    client = QueueserverClient(mock_re_manager, mock_listener)
 
     client.stop_listener()  # Should not raise
 
-    assert client._dispatcher is None
-    assert client._listener_thread is None
+    mock_listener.stop.assert_called_once()
 
 
 def test_runner_run_validates_environment(mock_optimization_problem):
