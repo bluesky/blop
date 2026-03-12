@@ -18,19 +18,31 @@ from bluesky.utils import MsgGenerator
 from ..plans import acquire_baseline, optimize, sample_suggestions
 from ..protocols import AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Sensor
 from ..utils import InferredReadable
-from .dof import DOF, DOFConstraint
+from .dof import DOF, DOFConstraint, RangeDOF
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer
 
 logger = logging.getLogger(__name__)
 
 
-def _has_str_keys(d: dict[DOF, Any] | dict[str, Any]) -> TypeGuard[dict[str, Any]]:
+def _has_str_keys_not_dof(d: dict[DOF, Any] | dict[str, Any]) -> TypeGuard[dict[str, Any]]:
     return all(isinstance(key, str) for key in d.keys())
 
 
 def _has_dof_keys(d: dict[DOF, Any] | dict[str, Any]) -> TypeGuard[dict[DOF, Any]]:
     return all(isinstance(key, DOF) for key in d.keys())
+
+
+def _has_str_keys_not_range_dof(
+    d: dict[RangeDOF, tuple[float, float]] | dict[str, tuple[float, float]],
+) -> TypeGuard[dict[str, tuple[float, float]]]:
+    return all(isinstance(key, str) for key in d.keys())
+
+
+def _has_range_dof_keys(
+    d: dict[RangeDOF, tuple[float, float]] | dict[str, tuple[float, float]],
+) -> TypeGuard[dict[RangeDOF, tuple[float, float]]]:
+    return all(isinstance(key, RangeDOF) for key in d.keys())
 
 
 class Agent:
@@ -192,7 +204,7 @@ class Agent:
             self._optimizer.fixed_parameters = None
             return
 
-        if _has_str_keys(fixed_dofs):
+        if _has_str_keys_not_dof(fixed_dofs):
             self._optimizer.fixed_parameters = fixed_dofs
         elif _has_dof_keys(fixed_dofs):
             self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
@@ -412,3 +424,24 @@ class Agent:
         Save the agent's state to a JSON file.
         """
         self._optimizer.checkpoint()
+
+    def reconfigure_search_space(
+        self, dof_bounds: dict[RangeDOF, tuple[float, float]] | dict[str, tuple[float, float]]
+    ) -> None:
+        """
+        Reconfigure bounds of RangeDOFs for future optimizations.
+
+        Parameters
+        ----------
+        dof_bounds : dict[RangeDOF, Any] | dict[str, Any] | None
+            A mapping of RangeDOFs or RangeDOF names to the values they should be fixed to.
+
+        """
+        if _has_str_keys_not_range_dof(dof_bounds):
+            self._optimizer.reconfigure_search_space(dof_bounds)
+        elif _has_range_dof_keys(dof_bounds):
+            self._optimizer.reconfigure_search_space({dof.parameter_name: bounds for dof, bounds in dof_bounds.items()})
+        else:
+            raise ValueError(
+                f"Keys must all be either {type(RangeDOF)} or {type(str)}, but got {type(list(dof_bounds.keys())[0])}"
+            )
