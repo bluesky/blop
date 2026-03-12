@@ -177,3 +177,20 @@ def test_ax_optimizer_checkpoint_no_path():
 
     with pytest.raises(ValueError):
         optimizer.checkpoint()
+
+def test_ax_optimizer_reconfigurable_search_space():
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(-5.0, 5.0), parameter_type="float"),
+            RangeParameterConfig(name="x2", bounds=(-5.0, 5.0), parameter_type="float"),
+            ChoiceParameterConfig(name="x3", values=[0, 1, 2, 3, 4, 5], parameter_type="int", is_ordered=True),
+        ],
+        objective="y1,-y2",
+        parameter_constraints=["x1 + x2 <= 10"],
+        outcome_constraints=["y1 >= 0", "y2 <= 0"],
+    )
+    with pytest.raises(KeyError):
+        optimizer.reconfigure_search_space({"x4": (1, 3)})
+    optimizer.reconfigure_search_space({"x1": (-4, 4)})
+    param_x1 = optimizer._client._experiment.parameters["x1"]
+    assert (param_x1.lower, param_x1.upper) == (-4, 4)

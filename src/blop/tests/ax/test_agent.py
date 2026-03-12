@@ -211,3 +211,22 @@ def test_ingest_baseline(mock_evaluation_function):
     summary_df = agent.ax_client.summarize()
     assert len(summary_df) == 1
     assert summary_df["arm_name"].values[0] == "baseline"
+
+def test_reconfigure_search_space(mock_evaluation_function):
+    movable1 = MovableSignal(name="test_movable1")
+    movable2 = MovableSignal(name="test_movable2")
+    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+    agent = Agent(
+        sensors=[],
+        dofs=[dof1, dof2],
+        objectives=[objective],
+        evaluation_function=mock_evaluation_function,
+    )
+    with pytest.raises(ValueError):
+        agent.reconfigure_search_space({"test_movable1": (3, 6), dof2: (3, 6)})
+    agent.reconfigure_search_space({"test_movable1": (3, 6)})
+    parameterizations = agent.suggest(10)
+    for i in range(10):
+        assert 3 <= parameterizations[i]["test_movable1"] <= 6
