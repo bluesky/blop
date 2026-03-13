@@ -11,15 +11,15 @@ The package works with Python 3.10+ and can be installed from both PyPI and/or c
 
 To install the package using the ``pip`` package manager, run the following command:
 
-.. code:: bash
-
-   $ pip install blop
+.. include:: _includes/installation-code-snippets.rst
+   :start-after: .. snippet-pip-standard-start
+   :end-before: .. snippet-pip-standard-end
 
 To install the package using the ``conda`` package manager, run the following command:
 
-.. code:: bash
-
-   $ conda install -c conda-forge blop
+.. include:: _includes/installation-code-snippets.rst
+   :start-after: .. snippet-conda-standard-start
+   :end-before: .. snippet-conda-standard-end
 
 PyTorch Acceleration Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -27,10 +27,9 @@ PyTorch Acceleration Options
 By default, ``blop`` installs PyTorch with GPU support (~7GB). For environments without GPU support,
 or to reduce installation size, you can install a CPU-only version (~900MB) using ``uv``:
 
-.. code:: bash
-
-   $ pip install uv
-   $ uv pip install blop[cpu]
+.. include:: _includes/installation-code-snippets.rst
+   :start-after: .. snippet-pip-cpu-start
+   :end-before: .. snippet-pip-cpu-end
 
 This is particularly useful for:
 
@@ -46,9 +45,10 @@ This is particularly useful for:
 
 For conda users who want CPU-only PyTorch:
 
-.. code:: bash
+.. include:: _includes/installation-code-snippets.rst
+   :start-after: .. snippet-conda-cpu-start
+   :end-before: .. snippet-conda-cpu-end
 
-   $ conda install -c conda-forge blop pytorch cpuonly -c pytorch
 
 Running the tutorials
 ^^^^^^^^^^^^^^^^^^^^^
@@ -69,7 +69,6 @@ Your third option is to simply convert the tutorials to ipynb format and use wha
 
    $ jupytext --to ipynb docs/source/tutorials/*.md
 
-.. _for-developers:
 
 For developers
 --------------

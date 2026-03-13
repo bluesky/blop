@@ -496,6 +496,30 @@ body.pagename-index .bd-sidebar { display: none !important; }
 body.pagename-index .bd-toc { display: none !important; }
 body.pagename-index .bd-main { grid-template-columns: 1fr !important; }
 body.pagename-index .bd-content { max-width: 100% !important; }
+body.pagename-index h1 { text-align: center; font-size: 4rem; margin-bottom: 0.5rem; }
+
+.index-subtitle {
+  text-align: center;
+  font-size: 1.25rem;
+  color: var(--pst-color-text-muted);
+  margin-bottom: 4rem;
+}
+
+.index-about-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  margin-bottom: 4rem;
+}
+
+@media (max-width: 768px) {
+  .index-about-grid,
+  .installation-grid,
+  .learn-more-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* INDEX PAGE STYLES */
 
@@ -805,4 +829,39 @@ body.pagename-index .bd-content { max-width: 100% !important; }
   text-align: center;
   color: var(--pst-color-text-base);
   margin-bottom: 2rem;
+}
+
+.learn-more-card-link {
+  background: var(--pst-color-surface);
+  border: 1px solid var(--pst-color-border);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.learn-more-card-link a {
+  color: var(--pst-color-text-base);
+  text-decoration: none;
+  display: block;
+}
+
+.learn-more-card-desc {
+  background: var(--pst-color-background);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--pst-color-text-muted);
+}
+
+.index-reference-box {
+  background-color: var(--pst-color-surface);
+  border-left: 5px solid var(--pst-color-primary);
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  border-radius: 0 8px 8px 0;
+  margin: 1.5rem 0;
 }
