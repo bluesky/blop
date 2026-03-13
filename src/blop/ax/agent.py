@@ -421,18 +421,18 @@ class Agent:
         self, dof_bounds: dict[RangeDOF, tuple[float, float]] | dict[str, tuple[float, float]]
     ) -> None:
         """
-        Reconfigure bounds of RangeDOFs for future optimizations.
+        Update bounds of existing RangeDOFs for future optimizations.
 
         Parameters
         ----------
-        dof_bounds : dict[RangeDOF, Any] | dict[str, Any] | None
-            A mapping of RangeDOFs or RangeDOF names to the values they should be fixed to.
+        dof_bounds : dict[RangeDOF, tuple[float, float]] | dict[str, tuple[float, float]]
+            Mapping of RangeDOFs or RangeDOF names to (upper, lower) bounds
 
         """
         if _has_str_keys(dof_bounds):
-            self._optimizer.reconfigure_search_space(dof_bounds)
+            self._optimizer._reconfigure_search_space(dof_bounds)
         elif _has_range_dof_keys(dof_bounds):
-            self._optimizer.reconfigure_search_space({dof.parameter_name: bounds for dof, bounds in dof_bounds.items()})
+            self._optimizer._reconfigure_search_space({dof.parameter_name: bounds for dof, bounds in dof_bounds.items()})
         else:
             raise ValueError(
                 f"Keys must all be either {type(RangeDOF)} or {type(str)}, but got {type(list(dof_bounds.keys())[0])}"

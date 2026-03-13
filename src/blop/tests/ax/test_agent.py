@@ -212,6 +212,7 @@ def test_ingest_baseline(mock_evaluation_function):
     assert len(summary_df) == 1
     assert summary_df["arm_name"].values[0] == "baseline"
 
+
 def test_reconfigure_search_space(mock_evaluation_function):
     movable1 = MovableSignal(name="test_movable1")
     movable2 = MovableSignal(name="test_movable2")

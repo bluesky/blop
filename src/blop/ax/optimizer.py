@@ -216,10 +216,17 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
             raise ValueError("Checkpoint path is not set. Please set a checkpoint path when initializing the optimizer.")
         self._client.save_to_json_file(self.checkpoint_path)
 
-    def reconfigure_search_space(self, parameter_bounds: dict[str, tuple[float, float]]) -> None:
-        unknown_parameter_names = {parameter_name for parameter_name, bounds in parameter_bounds.items()} - set(
-            self._parameter_names
-        )
+    def _reconfigure_search_space(self, parameter_bounds: dict[str, tuple[float, float]]) -> None:
+        """
+        Update the bounds of existing RangeParameters in the underlying experiment
+
+        Parameters
+        ----------
+        parameter_bounds : dict[str, tuple[float, float]]
+            Mapping of parameter names to (lower, upper) bounds
+
+        """
+        unknown_parameter_names = set(parameter_bounds) - set(self._parameter_names)
         if unknown_parameter_names:
             raise KeyError(
                 f"Unknown parameter(s): {sorted(unknown_parameter_names)}, expected: {sorted(self._parameter_names)}"

@@ -178,6 +178,7 @@ def test_ax_optimizer_checkpoint_no_path():
     with pytest.raises(ValueError):
         optimizer.checkpoint()
 
+
 def test_ax_optimizer_reconfigurable_search_space():
     optimizer = AxOptimizer(
         parameters=[
@@ -190,7 +191,7 @@ def test_ax_optimizer_reconfigurable_search_space():
         outcome_constraints=["y1 >= 0", "y2 <= 0"],
     )
     with pytest.raises(KeyError):
-        optimizer.reconfigure_search_space({"x4": (1, 3)})
-    optimizer.reconfigure_search_space({"x1": (-4, 4)})
+        optimizer._reconfigure_search_space({"x4": (-4, 4)})
+    optimizer._reconfigure_search_space({"x1": (-4, 4)})
     param_x1 = optimizer._client._experiment.parameters["x1"]
     assert (param_x1.lower, param_x1.upper) == (-4, 4)
