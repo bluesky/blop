@@ -1,0 +1,53 @@
+<header class="index-header">
+  <div class="index-header-container">
+
+    <div class="index-header-left">
+
+      <div class="index-logo">
+        <div class="index-logo-icon">
+          B
+        </div>
+
+        <a href="{{ pathto(master_doc) }}">
+          Blop
+        </a>
+      </div>
+
+      <nav class="index-nav">
+        <a href="{{ pathto('tutorials') }}">Tutorials</a>
+        <a href="{{ pathto('how-to-guides') }}">How-To Guides</a>
+        <a href="{{ pathto('explanation') }}">Explanations</a>
+        <a href="{{ pathto('reference') }}">API</a>
+        <a href="{{ pathto('release-history') }}">Release History</a>
+      </nav>
+
+    </div>
+
+    <div class="index-header-right">
+
+      <!-- Working sphinx search -->
+      <form class="index-searchbox"
+            action="{{ pathto('search') }}"
+            method="get"
+            role="search">
+
+        <input type="search"
+               class="form-control index-search-input"
+               name="q"
+               placeholder="Search docs..."
+               aria-label="Search docs">
+
+        <input type="hidden" name="check_keywords" value="yes">
+        <input type="hidden" name="area" value="default">
+      </form>
+
+      <!-- PyData theme search modal -->
+      {% include "components/search-button.html" %}
+
+      <!-- PyData theme dark/light toggle -->
+      {% include "components/theme-switcher.html" %}
+
+    </div>
+
+  </div>
+</header>

@@ -144,7 +144,12 @@ html_theme = "pydata_sphinx_theme"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    # "navbar_start": ["navbar-logo"],
+    # "navbar_center": ["navbar-nav"],
+    # "navbar_end": [],
+    "use_edit_page_button": True,  # enables the edit button on regular pages
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -168,8 +173,18 @@ html_js_files = [
 
 # Add custom CSS to fix .content height constraint for plotly plots
 html_css_files = [
-    "fix-content-height.css",
+    "css/fix-content-height.css",
+    "css/styles.css",
 ]
+
+html_context = {
+    "github_user": "bluesky",
+    "github_repo": "blop",
+    "github_version": "main",
+    "doc_path": "docs",
+}
+
+html_show_sourcelink = False
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -239,7 +254,7 @@ texinfo_documents = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    # "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
     "matplotlib": ("https://matplotlib.org/stable", None),
     "bluesky": ("https://blueskyproject.io/bluesky/main", None),
     "ophyd-async": ("https://blueskyproject.io/ophyd-async/main", None),
