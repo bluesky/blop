@@ -8,7 +8,7 @@ Blop
     installation
     how-to-guides
     explanation
-    .. tutorials
+    tutorials
     reference
     release-history
 
