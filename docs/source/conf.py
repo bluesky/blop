@@ -177,11 +177,6 @@ html_css_files = [
     "css/styles.css",
 ]
 
-html_additional_pages = {
-    "index": "index.html",
-    "documentation": "documentation.html",
-}
-
 html_context = {
     "github_user": "bluesky",
     "github_repo": "blop",
