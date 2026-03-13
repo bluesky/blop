@@ -70,6 +70,8 @@ Your third option is to simply convert the tutorials to ipynb format and use wha
    $ jupytext --to ipynb docs/source/tutorials/*.md
 
 
+.. _for-developers:
+
 For developers
 --------------
 
