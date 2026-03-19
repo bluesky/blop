@@ -1,6 +1,8 @@
-/* Let notebook Plotly outputs fill available space */
-.content {
-    overflow: hidden;
+/* Let notebook HTML/Plotly outputs fill available space without
+ * affecting unrelated theme/layout containers named .content. */
+.bd-article .cell_output .output.text_html .content,
+.bd-article .cell_output .content {
+    overflow: auto;
     height: auto;
     min-height: 0;
     max-height: none;
@@ -9,16 +11,17 @@
     max-width: none;
 }
 
-.content > * {
+.bd-article .cell_output .output.text_html .content > *,
+.bd-article .cell_output .content > * {
     max-height: none;
     width: 100%;
     max-width: none;
 }
 
-.content .js-plotly-plot,
-.content .plotly-graph-div,
-.content .plotly,
-.content .plot-container {
+.bd-article .cell_output .content .js-plotly-plot,
+.bd-article .cell_output .content .plotly-graph-div,
+.bd-article .cell_output .content .plotly,
+.bd-article .cell_output .content .plot-container {
     width: 100% !important;
     max-width: none;
 }

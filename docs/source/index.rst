@@ -33,11 +33,11 @@ optimization interface for beamline experiments.
 .. raw:: html
 
     </div>
-    <div class="about-viz">
-      <div class="about-viz-inner">
-         <span class="about-viz-placeholder">[Visualization Placeholder]</span>
-      </div>
-    </div>
+        <div class="about-viz">
+            <div class="about-viz-inner">
+                <img src="_static/blop-image.png" alt="Image of beamline optimization done through blop">      
+            </div>
+        </div>
     </div>
     <hr class="section-divider">
 

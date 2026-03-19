@@ -64,6 +64,11 @@ html[data-theme="dark"] #search-input:focus::placeholder {
   max-width: 100%;  /* default is 88rem */
 }
 
+/* Center the page title heading in article content (e.g., "Blop"). */
+.bd-article-container h1:first-of-type {
+  text-align: center;
+}
+
 .custom-header-inner {
   width: 100%;
   padding: 0 2rem;
@@ -157,120 +162,6 @@ html[data-theme="dark"] {
   --warning-btn-text: #ff6633;
   --warning-btn-hover-bg: #3d3d3d;
   --install-card-bg: #222; /* Dark mode color */
-}
-
-.warning-banner {
-  position: fixed;
-  top: 73px;
-  left: 0;
-  width: 100%;
-  background-color: var(--warning-bg);
-  color: var(--warning-text);
-  font-family: sans-serif;
-  z-index: 999;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  transition: all 0.01s ease;
-}
-
-.warning-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 15px 20px;
-}
-
-.warning-main {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-}
-
-.warning-text {
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.warning-expand-btn {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: var(--warning-text);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  padding: 5px 15px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 1s ease;
-}
-
-.warning-expand-btn:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.6);
-}
-
-.warning-details {
-  display: flex;
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  transition: all 0.01s ease;
-  margin-top: 0;
-}
-
-.warning-details.expanded {
-  max-height: 100%;
-  opacity: 1;
-  margin-top: 15px;
-}
-
-.warning-details-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 2px solid var(--warning-bg);
-  background-color: var(--warning-details-bg);
-  color: var(--warning-details-text);
-  border-radius: 8px;
-  padding: 20px;
-  text-align: left;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.warning-details-box p {
-  margin: 10px 0 5px 0;
-  font-size: 0.95rem;
-  color: var(--warning-details-text);
-  width: 100%;
-}
-
-.warning-details-box p:last-of-type {
-  margin: 5px 0;
-  font-size: 0.9rem;
-  opacity: 0.85;
-}
-
-.warning-close-btn {
-  background-color: var(--warning-btn-bg);
-  color: var(--warning-btn-text);
-  border: none;
-  padding: 8px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin-top: 10px;
-  transition: all 0.3s ease;
-}
-
-.warning-close-btn:hover {
-  background-color: var(--warning-btn-hover-bg);
-  transform: translateY(-1px);
-}
-
-.warning-banner.hidden {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
 }
 
 /* HERO SECTION */
@@ -680,34 +571,40 @@ body.pagename-index h1 { text-align: center; font-size: 4rem; margin-bottom: 0.5
 }
 
 .about-viz {
-  background: var(--pst-color-surface);
-  border: 1px solid var(--pst-color-border);
-  border-radius: 16px;
-  padding: 2rem;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
   text-align: center;
 }
 
 .about-viz-inner {
-  height: 220px;
-  background: var(--pst-color-background);
-  border: 1px solid var(--pst-color-border);
-  border-radius: 12px;
+  height: auto;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.about-viz-placeholder {
-  color: var(--pst-color-text-muted);
+.about-viz-inner img {
+  display: block;
+  height: auto;
+  max-width: 100%;
 }
 
-/* Section divider */
+html[data-theme="dark"] .about-viz-inner img {
+  background-color: transparent !important;
+}
+
+/* ---------------- Section divider -------------------- */
 .section-divider {
   border: 0;
   border-top: 1px solid var(--pst-color-border);
 }
 
-/* Installation section */
+/* -----------Installation section */
 .installation-section {
   margin: 4rem 0;
   padding: 0 2rem;
@@ -717,50 +614,6 @@ body.pagename-index h1 { text-align: center; font-size: 4rem; margin-bottom: 0.5
   text-align: center;
   color: var(--pst-color-text-base);
   margin-bottom: 1rem;
-}
-
-.pytorch-notice {
-  background: var(--pst-color-surface);
-  border: 1px solid var(--pst-color-border);
-  border-left: 4px solid var(--pst-color-primary);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  color: var(--pst-color-text-base);
-  text-align: left;
-}
-
-.pytorch-notice-title {
-  margin: 0 0 0.75rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-align: center;
-  color: var(--pst-color-primary);
-}
-
-.pytorch-notice-text {
-  margin: 0 0 0.5rem 0;
-  font-size: 0.95rem;
-  line-height: 1.4;
-}
-
-.pytorch-notice code {
-  background: var(--pst-color-inline-code-background);
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  font-weight: 600;
-  color: var(--pst-color-text-base);
-}
-
-.pytorch-notice-note {
-  color: var(--pst-color-text-muted);
-  margin: 0;
-  font-size: 0.85rem;
-  font-style: italic;
-}
-
-.pytorch-notice-note a {
-  color: var(--pst-color-primary);
 }
 
 .installation-grid {
@@ -788,7 +641,6 @@ body.pagename-index h1 { text-align: center; font-size: 4rem; margin-bottom: 0.5
   font-size: 0.85rem;
 }
 
-
 .install-box-single {
   margin-bottom: 0.75rem;
 }
@@ -812,15 +664,7 @@ body.pagename-index h1 { text-align: center; font-size: 4rem; margin-bottom: 0.5
   padding-right: 4.5rem;
 }
 
-.code-prompt {
-  color: #4CAF50;
-}
-
-.code-command {
-  color: #E0E0E0;
-}
-
-/* Learn More section */
+/* ------------------- Learn More section ----------------------*/
 .learn-more-section {
   margin: 4rem 0;
 }
@@ -856,6 +700,7 @@ body.pagename-index h1 { text-align: center; font-size: 4rem; margin-bottom: 0.5
   color: var(--pst-color-text-muted);
 }
 
+/* ------------------- References section ----------------------*/
 .index-reference-box {
   background-color: var(--pst-color-surface);
   border-left: 5px solid var(--pst-color-primary);
