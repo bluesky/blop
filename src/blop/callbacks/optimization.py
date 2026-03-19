@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any
+from typing import Any, Sequence
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -38,14 +38,16 @@ class _OptimizationCallback(CallbackBase):
 
     def __init__(
         self,
+        parameter_names: Sequence[str],
+        objective_names: Sequence[str],
         stdout: bool = True,
         live_plots: bool = True,
         figsize: tuple[float, float] = (12, 6),
         **kwargs: Any,
     ):
         super().__init__(**kwargs)
-        self._parameters = None
-        self._objectives = None
+        self._parameters = parameter_names
+        self._objectives = objective_names
         self._stdout = stdout
         self._live_plots = live_plots
         self._figsize = figsize
@@ -71,33 +73,18 @@ class _OptimizationCallback(CallbackBase):
         plt.show(block=False)
 
     def start(self, doc: RunStart) -> None:
-        if doc.get("run_key") == OPTIMIZE_RUN_KEY:
-            self._optimize_run_uid = doc["uid"]
-            self._iteration = 0
+        self._optimize_run_uid = doc["uid"]
+        self._iteration = 0
 
-            if self._stdout:
-                iterations = doc.get("iterations", "?")
-                print(f"\n{'=' * 60}")
-                print(f"Starting optimization for {iterations} iterations")
-                print(f"{'=' * 60}\n")
+        if self._stdout:
+            iterations = doc.get("iterations", "?")
+            print(f"\n{'=' * 60}")
+            print(f"Starting optimization for {iterations} iterations")
+            print(f"{'=' * 60}\n")
 
     def descriptor(self, doc: EventDescriptor) -> None:
-        if self._optimize_run_uid is None:
-            return
-
-        if doc.get("run_start") == self._optimize_run_uid:
-            self._optimize_descriptor_uids.add(doc["uid"])
-
-            data_keys = doc.get("data_keys", {})
-
-            if not self._initialized:
-                self._parameters = [name for name in data_keys.keys() if name not in ("suggestion_ids", "bluesky_uid")]
-                self._objectives = []
-
-                exclude_keys = {"suggestion_ids", "bluesky_uid"} | set(self._parameters or [])
-                self._objectives = [name for name in data_keys.keys() if name not in exclude_keys]
-
-                self._initialized = True
+        # TODO: Something specific with data types?
+        ...
 
     def event(self, doc: Event) -> Event:
         if self._optimize_run_uid is None:
