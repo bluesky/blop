@@ -1,13 +1,13 @@
 import numpy as np
 
 from blop.protocols import ID_KEY
-from blop.utils import InferredReadable, get_route_index, route_suggestions
+from blop.utils import InferredReadable, get_route_index, route_suggestions, Source
 
 # InferredReadable tests
 
 
 def test_inferred_readable_scalar_number():
-    r = InferredReadable("x", 1.5)
+    r = InferredReadable("x", Source.OTHER, 1.5)
     assert r.name == "x"
     assert r.parent is None
     read = r.read()
@@ -18,23 +18,23 @@ def test_inferred_readable_scalar_number():
 
 
 def test_inferred_readable_scalar_string():
-    r = InferredReadable("ids", ["0"])
+    r = InferredReadable("ids", Source.OTHER, ["0"])
     assert r.read()["ids"]["value"] == "0"
     assert r.describe()["ids"]["dtype"] == "string"
 
 
 def test_inferred_readable_array():
-    r = InferredReadable("arr", [0.0, 0.1])
+    r = InferredReadable("arr", Source.OTHER, [0.0, 0.1])
     assert r.read()["arr"]["value"] == [0.0, 0.1]
     assert r.describe()["arr"]["dtype"] == "array"
 
 
 def test_inferred_readable_update():
-    r = InferredReadable("x", 1.5)
+    r = InferredReadable("x", Source.OTHER, 1.5)
     r.update(2.0)
     assert r.read()["x"]["value"] == 2.0
 
-    r2 = InferredReadable("arr", [0.0, 0.1])
+    r2 = InferredReadable("arr", Source.OTHER, [0.0, 0.1])
     r2.update(np.array([1.0, 2.0]))
     assert list(r2.read()["arr"]["value"]) == [1.0, 2.0]
 
