@@ -15,7 +15,7 @@ from .utils import InferredReadable, collect_optimization_metadata, route_sugges
 logger = logging.getLogger(__name__)
 
 _DEFAULT_ACQUIRE_RUN_KEY: Literal["default_acquire"] = "default_acquire"
-_SAMPLE_SUGGESTIONS_RUN_KEY: Literal["sample_suggestions"] = "sample_suggestions"
+SAMPLE_SUGGESTIONS_RUN_KEY: Literal["sample_suggestions"] = "sample_suggestions"
 OPTIMIZE_RUN_KEY: Literal["optimize"] = "optimize"
 
 
@@ -292,11 +292,11 @@ def sample_suggestions(
         {
             "plan_name": "sample_suggestions",
             "suggestions": suggestions,
-            "run_key": _SAMPLE_SUGGESTIONS_RUN_KEY,
+            "run_key": SAMPLE_SUGGESTIONS_RUN_KEY,
         }
     )
 
-    @bpp.set_run_key_decorator(_SAMPLE_SUGGESTIONS_RUN_KEY)
+    @bpp.set_run_key_decorator(SAMPLE_SUGGESTIONS_RUN_KEY)
     @bpp.run_decorator(md=_md)
     def _inner_sample_suggestions() -> MsgGenerator[tuple[str, list[dict], list[dict]]]:
 

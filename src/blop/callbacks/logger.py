@@ -3,13 +3,12 @@ from collections import defaultdict
 from typing import Any, cast
 
 from bluesky.callbacks import CallbackBase
-from event_model import Event, EventDescriptor, RunRouter, RunStart, RunStop
+from event_model import Event, EventDescriptor, RunStart, RunStop
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from ..plans import OPTIMIZE_RUN_KEY
 from ..utils import Source
 
 # Styling constants
@@ -365,32 +364,3 @@ class OptimizationLogger(CallbackBase):
             self._console.rule(label, style="yellow")
 
         self._console.print()
-
-
-class BestEffortOptimizationCallback:
-    """Best effort callback for displaying optimization information."""
-
-    def __init__(
-        self,
-        stdout: bool = True,
-        live_plots: bool = True,
-        figsize: tuple[int, int] = (12, 6),
-    ) -> None:
-        self._run_router = RunRouter([self._factory])
-        self._callbacks = self._setup_callbacks(stdout, live_plots, figsize)
-
-    def _setup_callbacks(
-        self, stdout: bool = True, live_plots: bool = True, figsize: tuple[int, int] = (12, 6)
-    ) -> list[CallbackBase]:
-        callbacks = []
-        if stdout:
-            callbacks.append(OptimizationLogger())
-        return callbacks
-
-    def _factory(self, name, doc):
-        if name == "start" and doc["run_key"] == OPTIMIZE_RUN_KEY:
-            return self._callbacks, []
-        return [], []
-
-    def __call__(self, name, doc):
-        self._run_router(name, doc)

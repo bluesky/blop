@@ -31,7 +31,6 @@ dependencies = [
   "scipy",
   "networkx>=3",
   "numpy",
-  "matplotlib",
   "rich>=13",
 ]
 classifiers = [
