@@ -1,3 +1,5 @@
+import logging
+import warnings
 import time
 from typing import Any
 
@@ -6,6 +8,9 @@ from blop import Agent, RangeDOF, Objective
 from blop.callbacks import BestEffortOptimizationCallback
 from bluesky.run_engine import RunEngine
 from bluesky.protocols import Status, Readable, HasHints, HasParent, NamedMovable, Hints
+
+logging.getLogger("ax.api.client").setLevel(logging.WARNING)
+warnings.filterwarnings("ignore")
 
 
 class AlwaysSuccessfulStatus(Status):
@@ -85,5 +90,5 @@ agent = Agent(
     evaluation_function=evaluation_function,
 )
 RE = RunEngine({})
-beoc = BestEffortOptimizationCallback(live_plots=False)
+beoc = BestEffortOptimizationCallback()
 RE.subscribe(beoc)

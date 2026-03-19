@@ -1,5 +1,6 @@
 import time
 from collections.abc import Sequence
+from enum import StrEnum
 from typing import Any
 
 import networkx as nx
@@ -11,7 +12,15 @@ from numpy.typing import ArrayLike
 from .protocols import ID_KEY, OptimizationProblem
 
 
-def _infer_data_key(value: ArrayLike) -> DataKey:
+class Source(StrEnum):
+    """An enum that helps describe where the data key comes from."""
+
+    OUTCOME = "optimization-outcome"
+    PARAMETER = "optimization-parameter"
+    OTHER = "optimization-other"
+
+
+def _infer_data_key(source: Source, value: ArrayLike) -> DataKey:
     """Infer the data key from the provided value."""
     numpy_array = np.array(value)
     dtype_numpy = numpy_array.dtype.str
@@ -25,7 +34,7 @@ def _infer_data_key(value: ArrayLike) -> DataKey:
             dtype = "number"
         else:
             dtype = "string"
-    return DataKey(source="blop_optimization", dtype=dtype, shape=shape, dtype_numpy=dtype_numpy)
+    return DataKey(source=str(source), dtype=dtype, shape=shape, dtype_numpy=dtype_numpy)
 
 
 class InferredReadable(Readable, HasHints, HasParent):
@@ -38,12 +47,15 @@ class InferredReadable(Readable, HasHints, HasParent):
     ----------
     name : str
         The name of the readable instance.
+    source : str
+
     initial_value : numpy.typing.ArrayLike
         The initial value of the readable instance.
     """
 
-    def __init__(self, name: str, initial_value: ArrayLike) -> None:
+    def __init__(self, name: str, source: Source, initial_value: ArrayLike) -> None:
         self._name = name
+        self._source = source
         self._data_key = None
 
         if isinstance(initial_value, np.ndarray):
@@ -79,7 +91,7 @@ class InferredReadable(Readable, HasHints, HasParent):
                 numpy_array = np.array(self._value, dtype=self._dtype)
             else:
                 numpy_array = np.array(self._value)
-            self._data_key = _infer_data_key(numpy_array)
+            self._data_key = _infer_data_key(self._source, numpy_array)
         return {self.name: self._data_key}
 
     def update(self, value: ArrayLike) -> None:

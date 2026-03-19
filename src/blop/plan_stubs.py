@@ -6,7 +6,7 @@ import numpy as np
 from bluesky.utils import MsgGenerator, plan
 
 from .protocols import ID_KEY
-from .utils import InferredReadable
+from .utils import InferredReadable, Source
 
 _BLUESKY_UID_KEY: Literal["bluesky_uid"] = "bluesky_uid"
 _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
@@ -78,21 +78,23 @@ def read_step(
 
     # Create or update the InferredReadables for the suggestion_ids, step uid, suggestions, and outcomes
     if _SUGGESTION_IDS_KEY not in readable_cache:
-        readable_cache[_SUGGESTION_IDS_KEY] = InferredReadable(_SUGGESTION_IDS_KEY, initial_value=sorted_sids)
+        readable_cache[_SUGGESTION_IDS_KEY] = InferredReadable(
+            _SUGGESTION_IDS_KEY, source=Source.OTHER, initial_value=sorted_sids
+        )
     else:
         readable_cache[_SUGGESTION_IDS_KEY].update(sorted_sids)
     if _BLUESKY_UID_KEY not in readable_cache:
-        readable_cache[_BLUESKY_UID_KEY] = InferredReadable(_BLUESKY_UID_KEY, initial_value=uid)
+        readable_cache[_BLUESKY_UID_KEY] = InferredReadable(_BLUESKY_UID_KEY, source=Source.OTHER, initial_value=uid)
     else:
         readable_cache[_BLUESKY_UID_KEY].update(uid)
     for name, value in suggestions_flat.items():
         if name not in readable_cache:
-            readable_cache[name] = InferredReadable(name, initial_value=value)
+            readable_cache[name] = InferredReadable(name, source=Source.PARAMETER, initial_value=value)
         else:
             readable_cache[name].update(value)
     for name, value in outcomes_flat.items():
         if name not in readable_cache:
-            readable_cache[name] = InferredReadable(name, initial_value=value)
+            readable_cache[name] = InferredReadable(name, source=Source.OUTCOME, initial_value=value)
         else:
             readable_cache[name].update(value)
 
