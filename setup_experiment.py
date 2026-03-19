@@ -1,13 +1,14 @@
 import logging
-import warnings
 import time
+import warnings
 from typing import Any
 
 import numpy as np
-from blop import Agent, RangeDOF, Objective
-from blop.callbacks import BestEffortOptimizationCallback
+from bluesky.protocols import HasHints, HasParent, Hints, NamedMovable, Readable, Status
 from bluesky.run_engine import RunEngine
-from bluesky.protocols import Status, Readable, HasHints, HasParent, NamedMovable, Hints
+
+from blop import Agent, Objective, RangeDOF
+from blop.callbacks import BestEffortOptimizationCallback
 
 logging.getLogger("ax.api.client").setLevel(logging.WARNING)
 warnings.filterwarnings("ignore")
@@ -76,11 +77,14 @@ dofs = [
     RangeDOF(actuator=x2, bounds=(-5, 5), parameter_type="float"),
 ]
 sensors = [det]
-objectives = [Objective(name="intensity", minimize=False)]
+objectives = [
+    Objective(name="intensity", minimize=False),
+    Objective(name="beam_area", minimize=True),
+]
 
 
 def evaluation_function(uid: str, suggestions: list[dict]) -> list[dict]:
-    return [{"intensity": np.random.rand(), "_id": s["_id"]} for s in suggestions]
+    return [{"intensity": np.random.rand(), "beam_area": np.random.rand(), "_id": s["_id"]} for s in suggestions]
 
 
 agent = Agent(

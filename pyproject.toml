@@ -32,6 +32,7 @@ dependencies = [
   "networkx>=3",
   "numpy",
   "matplotlib",
+  "rich>=13",
 ]
 classifiers = [
   "Development Status :: 4 - Beta",

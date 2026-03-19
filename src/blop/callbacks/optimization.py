@@ -1,71 +1,190 @@
+import math
 from collections import defaultdict
 from typing import Any, cast
 
 from bluesky.callbacks import CallbackBase
 from event_model import Event, EventDescriptor, RunRouter, RunStart, RunStop
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich.text import Text
 
-from ..utils import Source
 from ..plans import OPTIMIZE_RUN_KEY
+from ..utils import Source
+
+# Styling constants
+_PARAM_STYLE = "cyan"
+_OUTCOME_STYLE = "green"
+_HEADER_STYLE = "bold"
+_DIM_STYLE = "dim"
+_ERROR_STYLE = "bold red"
+_ITERATION_RULE_STYLE = "blue"
+
+
+class _RunningStats:
+    """Accumulates running statistics using Welford's online algorithm.
+
+    Tracks count, min, max, mean, and standard deviation without
+    storing individual observations. Numerically stable for variance
+    computation.
+    """
+
+    __slots__ = ("count", "min", "max", "_mean", "_m2")
+
+    def __init__(self) -> None:
+        self.count: int = 0
+        self.min: float = math.inf
+        self.max: float = -math.inf
+        self._mean: float = 0.0
+        self._m2: float = 0.0
+
+    def update(self, value: float) -> None:
+        """Incorporate a new observation."""
+        if math.isnan(value) or math.isinf(value):
+            return
+        self.count += 1
+        self.min = min(self.min, value)
+        self.max = max(self.max, value)
+        delta = value - self._mean
+        self._mean += delta / self.count
+        delta2 = value - self._mean
+        self._m2 += delta * delta2
+
+    @property
+    def mean(self) -> float:
+        return self._mean if self.count > 0 else math.nan
+
+    @property
+    def std(self) -> float:
+        if self.count < 2:
+            return math.nan
+        return math.sqrt(self._m2 / (self.count - 1))
+
+
+def _format_value(value: Any) -> str:
+    """Format a numeric or other value for display.
+
+    Uses 6 significant figures for floats, passes through everything else.
+    """
+    if isinstance(value, float):
+        if math.isnan(value) or math.isinf(value):
+            return str(value)
+        return f"{value:.6g}"
+    return str(value)
+
+
+def _format_stat(value: float) -> str:
+    """Format a statistic value, returning '--' for NaN."""
+    if math.isnan(value) or math.isinf(value):
+        return "--"
+    return f"{value:.6g}"
+
+
+def _to_list(value: Any) -> list:
+    """Coerce a value into a list, handling scalars, numpy arrays, and iterables."""
+    if hasattr(value, "tolist"):
+        result = value.tolist()
+        return result if isinstance(result, list) else [result]
+    if isinstance(value, (list, tuple)):
+        return list(value)
+    return [value]
+
+
+def _is_numeric(value: Any) -> bool:
+    """Check if a value is numeric (int or float)."""
+    return isinstance(value, (int, float))
 
 
 class OptimizationLogger(CallbackBase):
-    """
-    A Bluesky callback for displaying optimization progress and live plots.
+    """A Bluesky callback for displaying optimization progress to the console.
 
-    This callback provides structured stdout output during
-    optimization runs. It listens for events from the ``optimize`` plan.
+    This callback provides structured, styled console output during
+    optimization runs using the ``rich`` library. It listens for documents
+    from the ``optimize`` plan and displays:
+
+    - A header panel with optimizer configuration at run start
+    - A formatted table of parameter and outcome values for each iteration
+    - A compact inline summary of outcome statistics after each iteration
+    - A full summary statistics table at run completion
 
     Notes
     -----
-    Multiple consecutive optimization runs will accumulate data in the plots.
+    Multiple consecutive optimization runs will accumulate iteration counts
+    and statistics.
+
+    When ``n_points > 1``, each iteration is displayed as a multi-row table
+    showing the batch of points suggested together by the optimizer, with
+    NaN-padded entries (from incomplete batches) filtered out.
     """
 
-    def __init__(
-        self,
-        **kwargs: Any,
-    ):
+    def __init__(self, console: Console | None = None, **kwargs: Any):
         super().__init__(**kwargs)
 
-        self._data_keys = {}
+        self._console = console or Console()
+        self._data_keys: dict = {}
         self._sorted_data_keys_by_source: dict[Source, list[str]] = {}
         self._total_iterations = 0
         self._current_iteration = 0
+        self._stats: dict[str, _RunningStats] = {}
 
     def start(self, doc: RunStart) -> None:
         iterations = doc.get("iterations", None)
-        print(f"\n{'=' * 60}")
+        n_points = doc.get("n_points", 1)
+        optimizer = doc.get("optimizer", "Unknown")
+        actuators = doc.get("actuators", [])
+        sensors = doc.get("sensors", [])
+
         if iterations:
             self._total_iterations = self._current_iteration + iterations
-            if self._current_iteration > 0:
-                print(f"Starting optimization for {iterations} more iterations")
-                print(f"Last iteration complete: {self._current_iteration}")
-                print(f"Total iterations to complete: {self._total_iterations}")
-            else:
-                print(f"Starting optimization for {iterations} iterations")
+
+        # Build the header content
+        lines = Text()
+        lines.append("Optimizer  ", style=_DIM_STYLE)
+        lines.append(f"{optimizer}\n", style=_HEADER_STYLE)
+        lines.append("Actuators  ", style=_DIM_STYLE)
+        lines.append(f"{', '.join(actuators) if actuators else 'N/A'}\n")
+        lines.append("Sensors    ", style=_DIM_STYLE)
+        lines.append(f"{', '.join(sensors) if sensors else 'N/A'}\n")
+        lines.append("Iterations ", style=_DIM_STYLE)
+
+        if self._current_iteration > 0:
+            lines.append(f"{iterations} more ({self._current_iteration} completed, ")
+            lines.append(f"{self._total_iterations} total)")
         else:
-            print("Starting optimization for ? iterations")
-        print(f"{'=' * 60}\n")
+            lines.append(f"{iterations}" if iterations else "?")
+
+        if n_points and n_points > 1:
+            lines.append("  ")
+            lines.append("Points/iter ", style=_DIM_STYLE)
+            lines.append(f"{n_points}")
+
+        panel = Panel(
+            lines,
+            title="[bold]Optimization[/bold]",
+            border_style="blue",
+            padding=(0, 1),
+        )
+        self._console.print()
+        self._console.print(panel)
 
     def descriptor(self, doc: EventDescriptor) -> None:
-        """Cache data keys and group by their source"""
+        """Cache data keys and group by their source."""
         data_keys = doc.get("data_keys", {})
         data_keys_by_source: dict[Source, list[str]] = defaultdict(list)
         for key, data_key in data_keys.items():
             data_keys_by_source[cast(Source, data_key.get("source", Source.OTHER))].append(key)
 
-        sorted_data_keys_by_source = {key: sorted(data_keys) for key, data_keys in data_keys_by_source.items()}
-
-        print(f"\n{'=' * 60}")
-        print("Parameters: ")
-        for p in sorted_data_keys_by_source[Source.PARAMETER]:
-            print(f"- {p}")
-        print("Outcomes: ")
-        for o in sorted_data_keys_by_source[Source.OUTCOME]:
-            print(f"- {o}")
-        print(f"{'=' * 60}")
-
+        self._sorted_data_keys_by_source = {key: sorted(keys) for key, keys in data_keys_by_source.items()}
         self._data_keys = data_keys
-        self._sorted_data_keys_by_source = sorted_data_keys_by_source
+
+    def _update_stats(self, columns: dict[str, list], valid_indices: list[int]) -> None:
+        """Update running statistics for each key with the valid values from this event."""
+        for key, values in columns.items():
+            for idx in valid_indices:
+                if idx < len(values) and _is_numeric(values[idx]):
+                    if key not in self._stats:
+                        self._stats[key] = _RunningStats()
+                    self._stats[key].update(float(values[idx]))
 
     def event(self, doc: Event) -> Event:
         data = doc.get("data", {})
@@ -73,25 +192,159 @@ class OptimizationLogger(CallbackBase):
             return doc
 
         self._current_iteration += 1
-        print(f"\nIteration {self._current_iteration} / {self._total_iterations}:")
-        parameter_keys = self._sorted_data_keys_by_source[Source.PARAMETER]
-        for param in parameter_keys:
-            param_data = data.get(param, None)
-            if param_data is None:
-                continue
-            print(f"{param}: {param_data}")
-        outcome_keys = self._sorted_data_keys_by_source[Source.OUTCOME]
-        for outcome in outcome_keys:
-            outcome_data = data.get(outcome, None)
-            if outcome_data is None:
-                continue
-            print(f"{outcome}: {outcome_data}")
+
+        parameter_keys: list[str] = self._sorted_data_keys_by_source.get(Source.PARAMETER, [])
+        outcome_keys: list[str] = self._sorted_data_keys_by_source.get(Source.OUTCOME, [])
+
+        # Extract values, normalizing to lists for uniform handling
+        param_columns: dict[str, list] = {k: _to_list(data[k]) for k in parameter_keys if k in data}
+        outcome_columns: dict[str, list] = {k: _to_list(data[k]) for k in outcome_keys if k in data}
+
+        # Determine how many real (non-padded) points we have
+        suggestion_ids = _to_list(data.get("suggestion_ids", []))
+        n_total = max(
+            (len(v) for v in [*param_columns.values(), *outcome_columns.values()]),
+            default=1,
+        )
+        # Filter out NaN-padded entries: suggestion_ids padded with "" indicate padding
+        if suggestion_ids:
+            valid_indices = [i for i, sid in enumerate(suggestion_ids) if sid != "" and str(sid).strip() != ""]
+        else:
+            valid_indices = list(range(n_total))
+        n_valid = len(valid_indices) if valid_indices else n_total
+
+        # Update running statistics
+        self._update_stats(param_columns, valid_indices)
+        self._update_stats(outcome_columns, valid_indices)
+
+        # Iteration header rule
+        iter_label = f"Iteration {self._current_iteration} / {self._total_iterations}"
+        if n_valid > 1:
+            iter_label += f"  ({n_valid} points)"
+        self._console.rule(iter_label, style=_ITERATION_RULE_STYLE)
+
+        # Build the results table
+        table = Table(
+            show_header=True,
+            header_style=_HEADER_STYLE,
+            border_style=_DIM_STYLE,
+            pad_edge=True,
+            padding=(0, 1),
+        )
+
+        # Add point column only when there are multiple valid points
+        if n_valid > 1:
+            table.add_column("#", style=_DIM_STYLE, justify="right", no_wrap=True)
+
+        for key in parameter_keys:
+            if key in param_columns:
+                table.add_column(key, style=_PARAM_STYLE, justify="right", no_wrap=True)
+        for key in outcome_keys:
+            if key in outcome_columns:
+                table.add_column(key, style=_OUTCOME_STYLE, justify="right", no_wrap=True)
+
+        # Populate rows
+        for row_idx, data_idx in enumerate(valid_indices):
+            row: list[str] = []
+            if n_valid > 1:
+                row.append(str(row_idx + 1))
+            for key in parameter_keys:
+                if key in param_columns:
+                    vals = param_columns[key]
+                    row.append(_format_value(vals[data_idx] if data_idx < len(vals) else ""))
+            for key in outcome_keys:
+                if key in outcome_columns:
+                    vals = outcome_columns[key]
+                    row.append(_format_value(vals[data_idx] if data_idx < len(vals) else ""))
+            table.add_row(*row)
+
+        self._console.print(table)
+
+        # Inline outcome summary
+        outcome_point_count = next(
+            (self._stats[k].count for k in outcome_keys if k in self._stats and self._stats[k].count > 0),
+            0,
+        )
+        trackable_outcomes = [k for k in outcome_keys if k in self._stats and self._stats[k].count > 0]
+        if trackable_outcomes and outcome_point_count > 0:
+            summary = Text()
+            summary.append("  ")
+            for i, key in enumerate(trackable_outcomes):
+                s = self._stats[key]
+                if i > 0:
+                    summary.append("\n  ", style=_DIM_STYLE)
+                summary.append(key, style=_OUTCOME_STYLE)
+                summary.append("  min: ", style=_DIM_STYLE)
+                summary.append(_format_stat(s.min))
+                summary.append("  max: ", style=_DIM_STYLE)
+                summary.append(_format_stat(s.max))
+                summary.append("  mean: ", style=_DIM_STYLE)
+                summary.append(_format_stat(s.mean))
+            summary.append(f"\n  ({outcome_point_count} pts sampled)", style=_DIM_STYLE)
+            self._console.print(summary)
+
         return doc
 
     def stop(self, doc: RunStop) -> None:
-        print(f"\n{'=' * 60}")
-        print("Optimization complete")
-        print(f"{'=' * 60}\n")
+        exit_status = doc.get("exit_status", "success")
+        reason = doc.get("reason", "")
+
+        parameter_keys: list[str] = self._sorted_data_keys_by_source.get(Source.PARAMETER, [])
+        outcome_keys: list[str] = self._sorted_data_keys_by_source.get(Source.OUTCOME, [])
+
+        # Build and print the summary statistics table
+        trackable_keys = [k for k in [*parameter_keys, *outcome_keys] if k in self._stats and self._stats[k].count > 0]
+        if trackable_keys:
+            self._console.print()
+            summary_table = Table(
+                title="Summary Statistics",
+                title_style="bold",
+                show_header=True,
+                header_style=_HEADER_STYLE,
+                border_style=_DIM_STYLE,
+                pad_edge=True,
+                padding=(0, 1),
+            )
+            summary_table.add_column("Name", no_wrap=True)
+            summary_table.add_column("Type", style=_DIM_STYLE, no_wrap=True)
+            summary_table.add_column("Min", justify="right", no_wrap=True)
+            summary_table.add_column("Max", justify="right", no_wrap=True)
+            summary_table.add_column("Mean", justify="right", no_wrap=True)
+            summary_table.add_column("Std", justify="right", no_wrap=True)
+            summary_table.add_column("Count", justify="right", style=_DIM_STYLE, no_wrap=True)
+
+            for key in trackable_keys:
+                s = self._stats[key]
+                is_param = key in parameter_keys
+                name_style = _PARAM_STYLE if is_param else _OUTCOME_STYLE
+                type_label = "param" if is_param else "outcome"
+
+                summary_table.add_row(
+                    Text(key, style=name_style),
+                    type_label,
+                    _format_stat(s.min),
+                    _format_stat(s.max),
+                    _format_stat(s.mean),
+                    _format_stat(s.std),
+                    str(s.count),
+                )
+
+            self._console.print(summary_table)
+
+        if exit_status == "success":
+            self._console.rule("[bold]Optimization Complete[/bold]", style="green")
+        elif exit_status == "abort":
+            label = "[bold]Optimization Aborted[/bold]"
+            if reason:
+                label += f"  ({reason})"
+            self._console.rule(label, style=_ERROR_STYLE)
+        else:
+            label = f"[bold]Optimization Stopped[/bold]  ({exit_status})"
+            if reason:
+                label += f"  {reason}"
+            self._console.rule(label, style="yellow")
+
+        self._console.print()
 
 
 class BestEffortOptimizationCallback:
