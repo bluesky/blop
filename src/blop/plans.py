@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 _DEFAULT_ACQUIRE_RUN_KEY: Literal["default_acquire"] = "default_acquire"
 _SAMPLE_SUGGESTIONS_RUN_KEY: Literal["sample_suggestions"] = "sample_suggestions"
-_OPTIMIZE_RUN_KEY: Literal["optimize"] = "optimize"
+OPTIMIZE_RUN_KEY: Literal["optimize"] = "optimize"
 
 
 def _unpack_for_list_scan(suggestions: list[dict], actuators: Sequence[Actuator]) -> list[Any]:
@@ -203,12 +203,12 @@ def optimize(
             "iterations": iterations,
             "n_points": n_points,
             "checkpoint_interval": checkpoint_interval,
-            "run_key": _OPTIMIZE_RUN_KEY,
+            "run_key": OPTIMIZE_RUN_KEY,
         }
     )
 
     # Encapsulate the optimization plan in a run decorator
-    @bpp.set_run_key_decorator(_OPTIMIZE_RUN_KEY)
+    @bpp.set_run_key_decorator(OPTIMIZE_RUN_KEY)
     @bpp.run_decorator(md=_md)
     def _optimize() -> MsgGenerator[None]:
         for i in range(iterations):

@@ -1,3 +1,3 @@
-from .optimization import OptimizationCallback
+from .optimization import BestEffortOptimizationCallback
 
-__all__ = ["OptimizationCallback"]
+__all__ = ["BestEffortOptimizationCallback"]

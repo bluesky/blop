@@ -1,17 +1,15 @@
-from __future__ import annotations
-
-import sys
 from collections import defaultdict
 from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 from bluesky.callbacks import CallbackBase
+from event_model import Event, EventDescriptor, RunRouter, RunStart, RunStop
 
-from ..protocols import ID_KEY
+from ..plans import OPTIMIZE_RUN_KEY
 
 
-class OptimizationCallback(CallbackBase):
+class _OptimizationCallback(CallbackBase):
     """
     A Bluesky callback for displaying optimization progress and live plots.
 
@@ -23,12 +21,6 @@ class OptimizationCallback(CallbackBase):
 
     Parameters
     ----------
-    dofs : list[str] | None, optional
-        Names of the degrees of freedom to track. If None, will be inferred from
-        the first optimize run's descriptor.
-    objectives : list[str] | None, optional
-        Names of the objectives to track. If None, will be inferred from the
-        first optimize run's descriptor.
     stdout : bool, optional
         Whether to show stdout progress output. Default is True.
     live_plots : bool, optional
@@ -46,16 +38,14 @@ class OptimizationCallback(CallbackBase):
 
     def __init__(
         self,
-        dofs: list[str] | None = None,
-        objectives: list[str] | None = None,
         stdout: bool = True,
         live_plots: bool = True,
         figsize: tuple[float, float] = (12, 6),
         **kwargs: Any,
     ):
         super().__init__(**kwargs)
-        self._dofs = dofs
-        self._objectives = objectives
+        self._parameters = None
+        self._objectives = None
         self._stdout = stdout
         self._live_plots = live_plots
         self._figsize = figsize
@@ -64,7 +54,7 @@ class OptimizationCallback(CallbackBase):
         self._optimize_descriptor_uids: set[str] = set()
         self._iteration: int = 0
 
-        self._dof_data: dict[str, list[Any]] = defaultdict(list)
+        self._parameter_data: dict[str, list[Any]] = defaultdict(list)
         self._objective_data: dict[str, list[float]] = defaultdict(list)
         self._suggestion_ids_history: list[str] = []
 
@@ -80,8 +70,8 @@ class OptimizationCallback(CallbackBase):
         self._fig.canvas.draw()
         plt.show(block=False)
 
-    def start(self, doc: dict[str, Any]) -> None:
-        if doc.get("run_key") == "optimize":
+    def start(self, doc: RunStart) -> None:
+        if doc.get("run_key") == OPTIMIZE_RUN_KEY:
             self._optimize_run_uid = doc["uid"]
             self._iteration = 0
 
@@ -91,7 +81,7 @@ class OptimizationCallback(CallbackBase):
                 print(f"Starting optimization for {iterations} iterations")
                 print(f"{'=' * 60}\n")
 
-    def descriptor(self, doc: dict[str, Any]) -> None:
+    def descriptor(self, doc: EventDescriptor) -> None:
         if self._optimize_run_uid is None:
             return
 
@@ -101,27 +91,25 @@ class OptimizationCallback(CallbackBase):
             data_keys = doc.get("data_keys", {})
 
             if not self._initialized:
-                if self._dofs is None:
-                    self._dofs = [name for name in data_keys.keys() if name not in ("suggestion_ids", "bluesky_uid")]
-                if self._objectives is None:
-                    self._objectives = []
+                self._parameters = [name for name in data_keys.keys() if name not in ("suggestion_ids", "bluesky_uid")]
+                self._objectives = []
 
-                exclude_keys = {"suggestion_ids", "bluesky_uid"} | set(self._dofs or [])
+                exclude_keys = {"suggestion_ids", "bluesky_uid"} | set(self._parameters or [])
                 self._objectives = [name for name in data_keys.keys() if name not in exclude_keys]
 
                 self._initialized = True
 
-    def event(self, doc: dict[str, Any]) -> None:
+    def event(self, doc: Event) -> Event:
         if self._optimize_run_uid is None:
-            return
+            return doc
 
         descriptor_uid = doc.get("descriptor")
         if descriptor_uid not in self._optimize_descriptor_uids:
-            return
+            return doc
 
         data = doc.get("data", {})
         if not data:
-            return
+            return doc
 
         self._iteration += 1
 
@@ -133,14 +121,14 @@ class OptimizationCallback(CallbackBase):
             if sid and sid not in self._suggestion_ids_history:
                 self._suggestion_ids_history.append(sid)
 
-        for dof_name in self._dofs or []:
-            values = data.get(dof_name)
+        for parameter_name in self._parameters or []:
+            values = data.get(parameter_name)
             if values is not None:
                 if isinstance(values, (int, float, str)):
                     values = [values]
                 for v in values:
                     if isinstance(v, (int, float)) and not np.isnan(v):
-                        self._dof_data[dof_name].append(v)
+                        self._parameter_data[parameter_name].append(v)
 
         for obj_name in self._objectives or []:
             values = data.get(obj_name)
@@ -156,6 +144,8 @@ class OptimizationCallback(CallbackBase):
 
         if self._live_plots:
             self._update_plots()
+
+        return doc
 
     def _print_progress(self, suggestion_ids: list[str]) -> None:
         n_evaluated = len(self._suggestion_ids_history)
@@ -180,7 +170,7 @@ class OptimizationCallback(CallbackBase):
     def _is_minimizing(self, objective_name: str) -> bool:
         return True
 
-    def stop(self, doc: dict[str, Any]) -> None:
+    def stop(self, doc: RunStop) -> None:
         if self._optimize_run_uid is None:
             return
 
@@ -205,19 +195,19 @@ class OptimizationCallback(CallbackBase):
         axes[0].clear()
         axes[1].clear()
 
-        dofs_to_plot = list(self._dof_data.keys())[:4]
-        for i, dof_name in enumerate(dofs_to_plot):
-            values = self._dof_data.get(dof_name, [])
+        parameters_to_plot = list(self._parameter_data.keys())[:4]
+        for parameter_name in parameters_to_plot:
+            values = self._parameter_data.get(parameter_name, [])
             if values and len(values) > 1:
-                axes[0].hist(values, bins=20, alpha=0.7, label=dof_name)
+                axes[0].hist(values, bins=20, alpha=0.7, label=parameter_name)
 
-        if dofs_to_plot:
+        if parameters_to_plot:
             axes[0].set_xlabel("Value")
             axes[0].set_ylabel("Count")
             axes[0].set_title("Parameter Distributions")
             axes[0].legend()
         else:
-            axes[0].set_title("No DOF data yet")
+            axes[0].set_title("No parameter data yet")
 
         for obj_name, values in self._objective_data.items():
             if values and len(values) > 1:
@@ -248,7 +238,7 @@ class OptimizationCallback(CallbackBase):
         the same callback instance.
         """
         self._iteration = 0
-        self._dof_data.clear()
+        self._parameter_data.clear()
         self._objective_data.clear()
         self._suggestion_ids_history.clear()
         self._initialized = False
@@ -256,3 +246,22 @@ class OptimizationCallback(CallbackBase):
         if self._live_plots and hasattr(self, "_fig"):
             plt.close(self._fig)
             self._setup_plots()
+
+
+class BestEffortOptimizationCallback:
+    """Best effort callback for displaying optimization information."""
+
+    def __init__(self, stdout: bool = True, live_plots: bool = True, figsize: tuple[int, int] = (12, 6)) -> None:
+        self._run_router = RunRouter([self._factory])
+        self._stdout = stdout
+        self._live_plots = live_plots
+        self._figsize = figsize
+
+    def _factory(self, name, doc):
+        if name == "start" and doc["run_key"] == OPTIMIZE_RUN_KEY:
+            callback = _OptimizationCallback(stdout=self._stdout, live_plots=self._live_plots, figsize=self._figsize)
+            return [callback], []
+        return [], []
+
+    def __call__(self, name, doc):
+        self._run_router(name, doc)
