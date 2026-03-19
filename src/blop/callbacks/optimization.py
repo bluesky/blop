@@ -133,6 +133,7 @@ class OptimizationLogger(CallbackBase):
         optimizer = doc.get("optimizer", "Unknown")
         actuators = doc.get("actuators", [])
         sensors = doc.get("sensors", [])
+        run_uid = doc.get("uid", "")
 
         if iterations:
             self._total_iterations = self._current_iteration + iterations
@@ -157,6 +158,11 @@ class OptimizationLogger(CallbackBase):
             lines.append("  ")
             lines.append("Points/iter ", style=_DIM_STYLE)
             lines.append(f"{n_points}")
+
+        if run_uid:
+            lines.append("\n")
+            lines.append("Run UID    ", style=_DIM_STYLE)
+            lines.append(run_uid)
 
         panel = Panel(
             lines,
@@ -200,8 +206,13 @@ class OptimizationLogger(CallbackBase):
         param_columns: dict[str, list] = {k: _to_list(data[k]) for k in parameter_keys if k in data}
         outcome_columns: dict[str, list] = {k: _to_list(data[k]) for k in outcome_keys if k in data}
 
-        # Determine how many real (non-padded) points we have
+        # Extract suggestion IDs and acquisition UID
         suggestion_ids = _to_list(data.get("suggestion_ids", []))
+        acquire_uid = data.get("bluesky_uid", "")
+        # Scalar string comes through as-is; ensure it's a plain string
+        if isinstance(acquire_uid, list):
+            acquire_uid = acquire_uid[0] if acquire_uid else ""
+
         n_total = max(
             (len(v) for v in [*param_columns.values(), *outcome_columns.values()]),
             default=1,
@@ -223,6 +234,13 @@ class OptimizationLogger(CallbackBase):
             iter_label += f"  ({n_valid} points)"
         self._console.rule(iter_label, style=_ITERATION_RULE_STYLE)
 
+        # Show acquisition UID for this iteration
+        if acquire_uid:
+            uid_line = Text()
+            uid_line.append("  Acquire UID  ", style=_DIM_STYLE)
+            uid_line.append(str(acquire_uid))
+            self._console.print(uid_line)
+
         # Build the results table
         table = Table(
             show_header=True,
@@ -232,9 +250,9 @@ class OptimizationLogger(CallbackBase):
             padding=(0, 1),
         )
 
-        # Add point column only when there are multiple valid points
-        if n_valid > 1:
-            table.add_column("#", style=_DIM_STYLE, justify="right", no_wrap=True)
+        # Iteration and suggestion ID columns (always shown)
+        table.add_column("Event", style=_DIM_STYLE, justify="right", no_wrap=True)
+        table.add_column("Suggestion ID", style=_DIM_STYLE, justify="right", no_wrap=True)
 
         for key in parameter_keys:
             if key in param_columns:
@@ -246,8 +264,10 @@ class OptimizationLogger(CallbackBase):
         # Populate rows
         for row_idx, data_idx in enumerate(valid_indices):
             row: list[str] = []
-            if n_valid > 1:
-                row.append(str(row_idx + 1))
+            row.append(str(row_idx))
+            # Suggestion ID for this point
+            sid = suggestion_ids[data_idx] if data_idx < len(suggestion_ids) else ""
+            row.append(str(sid))
             for key in parameter_keys:
                 if key in param_columns:
                     vals = param_columns[key]

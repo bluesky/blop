@@ -79,12 +79,14 @@ def read_step(
     # Create or update the InferredReadables for the suggestion_ids, step uid, suggestions, and outcomes
     if _SUGGESTION_IDS_KEY not in readable_cache:
         readable_cache[_SUGGESTION_IDS_KEY] = InferredReadable(
-            _SUGGESTION_IDS_KEY, source=Source.OTHER, initial_value=sorted_sids
+            _SUGGESTION_IDS_KEY, source=Source.SUGGESTION_ID, initial_value=sorted_sids
         )
     else:
         readable_cache[_SUGGESTION_IDS_KEY].update(sorted_sids)
     if _BLUESKY_UID_KEY not in readable_cache:
-        readable_cache[_BLUESKY_UID_KEY] = InferredReadable(_BLUESKY_UID_KEY, source=Source.OTHER, initial_value=uid)
+        readable_cache[_BLUESKY_UID_KEY] = InferredReadable(
+            _BLUESKY_UID_KEY, source=Source.ACQUISITION_UID, initial_value=uid
+        )
     else:
         readable_cache[_BLUESKY_UID_KEY].update(uid)
     for name, value in suggestions_flat.items():
