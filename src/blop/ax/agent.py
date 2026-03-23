@@ -18,7 +18,7 @@ from bluesky.utils import MsgGenerator
 from ..plans import acquire_baseline, optimize, sample_suggestions
 from ..protocols import AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Sensor
 from ..utils import InferredReadable
-from .dof import DOF, DOFConstraint, RangeDOF
+from .dof import DOF, ChoiceDOF, DOFConstraint, RangeDOF
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer
 
@@ -35,6 +35,10 @@ def _has_dof_keys(d: dict[Any, Any]) -> TypeGuard[dict[DOF, Any]]:
 
 def _has_range_dof_keys(d: dict[Any, Any]) -> TypeGuard[dict[RangeDOF, Any]]:
     return all(isinstance(key, RangeDOF) for key in d)
+
+
+def _has_choice_dof_keys(d: dict[Any, Any]) -> TypeGuard[dict[ChoiceDOF, Any]]:
+    return all(isinstance(key, ChoiceDOF) for key in d)
 
 
 class Agent:
@@ -418,22 +422,18 @@ class Agent:
         self._optimizer.checkpoint()
 
     def reconfigure_search_space(
-        self, dof_bounds: dict[RangeDOF, tuple[float, float]] | dict[str, tuple[float, float]]
+        self, dof_mappings: dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]
     ) -> None:
         """
-        Update bounds of existing RangeDOFs for future optimizations.
+        Update bounds or values of existing DOFs for future optimizations.
 
         Parameters
         ----------
-        dof_bounds : dict[RangeDOF, tuple[float, float]] | dict[str, tuple[float, float]]
-            Mapping of RangeDOFs or RangeDOF names to (upper, lower) bounds
-
+        dof_mappings : dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]
+            Mapping of DOFs to their new search space.
         """
-        if _has_str_keys(dof_bounds):
-            self._optimizer._reconfigure_search_space(dof_bounds)
-        elif _has_range_dof_keys(dof_bounds):
-            self._optimizer._reconfigure_search_space({dof.parameter_name: bounds for dof, bounds in dof_bounds.items()})
+
+        if _has_dof_keys(dof_mappings):
+            self._optimizer._reconfigure_search_space({dof.parameter_name: update for dof, update in dof_mappings.items()})
         else:
-            raise ValueError(
-                f"Keys must all be either {type(RangeDOF)} or {type(str)}, but got {type(list(dof_bounds.keys())[0])}"
-            )
+            raise TypeError("Keys must all be type DOF")

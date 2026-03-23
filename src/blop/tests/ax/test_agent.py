@@ -225,9 +225,12 @@ def test_reconfigure_search_space(mock_evaluation_function):
         objectives=[objective],
         evaluation_function=mock_evaluation_function,
     )
-    with pytest.raises(ValueError):
-        agent.reconfigure_search_space({"test_movable1": (3, 6), dof2: (3, 6)})
-    agent.reconfigure_search_space({"test_movable1": (3, 6)})
+    # Keys must be DOF objects, not parameter names
+    with pytest.raises(TypeError):
+        agent.reconfigure_search_space({"test_movable1": (3, 6)})
+
+    # Valid update should restrict the search space
+    agent.reconfigure_search_space({dof1: (3, 6)})
     parameterizations = agent.suggest(10)
     for i in range(10):
         assert 3 <= parameterizations[i]["test_movable1"] <= 6

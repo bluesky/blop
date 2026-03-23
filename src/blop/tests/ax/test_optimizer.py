@@ -190,8 +190,22 @@ def test_ax_optimizer_reconfigurable_search_space():
         parameter_constraints=["x1 + x2 <= 10"],
         outcome_constraints=["y1 >= 0", "y2 <= 0"],
     )
+    # Unknown parameter name
     with pytest.raises(KeyError):
         optimizer._reconfigure_search_space({"x4": (-4, 4)})
-    optimizer._reconfigure_search_space({"x1": (-4, 4)})
+    # ChoiceParameter expects a list
+    with pytest.raises(TypeError):
+        optimizer._reconfigure_search_space({"x3": 3})
+    # ChoiceParameter expects a list of single type
+    with pytest.raises(TypeError):
+        optimizer._reconfigure_search_space({"x3": ["2", 5, 3.6]})
+    # RangeParameter expects a tuple
+    with pytest.raises(TypeError):
+        optimizer._reconfigure_search_space({"x1": 3})
+
+    # Changing the serach space should reflect in parameter state
+    optimizer._reconfigure_search_space({"x1": (-4, 4), "x3": [6, 7, 8]})
     param_x1 = optimizer._client._experiment.parameters["x1"]
+    param_x3 = optimizer._client._experiment.parameters["x3"]
     assert (param_x1.lower, param_x1.upper) == (-4, 4)
+    assert param_x3.values == [6, 7, 8]
