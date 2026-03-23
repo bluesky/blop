@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import numpy as np
 import pytest
 from ax import ChoiceParameterConfig, RangeParameterConfig
@@ -212,3 +214,30 @@ def test_ax_optimizer_reconfigurable_search_space():
     param_x3 = optimizer._client._experiment.parameters["x3"]
     assert (param_x1.lower, param_x1.upper) == (-4, 4)
     assert param_x3.values == [6, 7, 8]
+
+
+def test_ax_optimizer_reconfigurable_search_space_rollback():
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(-5.0, 5.0), parameter_type="float"),
+            RangeParameterConfig(name="x2", bounds=(-5.0, 5.0), parameter_type="float"),
+            ChoiceParameterConfig(name="x3", values=[0, 1, 2, 3, 4, 5], parameter_type="int", is_ordered=True),
+        ],
+        objective="y1,-y2",
+        parameter_constraints=["x1 + x2 <= 10"],
+        outcome_constraints=["y1 >= 0", "y2 <= 0"],
+    )
+    p1 = optimizer._client._experiment.parameters["x1"]
+    original_p1 = (p1.lower, p1.upper)
+    # Make second state change fail after first
+    with patch.object(p1, "update_range", side_effect=RuntimeError("boom")):
+        with pytest.raises(RuntimeError):
+            optimizer._reconfigure_search_space(
+                {
+                    "x1": (3, 6),
+                    "x2": 5,
+                }
+            )
+
+    # Rollback should restore the original state
+    assert (p1.lower, p1.upper) == original_p1
