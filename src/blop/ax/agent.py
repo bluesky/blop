@@ -1,7 +1,7 @@
 import importlib.util
 import logging
 from collections.abc import Sequence
-from typing import Any, TypeGuard
+from typing import Any, TypeGuard, cast
 
 from ax import Client
 from ax.analysis import ContourPlot
@@ -14,9 +14,18 @@ else:
     from ax.analysis.analysis_card import AnalysisCardBase  # type: ignore[import-untyped]
 # ===============================
 from bluesky.utils import MsgGenerator
+from bluesky_queueserver_api.zmq import REManagerAPI
 
 from ..plans import acquire_baseline, optimize, sample_suggestions
-from ..protocols import AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Sensor
+from ..protocols import (
+    AcquisitionPlan,
+    Actuator,
+    EvaluationFunction,
+    OptimizationProblem,
+    QueueserverOptimizationProblem,
+    Sensor,
+)
+from ..queueserver import QueueserverClient, QueueserverOptimizationRunner
 from ..utils import InferredReadable
 from .dof import DOF, DOFConstraint
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
@@ -29,7 +38,160 @@ def _has_dof_keys(d: dict[Any, Any]) -> TypeGuard[dict[DOF, Any]]:
     return all(isinstance(key, DOF) for key in d)
 
 
-class Agent:
+class _AxAgentMixin:
+    """
+    Mixin providing Ax-related functionality shared by agents.
+    Expects subclasses to define `self._optimizer` as an `AxOptimizer`.
+    """
+
+    _optimizer: AxOptimizer
+
+    @property
+    def ax_client(self) -> Client:
+        return self._optimizer.ax_client
+
+    @property
+    def checkpoint_path(self) -> str | None:
+        return self._optimizer.checkpoint_path
+
+    @property
+    def fixed_dofs(self) -> dict[str, Any] | None:
+        return self._optimizer.fixed_parameters
+
+    @fixed_dofs.setter
+    def fixed_dofs(self, fixed_dofs: dict[DOF, Any] | None) -> None:
+        """
+        Fix degrees of freedom to a certain value for future optimizations.
+
+        Parameters
+        ----------
+        fixed_dofs : dict[DOF, Any] | dict[str, Any] | None
+            A mapping of DOFs or DOF names to the values they should be fixed to.
+
+        """
+        if not fixed_dofs:
+            self._optimizer.fixed_parameters = None
+            return
+
+        if _has_dof_keys(fixed_dofs):
+            self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
+        else:
+            raise TypeError("Keys must be DOF objects")
+
+    def suggest(self, num_points: int = 1) -> list[dict]:
+        """
+        Get the next point(s) to evaluate in the search space.
+
+        Uses the Bayesian optimization algorithm to suggest promising points based
+        on all previously acquired data. Each suggestion includes an "_id" key for
+        tracking.
+
+        Parameters
+        ----------
+        num_points : int, optional
+            The number of points to suggest. Default is 1. Higher values enable
+            batch optimization but may reduce optimization efficiency per iteration.
+
+        Returns
+        -------
+        list[dict]
+            A list of dictionaries, each containing a parameterization of a point to
+            evaluate next. Each dictionary includes an "_id" key for identification.
+        """
+        return self._optimizer.suggest(num_points)
+
+    def ingest(self, points: list[dict]) -> None:
+        """
+        Ingest evaluation results into the optimizer.
+
+        Updates the optimizer's model with new data. Can ingest both suggested points
+        (with "_id" key) and external data (without "_id" key).
+
+        Parameters
+        ----------
+        points : list[dict]
+            A list of dictionaries, each containing outcomes for a trial. For suggested
+            points, include the "_id" key. For external data, include DOF names and
+            objective values, and omit "_id".
+
+        Notes
+        -----
+        This method is typically called automatically by :meth:`optimize`. Manual usage
+        is only needed for custom workflows or when ingesting external data.
+
+        For complete examples, see :doc:`/how-to-guides/attach-data-to-experiments`.
+        """
+        self._optimizer.ingest(points)
+
+    def plot_objective(
+        self, x_dof_name: str, y_dof_name: str, objective_name: str, *args: Any, **kwargs: Any
+    ) -> list[AnalysisCardBase]:
+        """
+        Plot the predicted objective as a function of two DOFs.
+
+        Creates a contour plot showing the model's prediction of an objective across
+        the space defined by two DOFs. Useful for visualizing the optimization landscape.
+
+        Parameters
+        ----------
+        x_dof_name : str
+            The name of the DOF to plot on the x-axis.
+        y_dof_name : str
+            The name of the DOF to plot on the y-axis.
+        objective_name : str
+            The name of the objective to plot.
+        *args : Any
+            Additional positional arguments passed to Ax's compute_analyses.
+        **kwargs : Any
+            Additional keyword arguments passed to Ax's compute_analyses.
+
+        Returns
+        -------
+        list[AnalysisCard]
+            The computed analysis cards containing the plot data.
+
+        See Also
+        --------
+        ax.analysis.ContourPlot : Pre-built analysis for plotting objectives.
+        ax.analysis.AnalysisCard : Contains the raw and computed data.
+        """
+        return self.ax_client.compute_analyses(
+            [
+                ContourPlot(
+                    x_parameter_name=x_dof_name,
+                    y_parameter_name=y_dof_name,
+                    metric_name=objective_name,
+                ),
+            ],
+            *args,
+            **kwargs,
+        )
+
+    def checkpoint(self) -> None:
+        """
+        Save the agent's state to a JSON file.
+        """
+        self._optimizer.checkpoint()
+
+    def reconfigure_search_space(
+        self, dof_mappings: dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]
+    ) -> None:
+        """
+        Update bounds or values of existing DOFs for future optimizations.
+
+        Parameters
+        ----------
+        dof_mappings : dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]
+            Mapping of DOFs to their new search space.
+        """
+
+        if _has_dof_keys(dof_mappings):
+            self._optimizer._reconfigure_search_space({dof.parameter_name: update for dof, update in dof_mappings.items()})
+        else:
+            raise TypeError("Keys must all be type DOF")
+
+
+class Agent(_AxAgentMixin):
     """
     An interface that uses Ax as the backend for optimization and experiment tracking.
 
@@ -89,8 +251,13 @@ class Agent:
         checkpoint_path: str | None = None,
         **kwargs: Any,
     ):
+        if any(isinstance(dof.actuator, str) for dof in dofs):
+            dof_actuator_strs = [dof.actuator for dof in dofs if isinstance(dof.actuator, str)]
+            raise ValueError(
+                f"DOFs with actuators must be `Actuator` instances, not strings. Got strings for: {dof_actuator_strs}"
+            )
         self._sensors = sensors
-        self._actuators = [dof.actuator for dof in dofs if dof.actuator is not None]
+        self._actuators: Sequence[Actuator] = [cast(Actuator, dof.actuator) for dof in dofs if dof.actuator is not None]
         self._evaluation_function = evaluation_function
         self._acquisition_plan = acquisition_plan
         self._optimizer = AxOptimizer(
@@ -161,38 +328,6 @@ class Agent:
     def acquisition_plan(self) -> AcquisitionPlan | None:
         return self._acquisition_plan
 
-    @property
-    def ax_client(self) -> Client:
-        return self._optimizer.ax_client
-
-    @property
-    def checkpoint_path(self) -> str | None:
-        return self._optimizer.checkpoint_path
-
-    @property
-    def fixed_dofs(self) -> dict[str, Any] | None:
-        return self._optimizer.fixed_parameters
-
-    @fixed_dofs.setter
-    def fixed_dofs(self, fixed_dofs: dict[DOF, Any] | None) -> None:
-        """
-        Fix degrees of freedom to a certain value for future optimizations.
-
-        Parameters
-        ----------
-        fixed_dofs : dict[DOF, Any] | dict[str, Any] | None
-            A mapping of DOFs or DOF names to the values they should be fixed to.
-
-        """
-        if not fixed_dofs:
-            self._optimizer.fixed_parameters = None
-            return
-
-        if _has_dof_keys(fixed_dofs):
-            self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
-        else:
-            raise TypeError("Keys must be DOF objects")
-
     def to_optimization_problem(self) -> OptimizationProblem:
         """
         Construct an optimization problem from the agent.
@@ -218,51 +353,6 @@ class Agent:
             evaluation_function=self.evaluation_function,
             acquisition_plan=self.acquisition_plan,
         )
-
-    def suggest(self, num_points: int = 1) -> list[dict]:
-        """
-        Get the next point(s) to evaluate in the search space.
-
-        Uses the Bayesian optimization algorithm to suggest promising points based
-        on all previously acquired data. Each suggestion includes an "_id" key for
-        tracking.
-
-        Parameters
-        ----------
-        num_points : int, optional
-            The number of points to suggest. Default is 1. Higher values enable
-            batch optimization but may reduce optimization efficiency per iteration.
-
-        Returns
-        -------
-        list[dict]
-            A list of dictionaries, each containing a parameterization of a point to
-            evaluate next. Each dictionary includes an "_id" key for identification.
-        """
-        return self._optimizer.suggest(num_points)
-
-    def ingest(self, points: list[dict]) -> None:
-        """
-        Ingest evaluation results into the optimizer.
-
-        Updates the optimizer's model with new data. Can ingest both suggested points
-        (with "_id" key) and external data (without "_id" key).
-
-        Parameters
-        ----------
-        points : list[dict]
-            A list of dictionaries, each containing outcomes for a trial. For suggested
-            points, include the "_id" key. For external data, include DOF names and
-            objective values, and omit "_id".
-
-        Notes
-        -----
-        This method is typically called automatically by :meth:`optimize`. Manual usage
-        is only needed for custom workflows or when ingesting external data.
-
-        For complete examples, see :doc:`/how-to-guides/attach-data-to-experiments`.
-        """
-        self._optimizer.ingest(points)
 
     def acquire_baseline(self, parameterization: dict[str, Any] | None = None) -> MsgGenerator[None]:
         """
@@ -355,69 +445,153 @@ class Agent:
             )
         )
 
-    def plot_objective(
-        self, x_dof_name: str, y_dof_name: str, objective_name: str, *args: Any, **kwargs: Any
-    ) -> list[AnalysisCardBase]:
-        """
-        Plot the predicted objective as a function of two DOFs.
 
-        Creates a contour plot showing the model's prediction of an objective across
-        the space defined by two DOFs. Useful for visualizing the optimization landscape.
+class QueueserverAgent(_AxAgentMixin):
+    """
+    An asynchronous interface that uses Ax as the backend for optimization and experiment tracking
+    and the bluesky-queueserver-api for scheduling plan execution.
+
+    Parameters
+    ----------
+    re_manager_api : REManagerAPI
+        The manager API for interaction with Bluesky queueserver.
+    zmq_consumer_addr : str
+        A ZMQ address to consume Bluesky messages from, to react to plan execution on the
+        remote server.
+    sensors : Sequence[str]
+        The sensors to use for acquisition. These should be the minimal set
+        of sensors that are needed to compute the objectives.
+    dofs : Sequence[DOF]
+        The degrees of freedom that the agent can control, which determine the search space.
+    objectives : Sequence[Objective]
+        The objectives which the agent will try to optimize.
+    evaluation_function : EvaluationFunction
+        The function to evaluate acquired data and produce outcomes.
+    acquisition_plan : str | None, optional
+        The acquisition plan to use for acquiring data from the beamline. If not provided,
+        :func:`blop.plans.default_acquire` will be assumed.
+    dof_constraints : Sequence[DOFConstraint] | None, optional
+        Constraints on DOFs to refine the search space.
+    outcome_constraints : Sequence[OutcomeConstraint] | None, optional
+        Constraints on outcomes to be satisfied during optimization.
+    checkpoint_path : str | None, optional
+        The path to the checkpoint file to save the optimizer's state to.
+    **kwargs : Any
+        Additional keyword arguments to configure the Ax experiment.
+
+    See Also
+    --------
+    blop.protocols.Sensor : The protocol for sensors.
+    blop.ax.dof.RangeDOF : For continuous parameters.
+    blop.ax.dof.ChoiceDOF : For discrete parameters.
+    blop.ax.objective.Objective : For defining objectives.
+    blop.ax.optimizer.AxOptimizer : The optimizer used internally.
+    blop.queueserver.QueueservverOptimizatonRunner : Runner that handles interaction with bluesky-queueserver.
+    """
+
+    def __init__(
+        self,
+        re_manager_api: REManagerAPI,
+        zmq_consumer_addr: str,
+        sensors: Sequence[str],
+        dofs: Sequence[DOF],
+        objectives: Sequence[Objective],
+        evaluation_function: EvaluationFunction,
+        acquisition_plan: str | None = None,
+        dof_constraints: Sequence[DOFConstraint] | None = None,
+        outcome_constraints: Sequence[OutcomeConstraint] | None = None,
+        checkpoint_path: str | None = None,
+        **kwargs: Any,
+    ):
+        self._sensors = sensors
+        self._actuators: Sequence[str] = []
+        for dof in dofs:
+            if dof.actuator is not None:
+                if isinstance(dof.actuator, Actuator):
+                    self._actuators.append(dof.actuator.name)
+                else:
+                    self._actuators.append(dof.actuator)
+        self._evaluation_function = evaluation_function
+        self._acquisition_plan = acquisition_plan
+        self._optimizer = AxOptimizer(
+            parameters=[dof.to_ax_parameter_config() for dof in dofs],
+            objective=to_ax_objective_str(objectives),
+            parameter_constraints=[constraint.ax_constraint for constraint in dof_constraints] if dof_constraints else None,
+            outcome_constraints=[constraint.ax_constraint for constraint in outcome_constraints]
+            if outcome_constraints
+            else None,
+            checkpoint_path=checkpoint_path,
+            **kwargs,
+        )
+        self._runner = QueueserverOptimizationRunner(
+            self.to_optimization_problem(),
+            QueueserverClient(re_manager_api, zmq_consumer_addr),
+        )
+
+    @property
+    def evaluation_function(self) -> EvaluationFunction:
+        return self._evaluation_function
+
+    @property
+    def actuators(self) -> Sequence[str]:
+        return self._actuators
+
+    @property
+    def sensors(self) -> Sequence[str]:
+        return self._sensors
+
+    @property
+    def acquisition_plan(self) -> str | None:
+        return self._acquisition_plan
+
+    def to_optimization_problem(self) -> QueueserverOptimizationProblem:
+        return QueueserverOptimizationProblem(
+            optimizer=self._optimizer,
+            actuators=self._actuators,
+            sensors=self._sensors,
+            evaluation_function=self._evaluation_function,
+            acquisition_plan=self._acquisition_plan,
+        )
+
+    def run(self, iterations=1, n_points=1) -> None:
+        """
+        Start the optimization loop.
+
+        Validates the queueserver state, then begins the suggest -> acquire -> ingest
+        cycle. This method returns immediately; the optimization runs asynchronously
+        via callbacks.
 
         Parameters
         ----------
-        x_dof_name : str
-            The name of the DOF to plot on the x-axis.
-        y_dof_name : str
-            The name of the DOF to plot on the y-axis.
-        objective_name : str
-            The name of the objective to plot.
-        *args : Any
-            Additional positional arguments passed to Ax's compute_analyses.
-        **kwargs : Any
-            Additional keyword arguments passed to Ax's compute_analyses.
+        iterations : int
+            Number of optimization iterations to run.
+        num_points : int
+            Number of points to suggest per iteration.
 
-        Returns
-        -------
-        list[AnalysisCard]
-            The computed analysis cards containing the plot data.
+        Raises
+        ------
+        RuntimeError
+            If the queueserver environment is not ready.
+        ValueError
+            If required devices or plans are not available.
+        """
+
+        self._runner.run(iterations, n_points)
+
+    def submit_suggestions(self, suggestions: list[dict]) -> None:
+        """
+        Evaluate specific parameter combinations.
+
+        Acquires data for given suggestions and ingests results. Supports both
+        optimizer suggestions and manual points.
+
+        Parameters
+        ----------
+        suggestions : list[dict]
+            Either optimizer suggestions (with "_id") or manual points (without "_id").
 
         See Also
         --------
-        ax.analysis.ContourPlot : Pre-built analysis for plotting objectives.
-        ax.analysis.AnalysisCard : Contains the raw and computed data.
+        suggest : Get optimizer suggestions.
         """
-        return self.ax_client.compute_analyses(
-            [
-                ContourPlot(
-                    x_parameter_name=x_dof_name,
-                    y_parameter_name=y_dof_name,
-                    metric_name=objective_name,
-                ),
-            ],
-            *args,
-            **kwargs,
-        )
-
-    def checkpoint(self) -> None:
-        """
-        Save the agent's state to a JSON file.
-        """
-        self._optimizer.checkpoint()
-
-    def reconfigure_search_space(
-        self, dof_mappings: dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]
-    ) -> None:
-        """
-        Update bounds or values of existing DOFs for future optimizations.
-
-        Parameters
-        ----------
-        dof_mappings : dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]
-            Mapping of DOFs to their new search space.
-        """
-
-        if _has_dof_keys(dof_mappings):
-            self._optimizer._reconfigure_search_space({dof.parameter_name: update for dof, update in dof_mappings.items()})
-        else:
-            raise TypeError("Keys must all be type DOF")
+        self._runner.submit_suggestions(suggestions)
