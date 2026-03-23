@@ -106,11 +106,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
         if not fixed_parameters:
             self._fixed_parameters = None
             return
-        unknown_parameter_names = set(fixed_parameters) - set(self._parameter_names)
-        if unknown_parameter_names:
-            raise KeyError(
-                f"Unknown fixed parameter(s): {sorted(unknown_parameter_names)}, expected: {sorted(self._parameter_names)}"
-            )
+        self._verify_parameter_names(set(fixed_parameters))
         self._fixed_parameters = dict(fixed_parameters)
 
     def suggest(self, num_points: int | None = None) -> list[dict]:

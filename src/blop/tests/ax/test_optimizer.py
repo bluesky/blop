@@ -35,10 +35,13 @@ def test_ax_fixed_parameters():
         parameter_constraints=["x1 + x2 <= 10"],
         outcome_constraints=["y1 >= 0", "y2 <= 0"],
     )
-    optimizer.fixed_parameters = {"x3": 3}
-    assert optimizer.fixed_parameters == {"x3": 3}
+    # Unknown parameter name
     with pytest.raises(KeyError):
         optimizer.fixed_parameters = {"x4": 3}
+
+    # Optimizer state should reflect setter call
+    optimizer.fixed_parameters = {"x3": 3}
+    assert optimizer.fixed_parameters == {"x3": 3}
 
 
 def test_ax_optimizer_suggest():

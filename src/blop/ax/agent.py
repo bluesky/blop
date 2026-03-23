@@ -186,7 +186,7 @@ class Agent:
         return self._optimizer.fixed_parameters
 
     @fixed_dofs.setter
-    def fixed_dofs(self, fixed_dofs: dict[DOF, Any] | dict[str, Any] | None) -> None:
+    def fixed_dofs(self, fixed_dofs: dict[DOF, Any] | None) -> None:
         """
         Fix degrees of freedom to a certain value for future optimizations.
 
@@ -200,14 +200,10 @@ class Agent:
             self._optimizer.fixed_parameters = None
             return
 
-        if _has_str_keys(fixed_dofs):
-            self._optimizer.fixed_parameters = fixed_dofs
-        elif _has_dof_keys(fixed_dofs):
+        if _has_dof_keys(fixed_dofs):
             self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
         else:
-            raise ValueError(
-                f"Keys must all be either {type(DOF)} or {type(str)}, but got {type(list(fixed_dofs.keys())[0])}"
-            )
+            raise TypeError("Keys must be DOF objects")
 
     def to_optimization_problem(self) -> OptimizationProblem:
         """

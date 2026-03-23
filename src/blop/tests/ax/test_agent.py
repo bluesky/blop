@@ -147,8 +147,11 @@ def test_agent_suggest_fixed_dofs(mock_evaluation_function):
         objectives=[objective],
         evaluation_function=mock_evaluation_function,
     )
-    with pytest.raises(ValueError):
-        agent.fixed_dofs = {"test_movable1": 3, dof2: 4}
+    # Keys must be a DOF object
+    with pytest.raises(TypeError):
+        agent.fixed_dofs = {"test_movable1": 3}
+
+    # Valid updates should fix the DOF
     agent.fixed_dofs = {dof2: 4}
     parameterizations = agent.suggest(5)
     for i in range(5):
