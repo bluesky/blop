@@ -18,27 +18,15 @@ from bluesky.utils import MsgGenerator
 from ..plans import acquire_baseline, optimize, sample_suggestions
 from ..protocols import AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Sensor
 from ..utils import InferredReadable
-from .dof import DOF, ChoiceDOF, DOFConstraint, RangeDOF
+from .dof import DOF, DOFConstraint
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer
 
 logger = logging.getLogger(__name__)
 
 
-def _has_str_keys(d: dict[Any, Any]) -> TypeGuard[dict[str, Any]]:
-    return all(isinstance(key, str) for key in d)
-
-
 def _has_dof_keys(d: dict[Any, Any]) -> TypeGuard[dict[DOF, Any]]:
     return all(isinstance(key, DOF) for key in d)
-
-
-def _has_range_dof_keys(d: dict[Any, Any]) -> TypeGuard[dict[RangeDOF, Any]]:
-    return all(isinstance(key, RangeDOF) for key in d)
-
-
-def _has_choice_dof_keys(d: dict[Any, Any]) -> TypeGuard[dict[ChoiceDOF, Any]]:
-    return all(isinstance(key, ChoiceDOF) for key in d)
 
 
 class Agent:
