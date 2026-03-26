@@ -17,6 +17,7 @@ import bluesky.preprocessors as bpp
 from bluesky.utils import MsgGenerator
 from bluesky_queueserver_api.zmq import REManagerAPI
 
+from ..callbacks import BestEffortOptimizationCallback
 from ..plans import acquire_baseline, optimize, sample_suggestions
 from ..protocols import (
     AcquisitionPlan,
@@ -28,7 +29,6 @@ from ..protocols import (
 )
 from ..queueserver import QueueserverClient, QueueserverOptimizationRunner
 from ..utils import InferredReadable
-from ..callbacks import BestEffortOptimizationCallback
 from .dof import DOF, DOFConstraint
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer
