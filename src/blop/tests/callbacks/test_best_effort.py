@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+
 from blop.callbacks.best_effort import BestEffortOptimizationCallback
 from blop.plans import OPTIMIZE_RUN_KEY, SAMPLE_SUGGESTIONS_RUN_KEY
 

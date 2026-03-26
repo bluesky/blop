@@ -49,7 +49,7 @@ def _make_event(data: dict, seq_num: int = 1, **overrides) -> Event:
         "descriptor": "desc-001",
         "seq_num": seq_num,
         "data": data,
-        "timestamps": {k: 0.0 for k in data},
+        "timestamps": dict.fromkeys(data, 0.0),
     }
     doc.update(overrides)
     return Event(**doc)
