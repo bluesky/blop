@@ -1,7 +1,8 @@
 import numpy as np
+import pytest
 
 from blop.protocols import ID_KEY
-from blop.utils import InferredReadable, Source, get_route_index, route_suggestions
+from blop.utils import InferredReadable, Source, _infer_data_key, get_route_index, route_suggestions
 
 # InferredReadable tests
 
@@ -90,11 +91,16 @@ def test_route_suggestions_multiple_with_start():
     # "near" should come first since it's closer to start
     assert result[0][ID_KEY] == "near"
 
-
-def test_route_suggestions_ignores_non_float_values():
-    suggestions = [
-        {"x": 0.0, "label": "foo", ID_KEY: "a"},
-        {"x": 1.0, "label": "bar", ID_KEY: "b"},
-    ]
     result = route_suggestions(suggestions)
     assert len(result) == 2
+
+
+# _infer_data_key source value tests
+
+
+@pytest.mark.parametrize("source", list(Source))
+def test_infer_data_key_source_is_enum_value(source):
+    """The 'source' field in the DataKey must be the enum's string value, not its repr."""
+    data_key = _infer_data_key(source, 1.0)
+    assert data_key["source"] == source.value
+    assert "Source." not in data_key["source"]

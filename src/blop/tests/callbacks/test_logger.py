@@ -29,8 +29,8 @@ def _make_start(**overrides) -> RunStart:
 def _make_descriptor(data_keys: dict | None = None, **overrides) -> EventDescriptor:
     if data_keys is None:
         data_keys = {
-            "x": {"dtype": "number", "shape": [], "source": str(Source.PARAMETER)},
-            "y": {"dtype": "number", "shape": [], "source": str(Source.OUTCOME)},
+            "x": {"dtype": "number", "shape": [], "source": Source.PARAMETER.value},
+            "y": {"dtype": "number", "shape": [], "source": Source.OUTCOME.value},
         }
     doc = {
         "uid": "desc-001",
@@ -103,10 +103,10 @@ def test_descriptor(logger):
     logger.descriptor(
         _make_descriptor(
             data_keys={
-                "x1": {"dtype": "number", "shape": [], "source": str(Source.PARAMETER)},
-                "x2": {"dtype": "number", "shape": [], "source": str(Source.PARAMETER)},
-                "y": {"dtype": "number", "shape": [], "source": str(Source.OUTCOME)},
-                "other": {"dtype": "string", "shape": [], "source": str(Source.OTHER)},
+                "x1": {"dtype": "number", "shape": [], "source": Source.PARAMETER.value},
+                "x2": {"dtype": "number", "shape": [], "source": Source.PARAMETER.value},
+                "y": {"dtype": "number", "shape": [], "source": Source.OUTCOME.value},
+                "other": {"dtype": "string", "shape": [], "source": Source.OTHER.value},
             }
         )
     )
@@ -176,8 +176,8 @@ def test_event_non_numeric_data(logger, console):
     _setup_descriptor(
         logger,
         data_keys={
-            "x": {"dtype": "number", "shape": [], "source": str(Source.PARAMETER)},
-            "label": {"dtype": "string", "shape": [], "source": str(Source.OUTCOME)},
+            "x": {"dtype": "number", "shape": [], "source": Source.PARAMETER.value},
+            "label": {"dtype": "string", "shape": [], "source": Source.OUTCOME.value},
         },
     )
     doc = _make_event(data={"x": 1.0, "label": "good"})

@@ -36,7 +36,7 @@ def _infer_data_key(source: Source, value: ArrayLike) -> DataKey:
             dtype = "number"
         else:
             dtype = "string"
-    return DataKey(source=str(source), dtype=dtype, shape=shape, dtype_numpy=dtype_numpy)
+    return DataKey(source=source.value, dtype=dtype, shape=shape, dtype_numpy=dtype_numpy)
 
 
 class InferredReadable(Readable, HasHints, HasParent):
