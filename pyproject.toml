@@ -46,6 +46,7 @@ dynamic = ["version"]
 
 [project.optional-dependencies]
 qs = ["bluesky-queueserver-api"]
+plot = ["matplotlib"]
 dev = [
   "pytest",
   "pytest-cov",
@@ -57,6 +58,7 @@ dev = [
   "coverage",
   "pyright",
   "blop[qs]",
+  "blop[plot]",
 ]
 cpu = [
   # Empty extra - the source configuration below routes to CPU-only index
