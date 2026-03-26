@@ -29,7 +29,6 @@ from blop.ax import Agent, RangeDOF, Objective
 from bluesky.protocols import NamedMovable, Readable, Status, Hints, HasHints, HasParent
 from bluesky.run_engine import RunEngine
 from bluesky_tiled_plugins import TiledWriter
-from bluesky.callbacks.best_effort import BestEffortCallback
 from tiled.client import from_uri
 from tiled.client.container import Container
 from tiled.server import SimpleTiledServer
@@ -47,9 +46,6 @@ RE = RunEngine({})
 tiled_client = from_uri(tiled_server.uri)
 tiled_writer = TiledWriter(tiled_client)
 RE.subscribe(tiled_writer)
-bec = BestEffortCallback()
-bec.disable_plots()
-RE.subscribe(bec)
 ```
 
 ## Creating simulated devices
