@@ -1,6 +1,6 @@
 import time
 from collections.abc import Sequence
-from enum import StrEnum
+from enum import Enum
 from typing import Any
 
 import networkx as nx
@@ -12,7 +12,7 @@ from numpy.typing import ArrayLike
 from .protocols import ID_KEY, OptimizationProblem
 
 
-class Source(StrEnum):
+class Source(str, Enum):
     """An enum that helps describe where the data key comes from."""
 
     OUTCOME = "optimization-outcome"

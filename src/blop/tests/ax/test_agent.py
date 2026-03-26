@@ -3,12 +3,14 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 from ax import Client
+from bluesky.callbacks import CallbackBase
 from bluesky_queueserver_api.zmq import REManagerAPI
 
 from blop.ax.agent import Agent, QueueserverAgent
 from blop.ax.dof import DOFConstraint, RangeDOF
 from blop.ax.objective import Objective
 from blop.ax.optimizer import AxOptimizer
+from blop.callbacks.logger import OptimizationLogger
 from blop.protocols import AcquisitionPlan, EvaluationFunction
 
 from ..conftest import MovableSignal, ReadableSignal
@@ -311,3 +313,98 @@ def test_queueserver_agent_submit_suggestions(
     suggestions = [{"test_motor1": 5, "test_motor2": 9}]
     agent.submit_suggestions(suggestions)
     mock_queueserver_runner_cls.return_value.submit_suggestions.assert_called_once_with(suggestions)
+
+
+@pytest.fixture()
+def agent(mock_evaluation_function):
+    """A minimal Agent for testing callback management."""
+    dof = RangeDOF(name="x1", bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="obj", minimize=False)
+    return Agent(
+        sensors=[],
+        dofs=[dof],
+        objectives=[objective],
+        evaluation_function=mock_evaluation_function,
+    )
+
+
+class _StubCallback(CallbackBase):
+    """Minimal CallbackBase for test assertions."""
+
+
+def test_default_callbacks(agent):
+    """A new agent should have exactly one OptimizationLogger by default."""
+    assert len(agent.callbacks) == 1
+    assert isinstance(agent.callbacks[0], OptimizationLogger)
+
+
+def test_subscribe(agent):
+    cb = _StubCallback()
+    agent.subscribe(cb)
+    assert cb in agent.callbacks
+    assert len(agent.callbacks) == 2
+
+
+def test_subscribe_duplicate_raises(agent):
+    cb = _StubCallback()
+    agent.subscribe(cb)
+    with pytest.raises(ValueError, match="already subscribed"):
+        agent.subscribe(cb)
+
+
+def test_unsubscribe(agent):
+    cb = _StubCallback()
+    agent.subscribe(cb)
+    agent.unsubscribe(cb)
+    assert cb not in agent.callbacks
+
+
+def test_unsubscribe_not_subscribed_raises(agent):
+    cb = _StubCallback()
+    with pytest.raises(ValueError):
+        agent.unsubscribe(cb)
+
+
+def test_unsubscribe_default_logger(agent):
+    """Users should be able to remove the default OptimizationLogger."""
+    logger = agent.callbacks[0]
+    agent.unsubscribe(logger)
+    assert len(agent.callbacks) == 0
+
+
+def test_callbacks_clear(agent):
+    """Clearing the list should disable all callbacks."""
+    agent.callbacks.clear()
+    assert len(agent.callbacks) == 0
+
+
+def test_subscribe_after_clear(agent):
+    """Subscribing after clearing should work normally."""
+    agent.callbacks.clear()
+    cb = _StubCallback()
+    agent.subscribe(cb)
+    assert agent.callbacks == [cb]
+
+
+def test_from_checkpoint_has_default_callbacks(mock_evaluation_function, tmp_path):
+    """An agent loaded from a checkpoint should have the default callbacks."""
+    checkpoint_path = tmp_path / "checkpoint.json"
+    original = Agent(
+        sensors=[ReadableSignal(name="s")],
+        dofs=[RangeDOF(name="x1", bounds=(0, 10), parameter_type="float")],
+        objectives=[Objective(name="obj", minimize=False)],
+        evaluation_function=mock_evaluation_function,
+        checkpoint_path=str(checkpoint_path),
+    )
+    original.ingest([{"x1": 1.0, "obj": 2.0}])
+    original.ax_client.configure_generation_strategy()
+    original.checkpoint()
+
+    restored = Agent.from_checkpoint(
+        str(checkpoint_path),
+        sensors=[ReadableSignal(name="s")],
+        actuators=[],
+        evaluation_function=mock_evaluation_function,
+    )
+    assert len(restored.callbacks) == 1
+    assert isinstance(restored.callbacks[0], OptimizationLogger)

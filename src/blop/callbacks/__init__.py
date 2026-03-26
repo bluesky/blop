@@ -1,3 +1,3 @@
-from .best_effort import BestEffortOptimizationCallback
+from .router import OptimizationCallbackRouter
 
-__all__ = ["BestEffortOptimizationCallback"]
+__all__ = ["OptimizationCallbackRouter"]

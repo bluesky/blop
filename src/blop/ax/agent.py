@@ -14,10 +14,12 @@ else:
     from ax.analysis.analysis_card import AnalysisCardBase  # type: ignore[import-untyped]
 # ===============================
 import bluesky.preprocessors as bpp
+from bluesky.callbacks import CallbackBase
 from bluesky.utils import MsgGenerator
 from bluesky_queueserver_api.zmq import REManagerAPI
 
-from ..callbacks import BestEffortOptimizationCallback
+from ..callbacks.logger import OptimizationLogger
+from ..callbacks.router import OptimizationCallbackRouter
 from ..plans import acquire_baseline, optimize, sample_suggestions
 from ..protocols import (
     AcquisitionPlan,
@@ -212,9 +214,6 @@ class Agent(_AxAgentMixin):
         Constraints on outcomes to be satisfied during optimization.
     checkpoint_path : str | None, optional
         The path to the checkpoint file to save the optimizer's state to.
-    disable_callback : bool, optional
-        Disable use of the best-effort callback that displays optimization
-        progress (and persists data between calls). Defaults to False.
     **kwargs : Any
         Additional keyword arguments to configure the Ax experiment.
 
@@ -245,7 +244,6 @@ class Agent(_AxAgentMixin):
         dof_constraints: Sequence[DOFConstraint] | None = None,
         outcome_constraints: Sequence[OutcomeConstraint] | None = None,
         checkpoint_path: str | None = None,
-        disable_callback: bool = False,
         **kwargs: Any,
     ):
         if any(isinstance(dof.actuator, str) for dof in dofs):
@@ -268,10 +266,8 @@ class Agent(_AxAgentMixin):
             **kwargs,
         )
         self._readable_cache: dict[str, InferredReadable] = {}
-        if disable_callback:
-            self._best_effort_callback = None
-        else:
-            self._best_effort_callback = BestEffortOptimizationCallback()
+        self._callbacks: list[CallbackBase] = [OptimizationLogger()]
+        self._callback_router = OptimizationCallbackRouter(self._callbacks)
 
     @classmethod
     def from_checkpoint(
@@ -310,8 +306,56 @@ class Agent(_AxAgentMixin):
         instance._sensors = sensors
         instance._evaluation_function = evaluation_function
         instance._acquisition_plan = acquisition_plan
+        instance._readable_cache = {}
+        instance._callbacks = [OptimizationLogger()]
+        instance._callback_router = OptimizationCallbackRouter(instance._callbacks)
 
         return instance
+
+    @property
+    def callbacks(self) -> list[CallbackBase]:
+        """The list of active optimization callbacks.
+
+        Callbacks in this list receive documents from ``"optimize"`` and
+        ``"sample_suggestions"`` runs. The default list contains an
+        :class:`~blop.callbacks.logger.OptimizationLogger`.
+
+        The list can be mutated directly, or use :meth:`subscribe` /
+        :meth:`unsubscribe` for convenience.
+        """
+        return self._callbacks
+
+    def subscribe(self, callback: CallbackBase) -> None:
+        """Subscribe a callback to receive optimization run documents.
+
+        Parameters
+        ----------
+        callback : CallbackBase
+            A Bluesky callback instance.
+
+        Raises
+        ------
+        ValueError
+            If *callback* is already subscribed.
+        """
+        if callback in self._callbacks:
+            raise ValueError(f"Callback {callback!r} is already subscribed.")
+        self._callbacks.append(callback)
+
+    def unsubscribe(self, callback: CallbackBase) -> None:
+        """Unsubscribe a previously subscribed callback.
+
+        Parameters
+        ----------
+        callback : CallbackBase
+            The callback instance to remove.
+
+        Raises
+        ------
+        ValueError
+            If *callback* is not subscribed.
+        """
+        self._callbacks.remove(callback)
 
     @property
     def sensors(self) -> Sequence[Sensor]:
@@ -417,10 +461,10 @@ class Agent(_AxAgentMixin):
         optimize_plan = optimize(
             self.to_optimization_problem(), iterations=iterations, n_points=n_points, readable_cache=self._readable_cache
         )
-        if self._best_effort_callback is not None:
+        if self._callbacks:
             optimize_plan = bpp.subs_wrapper(
                 optimize_plan,
-                self._best_effort_callback,
+                self._callback_router,
             )
 
         yield from optimize_plan
@@ -450,10 +494,10 @@ class Agent(_AxAgentMixin):
         sample_suggestions_plan = sample_suggestions(
             self.to_optimization_problem(), suggestions=suggestions, readable_cache=self._readable_cache
         )
-        if self._best_effort_callback is not None:
+        if self._callbacks:
             sample_suggestions_plan = bpp.subs_wrapper(
                 sample_suggestions_plan,
-                self._best_effort_callback,
+                self._callback_router,
             )
 
         return (yield from sample_suggestions_plan)
