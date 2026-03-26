@@ -9,6 +9,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from .utils import RunningStats
 from ..utils import Source
 
 # Styling constants
@@ -18,46 +19,6 @@ _HEADER_STYLE = "bold"
 _DIM_STYLE = "dim"
 _ERROR_STYLE = "bold red"
 _ITERATION_RULE_STYLE = "blue"
-
-
-class _RunningStats:
-    """Accumulates running statistics using Welford's online algorithm.
-
-    Tracks count, min, max, mean, and standard deviation without
-    storing individual observations. Numerically stable for variance
-    computation.
-    """
-
-    __slots__ = ("count", "min", "max", "_mean", "_m2")
-
-    def __init__(self) -> None:
-        self.count: int = 0
-        self.min: float = math.inf
-        self.max: float = -math.inf
-        self._mean: float = 0.0
-        self._m2: float = 0.0
-
-    def update(self, value: float) -> None:
-        """Incorporate a new observation."""
-        if math.isnan(value) or math.isinf(value):
-            return
-        self.count += 1
-        self.min = min(self.min, value)
-        self.max = max(self.max, value)
-        delta = value - self._mean
-        self._mean += delta / self.count
-        delta2 = value - self._mean
-        self._m2 += delta * delta2
-
-    @property
-    def mean(self) -> float:
-        return self._mean if self.count > 0 else math.nan
-
-    @property
-    def std(self) -> float:
-        if self.count < 2:
-            return math.nan
-        return math.sqrt(self._m2 / (self.count - 1))
 
 
 def _format_value(value: Any) -> str:
@@ -124,7 +85,7 @@ class OptimizationLogger(CallbackBase):
         self._sorted_data_keys_by_source: dict[Source, list[str]] = {}
         self._total_iterations = 0
         self._current_iteration = 0
-        self._stats: dict[str, _RunningStats] = {}
+        self._stats: dict[str, RunningStats] = {}
 
     def start(self, doc: RunStart) -> None:
         iterations = doc.get("iterations", None)
@@ -188,7 +149,7 @@ class OptimizationLogger(CallbackBase):
             for idx in valid_indices:
                 if idx < len(values) and _is_numeric(values[idx]):
                     if key not in self._stats:
-                        self._stats[key] = _RunningStats()
+                        self._stats[key] = RunningStats()
                     self._stats[key].update(float(values[idx]))
 
     def event(self, doc: Event) -> Event:

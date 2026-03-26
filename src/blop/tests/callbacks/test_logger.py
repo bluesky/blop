@@ -1,12 +1,15 @@
 """Unit tests for the OptimizationLogger callback."""
 
+import math
 from unittest.mock import MagicMock
 
+import numpy as np
 import pytest
 from event_model import Event, EventDescriptor, RunStart, RunStop
 from rich.console import Console
 
 from blop.callbacks.logger import OptimizationLogger
+from blop.callbacks.utils import RunningStats
 from blop.utils import Source
 
 
@@ -238,3 +241,89 @@ def test_full_lifecycle(logger, console):
 
     assert console.print.call_count >= 1
     assert console.rule.call_count >= 1
+
+
+def test_running_stats_empty():
+    stats = RunningStats()
+    assert stats.count == 0
+    assert stats.min == math.inf
+    assert stats.max == -math.inf
+    assert math.isnan(stats.mean)
+    assert math.isnan(stats.std)
+
+
+def test_running_stats_single_value():
+    stats = RunningStats()
+    stats.update(5.0)
+    assert stats.count == 1
+    assert stats.min == 5.0
+    assert stats.max == 5.0
+    assert stats.mean == 5.0
+    assert math.isnan(stats.std)
+
+
+def test_running_stats_two_identical_values():
+    stats = RunningStats()
+    stats.update(3.0)
+    stats.update(3.0)
+    assert stats.count == 2
+    assert stats.mean == 3.0
+    assert stats.std == 0.0
+
+
+def test_running_stats_known_values():
+    values = [2.0, 4.0, 4.0, 4.0, 5.0, 5.0, 7.0, 9.0]
+    stats = RunningStats()
+    for v in values:
+        stats.update(v)
+
+    assert stats.count == len(values)
+    assert stats.min == np.min(values)
+    assert stats.max == np.max(values)
+    assert math.isclose(stats.mean, np.mean(values))
+    assert math.isclose(stats.std, np.std(values, ddof=1))
+
+
+def test_running_stats_large_offset():
+    """Welford's algorithm should be numerically stable with large offsets."""
+    values = [1e9 + 1, 1e9 + 2, 1e9 + 3]
+    stats = RunningStats()
+    for v in values:
+        stats.update(v)
+
+    assert math.isclose(stats.mean, np.mean(values))
+    assert math.isclose(stats.std, np.std(values, ddof=1))
+
+
+def test_running_stats_negative_values():
+    values = [-10.0, -5.0, 0.0, 5.0, 10.0]
+    stats = RunningStats()
+    for v in values:
+        stats.update(v)
+
+    assert stats.min == -10.0
+    assert stats.max == 10.0
+    assert math.isclose(stats.mean, np.mean(values))
+    assert math.isclose(stats.std, np.std(values, ddof=1))
+
+
+def test_running_stats_skips_nan():
+    stats = RunningStats()
+    stats.update(1.0)
+    stats.update(float("nan"))
+    stats.update(3.0)
+    assert stats.count == 2
+    assert stats.min == 1.0
+    assert stats.max == 3.0
+    assert math.isclose(stats.mean, 2.0)
+
+
+def test_running_stats_skips_inf():
+    stats = RunningStats()
+    stats.update(1.0)
+    stats.update(float("inf"))
+    stats.update(float("-inf"))
+    stats.update(3.0)
+    assert stats.count == 2
+    assert stats.min == 1.0
+    assert stats.max == 3.0
