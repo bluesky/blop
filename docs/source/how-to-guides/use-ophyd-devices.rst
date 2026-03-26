@@ -88,3 +88,8 @@ If you use a custom acquisition plan by implementing the :class:`blop.protocols.
     )
 
     RE(agent.optimize())
+
+.. testoutput::
+   :hide:
+
+   ...

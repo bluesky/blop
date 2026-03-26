@@ -9,8 +9,8 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
-from .utils import RunningStats
 from ..utils import Source
+from .utils import RunningStats
 
 # Styling constants
 _PARAM_STYLE = "cyan"
