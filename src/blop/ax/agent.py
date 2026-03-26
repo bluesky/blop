@@ -13,6 +13,7 @@ if importlib.util.find_spec("ax.core.analysis_card") is not None:
 else:
     from ax.analysis.analysis_card import AnalysisCardBase  # type: ignore[import-untyped]
 # ===============================
+import bluesky.preprocessors as bpp
 from bluesky.utils import MsgGenerator
 from bluesky_queueserver_api.zmq import REManagerAPI
 
@@ -27,6 +28,7 @@ from ..protocols import (
 )
 from ..queueserver import QueueserverClient, QueueserverOptimizationRunner
 from ..utils import InferredReadable
+from ..callbacks import BestEffortOptimizationCallback
 from .dof import DOF, DOFConstraint
 from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer
@@ -210,6 +212,9 @@ class Agent(_AxAgentMixin):
         Constraints on outcomes to be satisfied during optimization.
     checkpoint_path : str | None, optional
         The path to the checkpoint file to save the optimizer's state to.
+    disable_callback : bool, optional
+        Disable use of the best-effort callback that displays optimization
+        progress (and persists data between calls). Defaults to False.
     **kwargs : Any
         Additional keyword arguments to configure the Ax experiment.
 
@@ -240,6 +245,7 @@ class Agent(_AxAgentMixin):
         dof_constraints: Sequence[DOFConstraint] | None = None,
         outcome_constraints: Sequence[OutcomeConstraint] | None = None,
         checkpoint_path: str | None = None,
+        disable_callback: bool = False,
         **kwargs: Any,
     ):
         if any(isinstance(dof.actuator, str) for dof in dofs):
@@ -262,6 +268,10 @@ class Agent(_AxAgentMixin):
             **kwargs,
         )
         self._readable_cache: dict[str, InferredReadable] = {}
+        if disable_callback:
+            self._best_effort_callback = None
+        else:
+            self._best_effort_callback = BestEffortOptimizationCallback()
 
     @classmethod
     def from_checkpoint(
@@ -404,9 +414,16 @@ class Agent(_AxAgentMixin):
         suggest : Get point suggestions without running acquisition.
         ingest : Manually ingest evaluation results.
         """
-        yield from optimize(
+        optimize_plan = optimize(
             self.to_optimization_problem(), iterations=iterations, n_points=n_points, readable_cache=self._readable_cache
         )
+        if self._best_effort_callback is not None:
+            optimize_plan = bpp.subs_wrapper(
+                optimize_plan,
+                self._best_effort_callback,
+            )
+
+        yield from optimize_plan
 
     def sample_suggestions(self, suggestions: list[dict]) -> MsgGenerator[tuple[str, list[dict], list[dict]]]:
         """
@@ -430,11 +447,16 @@ class Agent(_AxAgentMixin):
         suggest : Get optimizer suggestions.
         optimize : Run full optimization loop.
         """
-        return (
-            yield from sample_suggestions(
-                self.to_optimization_problem(), suggestions=suggestions, readable_cache=self._readable_cache
-            )
+        sample_suggestions_plan = sample_suggestions(
+            self.to_optimization_problem(), suggestions=suggestions, readable_cache=self._readable_cache
         )
+        if self._best_effort_callback is not None:
+            sample_suggestions_plan = bpp.subs_wrapper(
+                sample_suggestions_plan,
+                self._best_effort_callback,
+            )
+
+        return (yield from sample_suggestions_plan)
 
 
 class QueueserverAgent(_AxAgentMixin):
