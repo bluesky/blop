@@ -240,7 +240,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
             original_range_values[parameter_name] = (parameter.lower, parameter.upper)
             parameter.update_range(*value)
         elif isinstance(parameter, ChoiceParameter):
-            if not isinstance(value, list):
+            if not isinstance(value, list) or not all(isinstance(v, type(parameter.values[0])) for v in value):
                 raise ValueError(f"{ChoiceParameter.__name__} only accepts list of items, but got: {value}")
             original_choice_values[parameter_name] = parameter.values
             parameter.set_values(value)

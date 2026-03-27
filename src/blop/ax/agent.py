@@ -1,7 +1,7 @@
 import importlib.util
 import logging
 from collections.abc import Sequence
-from typing import Any, TypeGuard, cast
+from typing import Any, cast
 
 from ax import Client
 from ax.analysis import ContourPlot
@@ -33,10 +33,6 @@ from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer
 
 logger = logging.getLogger(__name__)
-
-
-def _has_dof_keys(d: dict[Any, Any]) -> TypeGuard[dict[DOF, Any]]:
-    return all(isinstance(key, DOF) for key in d)
 
 
 class _AxAgentMixin:
