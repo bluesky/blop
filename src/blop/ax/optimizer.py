@@ -230,22 +230,22 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
 
         Raises
         ------
-        ValueError
+        TypeError
             If the provided value does not match the expected type for the parameter.
         """
         parameter = self._client._experiment.parameters[parameter_name]
         if isinstance(parameter, RangeParameter):
             if not isinstance(value, tuple):
-                raise ValueError(f"{RangeParameter.__name__} only accepts tuples of length 2, but got: {value}")
+                raise TypeError(f"{RangeParameter.__name__} only accepts tuples of length 2, but got: {value}")
             original_range_values[parameter_name] = (parameter.lower, parameter.upper)
             parameter.update_range(*value)
         elif isinstance(parameter, ChoiceParameter):
-            if not isinstance(value, list) or not all(isinstance(v, type(parameter.values[0])) for v in value):
-                raise ValueError(f"{ChoiceParameter.__name__} only accepts list of items, but got: {value}")
+            if not isinstance(value, list):
+                raise TypeError(f"{ChoiceParameter.__name__} only accepts list of items, but got: {value}")
             original_choice_values[parameter_name] = parameter.values
             parameter.set_values(value)
         else:
-            raise ValueError(f"Expected RangeParameter or ChoiceParameter, but got {parameter}")
+            raise TypeError(f"Expected RangeParameter or ChoiceParameter, but got {parameter}")
 
     def _rollback_parameter_updates(
         self,
