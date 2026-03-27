@@ -199,13 +199,13 @@ def test_ax_optimizer_reconfigurable_search_space():
     with pytest.raises(KeyError):
         optimizer._reconfigure_search_space({"x4": (-4, 4)})
     # ChoiceParameter expects a list
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         optimizer._reconfigure_search_space({"x3": 3})
     # ChoiceParameter expects a list of single type
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         optimizer._reconfigure_search_space({"x3": ["2", 5, 3.6]})
     # RangeParameter expects a tuple
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         optimizer._reconfigure_search_space({"x1": 3})
 
     # Changing the serach space should reflect in parameter state

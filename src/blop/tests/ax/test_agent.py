@@ -154,7 +154,7 @@ def test_agent_suggest_fixed_dofs(mock_evaluation_function):
         evaluation_function=mock_evaluation_function,
     )
     # Keys must be a DOF object
-    with pytest.raises(TypeError):
+    with pytest.raises(AttributeError):
         agent.fixed_dofs = {"test_movable1": 3}
 
     # Valid updates should fix the DOF
@@ -235,7 +235,7 @@ def test_reconfigure_search_space(mock_evaluation_function):
         evaluation_function=mock_evaluation_function,
     )
     # Keys must be DOF objects, not parameter names
-    with pytest.raises(TypeError):
+    with pytest.raises(AttributeError):
         agent.reconfigure_search_space({"test_movable1": (3, 6)})
 
     # Valid update should restrict the search space

@@ -1,10 +1,11 @@
 import importlib.util
 import logging
 from collections.abc import Sequence
-from typing import Any, TypeGuard, cast
+from typing import Any, cast
 
 from ax import Client
 from ax.analysis import ContourPlot
+from ax.core.types import TParamValue
 
 # ===============================
 # TODO: Remove when Python 3.10 is no longer supported
@@ -32,10 +33,6 @@ from .objective import Objective, OutcomeConstraint, to_ax_objective_str
 from .optimizer import AxOptimizer
 
 logger = logging.getLogger(__name__)
-
-
-def _has_dof_keys(d: dict[Any, Any]) -> TypeGuard[dict[DOF, Any]]:
-    return all(isinstance(key, DOF) for key in d)
 
 
 class _AxAgentMixin:
@@ -73,10 +70,7 @@ class _AxAgentMixin:
             self._optimizer.fixed_parameters = None
             return
 
-        if _has_dof_keys(fixed_dofs):
-            self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
-        else:
-            raise TypeError("Keys must be DOF objects")
+        self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
 
     def suggest(self, num_points: int = 1) -> list[dict]:
         """
@@ -173,9 +167,7 @@ class _AxAgentMixin:
         """
         self._optimizer.checkpoint()
 
-    def reconfigure_search_space(
-        self, dof_mappings: dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]
-    ) -> None:
+    def reconfigure_search_space(self, dof_mappings: dict[DOF, tuple[float, float] | list[TParamValue]]) -> None:
         """
         Update bounds or values of existing DOFs for future optimizations.
 
@@ -185,10 +177,7 @@ class _AxAgentMixin:
             Mapping of DOFs to their new search space.
         """
 
-        if _has_dof_keys(dof_mappings):
-            self._optimizer._reconfigure_search_space({dof.parameter_name: update for dof, update in dof_mappings.items()})
-        else:
-            raise TypeError("Keys must all be type DOF")
+        self._optimizer._reconfigure_search_space({dof.parameter_name: update for dof, update in dof_mappings.items()})
 
 
 class Agent(_AxAgentMixin):
