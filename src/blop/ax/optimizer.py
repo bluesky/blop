@@ -264,7 +264,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions):
             if isinstance(parameter, ChoiceParameter):
                 parameter.set_values(value)
 
-    def _reconfigure_search_space(self, parameter_mappings: dict[str, tuple[float, float] | list[TParamValue]]) -> None:
+    def reconfigure_search_space(self, parameter_mappings: dict[str, tuple[float, float] | list[TParamValue]]) -> None:
         """
         Update the bounds or values of existing parameters in the underlying experiment
 

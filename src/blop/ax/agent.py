@@ -177,7 +177,7 @@ class _AxAgentMixin:
             Mapping of DOFs to their new search space.
         """
 
-        self._optimizer._reconfigure_search_space({dof.parameter_name: update for dof, update in dof_mappings.items()})
+        self._optimizer.reconfigure_search_space({dof.parameter_name: update for dof, update in dof_mappings.items()})
 
 
 class Agent(_AxAgentMixin):
