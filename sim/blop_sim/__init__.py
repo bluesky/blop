@@ -7,4 +7,5 @@ from .backends.xrt import XRTBackend
 __all__ = [
     "SimpleBackend",
     "XRTBackend",
+    "XRTXASBackend"
 ]
