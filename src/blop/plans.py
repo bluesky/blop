@@ -9,7 +9,16 @@ from bluesky.protocols import Readable
 from bluesky.utils import MsgGenerator, plan
 
 from .plan_stubs import read_step
-from .protocols import ID_KEY, Actuator, CanRegisterSuggestions, Checkpointable, OptimizationProblem, Optimizer, Sensor
+from .protocols import (
+    ID_KEY,
+    Actuator,
+    CanRegisterSuggestions,
+    Checkpointable,
+    OptimizationProblem,
+    Optimizer,
+    Sensor,
+    TrialFaultAware,
+)
 from .utils import InferredReadable, collect_optimization_metadata, route_suggestions
 
 logger = logging.getLogger(__name__)
@@ -134,7 +143,13 @@ def optimize_step(
             f"optimizer implementation. Got suggestions: {suggestions}"
         )
 
-    uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, *args, **kwargs)
+    try:
+        uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, *args, **kwargs)
+    except Exception:
+        if isinstance(optimizer, TrialFaultAware):
+            optimizer.register_failures(suggestions)
+        raise
+
     outcomes = optimization_problem.evaluation_function(uid, suggestions)
     if any(ID_KEY not in outcome for outcome in outcomes):
         raise ValueError(
