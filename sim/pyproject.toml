@@ -18,7 +18,7 @@ dependencies = [
   "numpy",
   "scipy",
   "matplotlib",
-  "xrt>=1.6.1,<2",
+  "xrt==1.6.1",
 ]
 
 [tool.hatch.build.targets.wheel]

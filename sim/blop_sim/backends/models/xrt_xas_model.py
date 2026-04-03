@@ -17,18 +17,40 @@ This example is based on the layout of the BioXAS-Main beamline (Canadian Light 
 
 import numpy as np
 
-import xrt.backends.raycing.sources as rsources
+# import xrt.backends.raycing.sources as rsources
 import xrt.backends.raycing.screens as rscreens
 import xrt.backends.raycing.materials as rmats
-import xrt.backends.raycing.materials.elemental as rmatsel
-import xrt.backends.raycing.materials.compounds as rmatsco
-import xrt.backends.raycing.materials.crystals as rmatscr
+# import xrt.backends.raycing.materials.elemental as rmatsel
+# import xrt.backends.raycing.materials.compounds as rmatsco
+# import xrt.backends.raycing.materials.crystals as rmatscr
 import xrt.backends.raycing.oes as roes
 import xrt.backends.raycing.apertures as rapts
 import xrt.backends.raycing.run as rrun
 import xrt.backends.raycing as raycing
 import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
+
+def build_histRGB(lb, gb, limits=None, isScreen=False, shape=None):
+    if shape is None:
+        shape = [256, 256]
+    good = (lb.state == 1) | (lb.state == 2)
+    if isScreen:
+        x, y, z = lb.x[good], lb.z[good], lb.y[good]
+    else:
+        x, y, z = lb.x[good], lb.y[good], lb.z[good]
+    goodlen = len(lb.x[good])
+    hist2dRGB = np.zeros((shape[1], shape[0], 3), dtype=np.float64)
+    hist2d = np.zeros((shape[1], shape[0]), dtype=np.float64)
+
+    if limits is None and goodlen > 0:
+        limits = np.array([[np.min(x), np.max(x)], [np.min(y), np.max(y)], [np.min(z), np.max(z)]])
+
+    if goodlen > 0:
+        beamLimits = [limits[1], limits[0]] or None
+        flux = gb.Jss[good] + gb.Jpp[good]
+        hist2d, _, _ = np.histogram2d(y, x, bins=[shape[1], shape[0]], range=beamLimits, weights=flux)
+        hist2dRGB = None
+    return hist2d, hist2dRGB, limits
 
 CVD = rmats.Material(
     elements=['C'],
@@ -51,8 +73,7 @@ Si220 = rmats.CrystalSi(
     V=160.17128543981727,
     elements=['Si'],
     quantities=[1.0],
-    name=r"Si220",
-    kind=r"crystal")
+    name=r"Si220")
 
 CVDcoating = rmats.Material(
     elements=['C'],
@@ -91,20 +112,20 @@ Si220harm = rmats.CrystalHarmonics(
     beta=1.5707963267948966,
     gamma=1.5707963267948966,
     atomsFraction=[1, 1, 1, 1, 1, 1, 1, 1],
-    d=1.916079064786341,
-    V=159.1751463370933,
-    elements=['Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si'],
-    quantities=[1, 1, 1, 1, 1, 1, 1, 1],
-    rho=2.3439368026411915,
-    kind=r"crystal harmonics")
+    # V=159.1751463370933,
+    # elements=['Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si', 'Si'],
+    # quantities=[1, 1, 1, 1, 1, 1, 1, 1],
+    # rho=2.3439368026411915,
+    # kind=r"crystal harmonics"
+    )
 
 
 def build_beamline():
     BioXAS_Main = raycing.BeamLine(
-        alignE=8000,
-        name=r"BioXAS_Main")
+        alignE=8000)
 
-    BioXAS_Main.Wiggler = raycing.sources.synchr.Wiggler(
+    # BioXAS_Main.Wiggler = raycing.sources.synchr.Wiggler(
+    BioXAS_Main.Wiggler = raycing.sources_synchr.Wiggler(
         bl=BioXAS_Main,
         name=r"Wiggler",
         center=[0, 0, 0],
@@ -202,9 +223,10 @@ def build_beamline():
         center=[0, 26000, r"auto"],
         x=[1.0, -0.0, 0.0],
         z=[0.0, 0.0, 1.0],
-        limPhysX=[0.0, 0.0],
-        limPhysY=[0.0, 0.0],
-        cLimits=[0.0, 0.0])
+        # limPhysX=[0.0, 0.0],
+        # limPhysY=[0.0, 0.0],
+        # cLimits=[0.0, 0.0]
+        )
 
     BioXAS_Main.Mirror2 = roes.ToroidMirror(
         bl=BioXAS_Main,
@@ -266,9 +288,10 @@ def build_beamline():
         center=[0, 30650, r"auto"],
         x=[1.0, -0.0, 0.0],
         z=[0.0, 0.0, 1.0],
-        limPhysX=[0.0, 0.0],
-        limPhysY=[0.0, 0.0],
-        cLimits=[0.0, 0.0])
+        # limPhysX=[0.0, 0.0],
+        # limPhysY=[0.0, 0.0],
+        # cLimits=[0.0, 0.0])
+    )
 
     return BioXAS_Main
 

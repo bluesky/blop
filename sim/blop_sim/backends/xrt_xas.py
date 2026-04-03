@@ -17,7 +17,6 @@ class XRTXASBackend(SimBackend):
         """Initialize XRT backend."""
         super().__init__()
         self._beamline = None
-        # self._limits = [[-0.6, 0.6], [-0.45, 0.45]]
         self._noise = noise
 
     def _ensure_beamline(self):
@@ -33,12 +32,13 @@ class XRTXASBackend(SimBackend):
         """
         self._ensure_beamline()
 
-        # Get KB mirror radii from devices
-        # mirror_radii = await self._get_mirror_radii()
+        # Get fixed mask position (x, y, z)
+        fixed_mask_position = await self._get_fixed_mask_position()
 
+        print(fixed_mask_position)
         # Update XRT beamline mirror parameters
-        # self._beamline.toroidMirror01.R = mirror_radii[0]  # Vertical mirror
-        # self._beamline.toroidMirror02.R = mirror_radii[1]  # Horizontal mirror
+        if fixed_mask_position:
+            self._beamline.FEMask.center = fixed_mask_position
 
         # Run ray tracing
         outDict = run_process(self._beamline)
@@ -53,5 +53,17 @@ class XRTXASBackend(SimBackend):
             image += 1e-3 * np.abs(np.random.standard_normal(size=image.shape))
 
         return image
+    
+    async def _get_fixed_mask_position(self) -> list[float]:
+        for name, device in self._device_states.items():
+            # print(name, device)
+            print(device["type"])
+            if device["type"] == "fixed_mask_xrt":
+                state = await self._get_device_state(name)
+                print(state)
+                # print("DEBUG STATE: {}".format(state))
+                position = [state["x"], state["y"], state["z"]]
+                return position
 
-__all__ = ["XRTBackend"]
+
+__all__ = ["XRTXASBackend"]
