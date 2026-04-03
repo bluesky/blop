@@ -59,13 +59,14 @@ class CanRegisterSuggestions(Protocol):
 
 @runtime_checkable
 class TrialFaultAware(Protocol):
-    '''
+    """
     A protocol to accept information about trial failures of the optimization loop.
 
 
     Used to invalidate or register early stop on data for the optimizer, or do necesary
     cleanup of processes not directly tied to the run engine
-    '''
+    """
+
     def register_failures(self, suggestions: list[dict]) -> None:
         """
         Register the failed suggestions with the optimizer.
