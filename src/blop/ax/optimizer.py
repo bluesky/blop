@@ -211,6 +211,17 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
         return registered
 
     def register_failures(self, suggestions) -> None:
+        """
+        Register suggestions as failures
+
+        Inherited from the trialfaultaware class to make sure either the Ax optimizer knows to
+        either retry the trial or end the optimization context
+
+        Parameters
+        ----------
+        suggestions : list[dict]
+            the trial id key must be present to pass back to the optimizer
+        """
         for s in suggestions:
             self._client.mark_trial_failed(s[ID_KEY])
 
