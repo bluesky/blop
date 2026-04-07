@@ -86,8 +86,8 @@ def test_optimize(RE):
 
 
 def test_optimization_failure(RE):
-    class Alpha(Optimizer, TrialFaultAware):
-        ...
+    class Alpha(Optimizer, TrialFaultAware): ...
+
     suggestion = [{"x1": 0.0, "_id": 0}]
     optimizer = MagicMock(spec=Alpha)
     optimizer.suggest.return_value = suggestion
@@ -98,7 +98,7 @@ def test_optimization_failure(RE):
         actuators=[MovableSignal("x1", initial_value=-1.0)],
         sensors=[ReadableSignal("objective")],
         evaluation_function=evaluation_function,
-        acquisition_plan=aquisition_function
+        acquisition_plan=aquisition_function,
     )
 
     callback, events = _collect_optimize_events()
