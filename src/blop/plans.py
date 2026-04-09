@@ -142,7 +142,6 @@ def optimize_step(
             f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes. Please review your "
             f"optimizer implementation. Got suggestions: {suggestions}"
         )
-
     try:
         uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, *args, **kwargs)
     except Exception:
