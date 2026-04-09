@@ -187,7 +187,7 @@ def test_ax_optimizer_register_failures():
     optimizer.register_failures(suggestions)
     trial_df = optimizer.ax_client.summarize()
     assert 5 == len(trial_df)
-    assert trial_df.trial_status.eq('FAILED').all()
+    assert trial_df.trial_status.eq("FAILED").all()
 
 
 def test_ax_optimizer_checkpoint_no_path():
