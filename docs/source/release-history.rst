@@ -2,6 +2,66 @@
 Release History
 ===============
 
+v1.0.0b1 (2026-04-17)
+---------------------
+
+Features
+........
+* **Manual suggestions**: A new method for the Agent that allows manual 
+  optimization control (`#235 <https://github.com/NSLS-II/blop/pull/235>`_).
+* **Reconfigurable search spaces**: Search spaces can now be modified between optimization steps,
+  allowing dynamic adjustment of DOF bounds and constraints
+  (`#268 <https://github.com/NSLS-II/blop/pull/268>`_).
+* **Model checkpoints**: Save and restore optimizer state across sessions
+  (`#233 <https://github.com/NSLS-II/blop/pull/233>`_).
+* **Fixed parameters**: Hold specific parameters constant during optimization via
+  ``Agent.fixed_dofs`` (`#252 <https://github.com/NSLS-II/blop/pull/252>`_).
+* **Multi-point routing**: When suggesting multiple points, suggestions are now routed to
+  minimize actuator travel (`#217 <https://github.com/NSLS-II/blop/pull/217>`_).
+* **Failed and abandoned suggestions**: Properly handle and track failed 
+  optimization trials (`#272 <https://github.com/NSLS-II/blop/pull/272>`_).
+* **Optimization logging callback**: New ``OptimizationCallbackRouter`` and logging callback
+  for monitoring optimization progress
+  (`#270 <https://github.com/NSLS-II/blop/pull/270>`_).
+* **Optimization step tracking via event-model**: Optimization metadata is now emitted as
+  Bluesky event-model documents (`#236 <https://github.com/NSLS-II/blop/pull/236>`_).
+* **Queueserver support**: New ``QueueserverAgent`` for running optimization through
+  the Bluesky queueserver (`#212 <https://github.com/NSLS-II/blop/pull/212>`_,
+  `#264 <https://github.com/NSLS-II/blop/pull/264>`_,
+  `#266 <https://github.com/NSLS-II/blop/pull/266>`_).
+* **Actuator and Sensor types**: Expanded protocol types to support flyable and collectable
+  devices (`#211 <https://github.com/NSLS-II/blop/pull/211>`_).
+* **Python 3.13 support** (`#206 <https://github.com/NSLS-II/blop/pull/206>`_).
+
+Breaking Changes
+................
+* **Plans moved to top-level package**: Plans are now imported from ``blop.plans`` instead of
+  ``blop.ax.plans`` (`#259 <https://github.com/NSLS-II/blop/pull/259>`_).
+* **Simulation code separated**: The simulation module has been extracted into a separate
+  ``blop_sim`` package (`#248 <https://github.com/NSLS-II/blop/pull/248>`_,
+  `#256 <https://github.com/NSLS-II/blop/pull/256>`_).
+* **Deprecated code removed**: Legacy APIs deprecated in earlier releases have been removed
+  (`#218 <https://github.com/NSLS-II/blop/pull/218>`_).
+* **Deprecated bayesian.acquisition removed**: Use BoTorch's built-in constrained acquisition
+  functions instead (`#207 <https://github.com/NSLS-II/blop/pull/207>`_).
+
+Dependency Changes
+..................
+* Requires Ax Platform >= 1.2.3 (`#241 <https://github.com/NSLS-II/blop/pull/241>`_).
+* Requires BoTorch >= 0.16.0 (`#221 <https://github.com/NSLS-II/blop/pull/221>`_).
+
+Documentation
+.............
+* New how-to guide for using Tiled as a databroker (`#215 <https://github.com/NSLS-II/blop/pull/215>`_).
+* New how-to guide for using ophyd and ophyd-async devices (`#210 <https://github.com/NSLS-II/blop/pull/210>`_).
+* New explanation document for the Ax integration (`#227 <https://github.com/NSLS-II/blop/pull/227>`_).
+* Updated tutorials for the simple experiment and XRT KB mirrors
+  (`#222 <https://github.com/NSLS-II/blop/pull/222>`_,
+  `#223 <https://github.com/NSLS-II/blop/pull/223>`_,
+  `#224 <https://github.com/NSLS-II/blop/pull/224>`_).
+
+`Full Changelog <https://github.com/NSLS-II/blop/compare/v0.9.0...v1.0.0b1>`__
+
 v0.9.0 (2025-12-08)
 -------------------
 

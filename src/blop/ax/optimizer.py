@@ -87,14 +87,17 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
     @property
     def checkpoint_path(self) -> str | None:
+        """The file path for saving and restoring optimizer state, or ``None`` if disabled."""
         return self._checkpoint_path
 
     @property
     def ax_client(self) -> Client:
+        """The underlying Ax ``Client`` used for experiment management."""
         return self._client
 
     @property
     def fixed_parameters(self) -> dict[str, Any] | None:
+        """Parameters held fixed during optimization, or ``None`` if all parameters are free."""
         return self._fixed_parameters
 
     @fixed_parameters.setter

@@ -357,18 +357,22 @@ class Agent(_AxAgentMixin):
 
     @property
     def sensors(self) -> Sequence[Sensor]:
+        """The sensors used for data acquisition."""
         return self._sensors
 
     @property
     def actuators(self) -> Sequence[Actuator]:
+        """The actuators that control the degrees of freedom."""
         return self._actuators
 
     @property
     def evaluation_function(self) -> EvaluationFunction:
+        """The function used to evaluate acquired data and produce outcomes."""
         return self._evaluation_function
 
     @property
     def acquisition_plan(self) -> AcquisitionPlan | None:
+        """The acquisition plan for acquiring data, or ``None`` if using the default."""
         return self._acquisition_plan
 
     def to_optimization_problem(self) -> OptimizationProblem:
