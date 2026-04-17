@@ -1,0 +1,850 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>blop.plans &#8212; blop 0.9.1.dev42 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/fix-content-height.css?v=07fcbb05" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+
+    <script src="../../_static/documentation_options.js?v=cbc2caeb"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/blop/plans';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="0.9.1.dev42" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">blop 0.9.1.dev42 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../how-to-guides.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../explanation.html">
+    Explanation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release-history.html">
+    Release History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../how-to-guides.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../explanation.html">
+    Explanation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release-history.html">
+    Release History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">blop.plans</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for blop.plans</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plan_stubs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bps</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plans</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.preprocessors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bpp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">Readable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">plan</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.plan_stubs</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_step</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ID_KEY</span><span class="p">,</span>
+    <span class="n">Actuator</span><span class="p">,</span>
+    <span class="n">CanRegisterSuggestions</span><span class="p">,</span>
+    <span class="n">Checkpointable</span><span class="p">,</span>
+    <span class="n">OptimizationProblem</span><span class="p">,</span>
+    <span class="n">Optimizer</span><span class="p">,</span>
+    <span class="n">Sensor</span><span class="p">,</span>
+    <span class="n">TrialFaultAware</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">InferredReadable</span><span class="p">,</span> <span class="n">collect_optimization_metadata</span><span class="p">,</span> <span class="n">route_suggestions</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">_DEFAULT_ACQUIRE_RUN_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;default_acquire&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;default_acquire&quot;</span>
+<span class="n">SAMPLE_SUGGESTIONS_RUN_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;sample_suggestions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;sample_suggestions&quot;</span>
+<span class="n">OPTIMIZE_RUN_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;optimize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;optimize&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_unpack_for_list_scan</span><span class="p">(</span><span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Unpack the actuators and inputs into Bluesky list_scan plan arguments.&quot;&quot;&quot;</span>
+    <span class="n">actuators_and_inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">actuator</span><span class="p">:</span> <span class="p">[</span><span class="n">suggestion</span><span class="p">[</span><span class="n">actuator</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">]</span> <span class="k">for</span> <span class="n">actuator</span> <span class="ow">in</span> <span class="n">actuators</span><span class="p">}</span>
+    <span class="n">unpacked_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">actuator</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">actuators_and_inputs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">unpacked_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">actuator</span><span class="p">)</span>
+        <span class="n">unpacked_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">unpacked_list</span>
+
+
+<div class="viewcode-block" id="default_acquire">
+<a class="viewcode-back" href="../../reference/plans.html#blop.plans.default_acquire">[docs]</a>
+<span class="nd">@plan</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">default_acquire</span><span class="p">(</span>
+    <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="n">actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">],</span>
+    <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">per_step</span><span class="p">:</span> <span class="n">bp</span><span class="o">.</span><span class="n">PerStep</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A default plan to acquire data for optimization. Simply a list scan.</span>
+
+<span class="sd">    Includes a default metadata key &quot;blop_suggestion_ids&quot; which can be used to identify</span>
+<span class="sd">    the suggestions that were acquired for each step of the scan.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    suggestions: list[dict]</span>
+<span class="sd">        A list of dictionaries, each containing the parameterization of a point to evaluate.</span>
+<span class="sd">        The &quot;_id&quot; key is optional and can be used to identify each suggestion. It is suggested</span>
+<span class="sd">        to add &quot;_id&quot; values to the run metadata for later identification of the acquired data.</span>
+<span class="sd">    actuators: Sequence[Actuator]</span>
+<span class="sd">        The actuators to move and the inputs to move them to.</span>
+<span class="sd">    sensors: Sequence[Sensor]</span>
+<span class="sd">        The sensors that produce data to evaluate.</span>
+<span class="sd">    per_step: bp.PerStep | None, optional</span>
+<span class="sd">        The plan to execute for each step of the scan.</span>
+<span class="sd">    **kwargs: Any</span>
+<span class="sd">        Additional keyword arguments to pass to the list_scan plan.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The UID of the Bluesky run.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    bluesky.plans.list_scan : The Bluesky plan to acquire data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">sensors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sensors</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">readables</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sensors</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">Readable</span><span class="p">)]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">readables</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sensors</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Some sensors are not readable and will be ignored. Using only the readable sensors: </span><span class="si">{</span><span class="n">readables</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">suggestions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">actuator</span><span class="p">,</span> <span class="n">Readable</span><span class="p">)</span> <span class="k">for</span> <span class="n">actuator</span> <span class="ow">in</span> <span class="n">actuators</span><span class="p">):</span>
+            <span class="n">current_position</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">seq_read</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span> <span class="n">actuators</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">current_position</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">suggestions</span> <span class="o">=</span> <span class="n">route_suggestions</span><span class="p">(</span><span class="n">suggestions</span><span class="p">,</span> <span class="n">starting_position</span><span class="o">=</span><span class="n">current_position</span><span class="p">)</span>
+
+    <span class="n">md</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;blop_suggestions&quot;</span><span class="p">:</span> <span class="n">suggestions</span><span class="p">,</span> <span class="s2">&quot;run_key&quot;</span><span class="p">:</span> <span class="n">_DEFAULT_ACQUIRE_RUN_KEY</span><span class="p">}</span>
+    <span class="n">plan_args</span> <span class="o">=</span> <span class="n">_unpack_for_list_scan</span><span class="p">(</span><span class="n">suggestions</span><span class="p">,</span> <span class="n">actuators</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="c1"># TODO: fix argument type in bluesky.plans.list_scan</span>
+        <span class="k">yield from</span> <span class="n">bpp</span><span class="o">.</span><span class="n">set_run_key_wrapper</span><span class="p">(</span>
+            <span class="n">bp</span><span class="o">.</span><span class="n">list_scan</span><span class="p">(</span>
+                <span class="n">readables</span><span class="p">,</span>
+                <span class="o">*</span><span class="n">plan_args</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
+                <span class="n">per_step</span><span class="o">=</span><span class="n">per_step</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">=</span><span class="n">md</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">_DEFAULT_ACQUIRE_RUN_KEY</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="optimize_step">
+<a class="viewcode-back" href="../../reference/plans.html#blop.plans.optimize_step">[docs]</a>
+<span class="nd">@plan</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">optimize_step</span><span class="p">(</span>
+    <span class="n">optimization_problem</span><span class="p">:</span> <span class="n">OptimizationProblem</span><span class="p">,</span>
+    <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A single step of the optimization loop.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optimization_problem : OptimizationProblem</span>
+<span class="sd">        The optimization problem to solve.</span>
+<span class="sd">    n_points : int, optional</span>
+<span class="sd">        The number of points to suggest.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[list[dict], list[dict]]</span>
+<span class="sd">        A tuple containing the suggestions and outcomes of the step.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">acquisition_plan</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">acquisition_plan</span> <span class="o">=</span> <span class="n">default_acquire</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">acquisition_plan</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">acquisition_plan</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span>
+    <span class="n">actuators</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">actuators</span>
+    <span class="n">suggestions</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">suggest</span><span class="p">(</span><span class="n">n_points</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ID_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">suggestion</span> <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;All suggestions must contain an &#39;</span><span class="si">{</span><span class="n">ID_KEY</span><span class="si">}</span><span class="s2">&#39; key to later match with the outcomes. Please review your &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;optimizer implementation. Got suggestions: </span><span class="si">{</span><span class="n">suggestions</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">acquisition_plan</span><span class="p">(</span><span class="n">suggestions</span><span class="p">,</span> <span class="n">actuators</span><span class="p">,</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">sensors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">TrialFaultAware</span><span class="p">):</span>
+            <span class="n">optimizer</span><span class="o">.</span><span class="n">register_failures</span><span class="p">(</span><span class="n">suggestions</span><span class="p">)</span>
+        <span class="k">raise</span>
+
+    <span class="n">outcomes</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">evaluation_function</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ID_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">outcome</span> <span class="k">for</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="n">outcomes</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;All outcomes must contain an &#39;</span><span class="si">{</span><span class="n">ID_KEY</span><span class="si">}</span><span class="s2">&#39; key that matches with the suggestions. Please review your &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;evaluation function. Got suggestions: </span><span class="si">{</span><span class="n">suggestions</span><span class="si">}</span><span class="s2"> and outcomes: </span><span class="si">{</span><span class="n">outcomes</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">outcomes</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">,</span> <span class="n">outcomes</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_maybe_checkpoint</span><span class="p">(</span><span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="n">iteration</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to maybe create a checkpoint of the optimizer state at a given interval and iteration.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">checkpoint_interval</span> <span class="ow">and</span> <span class="p">(</span><span class="n">iteration</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">checkpoint_interval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">Checkpointable</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The optimizer is not checkpointable. Please review your optimizer configuration or implementation.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="optimize">
+<a class="viewcode-back" href="../../reference/plans.html#blop.plans.optimize">[docs]</a>
+<span class="nd">@plan</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span>
+    <span class="n">optimization_problem</span><span class="p">:</span> <span class="n">OptimizationProblem</span><span class="p">,</span>
+    <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">checkpoint_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">readable_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">InferredReadable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A plan to solve the optimization problem.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optimization_problem : OptimizationProblem</span>
+<span class="sd">        The optimization problem to solve.</span>
+<span class="sd">    iterations : int, optional</span>
+<span class="sd">        The number of optimization iterations to run.</span>
+<span class="sd">    n_points : int, optional</span>
+<span class="sd">        The number of points to suggest per iteration.</span>
+<span class="sd">    checkpoint_interval : int | None, optional</span>
+<span class="sd">        The number of iterations between optimizer checkpoints. If None, checkpoints</span>
+<span class="sd">        will not be saved. Optimizer must implement the</span>
+<span class="sd">        :class:`blop.protocols.Checkpointable` protocol.</span>
+<span class="sd">    readable_cache: dict[str, InferredReadable] | None = None</span>
+<span class="sd">        Cache of readable objects to store the suggestions and outcomes as events.</span>
+<span class="sd">        If None, a new cache will be created.</span>
+<span class="sd">    **kwargs : Any</span>
+<span class="sd">        Additional keyword arguments to pass to the :func:`optimize_step` plan.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.protocols.OptimizationProblem : The problem to solve.</span>
+<span class="sd">    blop.protocols.Checkpointable : The protocol for checkpointable objects.</span>
+<span class="sd">    optimize_step : The plan to execute a single step of the optimization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Cache to track readables created from suggestions and outcomes</span>
+    <span class="n">readable_cache</span> <span class="o">=</span> <span class="n">readable_cache</span> <span class="ow">or</span> <span class="p">{}</span>
+
+    <span class="n">_md</span> <span class="o">=</span> <span class="n">collect_optimization_metadata</span><span class="p">(</span><span class="n">optimization_problem</span><span class="p">)</span>
+    <span class="n">_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;plan_name&quot;</span><span class="p">:</span> <span class="s2">&quot;optimize&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;iterations&quot;</span><span class="p">:</span> <span class="n">iterations</span><span class="p">,</span>
+            <span class="s2">&quot;n_points&quot;</span><span class="p">:</span> <span class="n">n_points</span><span class="p">,</span>
+            <span class="s2">&quot;checkpoint_interval&quot;</span><span class="p">:</span> <span class="n">checkpoint_interval</span><span class="p">,</span>
+            <span class="s2">&quot;run_key&quot;</span><span class="p">:</span> <span class="n">OPTIMIZE_RUN_KEY</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Encapsulate the optimization plan in a run decorator</span>
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">set_run_key_decorator</span><span class="p">(</span><span class="n">OPTIMIZE_RUN_KEY</span><span class="p">)</span>
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">run_decorator</span><span class="p">(</span><span class="n">md</span><span class="o">=</span><span class="n">_md</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_optimize</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+            <span class="c1"># Perform a single step of the optimization</span>
+            <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">,</span> <span class="n">outcomes</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">optimize_step</span><span class="p">(</span><span class="n">optimization_problem</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+            <span class="c1"># Read the optimization step into the Bluesky and emit events for each suggestion and outcome</span>
+            <span class="k">yield from</span> <span class="n">read_step</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">,</span> <span class="n">outcomes</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">readable_cache</span><span class="p">)</span>
+
+            <span class="c1"># Possibly take a checkpoint of the optimizer state</span>
+            <span class="n">_maybe_checkpoint</span><span class="p">(</span><span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+
+    <span class="c1"># Start the optimization run</span>
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">_optimize</span><span class="p">())</span></div>
+
+
+
+<div class="viewcode-block" id="sample_suggestions">
+<a class="viewcode-back" href="../../reference/plans.html#blop.plans.sample_suggestions">[docs]</a>
+<span class="nd">@plan</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_suggestions</span><span class="p">(</span>
+    <span class="n">optimization_problem</span><span class="p">:</span> <span class="n">OptimizationProblem</span><span class="p">,</span>
+    <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+    <span class="n">readable_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">InferredReadable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Evaluate specific parameter combinations.</span>
+
+<span class="sd">    This plan acquires data for given suggestions and ingests results into the optimizer.</span>
+<span class="sd">    Supports both optimizer-generated suggestions (with &quot;_id&quot;) and manual points</span>
+<span class="sd">    (without &quot;_id&quot;, if optimizer implements CanRegisterSuggestions).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optimization_problem : OptimizationProblem</span>
+<span class="sd">        The optimization problem.</span>
+<span class="sd">    suggestions : list[dict]</span>
+<span class="sd">        Parameter combinations to evaluate. Can be:</span>
+
+<span class="sd">        - Optimizer suggestions (with &quot;_id&quot; keys from suggest())</span>
+<span class="sd">        - Manual points (without &quot;_id&quot;, requires CanRegisterSuggestions protocol)</span>
+
+<span class="sd">    readable_cache : dict[str, InferredReadable] | None</span>
+<span class="sd">        Cache for storing suggestions/outcomes as events.</span>
+<span class="sd">    **kwargs : Any</span>
+<span class="sd">        Additional arguments for acquisition plan.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    uid : str</span>
+<span class="sd">        Bluesky run UID.</span>
+<span class="sd">    suggestions : list[dict]</span>
+<span class="sd">        Suggestions with &quot;_id&quot; keys.</span>
+<span class="sd">    outcomes : list[dict]</span>
+<span class="sd">        Evaluated outcomes.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If suggestions lack &quot;_id&quot; and optimizer doesn&#39;t implement CanRegisterSuggestions.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    optimize_step : Standard optimizer-driven step.</span>
+<span class="sd">    blop.protocols.CanRegisterSuggestions : Protocol for manual suggestions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Ensure the suggestions have an ID_KEY or register them with the optimizer</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">CanRegisterSuggestions</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
+        <span class="n">ID_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">suggestion</span> <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;All suggestions must contain an &#39;</span><span class="si">{</span><span class="n">ID_KEY</span><span class="si">}</span><span class="s2">&#39; key to later match with the outcomes or your optimizer must &quot;</span>
+            <span class="s2">&quot;implement the `blop.protocols.CanRegisterSuggestions` protocol. Please review your optimizer &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;implementation. Got suggestions: </span><span class="si">{</span><span class="n">suggestions</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">CanRegisterSuggestions</span><span class="p">):</span>
+        <span class="n">suggestions</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">register_suggestions</span><span class="p">(</span><span class="n">suggestions</span><span class="p">)</span>
+
+    <span class="c1"># Collect the metadata for the run</span>
+    <span class="n">_md</span> <span class="o">=</span> <span class="n">collect_optimization_metadata</span><span class="p">(</span><span class="n">optimization_problem</span><span class="p">)</span>
+    <span class="n">_md</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;plan_name&quot;</span><span class="p">:</span> <span class="s2">&quot;sample_suggestions&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;suggestions&quot;</span><span class="p">:</span> <span class="n">suggestions</span><span class="p">,</span>
+            <span class="s2">&quot;run_key&quot;</span><span class="p">:</span> <span class="n">SAMPLE_SUGGESTIONS_RUN_KEY</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">set_run_key_decorator</span><span class="p">(</span><span class="n">SAMPLE_SUGGESTIONS_RUN_KEY</span><span class="p">)</span>
+    <span class="nd">@bpp</span><span class="o">.</span><span class="n">run_decorator</span><span class="p">(</span><span class="n">md</span><span class="o">=</span><span class="n">_md</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_inner_sample_suggestions</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]:</span>
+
+        <span class="c1"># Acquire data, evaluate, and ingest outcomes</span>
+        <span class="k">if</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">acquisition_plan</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">acquisition_plan</span> <span class="o">=</span> <span class="n">default_acquire</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">acquisition_plan</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">acquisition_plan</span>
+        <span class="n">uid</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">acquisition_plan</span><span class="p">(</span>
+            <span class="n">suggestions</span><span class="p">,</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">actuators</span><span class="p">,</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">sensors</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="n">outcomes</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">evaluation_function</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">)</span>
+        <span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">outcomes</span><span class="p">)</span>
+
+        <span class="c1"># Emit a Bluesky event</span>
+        <span class="k">yield from</span> <span class="n">read_step</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">,</span> <span class="n">outcomes</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">suggestions</span><span class="p">),</span> <span class="n">readable_cache</span> <span class="ow">or</span> <span class="p">{})</span>
+
+        <span class="k">return</span> <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">,</span> <span class="n">outcomes</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">_inner_sample_suggestions</span><span class="p">())</span></div>
+
+
+
+<span class="nd">@plan</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">seq_read</span><span class="p">(</span><span class="n">readables</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read the current values of the given readables.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    readables : Sequence[Readable]</span>
+<span class="sd">        The readables to read.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict[str, Any]</span>
+<span class="sd">        A dictionary of the readable names and their current values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">readable</span> <span class="ow">in</span> <span class="n">readables</span><span class="p">:</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">readable</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">rd</span><span class="p">(</span><span class="n">readable</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">results</span>
+
+
+<div class="viewcode-block" id="acquire_baseline">
+<a class="viewcode-back" href="../../reference/plans.html#blop.plans.acquire_baseline">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">acquire_baseline</span><span class="p">(</span>
+    <span class="n">optimization_problem</span><span class="p">:</span> <span class="n">OptimizationProblem</span><span class="p">,</span>
+    <span class="n">parameterization</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Acquire a baseline reading. Useful for relative outcome constraints.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optimization_problem : OptimizationProblem</span>
+<span class="sd">        The optimization problem to solve.</span>
+<span class="sd">    parameterization : dict[str, Any] | None = None</span>
+<span class="sd">        Move the DOFs to the given parameterization, if provided.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    default_acquire : The default plan to acquire data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">actuators</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">actuators</span>
+    <span class="k">if</span> <span class="n">parameterization</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">actuator</span><span class="p">,</span> <span class="n">Readable</span><span class="p">)</span> <span class="k">for</span> <span class="n">actuator</span> <span class="ow">in</span> <span class="n">actuators</span><span class="p">):</span>
+            <span class="n">parameterization</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">seq_read</span><span class="p">(</span><span class="n">cast</span><span class="p">(</span><span class="n">Sequence</span><span class="p">[</span><span class="n">Readable</span><span class="p">],</span> <span class="n">actuators</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;All actuators must also implement the Readable protocol to acquire a baseline from current positions.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">if</span> <span class="n">ID_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameterization</span><span class="p">:</span>
+        <span class="n">parameterization</span><span class="p">[</span><span class="n">ID_KEY</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;baseline&quot;</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span>
+    <span class="k">if</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">acquisition_plan</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">acquisition_plan</span> <span class="o">=</span> <span class="n">default_acquire</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">acquisition_plan</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">acquisition_plan</span>
+    <span class="n">uid</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">acquisition_plan</span><span class="p">([</span><span class="n">parameterization</span><span class="p">],</span> <span class="n">actuators</span><span class="p">,</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">sensors</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">outcome</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">evaluation_function</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="p">[</span><span class="n">parameterization</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">outcome</span><span class="p">,</span> <span class="o">**</span><span class="n">parameterization</span><span class="p">}</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">ingest</span><span class="p">([</span><span class="n">data</span><span class="p">])</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2020, Brookhaven National Laboratory.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

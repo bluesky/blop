@@ -1,0 +1,15 @@
+/* Override the .content height constraint that limits plotly plot display */
+
+/* MyST-NB can't determine the height of the interactive plots, so it defaults to 500px
+ * which is too small
+ */
+ .content {
+    height: auto !important;
+    min-height: 500px; /* Keep a minimum height for layout purposes */
+    max-height: none !important;
+}
+
+/* Ensure content can expand as needed for interactive plots */
+.content > * {
+    max-height: none !important;
+} 
