@@ -16,6 +16,7 @@ jobs:
         run: |
           export REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}  # just the repo, as opposed to org/repo
           echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
+          echo "DOCS_VERSION=${GITHUB_REF_NAME//[^A-Za-z0-9._-]/_}" >> $GITHUB_ENV
 
       - name: Checkout the code
         uses: actions/checkout@v5
@@ -41,9 +42,6 @@ jobs:
         with:
           name: ${{ env.REPOSITORY_NAME }}-docs
           path: docs/build/html/
-
-      - name: Sanitize ref name for docs version
-        run: echo "DOCS_VERSION=${GITHUB_REF_NAME//[^A-Za-z0-9._-]/_}" >> $GITHUB_ENV
 
       - name: Move to versioned directory
         run: mv docs/build/html .github/pages/$DOCS_VERSION
