@@ -6,7 +6,7 @@
 [![Conda](https://img.shields.io/conda/vn/conda-forge/blop.svg)](https://anaconda.org/conda-forge/blop)
 
 - Free software: 3-clause BSD license
-- Documentation: <https://NSLS-II.github.io/blop>.
+- Documentation: <https://blueskyproject.io/blop>.
 
 ## Installation
 
