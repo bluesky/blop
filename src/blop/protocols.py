@@ -254,6 +254,18 @@ class AcquisitionPlan(Protocol):
 
 @dataclass(frozen=True)
 class BaseOptimizationProblem(Generic[TActuator, TSensor, TPlan]):
+    """Base class for optimization problem definitions.
+
+    Provides the common structure shared by all optimization problem types.
+    Users should use the concrete subclasses :class:`OptimizationProblem` or
+    :class:`QueueserverOptimizationProblem` instead of this class directly.
+
+    See Also
+    --------
+    OptimizationProblem : Concrete problem type for standard usage.
+    QueueserverOptimizationProblem : Concrete problem type for queue server usage.
+    """
+
     optimizer: Optimizer
     actuators: Sequence[TActuator]
     sensors: Sequence[TSensor]
