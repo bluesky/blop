@@ -1,0 +1,802 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>blop.protocols &#8212; blop 1.0.0b1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/fix-content-height.css?v=07fcbb05" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+
+    <script src="../../_static/documentation_options.js?v=09d090fc"></script>
+    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/blop/protocols';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0.0b1" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">blop 1.0.0b1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../how-to-guides.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../explanation.html">
+    Explanation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release-history.html">
+    Release History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../how-to-guides.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../explanation.html">
+    Explanation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../reference.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../release-history.html">
+    Release History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">blop.protocols</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for blop.protocols</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">runtime_checkable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventCollectable</span><span class="p">,</span> <span class="n">EventPageCollectable</span><span class="p">,</span> <span class="n">Flyable</span><span class="p">,</span> <span class="n">HasName</span><span class="p">,</span> <span class="n">Movable</span><span class="p">,</span> <span class="n">Readable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">plan</span>
+
+
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MovableHasName</span><span class="p">(</span><span class="n">Movable</span><span class="p">,</span> <span class="n">HasName</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A movable that has a name.</span>
+
+<span class="sd">    We use this instead of `bluesky.protocols.NamedMovable` since</span>
+<span class="sd">    we do not want to require `HasHints` on the movable.</span>
+
+<span class="sd">    A `Movable` and `HasName` is sufficient. `HasHints` should be optional.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="o">...</span>
+
+
+<span class="n">ID_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_id&quot;</span>
+<span class="n">Actuator</span> <span class="o">=</span> <span class="n">MovableHasName</span> <span class="o">|</span> <span class="n">Flyable</span>
+<span class="n">Sensor</span> <span class="o">=</span> <span class="n">Readable</span> <span class="o">|</span> <span class="n">EventCollectable</span> <span class="o">|</span> <span class="n">EventPageCollectable</span>
+
+<span class="n">TActuator</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TActuator&quot;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Actuator generic type&quot;&quot;&quot;</span>
+<span class="n">TSensor</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TSensor&quot;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Sensor generic type&quot;&quot;&quot;</span>
+<span class="n">TPlan</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TPlan&quot;</span><span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;Plan generic type&quot;&quot;&quot;</span>
+
+
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CanRegisterSuggestions</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A protocol for optimizers that can register suggestions. This</span>
+<span class="sd">    allows them to add an &quot;_id&quot; key to the suggestions dynamically and ensure</span>
+<span class="sd">    that the suggestions are unique.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Register the suggestions with the optimizer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        suggestions: list[dict]</span>
+<span class="sd">            The suggestions to register. The &quot;_id&quot; key is optional and will be overwritten if present.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[dict]</span>
+<span class="sd">            The original suggestions with an &quot;_id&quot; key added.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span>
+
+
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrialFaultAware</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A protocol to accept information about trial failures of the optimization loop.</span>
+
+
+<span class="sd">    Used to invalidate or register early stop on data for the optimizer, or do necesary</span>
+<span class="sd">    cleanup of processes not directly tied to the run engine</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Register the failed suggestions with the optimizer.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        suggestions: list[dict]</span>
+<span class="sd">            The suggestions to fail. Ids must be present.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Nothing :)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span>
+
+
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Checkpointable</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A protocol for objects that can can write state to persistent storage.</span>
+
+<span class="sd">    Implementers configure storage at construction time (e.g., a file path, databse URI).</span>
+<span class="sd">    The checkpoint method then saves or updates to that pre-configured location.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the object&#39;s state to persistent storage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span>
+
+
+<div class="viewcode-block" id="Optimizer">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer">[docs]</a>
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Optimizer</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A minimal optimizer interface for optimization.</span>
+
+<span class="sd">    This protocol defines the interface for optimizers in Blop. Most users will use</span>
+<span class="sd">    the built-in :class:`blop.ax.optimizer.AxOptimizer`, which provides Bayesian optimization</span>
+<span class="sd">    via Ax. Custom implementations are only needed for specialized optimization algorithms.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.ax.optimizer.AxOptimizer : Built-in Ax-based optimizer implementation.</span>
+<span class="sd">    blop.ax.Agent : High-level interface that uses AxOptimizer internally.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Optimizer.suggest">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer.suggest">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a set of points in the input space, to be evaulated next.</span>
+
+<span class="sd">        The &quot;_id&quot; key is optional and can be used to identify suggested trials for later evaluation</span>
+<span class="sd">        and ingestion.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_points : int | None, optional</span>
+<span class="sd">            The number of points to suggest. If not provided, will default to 1.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[dict]</span>
+<span class="sd">            A list of dictionaries, each containing a parameterization of a point to evaluate next.</span>
+<span class="sd">            Each dictionary must contain a unique &quot;_id&quot; key to identify each parameterization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+
+
+<div class="viewcode-block" id="Optimizer.ingest">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer.ingest">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ingest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ingest a set of points into the experiment. Either from previously suggested points or from an external source.</span>
+
+<span class="sd">        The &quot;_id&quot; key is optional and can be used to identify points from previously suggested trials or to identify</span>
+<span class="sd">        the point as a &quot;baseline&quot; trial.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        points : list[dict]</span>
+<span class="sd">            A list of dictionaries, each containing the outcomes of each suggested parameterization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EvaluationFunction">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.EvaluationFunction">[docs]</a>
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EvaluationFunction</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A protocol for transforming acquired data into measurable outcomes.</span>
+
+<span class="sd">    This protocol defines how to extract and compute optimization objectives from</span>
+<span class="sd">    acquired data. Custom implementations are needed to define how your beamline</span>
+<span class="sd">    data translates into the outcomes you want to optimize.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The evaluation function is called after data acquisition to compute outcomes</span>
+<span class="sd">    from the acquired data. It should extract relevant data from the Bluesky run</span>
+<span class="sd">    and compute objective values and metrics for each suggestion.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    See the tutorial documentation for complete examples of evaluation functions:</span>
+<span class="sd">    :doc:`/tutorials/simple-experiment`</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.ax.Agent : Accepts an evaluation function during initialization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="EvaluationFunction.__call__">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.EvaluationFunction.__call__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate the data from a Bluesky run and produce outcomes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        uid: str</span>
+<span class="sd">            The unique identifier of the Bluesky run to evaluate.</span>
+<span class="sd">        suggestions: list[dict]</span>
+<span class="sd">            A list of dictionaries, each containing the parameterization of a point to evaluate.</span>
+<span class="sd">            The &quot;_id&quot; key is optional and can be used to identify each suggestion.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[dict]</span>
+<span class="sd">            A list of dictionaries containing the outcomes of the run, one for each suggested parameterization.</span>
+<span class="sd">            The &quot;_id&quot; key is optional and can be used to identify each outcome.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AcquisitionPlan">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.AcquisitionPlan">[docs]</a>
+<span class="nd">@runtime_checkable</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AcquisitionPlan</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A protocol for custom data acquisition plans.</span>
+
+<span class="sd">    This protocol defines how to acquire data from the beamline. Most users will use</span>
+<span class="sd">    the default :func:`blop.plans.default_acquire` plan, which performs a list scan</span>
+<span class="sd">    over the suggested points. Custom implementations are only needed for specialized</span>
+<span class="sd">    acquisition strategies (e.g., fly scans, complex detector configurations).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The acquisition plan is a Bluesky plan that should move the actuators to each</span>
+<span class="sd">    suggested position and acquire data from the sensors. It must return the UID</span>
+<span class="sd">    of the Bluesky run so that the evaluation function can retrieve the data.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.plans.default_acquire : Default acquisition plan implementation.</span>
+<span class="sd">    blop.ax.Agent : Accepts an optional acquisition plan during initialization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="AcquisitionPlan.__call__">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.AcquisitionPlan.__call__">[docs]</a>
+    <span class="nd">@plan</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+        <span class="n">actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">],</span>
+        <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">md</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Acquire data for optimization.</span>
+
+<span class="sd">        This should be a Bluesky plan that moves the actuators to each of their suggested positions</span>
+<span class="sd">        and acquires data from the sensors.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        suggestions: list[dict]</span>
+<span class="sd">            A list of dictionaries, each containing the parameterization of a point to evaluate.</span>
+<span class="sd">            The &quot;_id&quot; key is optional and can be used to identify each suggestion. It is suggested</span>
+<span class="sd">            to add &quot;_id&quot; values to the run metadata for later identification of the acquired data.</span>
+<span class="sd">        actuators: Sequence[Actuator]</span>
+<span class="sd">            The actuators to move to their suggested positions.</span>
+<span class="sd">        sensors: Sequence[Sensor], optional</span>
+<span class="sd">            The sensors that produce data to evaluate.</span>
+<span class="sd">        md : dict[str, Any] | None, optional</span>
+<span class="sd">            Metadata to attach to the start document</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The unique identifier of the Bluesky run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+</div>
+
+
+
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BaseOptimizationProblem</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">TActuator</span><span class="p">,</span> <span class="n">TSensor</span><span class="p">,</span> <span class="n">TPlan</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for optimization problem definitions.</span>
+
+<span class="sd">    Provides the common structure shared by all optimization problem types.</span>
+<span class="sd">    Users should use the concrete subclasses :class:`OptimizationProblem` or</span>
+<span class="sd">    :class:`QueueserverOptimizationProblem` instead of this class directly.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    OptimizationProblem : Concrete problem type for standard usage.</span>
+<span class="sd">    QueueserverOptimizationProblem : Concrete problem type for queue server usage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span>
+    <span class="n">actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">TActuator</span><span class="p">]</span>
+    <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">TSensor</span><span class="p">]</span>
+    <span class="n">evaluation_function</span><span class="p">:</span> <span class="n">EvaluationFunction</span>
+    <span class="n">acquisition_plan</span><span class="p">:</span> <span class="n">TPlan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="OptimizationProblem">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.OptimizationProblem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimizationProblem</span><span class="p">(</span><span class="n">BaseOptimizationProblem</span><span class="p">[</span><span class="n">Actuator</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">,</span> <span class="n">AcquisitionPlan</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An optimization problem to solve. Immutable once initialized.</span>
+
+<span class="sd">    This dataclass encapsulates all components needed for optimization into a single</span>
+<span class="sd">    immutable structure. It is typically created via :meth:`blop.ax.Agent.to_optimization_problem`</span>
+<span class="sd">    and used with optimization plans like :func:`blop.plans.optimize`.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optimizer: Optimizer</span>
+<span class="sd">        Suggests points to evaluate and ingests outcomes to inform the optimization.</span>
+<span class="sd">    actuators: Sequence[Actuator]</span>
+<span class="sd">        Objects that can be moved to control the beamline using the Bluesky RunEngine.</span>
+<span class="sd">        A subset of the actuators&#39; names must match the names of suggested parameterizations.</span>
+<span class="sd">    sensors: Sequence[Sensor]</span>
+<span class="sd">        Objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.</span>
+<span class="sd">    evaluation_function: EvaluationFunction</span>
+<span class="sd">        A callable to evaluate data from a Bluesky run and produce outcomes.</span>
+<span class="sd">    acquisition_plan: AcquisitionPlan, optional</span>
+<span class="sd">        A Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.ax.Agent.to_optimization_problem : Creates an OptimizationProblem from an Agent.</span>
+<span class="sd">    blop.plans.optimize : Bluesky plan that uses an OptimizationProblem.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="o">...</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">QueueserverOptimizationProblem</span><span class="p">(</span><span class="n">BaseOptimizationProblem</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An optimization problem to solve. Immutable once initialized.</span>
+
+<span class="sd">    This dataclass encapsulates all components needed for optimization into a single</span>
+<span class="sd">    immutable structure. It is typically created via :meth:`blop.ax.QueueserverAgent.to_optimization_problem`</span>
+<span class="sd">    and used with bluesky-queueserver-api. Actuators, sensors, and the acquisition plan are referenced</span>
+<span class="sd">    by their names, since their instances live on a remote server.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    optimizer: Optimizer</span>
+<span class="sd">        Suggests points to evaluate and ingests outcomes to inform the optimization.</span>
+<span class="sd">    actuators: Sequence[str]</span>
+<span class="sd">        Names of objects that can be moved to control the beamline using the Bluesky RunEngine.</span>
+<span class="sd">        A subset of the actuators&#39; names must match the names of suggested parameterizations.</span>
+<span class="sd">    sensors: Sequence[str]</span>
+<span class="sd">        Names of objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.</span>
+<span class="sd">    evaluation_function: EvaluationFunction</span>
+<span class="sd">        A callable to evaluate data from a Bluesky run and produce outcomes.</span>
+<span class="sd">    acquisition_plan: str, optional</span>
+<span class="sd">        The name of a Bluesky plan to acquire data from the beamline. If not provided, a default plan name will be used.</span>
+<span class="sd">        The plan must match the arguments of :ref:`AcquisitionPlan`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.ax.QueueserverAgent.to_optimization_problem : Creates a QueueserverOptimizationProblem from an agent.</span>
+<span class="sd">    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="o">...</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2020, Brookhaven National Laboratory.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

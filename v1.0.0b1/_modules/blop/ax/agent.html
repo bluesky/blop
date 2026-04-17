@@ -1,0 +1,1121 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>blop.ax.agent &#8212; blop 1.0.0b1 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=7f76b32a3354e82990f2" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/fix-content-height.css?v=07fcbb05" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=7f76b32a3354e82990f2"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2" />
+
+    <script src="../../../_static/documentation_options.js?v=09d090fc"></script>
+    <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../../_static/copybutton.js?v=f281be69"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/blop/ax/agent';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="1.0.0b1" />
+  
+    
+    <script src="../../../_static/searchtools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">blop 1.0.0b1 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to-guides.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanation.html">
+    Explanation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../release-history.html">
+    Release History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../installation.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../how-to-guides.html">
+    How-to Guides
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../explanation.html">
+    Explanation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../tutorials.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../reference.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../release-history.html">
+    Release History
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">blop.ax.agent</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for blop.ax.agent</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">ax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ax.analysis</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContourPlot</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ax.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">TParamValue</span>
+
+<span class="c1"># ===============================</span>
+<span class="c1"># TODO: Remove when Python 3.10 is no longer supported</span>
+<span class="k">if</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="s2">&quot;ax.core.analysis_card&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ax.core.analysis_card</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisCardBase</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">ax.analysis.analysis_card</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisCardBase</span>  <span class="c1"># type: ignore[import-untyped]</span>
+<span class="c1"># ===============================</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.preprocessors</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bpp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackBase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky_queueserver_api.zmq</span><span class="w"> </span><span class="kn">import</span> <span class="n">REManagerAPI</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..callbacks.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationLogger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..callbacks.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationCallbackRouter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plans</span><span class="w"> </span><span class="kn">import</span> <span class="n">acquire_baseline</span><span class="p">,</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">sample_suggestions</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..protocols</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AcquisitionPlan</span><span class="p">,</span>
+    <span class="n">Actuator</span><span class="p">,</span>
+    <span class="n">EvaluationFunction</span><span class="p">,</span>
+    <span class="n">OptimizationProblem</span><span class="p">,</span>
+    <span class="n">QueueserverOptimizationProblem</span><span class="p">,</span>
+    <span class="n">Sensor</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..queueserver</span><span class="w"> </span><span class="kn">import</span> <span class="n">QueueserverClient</span><span class="p">,</span> <span class="n">QueueserverOptimizationRunner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">InferredReadable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.dof</span><span class="w"> </span><span class="kn">import</span> <span class="n">DOF</span><span class="p">,</span> <span class="n">DOFConstraint</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.objective</span><span class="w"> </span><span class="kn">import</span> <span class="n">Objective</span><span class="p">,</span> <span class="n">OutcomeConstraint</span><span class="p">,</span> <span class="n">to_ax_objective_str</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.optimizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">AxOptimizer</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_AxAgentMixin</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Mixin providing Ax-related functionality shared by agents.</span>
+<span class="sd">    Expects subclasses to define `self._optimizer` as an `AxOptimizer`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">_optimizer</span><span class="p">:</span> <span class="n">AxOptimizer</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ax_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Client</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">ax_client</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">checkpoint_path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fixed_dofs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">fixed_parameters</span>
+
+    <span class="nd">@fixed_dofs</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fixed_dofs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fixed_dofs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">DOF</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Fix degrees of freedom to a certain value for future optimizations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fixed_dofs : dict[DOF, Any] | dict[str, Any] | None</span>
+<span class="sd">            A mapping of DOFs or DOF names to the values they should be fixed to.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_dofs</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">fixed_parameters</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">fixed_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">dof</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fixed_dofs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the next point(s) to evaluate in the search space.</span>
+
+<span class="sd">        Uses the Bayesian optimization algorithm to suggest promising points based</span>
+<span class="sd">        on all previously acquired data. Each suggestion includes an &quot;_id&quot; key for</span>
+<span class="sd">        tracking.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        num_points : int, optional</span>
+<span class="sd">            The number of points to suggest. Default is 1. Higher values enable</span>
+<span class="sd">            batch optimization but may reduce optimization efficiency per iteration.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[dict]</span>
+<span class="sd">            A list of dictionaries, each containing a parameterization of a point to</span>
+<span class="sd">            evaluate next. Each dictionary includes an &quot;_id&quot; key for identification.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">suggest</span><span class="p">(</span><span class="n">num_points</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ingest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Ingest evaluation results into the optimizer.</span>
+
+<span class="sd">        Updates the optimizer&#39;s model with new data. Can ingest both suggested points</span>
+<span class="sd">        (with &quot;_id&quot; key) and external data (without &quot;_id&quot; key).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        points : list[dict]</span>
+<span class="sd">            A list of dictionaries, each containing outcomes for a trial. For suggested</span>
+<span class="sd">            points, include the &quot;_id&quot; key. For external data, include DOF names and</span>
+<span class="sd">            objective values, and omit &quot;_id&quot;.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This method is typically called automatically by :meth:`optimize`. Manual usage</span>
+<span class="sd">        is only needed for custom workflows or when ingesting external data.</span>
+
+<span class="sd">        For complete examples, see :doc:`/how-to-guides/attach-data-to-experiments`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">plot_objective</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">x_dof_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">y_dof_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">objective_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnalysisCardBase</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Plot the predicted objective as a function of two DOFs.</span>
+
+<span class="sd">        Creates a contour plot showing the model&#39;s prediction of an objective across</span>
+<span class="sd">        the space defined by two DOFs. Useful for visualizing the optimization landscape.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        x_dof_name : str</span>
+<span class="sd">            The name of the DOF to plot on the x-axis.</span>
+<span class="sd">        y_dof_name : str</span>
+<span class="sd">            The name of the DOF to plot on the y-axis.</span>
+<span class="sd">        objective_name : str</span>
+<span class="sd">            The name of the objective to plot.</span>
+<span class="sd">        *args : Any</span>
+<span class="sd">            Additional positional arguments passed to Ax&#39;s compute_analyses.</span>
+<span class="sd">        **kwargs : Any</span>
+<span class="sd">            Additional keyword arguments passed to Ax&#39;s compute_analyses.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[AnalysisCard]</span>
+<span class="sd">            The computed analysis cards containing the plot data.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        ax.analysis.ContourPlot : Pre-built analysis for plotting objectives.</span>
+<span class="sd">        ax.analysis.AnalysisCard : Contains the raw and computed data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_client</span><span class="o">.</span><span class="n">compute_analyses</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">ContourPlot</span><span class="p">(</span>
+                    <span class="n">x_parameter_name</span><span class="o">=</span><span class="n">x_dof_name</span><span class="p">,</span>
+                    <span class="n">y_parameter_name</span><span class="o">=</span><span class="n">y_dof_name</span><span class="p">,</span>
+                    <span class="n">metric_name</span><span class="o">=</span><span class="n">objective_name</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+            <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save the agent&#39;s state to a JSON file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">reconfigure_search_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dof_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">DOF</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">TParamValue</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update bounds or values of existing DOFs for future optimizations.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dof_mappings : dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]</span>
+<span class="sd">            Mapping of DOFs to their new search space.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">reconfigure_search_space</span><span class="p">({</span><span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">:</span> <span class="n">update</span> <span class="k">for</span> <span class="n">dof</span><span class="p">,</span> <span class="n">update</span> <span class="ow">in</span> <span class="n">dof_mappings</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
+
+
+<div class="viewcode-block" id="Agent">
+<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Agent</span><span class="p">(</span><span class="n">_AxAgentMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An interface that uses Ax as the backend for optimization and experiment tracking.</span>
+
+<span class="sd">    The Agent is the main entry point for setting up and running Bayesian optimization</span>
+<span class="sd">    using Blop. It coordinates the DOFs, objectives, evaluation function, and optimizer</span>
+<span class="sd">    to perform intelligent exploration of the parameter space.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sensors : Sequence[Sensor]</span>
+<span class="sd">        The sensors to use for acquisition. These should be the minimal set</span>
+<span class="sd">        of sensors that are needed to compute the objectives.</span>
+<span class="sd">    dofs : Sequence[DOF]</span>
+<span class="sd">        The degrees of freedom that the agent can control, which determine the search space.</span>
+<span class="sd">    objectives : Sequence[Objective]</span>
+<span class="sd">        The objectives which the agent will try to optimize.</span>
+<span class="sd">    evaluation_function : EvaluationFunction</span>
+<span class="sd">        The function to evaluate acquired data and produce outcomes.</span>
+<span class="sd">    acquisition_plan : AcquisitionPlan | None, optional</span>
+<span class="sd">        The acquisition plan to use for acquiring data from the beamline. If not provided,</span>
+<span class="sd">        :func:`blop.plans.default_acquire` will be used.</span>
+<span class="sd">    dof_constraints : Sequence[DOFConstraint] | None, optional</span>
+<span class="sd">        Constraints on DOFs to refine the search space.</span>
+<span class="sd">    outcome_constraints : Sequence[OutcomeConstraint] | None, optional</span>
+<span class="sd">        Constraints on outcomes to be satisfied during optimization.</span>
+<span class="sd">    checkpoint_path : str | None, optional</span>
+<span class="sd">        The path to the checkpoint file to save the optimizer&#39;s state to.</span>
+<span class="sd">    **kwargs : Any</span>
+<span class="sd">        Additional keyword arguments to configure the Ax experiment.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For more complex setups, you can configure the Ax client directly via ``self.ax_client``.</span>
+
+<span class="sd">    For complete working examples of creating and using an Agent, see the tutorial</span>
+<span class="sd">    documentation, particularly :doc:`/tutorials/simple-experiment`.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.protocols.Sensor : The protocol for sensors.</span>
+<span class="sd">    blop.ax.dof.RangeDOF : For continuous parameters.</span>
+<span class="sd">    blop.ax.dof.ChoiceDOF : For discrete parameters.</span>
+<span class="sd">    blop.ax.objective.Objective : For defining objectives.</span>
+<span class="sd">    blop.ax.optimizer.AxOptimizer : The optimizer used internally.</span>
+<span class="sd">    blop.plans.optimize : Bluesky plan for running optimization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">],</span>
+        <span class="n">dofs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DOF</span><span class="p">],</span>
+        <span class="n">objectives</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Objective</span><span class="p">],</span>
+        <span class="n">evaluation_function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
+        <span class="n">acquisition_plan</span><span class="p">:</span> <span class="n">AcquisitionPlan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">dof_constraints</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DOFConstraint</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">outcome_constraints</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">OutcomeConstraint</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span><span class="p">):</span>
+            <span class="n">dof_actuator_strs</span> <span class="o">=</span> <span class="p">[</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">,</span> <span class="nb">str</span><span class="p">)]</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;DOFs with actuators must be `Actuator` instances, not strings. Got strings for: </span><span class="si">{</span><span class="n">dof_actuator_strs</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span> <span class="o">=</span> <span class="n">sensors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">Actuator</span><span class="p">,</span> <span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">)</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span> <span class="k">if</span> <span class="n">dof</span><span class="o">.</span><span class="n">actuator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span> <span class="o">=</span> <span class="n">evaluation_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span> <span class="o">=</span> <span class="n">acquisition_plan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">AxOptimizer</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="n">dof</span><span class="o">.</span><span class="n">to_ax_parameter_config</span><span class="p">()</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span><span class="p">],</span>
+            <span class="n">objective</span><span class="o">=</span><span class="n">to_ax_objective_str</span><span class="p">(</span><span class="n">objectives</span><span class="p">),</span>
+            <span class="n">parameter_constraints</span><span class="o">=</span><span class="p">[</span><span class="n">constraint</span><span class="o">.</span><span class="n">ax_constraint</span> <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="n">dof_constraints</span><span class="p">]</span> <span class="k">if</span> <span class="n">dof_constraints</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">outcome_constraints</span><span class="o">=</span><span class="p">[</span><span class="n">constraint</span><span class="o">.</span><span class="n">ax_constraint</span> <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="n">outcome_constraints</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">outcome_constraints</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">checkpoint_path</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_readable_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">InferredReadable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CallbackBase</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">OptimizationLogger</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callback_router</span> <span class="o">=</span> <span class="n">OptimizationCallbackRouter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Agent.from_checkpoint">
+<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.from_checkpoint">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_checkpoint</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">],</span>
+        <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">],</span>
+        <span class="n">evaluation_function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
+        <span class="n">acquisition_plan</span><span class="p">:</span> <span class="n">AcquisitionPlan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Agent&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Load an agent from the optimizer&#39;s checkpoint file.</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            Only the optimizer state is saved during a checkpoint, so we cannot reliably validate</span>
+<span class="sd">            the remaining state against the optimizer configuration.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        checkpoint_path : str</span>
+<span class="sd">            The checkpoint path to load the agent from.</span>
+<span class="sd">        actuators: Sequence[Actuator]</span>
+<span class="sd">            Objects that can be moved to control the beamline using the Bluesky RunEngine.</span>
+<span class="sd">            A subset of the actuators&#39; names must match the names of suggested parameterizations.</span>
+<span class="sd">        sensors: Sequence[Sensor]</span>
+<span class="sd">            Objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.</span>
+<span class="sd">        evaluation_function: EvaluationFunction</span>
+<span class="sd">            A callable to evaluate data from a Bluesky run and produce outcomes.</span>
+<span class="sd">        acquisition_plan: AcquisitionPlan, optional</span>
+<span class="sd">            A Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">instance</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">AxOptimizer</span><span class="o">.</span><span class="n">from_checkpoint</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_actuators</span> <span class="o">=</span> <span class="n">actuators</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_sensors</span> <span class="o">=</span> <span class="n">sensors</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_evaluation_function</span> <span class="o">=</span> <span class="n">evaluation_function</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_acquisition_plan</span> <span class="o">=</span> <span class="n">acquisition_plan</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_readable_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">OptimizationLogger</span><span class="p">()]</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_callback_router</span> <span class="o">=</span> <span class="n">OptimizationCallbackRouter</span><span class="p">(</span><span class="n">instance</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">instance</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CallbackBase</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of active optimization callbacks.</span>
+
+<span class="sd">        Callbacks in this list receive documents from ``&quot;optimize&quot;`` and</span>
+<span class="sd">        ``&quot;sample_suggestions&quot;`` runs. The default list contains an</span>
+<span class="sd">        :class:`~blop.callbacks.logger.OptimizationLogger`.</span>
+
+<span class="sd">        The list can be mutated directly, or use :meth:`subscribe` /</span>
+<span class="sd">        :meth:`unsubscribe` for convenience.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span>
+
+<div class="viewcode-block" id="Agent.subscribe">
+<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.subscribe">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">CallbackBase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subscribe a callback to receive optimization run documents.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        callback : CallbackBase</span>
+<span class="sd">            A Bluesky callback instance.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If *callback* is already subscribed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Callback </span><span class="si">{</span><span class="n">callback</span><span class="si">!r}</span><span class="s2"> is already subscribed.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Agent.unsubscribe">
+<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.unsubscribe">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unsubscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">CallbackBase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unsubscribe a previously subscribed callback.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        callback : CallbackBase</span>
+<span class="sd">            The callback instance to remove.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If *callback* is not subscribed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The sensors used for data acquisition.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actuators</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The actuators that control the degrees of freedom.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationFunction</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The function used to evaluate acquired data and produce outcomes.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">acquisition_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AcquisitionPlan</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The acquisition plan for acquiring data, or ``None`` if using the default.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span>
+
+<div class="viewcode-block" id="Agent.to_optimization_problem">
+<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.to_optimization_problem">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_optimization_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationProblem</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct an optimization problem from the agent.</span>
+
+<span class="sd">        Creates an immutable :class:`blop.protocols.OptimizationProblem` that</span>
+<span class="sd">        encapsulates all components needed for optimization. This is typically</span>
+<span class="sd">        used internally by optimization plans.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        OptimizationProblem</span>
+<span class="sd">            An immutable optimization problem that can be deployed via Bluesky.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        blop.protocols.OptimizationProblem : The optimization problem dataclass.</span>
+<span class="sd">        blop.plans.optimize : Uses the optimization problem to run optimization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">OptimizationProblem</span><span class="p">(</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="p">,</span>
+            <span class="n">actuators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">actuators</span><span class="p">,</span>
+            <span class="n">sensors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sensors</span><span class="p">,</span>
+            <span class="n">evaluation_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">evaluation_function</span><span class="p">,</span>
+            <span class="n">acquisition_plan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">acquisition_plan</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Agent.acquire_baseline">
+<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.acquire_baseline">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">acquire_baseline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameterization</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Acquire a baseline reading for reference.</span>
+
+<span class="sd">        Acquires data at a specific parameterization (or current positions) to establish</span>
+<span class="sd">        a baseline for comparison. Useful for relative outcome constraints.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parameterization : dict[str, Any] | None, optional</span>
+<span class="sd">            The DOF values to move to before acquiring baseline. If None, acquires</span>
+<span class="sd">            at current positions.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        Msg</span>
+<span class="sd">            Bluesky messages for the run engine.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        blop.plans.acquire_baseline : The underlying Bluesky plan.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">yield from</span> <span class="n">acquire_baseline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">(),</span> <span class="n">parameterization</span><span class="o">=</span><span class="n">parameterization</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Agent.optimize">
+<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.optimize">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run Bayesian optimization.</span>
+
+<span class="sd">        Performs iterative optimization by suggesting points, acquiring data, evaluating</span>
+<span class="sd">        outcomes, and updating the model. This is the main method for running optimization</span>
+<span class="sd">        with an agent.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        iterations : int, optional</span>
+<span class="sd">            The number of optimization iterations to run. Default is 1. Each iteration</span>
+<span class="sd">            suggests, evaluates, and learns from n_points.</span>
+<span class="sd">        n_points : int, optional</span>
+<span class="sd">            The number of points to evaluate per iteration. Default is 1. Higher values</span>
+<span class="sd">            enable batch optimization but may reduce optimization efficiency per iteration.</span>
+
+<span class="sd">        Yields</span>
+<span class="sd">        ------</span>
+<span class="sd">        Msg</span>
+<span class="sd">            Bluesky messages for the run engine.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This is the primary method for running optimization. It handles the full loop</span>
+<span class="sd">        of suggesting points, acquiring data, evaluating outcomes, and updating the model.</span>
+
+<span class="sd">        For complete examples, see :doc:`/tutorials/simple-experiment`.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        blop.plans.optimize : The underlying Bluesky optimization plan.</span>
+<span class="sd">        suggest : Get point suggestions without running acquisition.</span>
+<span class="sd">        ingest : Manually ingest evaluation results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">optimize_plan</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">(),</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span> <span class="n">readable_cache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_readable_cache</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">:</span>
+            <span class="n">optimize_plan</span> <span class="o">=</span> <span class="n">bpp</span><span class="o">.</span><span class="n">subs_wrapper</span><span class="p">(</span>
+                <span class="n">optimize_plan</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_callback_router</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">yield from</span> <span class="n">optimize_plan</span></div>
+
+
+<div class="viewcode-block" id="Agent.sample_suggestions">
+<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.sample_suggestions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate specific parameter combinations.</span>
+
+<span class="sd">        Acquires data for given suggestions and ingests results. Supports both</span>
+<span class="sd">        optimizer suggestions and manual points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        suggestions : list[dict]</span>
+<span class="sd">            Either optimizer suggestions (with &quot;_id&quot;) or manual points (without &quot;_id&quot;).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple[str, list[dict], list[dict]]</span>
+<span class="sd">            Bluesky run UID, suggestions with &quot;_id&quot;, and outcomes.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        suggest : Get optimizer suggestions.</span>
+<span class="sd">        optimize : Run full optimization loop.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sample_suggestions_plan</span> <span class="o">=</span> <span class="n">sample_suggestions</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">(),</span> <span class="n">suggestions</span><span class="o">=</span><span class="n">suggestions</span><span class="p">,</span> <span class="n">readable_cache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_readable_cache</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">:</span>
+            <span class="n">sample_suggestions_plan</span> <span class="o">=</span> <span class="n">bpp</span><span class="o">.</span><span class="n">subs_wrapper</span><span class="p">(</span>
+                <span class="n">sample_suggestions_plan</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_callback_router</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">sample_suggestions_plan</span><span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">QueueserverAgent</span><span class="p">(</span><span class="n">_AxAgentMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An asynchronous interface that uses Ax as the backend for optimization and experiment tracking</span>
+<span class="sd">    and the bluesky-queueserver-api for scheduling plan execution.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    re_manager_api : REManagerAPI</span>
+<span class="sd">        The manager API for interaction with Bluesky queueserver.</span>
+<span class="sd">    zmq_consumer_addr : str</span>
+<span class="sd">        A ZMQ address to consume Bluesky messages from, to react to plan execution on the</span>
+<span class="sd">        remote server.</span>
+<span class="sd">    sensors : Sequence[str]</span>
+<span class="sd">        The sensors to use for acquisition. These should be the minimal set</span>
+<span class="sd">        of sensors that are needed to compute the objectives.</span>
+<span class="sd">    dofs : Sequence[DOF]</span>
+<span class="sd">        The degrees of freedom that the agent can control, which determine the search space.</span>
+<span class="sd">    objectives : Sequence[Objective]</span>
+<span class="sd">        The objectives which the agent will try to optimize.</span>
+<span class="sd">    evaluation_function : EvaluationFunction</span>
+<span class="sd">        The function to evaluate acquired data and produce outcomes.</span>
+<span class="sd">    acquisition_plan : str | None, optional</span>
+<span class="sd">        The acquisition plan to use for acquiring data from the beamline. If not provided,</span>
+<span class="sd">        :func:`blop.plans.default_acquire` will be assumed.</span>
+<span class="sd">    dof_constraints : Sequence[DOFConstraint] | None, optional</span>
+<span class="sd">        Constraints on DOFs to refine the search space.</span>
+<span class="sd">    outcome_constraints : Sequence[OutcomeConstraint] | None, optional</span>
+<span class="sd">        Constraints on outcomes to be satisfied during optimization.</span>
+<span class="sd">    checkpoint_path : str | None, optional</span>
+<span class="sd">        The path to the checkpoint file to save the optimizer&#39;s state to.</span>
+<span class="sd">    **kwargs : Any</span>
+<span class="sd">        Additional keyword arguments to configure the Ax experiment.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.protocols.Sensor : The protocol for sensors.</span>
+<span class="sd">    blop.ax.dof.RangeDOF : For continuous parameters.</span>
+<span class="sd">    blop.ax.dof.ChoiceDOF : For discrete parameters.</span>
+<span class="sd">    blop.ax.objective.Objective : For defining objectives.</span>
+<span class="sd">    blop.ax.optimizer.AxOptimizer : The optimizer used internally.</span>
+<span class="sd">    blop.queueserver.QueueservverOptimizatonRunner : Runner that handles interaction with bluesky-queueserver.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">re_manager_api</span><span class="p">:</span> <span class="n">REManagerAPI</span><span class="p">,</span>
+        <span class="n">zmq_consumer_addr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">dofs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DOF</span><span class="p">],</span>
+        <span class="n">objectives</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Objective</span><span class="p">],</span>
+        <span class="n">evaluation_function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
+        <span class="n">acquisition_plan</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">dof_constraints</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DOFConstraint</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">outcome_constraints</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">OutcomeConstraint</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span> <span class="o">=</span> <span class="n">sensors</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dof</span><span class="o">.</span><span class="n">actuator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">,</span> <span class="n">Actuator</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span> <span class="o">=</span> <span class="n">evaluation_function</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span> <span class="o">=</span> <span class="n">acquisition_plan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">AxOptimizer</span><span class="p">(</span>
+            <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="n">dof</span><span class="o">.</span><span class="n">to_ax_parameter_config</span><span class="p">()</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span><span class="p">],</span>
+            <span class="n">objective</span><span class="o">=</span><span class="n">to_ax_objective_str</span><span class="p">(</span><span class="n">objectives</span><span class="p">),</span>
+            <span class="n">parameter_constraints</span><span class="o">=</span><span class="p">[</span><span class="n">constraint</span><span class="o">.</span><span class="n">ax_constraint</span> <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="n">dof_constraints</span><span class="p">]</span> <span class="k">if</span> <span class="n">dof_constraints</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">outcome_constraints</span><span class="o">=</span><span class="p">[</span><span class="n">constraint</span><span class="o">.</span><span class="n">ax_constraint</span> <span class="k">for</span> <span class="n">constraint</span> <span class="ow">in</span> <span class="n">outcome_constraints</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">outcome_constraints</span>
+            <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">checkpoint_path</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runner</span> <span class="o">=</span> <span class="n">QueueserverOptimizationRunner</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">(),</span>
+            <span class="n">QueueserverClient</span><span class="p">(</span><span class="n">re_manager_api</span><span class="p">,</span> <span class="n">zmq_consumer_addr</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">evaluation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationFunction</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">actuators</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">acquisition_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_optimization_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueueserverOptimizationProblem</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">QueueserverOptimizationProblem</span><span class="p">(</span>
+            <span class="n">optimizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="p">,</span>
+            <span class="n">actuators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="p">,</span>
+            <span class="n">sensors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span><span class="p">,</span>
+            <span class="n">evaluation_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span><span class="p">,</span>
+            <span class="n">acquisition_plan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start the optimization loop.</span>
+
+<span class="sd">        Validates the queueserver state, then begins the suggest -&gt; acquire -&gt; ingest</span>
+<span class="sd">        cycle. This method returns immediately; the optimization runs asynchronously</span>
+<span class="sd">        via callbacks.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        iterations : int</span>
+<span class="sd">            Number of optimization iterations to run.</span>
+<span class="sd">        num_points : int</span>
+<span class="sd">            Number of points to suggest per iteration.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If the queueserver environment is not ready.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If required devices or plans are not available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">iterations</span><span class="p">,</span> <span class="n">n_points</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">submit_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Evaluate specific parameter combinations.</span>
+
+<span class="sd">        Acquires data for given suggestions and ingests results. Supports both</span>
+<span class="sd">        optimizer suggestions and manual points.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        suggestions : list[dict]</span>
+<span class="sd">            Either optimizer suggestions (with &quot;_id&quot;) or manual points (without &quot;_id&quot;).</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        suggest : Get optimizer suggestions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runner</span><span class="o">.</span><span class="n">submit_suggestions</span><span class="p">(</span><span class="n">suggestions</span><span class="p">)</span>
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=7f76b32a3354e82990f2"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=7f76b32a3354e82990f2"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2020, Brookhaven National Laboratory.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
