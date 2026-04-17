@@ -144,7 +144,13 @@ html_theme = "pydata_sphinx_theme"
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    "switcher": {
+        "json_url": "https://bluesky.github.io/blop/switcher.json",
+        "version_match": version,
+    },
+    "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
