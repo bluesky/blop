@@ -58,10 +58,7 @@ def get_versions(ref: str, add: str | None) -> list[str]:
 def write_json(path: Path, repository: str, versions: list[str]):
     """Write the JSON switcher to path."""
     org, repo_name = repository.split("/")
-    struct = [
-        {"version": version, "url": f"https://{org}.github.io/{repo_name}/{version}/"}
-        for version in versions
-    ]
+    struct = [{"version": version, "url": f"https://{org}.github.io/{repo_name}/{version}/"} for version in versions]
     text = json.dumps(struct, indent=2)
     print(f"JSON switcher:\n{text}")
     path.write_text(text, encoding="utf-8")
@@ -69,9 +66,7 @@ def write_json(path: Path, repository: str, versions: list[str]):
 
 def main(args=None):
     """Parse args and write switcher."""
-    parser = ArgumentParser(
-        description="Make a versions.json file from gh-pages directories"
-    )
+    parser = ArgumentParser(description="Make a versions.json file from gh-pages directories")
     parser.add_argument(
         "--add",
         help="Add this directory to the list of existing directories",
