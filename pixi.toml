@@ -29,6 +29,7 @@ check = "pre-commit run --all-files"
 tests = "pytest src/blop/tests"
 
 [feature.docs.dependencies]
+graphviz = ">=14.1.2,<15"
 
 [feature.docs.pypi-dependencies]
 blop = { path = ".", editable = true, extras = ["cpu"] }
