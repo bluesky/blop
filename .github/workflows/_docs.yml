@@ -2,9 +2,6 @@ name: Build Documentation
 
 on:
   workflow_call:
-    secrets:
-      deploy_key:
-        required: false
 
 jobs:
   build_docs:
@@ -19,9 +16,10 @@ jobs:
         run: |
           export REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}  # just the repo, as opposed to org/repo
           echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
+          echo "DOCS_VERSION=${GITHUB_REF_NAME//[^A-Za-z0-9._-]/_}" >> $GITHUB_ENV
 
       - name: Checkout the code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
@@ -45,16 +43,18 @@ jobs:
           name: ${{ env.REPOSITORY_NAME }}-docs
           path: docs/build/html/
 
-      - name: Deploy documentation to nsls-ii.github.io
-        if: github.event_name == 'release'
+      - name: Move to versioned directory
+        run: mv docs/build/html .github/pages/$DOCS_VERSION
+
+      - name: Write switcher.json
+        run: python .github/pages/make_switcher.py --add $DOCS_VERSION ${{ github.repository }} .github/pages/switcher.json
+
+      - name: Publish Docs to gh-pages
+        if: github.ref_type == 'tag' || github.ref_name == 'main'
         # We pin to the SHA, not the tag, for security reasons.
-        # https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/security-hardening-for-github-actions#using-third-party-actions
-        uses: peaceiris/actions-gh-pages@bbdfb200618d235585ad98e965f4aafc39b4c501  # v3.7.3
+        # https://docs.github.com/en/actions/learn-github-actions/security-hardening-for-github-actions#using-third-party-actions
+        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
         with:
-          deploy_key: ${{ secrets.deploy_key }}
-          publish_branch: master
-          publish_dir: ./docs/build/html
-          external_repository: NSLS-II/NSLS-II.github.io
-          destination_dir: ${{ env.REPOSITORY_NAME }}
-          keep_files: true  # Keep old files.
-          force_orphan: false  # Keep git history.
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .github/pages
+          keep_files: true

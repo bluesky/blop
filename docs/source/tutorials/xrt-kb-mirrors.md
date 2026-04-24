@@ -43,10 +43,8 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from tiled.client.container import Container
-from bluesky.callbacks import best_effort
 from bluesky_tiled_plugins import TiledWriter
 from bluesky.run_engine import RunEngine
-from event_model import RunRouter
 from tiled.client import from_uri  # type: ignore[import-untyped]
 from tiled.server import SimpleTiledServer
 from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
@@ -68,22 +66,14 @@ plt.ion()
 DETECTOR_STORAGE = "/tmp/blop/sim"
 ```
 
-Next, we create a local Tiled server. The `TiledWriter` callback will save experimental data to this server, and our evaluation function will read from it. The `BestEffortCallback` provides live feedback during scans.
+Next, we create a local Tiled server. The `TiledWriter` callback will save experimental data to this server, and our evaluation function will read from it.
 
 ```{code-cell} ipython3
 tiled_server = SimpleTiledServer(readable_storage=[DETECTOR_STORAGE])
 tiled_client = from_uri(tiled_server.uri)
 tiled_writer = TiledWriter(tiled_client)
 
-def bec_factory(name, doc):
-    bec = best_effort.BestEffortCallback()
-    bec.disable_plots()
-    return [bec], []
-
-rr = RunRouter([bec_factory])
-
 RE = RunEngine({})
-RE.subscribe(rr)
 RE.subscribe(tiled_writer)
 ```
 

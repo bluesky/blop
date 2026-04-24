@@ -1,13 +1,35 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Literal, Protocol, runtime_checkable
+from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
-from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, NamedMovable, Readable
+from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, HasName, Movable, Readable
 from bluesky.utils import MsgGenerator, plan
 
+
+@runtime_checkable
+class MovableHasName(Movable, HasName, Protocol):
+    """
+    A movable that has a name.
+
+    We use this instead of `bluesky.protocols.NamedMovable` since
+    we do not want to require `HasHints` on the movable.
+
+    A `Movable` and `HasName` is sufficient. `HasHints` should be optional.
+    """
+
+    ...
+
+
 ID_KEY: Literal["_id"] = "_id"
-Actuator = NamedMovable | Flyable
+Actuator = MovableHasName | Flyable
 Sensor = Readable | EventCollectable | EventPageCollectable
+
+TActuator = TypeVar("TActuator")
+"""Actuator generic type"""
+TSensor = TypeVar("TSensor")
+"""Sensor generic type"""
+TPlan = TypeVar("TPlan")
+"""Plan generic type"""
 
 
 @runtime_checkable
@@ -31,6 +53,32 @@ class CanRegisterSuggestions(Protocol):
         -------
         list[dict]
             The original suggestions with an "_id" key added.
+        """
+        ...
+
+
+@runtime_checkable
+class TrialFaultAware(Protocol):
+    """
+    A protocol to accept information about trial failures of the optimization loop.
+
+
+    Used to invalidate or register early stop on data for the optimizer, or do necesary
+    cleanup of processes not directly tied to the run engine
+    """
+
+    def register_failures(self, suggestions: list[dict]) -> None:
+        """
+        Register the failed suggestions with the optimizer.
+
+        Parameters
+        ----------
+        suggestions: list[dict]
+            The suggestions to fail. Ids must be present.
+
+        Returns
+        -------
+        Nothing :)
         """
         ...
 
@@ -175,6 +223,7 @@ class AcquisitionPlan(Protocol):
         suggestions: list[dict],
         actuators: Sequence[Actuator],
         sensors: Sequence[Sensor] | None = None,
+        md: dict[str, Any] | None = None,
     ) -> MsgGenerator[str]:
         """
         Acquire data for optimization.
@@ -192,6 +241,8 @@ class AcquisitionPlan(Protocol):
             The actuators to move to their suggested positions.
         sensors: Sequence[Sensor], optional
             The sensors that produce data to evaluate.
+        md : dict[str, Any] | None, optional
+            Metadata to attach to the start document
 
         Returns
         -------
@@ -202,7 +253,27 @@ class AcquisitionPlan(Protocol):
 
 
 @dataclass(frozen=True)
-class OptimizationProblem:
+class BaseOptimizationProblem(Generic[TActuator, TSensor, TPlan]):
+    """Base class for optimization problem definitions.
+
+    Provides the common structure shared by all optimization problem types.
+    Users should use the concrete subclasses :class:`OptimizationProblem` or
+    :class:`QueueserverOptimizationProblem` instead of this class directly.
+
+    See Also
+    --------
+    OptimizationProblem : Concrete problem type for standard usage.
+    QueueserverOptimizationProblem : Concrete problem type for queue server usage.
+    """
+
+    optimizer: Optimizer
+    actuators: Sequence[TActuator]
+    sensors: Sequence[TSensor]
+    evaluation_function: EvaluationFunction
+    acquisition_plan: TPlan | None = None
+
+
+class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionPlan]):
     """
     An optimization problem to solve. Immutable once initialized.
 
@@ -230,8 +301,37 @@ class OptimizationProblem:
     blop.plans.optimize : Bluesky plan that uses an OptimizationProblem.
     """
 
+    ...
+
+
+class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
+    """
+    An optimization problem to solve. Immutable once initialized.
+
+    This dataclass encapsulates all components needed for optimization into a single
+    immutable structure. It is typically created via :meth:`blop.ax.QueueserverAgent.to_optimization_problem`
+    and used with bluesky-queueserver-api. Actuators, sensors, and the acquisition plan are referenced
+    by their names, since their instances live on a remote server.
+
+    Attributes
+    ----------
     optimizer: Optimizer
-    actuators: Sequence[Actuator]
-    sensors: Sequence[Sensor]
+        Suggests points to evaluate and ingests outcomes to inform the optimization.
+    actuators: Sequence[str]
+        Names of objects that can be moved to control the beamline using the Bluesky RunEngine.
+        A subset of the actuators' names must match the names of suggested parameterizations.
+    sensors: Sequence[str]
+        Names of objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.
     evaluation_function: EvaluationFunction
-    acquisition_plan: AcquisitionPlan | None = None
+        A callable to evaluate data from a Bluesky run and produce outcomes.
+    acquisition_plan: str, optional
+        The name of a Bluesky plan to acquire data from the beamline. If not provided, a default plan name will be used.
+        The plan must match the arguments of :ref:`AcquisitionPlan`.
+
+    See Also
+    --------
+    blop.ax.QueueserverAgent.to_optimization_problem : Creates a QueueserverOptimizationProblem from an agent.
+    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.
+    """
+
+    ...

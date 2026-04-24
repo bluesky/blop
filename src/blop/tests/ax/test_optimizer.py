@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import numpy as np
 import pytest
 from ax import ChoiceParameterConfig, RangeParameterConfig
@@ -35,10 +37,13 @@ def test_ax_fixed_parameters():
         parameter_constraints=["x1 + x2 <= 10"],
         outcome_constraints=["y1 >= 0", "y2 <= 0"],
     )
-    optimizer.fixed_parameters = {"x3": 3}
-    assert optimizer.fixed_parameters == {"x3": 3}
+    # Unknown parameter name
     with pytest.raises(KeyError):
         optimizer.fixed_parameters = {"x4": 3}
+
+    # Optimizer state should reflect setter call
+    optimizer.fixed_parameters = {"x3": 3}
+    assert optimizer.fixed_parameters == {"x3": 3}
 
 
 def test_ax_optimizer_suggest():
@@ -167,6 +172,24 @@ def test_ax_optimizer_checkpoint(tmp_path):
     assert optimizer.checkpoint_path == str(checkpoint_path)
 
 
+def test_ax_optimizer_register_failures():
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(-5.0, 5.0), parameter_type="float"),
+            RangeParameterConfig(name="x2", bounds=(-5.0, 5.0), parameter_type="float"),
+            ChoiceParameterConfig(name="x3", values=[0, 1, 2, 3, 4, 5], parameter_type="int", is_ordered=True),
+        ],
+        objective="y1,-y2",
+        parameter_constraints=["x1 + x2 <= 10"],
+        outcome_constraints=["y1 >= 0", "y2 <= 0"],
+    )
+    suggestions = optimizer.suggest(num_points=5)
+    optimizer.register_failures(suggestions)
+    trial_df = optimizer.ax_client.summarize()
+    assert 5 == len(trial_df)
+    assert trial_df.trial_status.eq("FAILED").all()
+
+
 def test_ax_optimizer_checkpoint_no_path():
     optimizer = AxOptimizer(
         parameters=[
@@ -177,3 +200,62 @@ def test_ax_optimizer_checkpoint_no_path():
 
     with pytest.raises(ValueError):
         optimizer.checkpoint()
+
+
+def test_ax_optimizer_reconfigurable_search_space():
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(-5.0, 5.0), parameter_type="float"),
+            RangeParameterConfig(name="x2", bounds=(-5.0, 5.0), parameter_type="float"),
+            ChoiceParameterConfig(name="x3", values=[0, 1, 2, 3, 4, 5], parameter_type="int", is_ordered=True),
+        ],
+        objective="y1,-y2",
+        parameter_constraints=["x1 + x2 <= 10"],
+        outcome_constraints=["y1 >= 0", "y2 <= 0"],
+    )
+    # Unknown parameter name
+    with pytest.raises(KeyError):
+        optimizer.reconfigure_search_space({"x4": (-4, 4)})
+    # ChoiceParameter expects a list
+    with pytest.raises(TypeError):
+        optimizer.reconfigure_search_space({"x3": 3})
+    # ChoiceParameter expects a list of types castable to parameter_type
+    with pytest.raises(ValueError):
+        optimizer.reconfigure_search_space({"x3": ["2", "Hello", 3.6]})
+    # RangeParameter expects a tuple
+    with pytest.raises(TypeError):
+        optimizer.reconfigure_search_space({"x1": 3})
+
+    # Changing the serach space should reflect in parameter state
+    optimizer.reconfigure_search_space({"x1": (-4, 4), "x3": [6, 7, 8]})
+    param_x1 = optimizer._client._experiment.parameters["x1"]
+    param_x3 = optimizer._client._experiment.parameters["x3"]
+    assert (param_x1.lower, param_x1.upper) == (-4, 4)
+    assert param_x3.values == [6, 7, 8]
+
+
+def test_ax_optimizer_reconfigurable_search_space_rollback():
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(-5.0, 5.0), parameter_type="float"),
+            RangeParameterConfig(name="x2", bounds=(-5.0, 5.0), parameter_type="float"),
+            ChoiceParameterConfig(name="x3", values=[0, 1, 2, 3, 4, 5], parameter_type="int", is_ordered=True),
+        ],
+        objective="y1,-y2",
+        parameter_constraints=["x1 + x2 <= 10"],
+        outcome_constraints=["y1 >= 0", "y2 <= 0"],
+    )
+    p1 = optimizer._client._experiment.parameters["x1"]
+    original_p1 = (p1.lower, p1.upper)
+    # Make second state change fail after first
+    with patch.object(p1, "update_range", side_effect=RuntimeError("boom")):
+        with pytest.raises(RuntimeError):
+            optimizer.reconfigure_search_space(
+                {
+                    "x1": (3, 6),
+                    "x2": 5,
+                }
+            )
+
+    # Rollback should restore the original state
+    assert (p1.lower, p1.upper) == original_p1

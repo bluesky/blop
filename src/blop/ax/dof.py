@@ -24,8 +24,8 @@ class DOF(ABC):
     ----------
     name : str | None
         The name of the DOF. Provide a name if the DOF is not an actuator.
-    actuator : Actuator | None
-        The actuator to use for the DOF. Provide an actuator if the DOF is controllable by Bluesky.
+    actuator : Actuator | str | None
+        The actuator or its name to use for the DOF. Provide an actuator if the DOF is controllable by Bluesky.
 
     Notes
     -----
@@ -42,7 +42,7 @@ class DOF(ABC):
     """
 
     name: str | None = None
-    actuator: Actuator | None = None
+    actuator: Actuator | str | None = None
 
     def __post_init__(self) -> None:
         if not (bool(self.name) ^ bool(self.actuator)):
@@ -50,7 +50,13 @@ class DOF(ABC):
 
     @property
     def parameter_name(self) -> str:
-        return self.name or cast(Actuator, self.actuator).name
+        if isinstance(self.actuator, Actuator):
+            param_name = self.actuator.name
+        elif isinstance(self.actuator, str):
+            param_name = self.actuator
+        else:
+            param_name = cast(str, self.name)
+        return param_name
 
     @abstractmethod
     def to_ax_parameter_config(self) -> RangeParameterConfig | ChoiceParameterConfig: ...

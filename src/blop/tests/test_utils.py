@@ -1,13 +1,14 @@
 import numpy as np
+import pytest
 
 from blop.protocols import ID_KEY
-from blop.utils import InferredReadable, get_route_index, route_suggestions
+from blop.utils import InferredReadable, Source, _infer_data_key, get_route_index, route_suggestions
 
 # InferredReadable tests
 
 
 def test_inferred_readable_scalar_number():
-    r = InferredReadable("x", 1.5)
+    r = InferredReadable("x", Source.OTHER, 1.5)
     assert r.name == "x"
     assert r.parent is None
     read = r.read()
@@ -18,23 +19,23 @@ def test_inferred_readable_scalar_number():
 
 
 def test_inferred_readable_scalar_string():
-    r = InferredReadable("ids", ["0"])
+    r = InferredReadable("ids", Source.OTHER, ["0"])
     assert r.read()["ids"]["value"] == "0"
     assert r.describe()["ids"]["dtype"] == "string"
 
 
 def test_inferred_readable_array():
-    r = InferredReadable("arr", [0.0, 0.1])
+    r = InferredReadable("arr", Source.OTHER, [0.0, 0.1])
     assert r.read()["arr"]["value"] == [0.0, 0.1]
     assert r.describe()["arr"]["dtype"] == "array"
 
 
 def test_inferred_readable_update():
-    r = InferredReadable("x", 1.5)
+    r = InferredReadable("x", Source.OTHER, 1.5)
     r.update(2.0)
     assert r.read()["x"]["value"] == 2.0
 
-    r2 = InferredReadable("arr", [0.0, 0.1])
+    r2 = InferredReadable("arr", Source.OTHER, [0.0, 0.1])
     r2.update(np.array([1.0, 2.0]))
     assert list(r2.read()["arr"]["value"]) == [1.0, 2.0]
 
@@ -90,11 +91,16 @@ def test_route_suggestions_multiple_with_start():
     # "near" should come first since it's closer to start
     assert result[0][ID_KEY] == "near"
 
-
-def test_route_suggestions_ignores_non_float_values():
-    suggestions = [
-        {"x": 0.0, "label": "foo", ID_KEY: "a"},
-        {"x": 1.0, "label": "bar", ID_KEY: "b"},
-    ]
     result = route_suggestions(suggestions)
     assert len(result) == 2
+
+
+# _infer_data_key source value tests
+
+
+@pytest.mark.parametrize("source", list(Source))
+def test_infer_data_key_source_is_enum_value(source):
+    """The 'source' field in the DataKey must be the enum's string value, not its repr."""
+    data_key = _infer_data_key(source, 1.0)
+    assert data_key["source"] == source.value
+    assert "Source." not in data_key["source"]

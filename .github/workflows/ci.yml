@@ -33,8 +33,8 @@ jobs:
     needs: lint
     if: needs.check.outputs.branch-pr == ''
     uses: ./.github/workflows/_docs.yml
-    secrets:
-      deploy_key: ${{ github.event_name == 'release' && secrets.ACTIONS_DOCUMENTATION_DEPLOY_KEY || '' }}
+    permissions:
+      contents: write
   
   pypi:
     name: Publish package to PyPI

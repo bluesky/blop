@@ -6,7 +6,14 @@ from bluesky.run_engine import RunEngine
 from bluesky.utils import plan
 
 from blop.plans import acquire_baseline, default_acquire, optimize, optimize_step
-from blop.protocols import AcquisitionPlan, Checkpointable, EvaluationFunction, OptimizationProblem, Optimizer
+from blop.protocols import (
+    AcquisitionPlan,
+    Checkpointable,
+    EvaluationFunction,
+    OptimizationProblem,
+    Optimizer,
+    TrialFaultAware,
+)
 
 from .conftest import MovableSignal, ReadableSignal
 
@@ -76,6 +83,35 @@ def test_optimize(RE):
     assert data["x1"] == 0.0
     assert data["objective"] == 0.0
     assert data["bluesky_uid"] and isinstance(data["bluesky_uid"], str)
+
+
+def test_optimization_failure(RE):
+    class Alpha(Optimizer, TrialFaultAware): ...
+
+    suggestion = [{"x1": 0.0, "_id": 0}]
+    optimizer = MagicMock(spec=Alpha)
+    optimizer.suggest.return_value = suggestion
+    evaluation_function = MagicMock(spec=EvaluationFunction, return_value=[{"objective": 0.0, "_id": 0}])
+    aquisition_function = MagicMock(spec=AcquisitionPlan, side_effect=RuntimeError())
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=aquisition_function,
+    )
+
+    callback, events = _collect_optimize_events()
+    RE.subscribe(callback)
+    try:
+        RE(optimize(optimization_problem))
+    except RuntimeError:
+        ...
+    finally:
+        RE.unsubscribe(callback)
+
+    optimizer.register_failures.assert_called_once_with(suggestion)
+    assert evaluation_function.call_count == 0
 
 
 def test_optimize_multiple(RE):

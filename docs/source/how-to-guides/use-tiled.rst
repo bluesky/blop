@@ -155,3 +155,8 @@ Configure an agent
     )
     RE(agent.optimize())
     server.close()
+
+.. testoutput::
+   :hide:
+
+   ...

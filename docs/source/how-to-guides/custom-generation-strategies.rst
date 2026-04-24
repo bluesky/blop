@@ -211,6 +211,10 @@ Run the experiment with Bluesky
 
     RE(agent.optimize(iterations=12, n_points=1))
 
+.. testoutput::
+   :hide:
+
+   ...
 
 Verify the generation strategy was used
 ---------------------------------------

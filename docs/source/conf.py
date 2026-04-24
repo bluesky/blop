@@ -145,10 +145,11 @@ html_theme = "pydata_sphinx_theme"
 # documentation.
 #
 html_theme_options = {
-    # "navbar_start": ["navbar-logo"],
-    # "navbar_center": ["navbar-nav"],
-    # "navbar_end": [],
-    "use_edit_page_button": True,  # enables the edit button on regular pages
+    "switcher": {
+        "json_url": "https://bluesky.github.io/blop/switcher.json",
+        "version_match": os.environ.get("DOCS_VERSION", "main"),
+    },
+    "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
