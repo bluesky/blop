@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from typing import Any, cast
 
 from ax import Client
-from ax.analysis import ContourPlot
+from ax.analysis.plotly.surface.contour import ContourPlot
 from ax.core.types import TParamValue
 
 # ===============================
