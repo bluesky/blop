@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>What is Blop? &#8212; blop 1.0.0b2.dev5 documentation</title>
+    <title>Blop &#8212; blop 1.0.0b2.dev6 documentation</title>
   
   
   
@@ -34,7 +34,8 @@
     <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
     <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
-    <link rel="stylesheet" type="text/css" href="_static/fix-content-height.css?v=07fcbb05" />
+    <link rel="stylesheet" type="text/css" href="_static/css/fix-content-height.css?v=b3482279" />
+    <link rel="stylesheet" type="text/css" href="_static/css/styles.css?v=6dcc6ad6" />
   
   <!-- So that users can add custom icons -->
   <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
@@ -42,7 +43,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="_static/documentation_options.js?v=344ac48a"></script>
+    <script src="_static/documentation_options.js?v=03b24ee0"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -63,7 +64,7 @@
     <link rel="next" title="Installation" href="installation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev5" />
+  <meta name="docsearch:version" content="1.0.0b2.dev6" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -131,7 +132,7 @@
   
   
   
-    <p class="title logo__title">blop 1.0.0b2.dev5 documentation</p>
+    <p class="title logo__title">blop 1.0.0b2.dev6 documentation</p>
   
 </a></div>
     
@@ -232,6 +233,34 @@
   <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
   <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
 </button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/bluesky/blop" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/blop" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
       
     </div>
     
@@ -360,6 +389,34 @@
   <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
 </button></div>
         
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/bluesky/blop" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/blop" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fas fa-cube fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
       </div>
     
   </div>
@@ -392,45 +449,129 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="what-is-blop">
-<h1>What is Blop?<a class="headerlink" href="#what-is-blop" title="Link to this heading">#</a></h1>
-<p>Blop is a Python library for performing optimization for beamline experiments. It is designed to integrate nicely with the Bluesky ecosystem and primarily acts as a bridge between optimization routines and fine-grained data acquisition and control. Our goal is to provide a simple and practical data-driven optimization interface for beamline experiments.</p>
-</section>
-<section id="documentation-structure">
-<h1>Documentation structure<a class="headerlink" href="#documentation-structure" title="Link to this heading">#</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="installation.html"><span class="doc">Installation</span></a> - Installation instructions</p></li>
-<li><p><a class="reference internal" href="how-to-guides.html"><span class="doc">How-to Guides</span></a> - How-to guides for common tasks</p></li>
-<li><p><a class="reference internal" href="explanation.html"><span class="doc">Explanation</span></a> - Explanation of the underlying concepts</p></li>
-<li><p><a class="reference internal" href="tutorials.html"><span class="doc">Tutorials</span></a> - Tutorials for learning</p></li>
-<li><p><a class="reference internal" href="reference.html"><span class="doc">API Reference</span></a> - Reference documentation for the API</p></li>
-<li><p><a class="reference internal" href="release-history.html"><span class="doc">Release History</span></a> - Release history</p></li>
-</ul>
+  <section id="blop">
+<h1>Blop<a class="headerlink" href="#blop" title="Link to this heading">#</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-</section>
-<section id="citation">
-<h1>Citation<a class="headerlink" href="#citation" title="Link to this heading">#</a></h1>
+<p class="index-subtitle">a BLuesky Optimization Package</p>
+<div class="index-about-grid">
+<div><section id="what-is-blop">
+<h2>What is Blop?<a class="headerlink" href="#what-is-blop" title="Link to this heading">#</a></h2>
+<p>Blop is a Python library for performing optimization for <a class="reference external" href="https://blueskyproject.io/bluesky/main/index.html">Bluesky</a>
+experiments. It is designed to integrate nicely with the Bluesky
+ecosystem and primarily targets rapid data acquisition
+and control.</p>
+<p>Our goal is to provide a simple and practical data-driven
+optimization interface for Bluesky-driven experimentation.</p>
+</div>
+    <div class="about-viz">
+        <div class="about-viz-inner">
+            <img src="_static/blop-alignment-image.png" alt="Image of beamline optimization done through blop">
+        </div>
+        <p class="viz-caption">Autonomous alignment visualization using Bayesian optimization.</p>
+    </div>
+</div>
+<hr class="section-divider"></section>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading">#</a></h2>
+<div class="installation-grid"><div class="install-card docutils container">
+<div class="install-card-title docutils container">
+<p>Via PyPI</p>
+</div>
+<div class="install-label docutils container">
+<p>Standard (GPU support):</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>blop
+</pre></div>
+</div>
+<div class="install-label docutils container">
+<p>CPU-only (containers, CI/CD, laptops):</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>uv
+$<span class="w"> </span>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>blop<span class="o">[</span>cpu<span class="o">]</span>
+</pre></div>
+</div>
+</div>
+<div class="install-card docutils container">
+<div class="install-card-title docutils container">
+<p>Via Conda-forge</p>
+</div>
+<div class="install-label docutils container">
+<p>Standard:</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>blop
+</pre></div>
+</div>
+<div class="install-label docutils container">
+<p>CPU-only:</p>
+</div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>blop<span class="w"> </span>pytorch<span class="w"> </span>cpuonly<span class="w"> </span>-c<span class="w"> </span>pytorch
+</pre></div>
+</div>
+</div>
+</div><p>For additional installation instructions, refer to the <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a> guide.</p>
+<hr class="section-divider"></section>
+<section id="learn-more">
+<h2>Learn More!<a class="headerlink" href="#learn-more" title="Link to this heading">#</a></h2>
+<div class="learn-more-grid"><div class="learn-more-item docutils container">
+<div class="learn-more-card-link docutils container">
+<p><a class="reference internal" href="tutorials.html"><span class="doc">Tutorials</span></a></p>
+</div>
+<div class="learn-more-card-desc docutils container">
+<p>Step-by-step guides to get started with Blop fundamentals and basic workflows.</p>
+</div>
+</div>
+<div class="learn-more-item docutils container">
+<div class="learn-more-card-link docutils container">
+<p><a class="reference internal" href="how-to-guides.html"><span class="doc">How-To Guides</span></a></p>
+</div>
+<div class="learn-more-card-desc docutils container">
+<p>Practical recipes and solutions for specific beamline optimization tasks.</p>
+</div>
+</div>
+<div class="learn-more-item docutils container">
+<div class="learn-more-card-link docutils container">
+<p><a class="reference internal" href="reference.html"><span class="doc">References</span></a></p>
+</div>
+<div class="learn-more-card-desc docutils container">
+<p>Complete API documentation, class references, and technical specifications.</p>
+</div>
+</div>
+<div class="learn-more-item docutils container">
+<div class="learn-more-card-link docutils container">
+<p><a class="reference internal" href="release-history.html"><span class="doc">Release History</span></a></p>
+</div>
+<div class="learn-more-card-desc docutils container">
+<p>Version updates, new features, bug fixes, and changelog for the current release.</p>
+</div>
+</div>
+</div>
+<hr class="section-divider"></section>
+<section id="references">
+<h2>References<a class="headerlink" href="#references" title="Link to this heading">#</a></h2>
 <p>If you use this package in your work, please cite the following paper:</p>
-<blockquote>
-<div><p>Morris, T. W., Rakitin, M., Du, Y., Fedurin, M., Giles, A. C., Leshchev, D., Li, W. H., Romasky, B., Stavitski, E., Walter, A. L., Moeller, P., Nash, B., &amp; Islegen-Wojdyla, A. (2024). A general Bayesian algorithm for the autonomous alignment of beamlines. Journal of Synchrotron Radiation, 31(6), 1446–1456. <a class="reference external" href="https://doi.org/10.1107/S1600577524008993">https://doi.org/10.1107/S1600577524008993</a></p>
-</div></blockquote>
-<p>BibTeX:</p>
+<div class="index-reference-box"><p>Morris, T. W., Rakitin, M., Du, Y., Fedurin, M., Giles, A. C., Leshchev,
+D., Li, W. H., Romasky, B., Stavitski, E., Walter, A. L., Moeller, P.,
+Nash, B., &amp; Islegen-Wojdyla, A. (2024). A general Bayesian algorithm for
+the autonomous alignment of beamlines. <em>Journal of Synchrotron Radiation</em>,
+31(6), 1446–1456. <a class="reference external" href="https://doi.org/10.1107/S1600577524008993">https://doi.org/10.1107/S1600577524008993</a></p>
+</div><p><strong>BibTeX:</strong></p>
 <div class="highlight-bibtex notranslate"><div class="highlight"><pre><span></span><span class="nc">@Article</span><span class="p">{</span><span class="nl">Morris2024</span><span class="p">,</span>
-<span class="w">  </span><span class="na">author</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{Morris, Thomas W. and Rakitin, Max and Du, Yonghua and Fedurin, Mikhail and Giles, Abigail C. and Leshchev, Denis and Li, William H. and Romasky, Brianna and Stavitski, Eli and Walter, Andrew L. and Moeller, Paul and Nash, Boaz and Islegen-Wojdyla, Antoine}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">journal</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{Journal of Synchrotron Radiation}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">title</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{{A general Bayesian algorithm for the autonomous alignment of beamlines}}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">year</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{2024}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">month</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{Nov}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">number</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{6}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">pages</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{1446--1456}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">volume</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{31}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">doi</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="s">{10.1107/S1600577524008993}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">keywords</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Bayesian optimization, automated alignment, synchrotron radiation, digital twins, machine learning}</span><span class="p">,</span>
-<span class="w">  </span><span class="na">url</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="s">{https://doi.org/10.1107/S1600577524008993}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">author</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{Morris, Thomas W. and Rakitin, Max and Du, Yonghua and Fedurin, Mikhail and Giles, Abigail C. and Leshchev, Denis and Li, William H. and Romasky, Brianna and Stavitski, Eli and Walter, Andrew L. and Moeller, Paul and Nash, Boaz and Islegen-Wojdyla, Antoine}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">journal</span><span class="w">  </span><span class="p">=</span><span class="w"> </span><span class="s">{Journal of Synchrotron Radiation}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">title</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{A general Bayesian algorithm for the autonomous alignment of beamlines}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">year</span><span class="w">     </span><span class="p">=</span><span class="w"> </span><span class="s">{2024}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">month</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{Nov}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">number</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{6}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">pages</span><span class="w">    </span><span class="p">=</span><span class="w"> </span><span class="s">{1446--1456}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">volume</span><span class="w">   </span><span class="p">=</span><span class="w"> </span><span class="s">{31}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">doi</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="s">{10.1107/S1600577524008993}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">keywords</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s">{Bayesian optimization, automated alignment, synchrotron radiation, digital twins, machine learning}</span><span class="p">,</span>
+<span class="w">     </span><span class="na">url</span><span class="w">      </span><span class="p">=</span><span class="w"> </span><span class="s">{https://doi.org/10.1107/S1600577524008993}</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
 </div>
+</section>
 </section>
 
 
@@ -471,18 +612,25 @@
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#">What is Blop?</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation-structure">Documentation structure</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#citation">Citation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-is-blop">What is Blop?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installation">Installation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#learn-more">Learn More!</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#references">References</a></li>
 </ul>
-
   </nav></div>
 
   <div class="sidebar-secondary-item">
 
-  <div class="tocsection sourcelink">
-    <a href="_sources/index.rst.txt">
-      <i class="fa-solid fa-file-lines"></i> Show Source
+  
+  <div class="tocsection editthispage">
+    <a href="https://github.com/bluesky/blop/edit/main/docs/index.rst">
+      <i class="fa-solid fa-pencil"></i>
+      
+      
+        
+          Edit on GitHub
+        
+      
     </a>
   </div>
 </div>
