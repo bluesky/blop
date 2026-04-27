@@ -145,11 +145,20 @@ html_theme = "pydata_sphinx_theme"
 # documentation.
 #
 html_theme_options = {
+    "github_url": "https://github.com/bluesky/blop",
     "switcher": {
         "json_url": "https://bluesky.github.io/blop/switcher.json",
         "version_match": os.environ.get("DOCS_VERSION", "main"),
     },
     "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
+    "icon_links": [
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/blop",
+            "icon": "fas fa-cube",
+        },
+    ],
+    "use_edit_page_button": True,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -165,6 +174,7 @@ html_static_path = ["_static"]
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "blop"
+
 
 # Add require.js to the HTML output
 html_js_files = [

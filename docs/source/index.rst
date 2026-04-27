@@ -23,7 +23,7 @@ What is Blop?
 -------------
 
 Blop is a Python library for performing optimization for beamline
-experiments. It is designed to integrate nicely with the Bluesky
+experiments. It is designed to integrate nicely with the `Bluesky <https://blueskyproject.io/bluesky/main/index.html>`_
 ecosystem and primarily targets rapid beamline data acquisition
 and control.
 
@@ -37,6 +37,7 @@ optimization interface for beamline experiments.
             <div class="about-viz-inner">
                 <img src="_static/blop-image.png" alt="Image of beamline optimization done through blop">      
             </div>
+            <p class="viz-caption">Autonomous alignment visualization using Bayesian optimization.</p>
         </div>
     </div>
     <hr class="section-divider">
