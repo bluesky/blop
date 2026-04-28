@@ -8,7 +8,7 @@ from bluesky_queueserver_api.zmq import REManagerAPI
 
 from blop.ax.agent import Agent, QueueserverAgent
 from blop.ax.dof import DOFConstraint, RangeDOF
-from blop.ax.objective import Objective
+from blop.ax.objective import Objective, ScalarizedObjective
 from blop.ax.optimizer import AxOptimizer
 from blop.callbacks.logger import OptimizationLogger
 from blop.protocols import AcquisitionPlan, EvaluationFunction
@@ -254,6 +254,60 @@ def test_agent_init_actuator_string_raises(mock_evaluation_function):
 
     with pytest.raises(ValueError, match="not strings"):
         Agent(sensors=[], dofs=[dof1, dof2], objectives=[objective], evaluation_function=mock_evaluation_function)
+
+
+def test_agent_scalarized_objective(mock_evaluation_function):
+    dof1 = RangeDOF(name="test1", bounds=(0, 10), parameter_type="float")
+    objective = ScalarizedObjective(
+        "-50 * x + 100 * y",
+        minimize=False,
+        x="obj1",
+        y="obj2",
+    )
+
+    with patch("blop.ax.optimizer.Client.configure_optimization") as mock_configure_optimization:
+        Agent(
+            sensors=[],
+            dofs=[dof1],
+            objectives=[objective],
+            evaluation_function=mock_evaluation_function,
+        )
+
+        mock_configure_optimization.assert_called_once_with(
+            objective="-50 * obj1 + 100 * obj2",
+            outcome_constraints=None,
+        )
+
+
+def test_agent_scalarized_objective_multiple(mock_evaluation_function):
+    dof1 = RangeDOF(name="test1", bounds=(0, 10), parameter_type="float")
+    objectives = [
+        ScalarizedObjective(
+            "-50 * x + 100 * y",
+            minimize=True,
+            x="obj1",
+            y="obj2",
+        ),
+        ScalarizedObjective(
+            "250 * x + 3 * y",
+            minimize=True,
+            x="obj3",
+            y="obj4",
+        ),
+    ]
+
+    with patch("blop.ax.optimizer.Client.configure_optimization") as mock_configure_optimization:
+        Agent(
+            sensors=[],
+            dofs=[dof1],
+            objectives=objectives,
+            evaluation_function=mock_evaluation_function,
+        )
+
+        mock_configure_optimization.assert_called_once_with(
+            objective="-50 * x + 100 * y, 250 * x + 3 * y",
+            outcome_constraints=None,
+        )
 
 
 def test_queueserver_agent_init(mock_re_manager_api, mock_evaluation_function):
