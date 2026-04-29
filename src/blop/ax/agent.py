@@ -33,7 +33,7 @@ from ..protocols import (
 from ..queueserver import QueueserverClient, QueueserverOptimizationRunner
 from ..utils import InferredReadable
 from .dof import DOF, DOFConstraint
-from .objective import Objective, OutcomeConstraint, to_ax_objective_str
+from .objective import Objective, OutcomeConstraint, ScalarizedObjective, to_ax_objective_str
 from .optimizer import AxOptimizer
 
 logger = logging.getLogger(__name__)
@@ -236,7 +236,7 @@ class Agent(_AxAgentMixin):
         self,
         sensors: Sequence[Sensor],
         dofs: Sequence[DOF],
-        objectives: Sequence[Objective],
+        objectives: Sequence[Objective] | ScalarizedObjective,
         evaluation_function: EvaluationFunction,
         acquisition_plan: AcquisitionPlan | None = None,
         dof_constraints: Sequence[DOFConstraint] | None = None,
