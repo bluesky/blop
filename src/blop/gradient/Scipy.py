@@ -1,65 +1,189 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
-from threading import Event, thread
+from enum import Enum
+from threading import Event, Thread
 from typing import Any, cast
 
+import bluesky.preprocessors as bpp
+from bluesky.callbacks import CallbackBase
 from scipy.optimize import Bounds, dual_annealing, minimize
 
-from blop.ax.dof import RangeDOF, DOFConstraint
-from blop.ax.objective import OutcomeConstraint
+from blop.ax.dof import RangeDOF
+from blop.callbacks.logger import OptimizationLogger
+from blop.callbacks.router import OptimizationCallbackRouter
+from blop.plans import optimize
+from blop.utils import InferredReadable
 
-from ..protocols import AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Optimizer, Sensor
+from ..protocols import ID_KEY, AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Optimizer, Sensor
+
+
+class SCP(str, Enum):
+    Default = "Default"
+    Dual_Annealing = "dual annealing"
 
 
 @dataclass
-class ScpCFG:
-    dof: Sequence[RangeDOF]
+class ScipyCFG:
+    dofs: Sequence[RangeDOF]
     # dof_constraints: Sequence[DOFConstraint] | None = None
-    outcome_constraints: Sequence[OutcomeConstraint] | None = None
-    Optimizer: str = "Default"
+    # outcome_constraints: Sequence[OutcomeConstraint] | None = None
+    optimizer: str = "Default"
+    initial: Sequence[float] | None = None
     max_iter: int | None = None
     eps: float | None = None
 
 
 class Scipy:
+    """
+    A convenience interface associated with running optimizations with Scipy, providing similar syntax to the Ax Agent
+    (allowing drop in swapping as much as possible). Useful as a cover in for all the QOL provided by the Agent object.
+    """
+
     def __init__(
         self,
+        sensors: Sequence[Sensor],
+        config: ScipyCFG,
+        evaluation_function: EvaluationFunction,
+        acquisition_plan: AcquisitionPlan | None = None,
+    ):
+
+        self._config = config
+        self._sensors = sensors
+        self._actuators = [cast(Actuator, dof.actuator) for dof in config.dofs if dof.actuator is not None]
+        self._evaluation_function = evaluation_function
+        self._acquisition_plan = acquisition_plan
+        self._optimizer = ScipyOptimizer(self._config)
+        self._readable_cache: dict[str, InferredReadable] = {}
+        self._callbacks: list[CallbackBase] = [OptimizationLogger()]
+        self._callback_router = OptimizationCallbackRouter(self._callbacks)
+
+    @classmethod
+    def Agent(
+        cls,
         sensors: Sequence[Sensor],
         dofs: Sequence[RangeDOF],
         evaluation_function: EvaluationFunction,
         acquisition_plan: AcquisitionPlan | None = None,
-        # dof_constraints: Sequence[DOFConstraint] | None = None,
-        outcome_constraints: Sequence[OutcomeConstraint] | None = None,
-        checkpoint_path: str | None = None,
+        optimizer: SCP | str = SCP.Default,
+        # dof_constraints: Sequence[DOFConstraint] | None = None,  #implemented in future iterations? make to match ax?
+        # outcome_constraints: Sequence[OutcomeConstraint] | None = None,
         **kwargs: Any,
     ):
-        self._sensors = sensors
-        self._actuators: Sequence[Actuator] = [cast(Actuator, dof.actuator) for dof in dofs if dof.actuator is not None]
-        self._evaluation_function = evaluation_function
-        self._acquisition_plan = acquisition_plan
-        self._params = []
-        self._bounds = 
-        for dof in dofs:
-            self._params.append(dof.parameter_name)
-            self.bounds.append(Bounds(lb=param.bounds[0], ub=param.bounds[1]))
 
-    @classmethod
-    def configure(cls, config: ScipyCFG):
-        self = cls()
-        self.cfg = config
-        return cls()
+        if optimizer not in SCP:
+            raise ValueError(f"optimizer {optimizer} not in supported optimizers:{list(SCP)}")
+
+        config = ScipyCFG(dofs=dofs, optimizer=optimizer, max_iter=kwargs.get("max_iter", None), eps=kwargs.get("eps", None))
+        return cls(sensors, config, evaluation_function, acquisition_plan)
+
+    @property
+    def sensors(self) -> Sequence[Sensor]:
+        """The sensors used for data acquisition."""
+        return self._sensors
+
+    @property
+    def actuators(self) -> Sequence[Actuator]:
+        """The actuators that control the degrees of freedom."""
+        return self._actuators
+
+    @property
+    def evaluation_function(self) -> EvaluationFunction:
+        """The function used to evaluate acquired data and produce outcomes."""
+        return self._evaluation_function
+
+    @property
+    def acquisition_plan(self) -> AcquisitionPlan | None:
+        """The acquisition plan for acquiring data, or ``None`` if using the default."""
+        return self._acquisition_plan
 
     def to_optimization_problem(self) -> OptimizationProblem:
-        ...
+        """
+        Construct an optimization problem from the Scipy Base class
 
-    def optimize():
-        ...
+        Creates an immutable :class:`blop.protocols.OptimizationProblem` that
+        encapsulates all components needed for optimization. This is typically
+        used internally by optimization plans.
+
+        Returns
+        -------
+        OptimizationProblem
+            An immutable optimization problem that can be deployed via Bluesky.
+
+        See Also
+        --------
+        blop.protocols.OptimizationProblem : The optimization problem dataclass.
+        blop.plans.optimize : Uses the optimization problem to run optimization.
+        """
+        return OptimizationProblem(
+            optimizer=self._optimizer,
+            actuators=self._actuators,
+            sensors=self._sensors,
+            evaluation_function=self._evaluation_function,
+            acquisition_plan=self._acquisition_plan,
+        )
+
+    def optimize(self):
+        optimize_plan = optimize(self.to_optimization_problem(), readable_cache=self._readable_cache)
+
+        if self._callbacks:
+            optimize_plan = bpp.subs_wrapper(
+                optimize_plan,
+                self._callback_router,
+            )
+
+        yield from optimize_plan
 
 
 class ScipyOptimizer(Optimizer):
+    """
+    An optimizer object to supply an interactive interface for the scipy optimizers, with some caveats.
+    """
 
-    def __init__(self, ScpCFG):
-        ...
+    def __init__(self, config: ScipyCFG):
+        self._semaphore = Event()
+        self._params = []
+        self._bounds = []
+        self._increment = 0
+        self._y = None
+        self.final = None
+        self.force_resiliance = False
+        midp = []
+
+        for dof in config.dofs:
+            self._params.append(dof.parameter_name)
+            self._bounds.append(Bounds(lb=dof.bounds[0], ub=dof.bounds[1]))
+            midp.append(0.5 * dof.bounds[0] + 0.5 * dof.bounds[1])
+
+        if config.initial is not None:
+            self._x = config.initial
+        else:
+            self._x = midp
+
+        if config.optimizer in (SCP.Default):
+
+            def cost(x):
+                self._x = x
+                self._semaphore.clear()
+                self._semaphore.wait()
+                if self._y is None:
+                    raise ValueError("return value is not present")
+                return self._y
+
+            kw = {}
+            if config.eps is not None:
+                kw["eps"] = config.eps
+            if config.max_iter is not None:
+                kw["max_iter"] = config.max_iter
+
+            def mini_worker():
+                self.final = minimize(fun=cost, x0=self._x, args=kw)
+
+            # self.t = Thread(target=minimize, args=(cost, self._x), kwargs=kw, name="optimizer")
+            self.t = Thread(target=mini_worker, name="optimizer")
+            self.t.start()
+        elif config.optimizer is SCP.Dual_Annealing:
+            print("do it yourself")
+            return dual_annealing
 
     def suggest(self, num_points: int | None = None) -> list[dict]:
         """
@@ -79,18 +203,28 @@ class ScipyOptimizer(Optimizer):
             A list of dictionaries, each containing a parameterization of a point to evaluate next.
             Each dictionary must contain a unique "_id" key to identify each parameterization.
         """
-        ...
+        if self.final is None:
+            suggestion = dict(zip(self._params, self._x, strict=True))
+        else:
+            suggestion = dict(zip(self._params, self.final.x, strict=True))
+        suggestion[ID_KEY] = self._increment
+        self.increment += 1
+        return [suggestion]
 
     def ingest(self, points: list[dict]) -> None:
         """
         Ingest a set of points into the experiment. Either from previously suggested points or from an external source.
 
-        The "_id" key is optional and can be used to identify points from previously suggested trials or to identify
-        the point as a "baseline" trial.
+        The "_id" key is optional.
 
         Parameters
         ----------
         points : list[dict]
             A list of dictionaries, each containing the outcomes of each suggested parameterization.
         """
-        ...
+        if self._semaphore.is_set() and not self.force_resiliance:
+            raise ValueError("optimizer did not expect to receive an update")
+        res = points[0]
+        re_val = [res[param] for param in res if param not in (*self._params, ID_KEY)]
+        self._y = re_val[0]
+        self._semaphore.set()
