@@ -145,11 +145,20 @@ html_theme = "pydata_sphinx_theme"
 # documentation.
 #
 html_theme_options = {
+    "github_url": "https://github.com/bluesky/blop",
     "switcher": {
         "json_url": "https://bluesky.github.io/blop/switcher.json",
         "version_match": os.environ.get("DOCS_VERSION", "main"),
     },
     "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
+    "icon_links": [
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/blop",
+            "icon": "fas fa-cube",
+        },
+    ],
+    "use_edit_page_button": True,
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -166,6 +175,7 @@ html_static_path = ["_static"]
 # Output file base name for HTML help builder.
 htmlhelp_basename = "blop"
 
+
 # Add require.js to the HTML output
 html_js_files = [
     "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js",
@@ -174,8 +184,18 @@ html_js_files = [
 
 # Add custom CSS to fix .content height constraint for plotly plots
 html_css_files = [
-    "fix-content-height.css",
+    "css/fix-content-height.css",
+    "css/styles.css",
 ]
+
+html_context = {
+    "github_user": "bluesky",
+    "github_repo": "blop",
+    "github_version": "main",
+    "doc_path": "docs",
+}
+
+html_show_sourcelink = False
 
 
 # -- Options for LaTeX output ---------------------------------------------
@@ -245,7 +265,7 @@ texinfo_documents = [
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "numpy": ("https://numpy.org/doc/stable/", None),
-    "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
+    # "pandas": ("https://pandas.pydata.org/pandas-docs/stable", None),
     "matplotlib": ("https://matplotlib.org/stable", None),
     "bluesky": ("https://blueskyproject.io/bluesky/main", None),
     "ophyd-async": ("https://blueskyproject.io/ophyd-async/main", None),

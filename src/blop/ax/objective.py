@@ -38,6 +38,18 @@ class Objective:
     name: str
     minimize: bool
 
+    @property
+    def ax_expression(self) -> str:
+        """
+        Convert the objective to a string that can be used by Ax.
+
+        Returns
+        -------
+        str
+            The expression with the objective name, negated if minimizing.
+        """
+        return f"-{self.name}" if self.minimize else self.name
+
 
 class ScalarizedObjective:
     """
@@ -193,7 +205,7 @@ class OutcomeConstraint:
         return self.ax_constraint
 
 
-def to_ax_objective_str(objectives: Sequence[Objective]) -> str:
+def to_ax_objective_str(objectives: Sequence[Objective] | ScalarizedObjective) -> str:
     """
     Convert a list of objectives to a string that can be used by Ax.
 
@@ -202,14 +214,13 @@ def to_ax_objective_str(objectives: Sequence[Objective]) -> str:
 
     Parameters
     ----------
-    objectives : Sequence[Objective]
-        The objectives to convert to a string.
+    objectives : Sequence[Objective] | ScalarizedObjective
+        The objectives or single scalarized objective to convert to a string.
 
     Returns
     -------
     str
-        The string representation of the objectives, comma-separated with minus
-        signs for minimization.
+        The string representation of the objectives usable by Ax.
 
     Examples
     --------
@@ -220,5 +231,14 @@ def to_ax_objective_str(objectives: Sequence[Objective]) -> str:
     ... ]
     >>> to_ax_objective_str(objectives)
     'intensity, -width'
+
+    >>> from blop.ax.objective import ScalarizedObjective, to_ax_objective_str
+    >>> objective = ScalarizedObjective(expression="2 * x + 3 * y", minimize=False, x="obj1", y="obj2")
+    >>> to_ax_objective_str(objective)
+    2 * obj1 + 3 * obj2
     """
-    return ", ".join([o.name if not o.minimize else f"-{o.name}" for o in objectives])
+    return (
+        objectives.ax_expression
+        if isinstance(objectives, ScalarizedObjective)
+        else ", ".join([o.ax_expression for o in objectives])
+    )
