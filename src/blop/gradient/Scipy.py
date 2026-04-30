@@ -6,7 +6,7 @@ from typing import Any, cast
 
 import bluesky.preprocessors as bpp
 from bluesky.callbacks import CallbackBase
-from scipy.optimize import Bounds, dual_annealing, minimize
+from scipy.optimize import Bounds, OptimizeResult, dual_annealing, minimize
 
 from blop.ax.dof import RangeDOF
 from blop.callbacks.logger import OptimizationLogger
@@ -29,7 +29,7 @@ class ScipyCFG:
     # outcome_constraints: Sequence[OutcomeConstraint] | None = None
     optimizer: str = "Default"
     initial: Sequence[float] | None = None
-    max_iter: int | None = None
+    max_iter: int | None = 100
     eps: float | None = None
 
 
@@ -145,6 +145,7 @@ class ScipyOptimizer(Optimizer):
         self._bounds = []
         self._increment = 0
         self._y = None
+        self.intermediate = None
         self.final = None
         self.force_resiliance = False
         midp = []
@@ -169,6 +170,9 @@ class ScipyOptimizer(Optimizer):
                     raise ValueError("return value is not present")
                 return self._y
 
+            def optim_callback(intermediate_result: OptimizeResult):
+                self.intermediate = intermediate_result
+
             kw = {}
             if config.eps is not None:
                 kw["eps"] = config.eps
@@ -176,7 +180,7 @@ class ScipyOptimizer(Optimizer):
                 kw["max_iter"] = config.max_iter
 
             def mini_worker():
-                self.final = minimize(fun=cost, x0=self._x, args=kw)
+                self.final = minimize(fun=cost, x0=self._x, callback=optim_callback, options=kw)
 
             # self.t = Thread(target=minimize, args=(cost, self._x), kwargs=kw, name="optimizer")
             self.t = Thread(target=mini_worker, name="optimizer")
@@ -184,6 +188,12 @@ class ScipyOptimizer(Optimizer):
         elif config.optimizer is SCP.Dual_Annealing:
             print("do it yourself")
             return dual_annealing
+
+    def optimum(self):
+        if self.final is not None:
+            return self.final
+
+        return self.intermediate
 
     def suggest(self, num_points: int | None = None) -> list[dict]:
         """
@@ -208,7 +218,7 @@ class ScipyOptimizer(Optimizer):
         else:
             suggestion = dict(zip(self._params, self.final.x, strict=True))
         suggestion[ID_KEY] = self._increment
-        self.increment += 1
+        self._increment += 1
         return [suggestion]
 
     def ingest(self, points: list[dict]) -> None:
