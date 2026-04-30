@@ -122,8 +122,8 @@ class Scipy:
             acquisition_plan=self._acquisition_plan,
         )
 
-    def optimize(self):
-        optimize_plan = optimize(self.to_optimization_problem(), readable_cache=self._readable_cache)
+    def optimize(self, iterations=10):
+        optimize_plan = optimize(self.to_optimization_problem(), iterations=iterations, readable_cache=self._readable_cache)
 
         if self._callbacks:
             optimize_plan = bpp.subs_wrapper(
