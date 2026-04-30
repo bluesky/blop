@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.objective &#8212; blop 1.0.0b2.dev6 documentation</title>
+    <title>blop.ax.objective &#8212; blop 1.0.0b2.dev7 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=03b24ee0"></script>
+    <script src="../../../_static/documentation_options.js?v=a7cacaf9"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -62,7 +62,7 @@
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev6" />
+  <meta name="docsearch:version" content="1.0.0b2.dev7" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -130,7 +130,7 @@
   
   
   
-    <p class="title logo__title">blop 1.0.0b2.dev6 documentation</p>
+    <p class="title logo__title">blop 1.0.0b2.dev7 documentation</p>
   
 </a></div>
     
@@ -511,7 +511,19 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span></div>
+    <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ax_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert the objective to a string that can be used by Ax.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            The expression with the objective name, negated if minimizing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
 
 
 
@@ -675,7 +687,7 @@
 
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">to_ax_objective_str</span><span class="p">(</span><span class="n">objectives</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Objective</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_ax_objective_str</span><span class="p">(</span><span class="n">objectives</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Objective</span><span class="p">]</span> <span class="o">|</span> <span class="n">ScalarizedObjective</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Convert a list of objectives to a string that can be used by Ax.</span>
 
@@ -684,14 +696,13 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    objectives : Sequence[Objective]</span>
-<span class="sd">        The objectives to convert to a string.</span>
+<span class="sd">    objectives : Sequence[Objective] | ScalarizedObjective</span>
+<span class="sd">        The objectives or single scalarized objective to convert to a string.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    str</span>
-<span class="sd">        The string representation of the objectives, comma-separated with minus</span>
-<span class="sd">        signs for minimization.</span>
+<span class="sd">        The string representation of the objectives usable by Ax.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -702,8 +713,17 @@
 <span class="sd">    ... ]</span>
 <span class="sd">    &gt;&gt;&gt; to_ax_objective_str(objectives)</span>
 <span class="sd">    &#39;intensity, -width&#39;</span>
+
+<span class="sd">    &gt;&gt;&gt; from blop.ax.objective import ScalarizedObjective, to_ax_objective_str</span>
+<span class="sd">    &gt;&gt;&gt; objective = ScalarizedObjective(expression=&quot;2 * x + 3 * y&quot;, minimize=False, x=&quot;obj1&quot;, y=&quot;obj2&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; to_ax_objective_str(objective)</span>
+<span class="sd">    2 * obj1 + 3 * obj2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">o</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">o</span><span class="o">.</span><span class="n">minimize</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;-</span><span class="si">{</span><span class="n">o</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">objectives</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">objectives</span><span class="o">.</span><span class="n">ax_expression</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objectives</span><span class="p">,</span> <span class="n">ScalarizedObjective</span><span class="p">)</span>
+        <span class="k">else</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">o</span><span class="o">.</span><span class="n">ax_expression</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">objectives</span><span class="p">])</span>
+    <span class="p">)</span>
 </pre></div>
 
                 </article>
