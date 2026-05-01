@@ -123,6 +123,7 @@ class Scipy:
         )
 
     def optimize(self, iterations=10):
+        self._optimizer = ScipyOptimizer(self._config)
         optimize_plan = optimize(self.to_optimization_problem(), iterations=iterations, readable_cache=self._readable_cache)
 
         if self._callbacks:
@@ -160,34 +161,36 @@ class ScipyOptimizer(Optimizer):
         else:
             self._x = midp
 
+        def cost(x):
+            self._x = x
+            self._semaphore.clear()
+            self._semaphore.wait()
+            if self._y is None:
+                raise ValueError("return value is not present")
+            return self._y
+
+        def optim_callback(intermediate_result: OptimizeResult):
+            self.intermediate = intermediate_result
+
+        kw = {}
+        if config.eps is not None:
+            kw["eps"] = config.eps
+        if config.max_iter is not None:
+            kw["max_iter"] = config.max_iter
+
         if config.optimizer in (SCP.Default):
-
-            def cost(x):
-                self._x = x
-                self._semaphore.clear()
-                self._semaphore.wait()
-                if self._y is None:
-                    raise ValueError("return value is not present")
-                return self._y
-
-            def optim_callback(intermediate_result: OptimizeResult):
-                self.intermediate = intermediate_result
-
-            kw = {}
-            if config.eps is not None:
-                kw["eps"] = config.eps
-            if config.max_iter is not None:
-                kw["max_iter"] = config.max_iter
-
             def mini_worker():
-                self.final = minimize(fun=cost, x0=self._x, callback=optim_callback, options=kw)
+                self.final = minimize(fun=cost, x0=self._x, bounds=self._bounds, callback=optim_callback, options=kw)
+        elif config.optimizer in (SCP.Dual_Annealing):
+            def mini_worker():
+                self.final = dual_annealing(
+                    func=cost, x0=self._x, bounds=self._bounds, callback=optim_callback, minimizer_kwargs=kw)
+        else:
+            raise NotImplementedError("")
 
-            # self.t = Thread(target=minimize, args=(cost, self._x), kwargs=kw, name="optimizer")
-            self.t = Thread(target=mini_worker, name="optimizer")
-            self.t.start()
-        elif config.optimizer is SCP.Dual_Annealing:
-            print("do it yourself")
-            return dual_annealing
+        # self.t = Thread(target=minimize, args=(cost, self._x), kwargs=kw, name="optimizer")
+        self.t = Thread(target=mini_worker, name="optimizer")
+        self.t.start()
 
     def optimum(self):
         if self.final is not None:
