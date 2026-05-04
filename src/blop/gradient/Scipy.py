@@ -179,12 +179,15 @@ class ScipyOptimizer(Optimizer):
             kw["max_iter"] = config.max_iter
 
         if config.optimizer in (SCP.Default):
+
             def mini_worker():
                 self.final = minimize(fun=cost, x0=self._x, bounds=self._bounds, callback=optim_callback, options=kw)
         elif config.optimizer in (SCP.Dual_Annealing):
+
             def mini_worker():
                 self.final = dual_annealing(
-                    func=cost, x0=self._x, bounds=self._bounds, callback=optim_callback, minimizer_kwargs=kw)
+                    func=cost, x0=self._x, bounds=self._bounds, callback=optim_callback, minimizer_kwargs=kw
+                )
         else:
             raise NotImplementedError("")
 
