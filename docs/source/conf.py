@@ -150,7 +150,11 @@ html_theme_options = {
         "json_url": "https://bluesky.github.io/blop/switcher.json",
         "version_match": os.environ.get("DOCS_VERSION", "main"),
     },
-    "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
+    "logo": {
+        "text": "Blop", 
+    },
+    "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "icon_links": [
         {
             "name": "PyPI",
