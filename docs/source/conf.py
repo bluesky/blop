@@ -151,7 +151,7 @@ html_theme_options = {
         "version_match": os.environ.get("DOCS_VERSION", "main"),
     },
     "logo": {
-        "text": "Blop", 
+        "text": "Blop",
     },
     "navbar_start": ["navbar-logo", "version-switcher"],
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
