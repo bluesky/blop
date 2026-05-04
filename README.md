@@ -1,4 +1,4 @@
-# Blop - Beamline Optimization Package
+# Blop - Bluesky Optimization Package
 
 [![Testing](https://github.com/bluesky/blop/actions/workflows/ci.yml/badge.svg)](https://github.com/bluesky/blop/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/bluesky/blop/branch/main/graph/badge.svg)](https://codecov.io/gh/bluesky/blop)
