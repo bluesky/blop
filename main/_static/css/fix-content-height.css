@@ -5,7 +5,7 @@
     overflow: auto;
     height: auto;
     min-height: 0;
-    max-height: none;
+    max-height: 600px;
     width: 100%;
     min-width: 0;
     max-width: none;
