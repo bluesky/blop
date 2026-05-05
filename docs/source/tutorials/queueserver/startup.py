@@ -7,7 +7,6 @@ This script runs inside the RE Manager process. It sets up:
 - The default_acquire plan from Blop
 """
 
-import numpy as np
 from bluesky import RunEngine
 from bluesky_queueserver import is_re_worker_active
 from ophyd.sim import SynAxis, SynSignal
@@ -38,8 +37,8 @@ motor2 = SynAxis(name="motor2", labels={"motors"})
 
 
 def _compute_himmelblau():
-    x = motor1.read()["motor1"]["value"]
-    y = motor2.read()["motor2"]["value"]
+    x = motor1.read()["motor1"]["value"]  # type: ignore
+    y = motor2.read()["motor2"]["value"]  # type: ignore
     return float((x**2 + y - 11) ** 2 + (x + y**2 - 7) ** 2)
 
 

@@ -34,15 +34,6 @@ jobs:
       - name: Start queueserver tutorial infrastructure
         run: |
           docker compose -f docs/source/tutorials/queueserver/docker-compose.yml up -d --build --wait
-          # Open the RE Manager worker environment
-          pixi run python -c "
-          from bluesky_queueserver_api.zmq import REManagerAPI
-          RM = REManagerAPI(zmq_control_addr='tcp://localhost:60615')
-          RM.environment_open()
-          RM.wait_for_idle(timeout=60)
-          print(RM.status())
-          RM.close()
-          "
 
       - name: Test with doctest
         run: pixi run doc-tests

@@ -53,13 +53,14 @@ The distributed system has five components:
 ```
 
 **Data flow:**
+
 1. The agent suggests parameter values and submits an acquisition plan to the RE Manager
-2. The RE Manager executes the plan (moves motors, reads detectors)
-3. Bluesky documents are published via ZMQ to the proxy
-4. The ZMQ-Tiled bridge persists documents to the Tiled server
-5. The agent's ZMQ listener detects plan completion
-6. The agent's evaluation function reads results from Tiled and computes objectives
-7. The optimizer ingests outcomes and suggests the next point
+1. The RE Manager executes the plan (moves motors, reads detectors)
+1. Bluesky documents are published via ZMQ to the proxy
+1. The ZMQ-Tiled bridge persists documents to the Tiled server
+1. The agent's ZMQ listener detects plan completion
+1. The agent's evaluation function reads results from Tiled and computes objectives
+1. The optimizer ingests outcomes and suggests the next point
 
 ## Prerequisites
 
@@ -146,16 +147,19 @@ if is_re_worker_active():
 motor1 = SynAxis(name="motor1", labels={"motors"})
 motor2 = SynAxis(name="motor2", labels={"motors"})
 
+
 # Simulated detector that computes the Himmelblau function
 def _compute_himmelblau():
     x = motor1.read()["motor1"]["value"]
     y = motor2.read()["motor2"]["value"]
     return float((x**2 + y - 11) ** 2 + (x + y**2 - 7) ** 2)
 
+
 himmel_det = SynSignal(name="himmel_det", func=_compute_himmelblau, labels={"detectors"})
 
 # Acquisition plan — moves actuators to suggested positions and reads sensors
 import bluesky.plans as bp
+
 
 def default_acquire(suggestions, actuators, sensors, *, md=None):
     plan_args = []
@@ -172,6 +176,7 @@ def default_acquire(suggestions, actuators, sensors, *, md=None):
 ```
 
 Key points:
+
 - `is_re_worker_active()` gates code that should only run inside the queueserver worker
 - The ZMQ publisher sends all run documents to the proxy for external consumption
 - `default_acquire` is a simple plan that wraps Bluesky's `list_scan` — it moves actuators to each suggested position and reads sensors
@@ -209,6 +214,7 @@ sensors = ["himmel_det"]
 ## Writing the Evaluation Function
 
 The evaluation function is called each time a plan completes. It reads data from Tiled and computes the objective values. The function receives:
+
 - `uid`: the Bluesky run UID (use this to look up data in Tiled)
 - `suggestions`: the list of parameter dicts that were evaluated
 
@@ -274,6 +280,7 @@ class HimmelblauEvaluation:
 ## Creating the Queueserver Agent
 
 Now we bring everything together. The `QueueserverAgent` needs:
+
 - `re_manager_api`: how to communicate with the queueserver (submit plans, check status)
 - `zmq_consumer_addr`: where to listen for document completion events
 - The DOFs, objectives, sensors, and evaluation function
@@ -324,6 +331,7 @@ agent.ax_client.summarize()
 ```
 
 The Himmelblau function has four global minima (all with value 0). The optimizer should have found one or more of these:
+
 - (3.0, 2.0)
 - (-2.805, 3.131)
 - (-3.779, -3.283)
