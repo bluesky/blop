@@ -603,6 +603,17 @@ class QueueserverAgent(_AxAgentMixin):
     def acquisition_plan(self) -> str | None:
         return self._acquisition_plan
 
+    @property
+    def is_running(self) -> bool:
+        return self._runner.is_running
+
+    @property
+    def current_iteration(self) -> int:
+        return self._runner.current_iteration
+
+    def stop(self) -> None:
+        self._runner.stop()
+
     def to_optimization_problem(self) -> QueueserverOptimizationProblem:
         return QueueserverOptimizationProblem(
             optimizer=self._optimizer,

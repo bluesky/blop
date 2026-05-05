@@ -53,7 +53,11 @@ class ConsumerCallback(CallbackBase):
 
     def stop(self, doc: RunStop) -> None:
         """Executes the callback if the cached start and stop document match"""
-        if self._callback is not None and self._start_doc_cache is not None and self._start_doc_cache["uid"] == doc["uid"]:
+        if (
+            self._callback is not None
+            and self._start_doc_cache is not None
+            and self._start_doc_cache["uid"] == doc["run_start"]
+        ):
             self._callback(self._start_doc_cache, doc)
         self._start_doc_cache = None
 
@@ -414,5 +418,4 @@ class QueueserverOptimizationRunner:
             self._submit_next()
         else:
             self._state.finished = True
-            self._client.stop_listener()
             logger.info(f"Optimization complete after {self._state.current_iteration} iterations")

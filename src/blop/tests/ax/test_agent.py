@@ -303,6 +303,8 @@ def test_queueserver_agent_init(mock_re_manager_api, mock_evaluation_function):
     assert agent.actuators == [dof1.actuator, dof2.actuator]
     assert agent.evaluation_function == mock_evaluation_function
     assert agent.acquisition_plan is None
+    assert not agent.is_running
+    assert agent.current_iteration == 0
     assert isinstance(agent.ax_client, Client)
 
     problem = agent.to_optimization_problem()
@@ -371,6 +373,28 @@ def test_queueserver_agent_submit_suggestions(
     suggestions = [{"test_motor1": 5, "test_motor2": 9}]
     agent.submit_suggestions(suggestions)
     mock_queueserver_runner_cls.return_value.submit_suggestions.assert_called_once_with(suggestions)
+
+
+@patch("blop.ax.agent.QueueserverClient")
+@patch("blop.ax.agent.QueueserverOptimizationRunner")
+def test_queueserver_agent_stop(
+    mock_queueserver_runner_cls, mock_queueserver_client_cls, mock_re_manager_api, mock_evaluation_function
+):
+    dof1 = RangeDOF(actuator="test_motor1", bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator="test_motor2", bounds=(0, 10), parameter_type="float")
+    agent = QueueserverAgent(
+        mock_re_manager_api,
+        "inproc://test",
+        ["det"],
+        [dof1, dof2],
+        [Objective(name="obj1", minimize=False)],
+        mock_evaluation_function,
+    )
+    mock_queueserver_client_cls.assert_called_once()
+    mock_queueserver_runner_cls.assert_called_once()
+
+    agent.stop()
+    mock_queueserver_runner_cls.return_value.stop.assert_called_once()
 
 
 @pytest.fixture()

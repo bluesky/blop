@@ -29,8 +29,9 @@ def test_consumer_callback_caches_start_and_calls_on_stop():
     """Test ConsumerCallback caches start doc and calls callback on stop."""
     mock_callback = MagicMock()
     callback = ConsumerCallback(callback=mock_callback)
-    start_doc = {"uid": "test-uid", CORRELATION_UID_KEY: "123", "time": 123}
-    stop_doc = {"uid": "test-uid", "exit_status": "success"}
+    run_uid = "test-uid"
+    start_doc = {"uid": run_uid, CORRELATION_UID_KEY: "123", "time": 123}
+    stop_doc = {"uid": "test-uid2", "run_start": run_uid, "exit_status": "success"}
 
     callback.start(start_doc)
     mock_callback.assert_not_called()
@@ -43,8 +44,9 @@ def test_consumer_callback_clears_cache_after_stop():
     """Test ConsumerCallback clears cache after stop is called."""
     mock_callback = MagicMock()
     callback = ConsumerCallback(callback=mock_callback)
-    start_doc = {"uid": "test-uid", CORRELATION_UID_KEY: "123"}
-    stop_doc = {"uid": "test-uid"}
+    run_uid = "test-uid"
+    start_doc = {"uid": run_uid, CORRELATION_UID_KEY: "123"}
+    stop_doc = {"uid": "test-uid2", "run_start": run_uid}
 
     callback.start(start_doc)
     callback.stop(stop_doc)
