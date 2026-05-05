@@ -1,0 +1,27 @@
+user_groups:
+  root:
+    allowed_plans:
+      - null  # Allow all
+    forbidden_plans:
+      - ":^_"
+    allowed_devices:
+      - null  # Allow all
+    forbidden_devices:
+      - ":^_:?.*"
+    allowed_functions:
+      - null  # Allow all
+    forbidden_functions:
+      - ":^_"
+  primary:
+    allowed_plans:
+      - ":.*"
+    forbidden_plans:
+      - null
+    allowed_devices:
+      - ":?.*:depth=5"
+    forbidden_devices:
+      - null
+    allowed_functions:
+      - null
+    forbidden_functions:
+      - ":^_"
