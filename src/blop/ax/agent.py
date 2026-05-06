@@ -538,7 +538,7 @@ class Agent(_AxAgentMixin):
         ----------
         parameterization : Mapping | None, optional
             Explicit parameterization to navigate to. If None, queries the optimizer's
-            best point. For multi-objective problems, call ``get_best_points()`` 
+            best point. For multi-objective problems, call ``get_best_points()``
             to inspect the Pareto set and select one.
 
         Raises

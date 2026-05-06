@@ -157,10 +157,17 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
               - trial index (int)
               - parameter values (dict)
               - metric values (dict, where values may be (value, sem) tuples)
+
+        Raises
+        ------
+        ValueError
+            If the Ax client's optimization has not been configured yet.
         """
 
         opt_config = self._client._experiment.optimization_config
-        is_multi_objective = isinstance(opt_config.objective, MultiObjective)  # type: ignore
+        if opt_config is None:
+            raise ValueError("Somehow your optimization has not been configured yet...check `ax_client`.")
+        is_multi_objective = isinstance(opt_config.objective, MultiObjective)
 
         if is_multi_objective:
             frontier = self._client.get_pareto_frontier(use_model_predictions=False)
