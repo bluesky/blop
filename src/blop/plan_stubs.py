@@ -126,9 +126,9 @@ def navigate_to_best(
         The optimizer to query for the best point. Must implement
         :class:`~blop.protocols.HasBestPoints` if ``parameterization`` is None.
     parameterization : Mapping | None, optional
-        Explicit parameterization to navigate to. If None, the optimizer's
-        best point is used. Call ``optimizer.get_best_points()`` to inspect
-        available points and select one for multi-objective problems.
+        Explicit parameterization to navigate to. If None, queries the optimizer's
+        best point. For multi-objective problems, call ``optimizer.get_best_points()``
+        to inspect the Pareto set and select one.
 
     Raises
     ------

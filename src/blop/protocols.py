@@ -47,7 +47,7 @@ class HasBestPoints(Protocol):
 
         Returns
         -------
-        list[tuple[str, dict, dict]]
+        list[tuple[Any, Mapping, Mapping]]
             Each element in the list is a tuple of:
               - "_id" of the suggestion
               - suggested parameters

@@ -152,11 +152,11 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
         Returns
         -------
-        list[tuple[str, dict, dict]]
+        list[tuple[int, TParameterization, TOutcome]]
             Each element in the list is a tuple of:
-              - "_id" of the suggestion
-              - suggested parameters
-              - measured outcomes
+              - trial index (int)
+              - parameter values (dict)
+              - metric values (dict, where values may be (value, sem) tuples)
         """
 
         opt_config = self._client._experiment.optimization_config

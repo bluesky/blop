@@ -131,11 +131,11 @@ class _AxAgentMixin:
 
         Returns
         -------
-        list[tuple[str, dict, dict]]
+        list[tuple[int, TParameterization, TOutcome]]
             Each element in the list is a tuple of:
-              - "_id" of the suggestion
-              - suggested parameters
-              - measured outcomes
+              - trial index (int)
+              - parameter values (dict)
+              - metric values (dict, where values may be (value, sem) tuples)
 
         See Also
         --------
@@ -537,15 +537,19 @@ class Agent(_AxAgentMixin):
         Parameters
         ----------
         parameterization : Mapping | None, optional
-            Explicit parameterization to navigate to. If None, the optimizer's
-            best point is used. Call ``get_best_points()`` to inspect
-            available points and select one for multi-objective problems.
+            Explicit parameterization to navigate to. If None, queries the optimizer's
+            best point. For multi-objective problems, call ``get_best_points()`` 
+            to inspect the Pareto set and select one.
 
         Raises
         ------
         ValueError
             If the optimizer returns multiple Pareto-optimal points and no
             explicit ``parameterization`` is provided.
+
+        See Also
+        --------
+        get_best_points : Query the optimizer for best points.
         """
         optimization_problem = self.to_optimization_problem()
         return (
