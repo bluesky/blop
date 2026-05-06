@@ -52,6 +52,7 @@ extensions = [
     "numpydoc",
     "sphinx_copybutton",
     "myst_nb",
+    "sphinxcontrib.mermaid",
 ]
 
 # Configuration options for plot_directive. See:
@@ -89,7 +90,7 @@ nb_render_image_options = {
     "align": "center",
 }
 nb_execution_mode = "auto"
-if "doctest" in sys.argv:
+if "doctest" in sys.argv or os.environ.get("BLOP_DOCS_NO_EXEC"):
     nb_execution_mode = "off"
 
 # Enable ELLIPSIS option for doctest to match any substring including empty

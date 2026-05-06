@@ -31,19 +31,8 @@ jobs:
           cache: false
           activate-environment: docs
 
-      - name: Start queueserver tutorial infrastructure
-        run: |
-          docker compose -f docs/source/tutorials/queueserver/docker-compose.yml up -d --build --wait
-
-      - name: Test with doctest
-        run: pixi run doc-tests
-
       - name: Build Docs
         run: pixi run build-docs
-
-      - name: Stop queueserver tutorial infrastructure
-        if: always()
-        run: docker compose -f docs/source/tutorials/queueserver/docker-compose.yml down
 
       - name: Upload HTML docs artifact
         uses: actions/upload-artifact@v4

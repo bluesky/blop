@@ -16,14 +16,14 @@ services:
 
   zmq-proxy:
     <<: *blop-service
-    command: pixi run bluesky-0MQ-proxy 5577 5578
+    command: bluesky-0MQ-proxy 5577 5578
     ports:
       - "5577:5577"
       - "5578:5578"
 
   tiled:
     <<: *blop-service
-    command: pixi run tiled serve catalog --temp --host 0.0.0.0 --port 8000 --api-key tutorialkey
+    command: tiled serve catalog --temp --host 0.0.0.0 --port 8000 --api-key tutorialkey
     ports:
       - "8000:8000"
     healthcheck:
@@ -34,7 +34,7 @@ services:
 
   re-manager:
     <<: *blop-service
-    command: pixi run start-re-manager --startup-dir=/app/startup --zmq-publish-console OFF --redis-addr redis:6379
+    command: start-re-manager --startup-dir=/app/startup --zmq-publish-console OFF --redis-addr redis:6379
     depends_on:
       redis:
         condition: service_healthy
@@ -50,7 +50,7 @@ services:
 
   zmq-tiled-bridge:
     <<: *blop-service
-    command: pixi run python /app/zmq_tiled_bridge.py
+    command: python -u /app/zmq_tiled_bridge.py
     depends_on:
       zmq-proxy:
         condition: service_started

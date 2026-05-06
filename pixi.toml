@@ -36,6 +36,7 @@ blop = { path = ".", editable = true, extras = ["cpu"] }
 blop-sim = { path = "sim", editable = true }
 numpydoc = "*"
 sphinx-copybutton = "*"
+sphinxcontrib-mermaid = "*"
 myst-nb = "*"
 furo = "*"
 jupytext = "*"
@@ -62,8 +63,15 @@ check = "pre-commit run --all-files"
 tests = "pytest src/blop/tests"
 
 [feature.docs.tasks]
-build-docs = "make -C docs/ html"
-doc-tests = "make -C docs/ test"
+start-queueserver = "docker compose -f docs/source/tutorials/queueserver/docker-compose.yml up -d --build --wait"
+stop-queueserver = "docker compose -f docs/source/tutorials/queueserver/docker-compose.yml down"
+build-docs = { cmd = "make -C docs/ html; EXIT_CODE=$?; docker compose -f docs/source/tutorials/queueserver/docker-compose.yml down; exit $EXIT_CODE", depends-on = [
+  "start-queueserver",
+  "doc-tests",
+] }
+clean-docs = "make -C docs/ clean"
+build-docs-no-exec = { cmd = "BLOP_DOCS_NO_EXEC=1 make -C docs/ html" }
+doc-tests = { cmd = "make -C docs/ test", depends-on = ["start-queueserver"] }
 convert-tutorials-to-ipynb = "jupytext --to notebook docs/source/tutorials/*.md"
 
 [environments]

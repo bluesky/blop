@@ -25,31 +25,26 @@ We will optimize the same Himmelblau function from the [simple experiment tutori
 
 The distributed system has five components:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                     Docker Compose Stack                         │
-│                                                                 │
-│  ┌─────────┐    ┌───────────┐    ┌──────────────────────┐      │
-│  │  Redis  │◄───│ RE Manager│───►│  ZMQ Proxy (pub/sub) │      │
-│  └─────────┘    │ (devices  │    └──────────┬───────────┘      │
-│                 │  + plans) │               │                   │
-│                 └───────────┘               │                   │
-│                                             ▼                   │
-│                 ┌──────────────────────────────┐                │
-│                 │  ZMQ-Tiled Bridge            │                │
-│                 │  (persists docs to Tiled)    │                │
-│                 └──────────────┬───────────────┘                │
-│                                ▼                                │
-│                 ┌──────────────────────────────┐                │
-│                 │  Tiled Server (data storage) │                │
-│                 └──────────────────────────────┘                │
-└─────────────────────────────────────────────────────────────────┘
-        ▲ submit plans              │ ZMQ docs    │ read data
-        │ (REManagerAPI)            ▼             ▼
-┌───────────────────────────────────────────────────────────────┐
-│                    Blop QueueserverAgent                       │
-│  (suggests points, listens for completions, evaluates data)   │
-└───────────────────────────────────────────────────────────────┘
+```{mermaid}
+flowchart
+    subgraph docker["Docker Compose Stack"]
+        redis["Redis"]
+        rem["RE Manager<br/>(devices + plans)"]
+        zmqp["ZMQ Proxy<br/>(pub/sub)"]
+        bridge["ZMQ-Tiled Bridge<br/>(persists docs to Tiled)"]
+        tiled["Tiled Server<br/>(data storage)"]
+
+        redis <-->|state| rem
+        rem -->|publishes documents| zmqp
+        zmqp -->|document stream| bridge
+        bridge -->|writes| tiled
+    end
+
+    agent["Blop QueueserverAgent<br/>(suggests points, listens for completions, evaluates data)"]
+
+    agent -->|submit plans via REManagerAPI| rem
+    zmqp -->|document stream| agent
+    tiled -->|read data| agent
 ```
 
 **Data flow:**
@@ -57,7 +52,7 @@ The distributed system has five components:
 1. The agent suggests parameter values and submits an acquisition plan to the RE Manager
 1. The RE Manager executes the plan (moves motors, reads detectors)
 1. Bluesky documents are published via ZMQ to the proxy
-1. The ZMQ-Tiled bridge persists documents to the Tiled server
+1. The ZMQ-Tiled bridge persists documents to the Tiled server (using [bluesky-tiled-plugins](https://blueskyproject.io/bluesky-tiled-plugins)'s `TiledWriter` callback)
 1. The agent's ZMQ listener detects plan completion
 1. The agent's evaluation function reads results from Tiled and computes objectives
 1. The optimizer ingests outcomes and suggests the next point
@@ -66,6 +61,7 @@ The distributed system has five components:
 
 - Docker and Docker Compose installed
 - The `blop` Python package installed (with `bluesky-queueserver-api` and `tiled`)
+- The `blop` GitHub repository cloned (for the service definitions under `docs/source/tutorials/queueserver/`)
 
 ## Starting the Infrastructure
 
@@ -91,21 +87,7 @@ You should see all services in a "healthy" or "running" state. The services expo
 | Tiled | 8000 | Data access (evaluation function reads results) |
 | Redis | 6379 | Internal message broker for queueserver |
 
-Once the containers are up, open the RE Manager worker environment (which loads the startup script with devices and plans):
-
-```bash
-# From any terminal with bluesky-queueserver-api installed:
-python -c "
-from bluesky_queueserver_api.zmq import REManagerAPI
-RM = REManagerAPI(zmq_control_addr='tcp://localhost:60615')
-RM.environment_open()
-RM.wait_for_idle(timeout=30)
-print(RM.status())
-RM.close()
-"
-```
-
-Once the environment is open, proceed with the tutorial below.
+Once the containers are up, proceed with the tutorial below.
 
 ```{code-cell} ipython3
 import time
@@ -265,7 +247,7 @@ class HimmelblauEvaluation:
         run = self._wait_for_run(uid)
 
         # Read the detector values from the primary data stream
-        himmel_values = self._wait_for_detector_data(run, "primary/data/himmel_det")
+        himmel_values = self._wait_for_detector_data(run, "primary/himmel_det")
 
         outcomes = []
         for idx, suggestion in enumerate(suggestions):
@@ -330,7 +312,7 @@ Since `QueueserverAgent` uses the same Ax optimizer backend as the local `Agent`
 agent.ax_client.summarize()
 ```
 
-The Himmelblau function has four global minima (all with value 0). The optimizer should have found one or more of these:
+The Himmelblau function has four global minima (all with value 0). The optimizer should have made some progress toward these optima.
 
 - (3.0, 2.0)
 - (-2.805, 3.131)
@@ -355,13 +337,13 @@ docker compose down
 ## What You Learned
 
 - **Distributed architecture**: The queueserver separates experiment execution from optimization logic, connected via ZMQ and Tiled
-- **String-based device references**: Since devices live in the remote process, DOFs and sensors are referenced by name
+- **String-based device references**: Since devices live in the remote process, DOFs, sensors, and plans are referenced by name
 - **Asynchronous operation**: `agent.run()` is non-blocking; the agent reacts to events via ZMQ callbacks
 - **Evaluation function**: Reads from Tiled (not direct device access) to compute objectives after each plan completes
 
 ## Next Steps
 
 - Add multiple objectives for multi-objective optimization (see [KB Mirrors tutorial](./xrt-kb-mirrors.md))
-- Use `agent.submit_suggestions()` to manually evaluate specific parameter combinations
-- Implement `outcome_constraints` to keep optimization within safe operating regions
-- Add a `checkpoint_path` to persist optimizer state across restarts
+- Use `agent.submit_suggestions()` to manually evaluate specific parameter combinations (see [](../how-to-guides/manual-suggestions.rst))
+- Implement `outcome_constraints` to constrain the optimization (see [](../how-to-guides/set-outcome-constraints.rst))
+- Add a `checkpoint_path` to persist optimizer state across restarts (see [](../reference/agent.rst))
