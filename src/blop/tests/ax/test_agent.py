@@ -515,7 +515,7 @@ def test_agent_get_best_points_single_objective(mock_evaluation_function):
 
     best_points = agent.get_best_points()
     assert len(best_points) == 1
-    trial_id, params, metrics = best_points[0]
+    _, params, metrics = best_points[0]
     assert params["test_movable1"] == 7.0
     assert metrics["test_objective"][0] == 20.0
 
@@ -544,7 +544,7 @@ def test_agent_get_best_points_multi_objective(mock_evaluation_function):
     best_points = agent.get_best_points()
     # Should return at least the non-dominated points
     assert len(best_points) >= 2
-    for trial_id, params, metrics in best_points:
+    for _, params, metrics in best_points:
         assert "x1" in params
         assert "obj1" in metrics
         assert "obj2" in metrics

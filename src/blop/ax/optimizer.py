@@ -164,10 +164,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
         if is_multi_objective:
             frontier = self._client.get_pareto_frontier(use_model_predictions=False)
-            return [
-                (trial_index, params, metrics)
-                for params, metrics, trial_index, _ in frontier
-            ]
+            return [(trial_index, params, metrics) for params, metrics, trial_index, _ in frontier]
         else:
             params, metrics, trial_index, _ = self._client.get_best_parameterization(use_model_predictions=False)
             return [(trial_index, params, metrics)]
