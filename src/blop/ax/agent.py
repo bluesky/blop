@@ -1,9 +1,9 @@
 import importlib.util
 import logging
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any, cast
 
-from ax import Client
+from ax import Client, TOutcome, TParameterization
 from ax.analysis.plotly.surface.contour import ContourPlot
 from ax.core.types import TParamValue
 
@@ -21,6 +21,7 @@ from bluesky_queueserver_api.zmq import REManagerAPI
 
 from ..callbacks.logger import OptimizationLogger
 from ..callbacks.router import OptimizationCallbackRouter
+from ..plan_stubs import navigate_to_best
 from ..plans import acquire_baseline, optimize, sample_suggestions
 from ..protocols import (
     AcquisitionPlan,
@@ -120,6 +121,27 @@ class _AxAgentMixin:
         For complete examples, see :doc:`/how-to-guides/attach-data-to-experiments`.
         """
         self._optimizer.ingest(points)
+
+    def get_best_points(self) -> list[tuple[int, TParameterization, TOutcome]]:
+        """
+        Get a list of the optimal points found during optimization.
+
+        For single-objective optimization, returns a single best point.
+        For multi-objective optimization, returns the Pareto-optimal set.
+
+        Returns
+        -------
+        list[tuple[str, dict, dict]]
+            Each element in the list is a tuple of:
+              - "_id" of the suggestion
+              - suggested parameters
+              - measured outcomes
+
+        See Also
+        --------
+        navigate_to_best : Plan stub to move actuators to a best point.
+        """
+        return self._optimizer.get_best_points()
 
     def plot_objective(
         self, x_dof_name: str, y_dof_name: str, objective_name: str, *args: Any, **kwargs: Any
@@ -503,6 +525,36 @@ class Agent(_AxAgentMixin):
             )
 
         return (yield from sample_suggestions_plan)
+
+    def navigate_to_best(self, parameterization: Mapping | None = None) -> MsgGenerator[None]:
+        """
+        Move actuators to the best point found during optimization.
+
+        If no explicit parameterization is provided, queries the optimizer for its
+        best point(s). For multi-objective optimizers that return multiple Pareto-optimal
+        points, an explicit parameterization must be provided.
+
+        Parameters
+        ----------
+        parameterization : Mapping | None, optional
+            Explicit parameterization to navigate to. If None, the optimizer's
+            best point is used. Call ``get_best_points()`` to inspect
+            available points and select one for multi-objective problems.
+
+        Raises
+        ------
+        ValueError
+            If the optimizer returns multiple Pareto-optimal points and no
+            explicit ``parameterization`` is provided.
+        """
+        optimization_problem = self.to_optimization_problem()
+        return (
+            yield from navigate_to_best(
+                optimization_problem.actuators,
+                optimization_problem.optimizer,
+                parameterization,
+            )
+        )
 
 
 class QueueserverAgent(_AxAgentMixin):

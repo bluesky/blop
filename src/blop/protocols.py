@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
@@ -30,6 +30,30 @@ TSensor = TypeVar("TSensor")
 """Sensor generic type"""
 TPlan = TypeVar("TPlan")
 """Plan generic type"""
+
+
+@runtime_checkable
+class HasBestPoints(Protocol):
+    """
+    A protocol for optimizers that can report their best-found parameterization(s).
+    """
+
+    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
+        """
+        Get a list of the optimal points found during optimization.
+
+        For single-objective optimization, returns a single best point.
+        For multi-objective optimization, returns the Pareto-optimal set.
+
+        Returns
+        -------
+        list[tuple[str, dict, dict]]
+            Each element in the list is a tuple of:
+              - "_id" of the suggestion
+              - suggested parameters
+              - measured outcomes
+        """
+        ...
 
 
 @runtime_checkable

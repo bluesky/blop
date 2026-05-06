@@ -1,11 +1,12 @@
 from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from typing import Any, Literal
 
 import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import MsgGenerator, plan
 
-from .protocols import ID_KEY
+from .protocols import ID_KEY, Actuator, HasBestPoints, Optimizer
 from .utils import InferredReadable, Source
 
 _BLUESKY_UID_KEY: Literal["bluesky_uid"] = "bluesky_uid"
@@ -102,3 +103,63 @@ def read_step(
 
     # Read and save to produce a single event
     yield from bps.trigger_and_read(list(readable_cache.values()))
+
+
+@plan
+def navigate_to_best(
+    actuators: Sequence[Actuator],
+    optimizer: Optimizer | None = None,
+    parameterization: Mapping | None = None,
+) -> MsgGenerator[None]:
+    """
+    Move actuators to the best point found during optimization.
+
+    If no explicit parameterization is provided, queries the optimizer for its
+    best point(s). For multi-objective optimizers that return multiple Pareto-optimal
+    points, an explicit parameterization must be provided.
+
+    Parameters
+    ----------
+    actuators : Sequence[Actuator]
+        The actuators to move to the best parameterization.
+    optimizer : Optimizer | None, optional
+        The optimizer to query for the best point. Must implement
+        :class:`~blop.protocols.HasBestPoints` if ``parameterization`` is None.
+    parameterization : Mapping | None, optional
+        Explicit parameterization to navigate to. If None, the optimizer's
+        best point is used. Call ``optimizer.get_best_points()`` to inspect
+        available points and select one for multi-objective problems.
+
+    Raises
+    ------
+    TypeError
+        If ``parameterization`` is None and the optimizer does not implement
+        :class:`~blop.protocols.HasBestPoints`.
+    ValueError
+        If the optimizer returns multiple Pareto-optimal points and no
+        explicit ``parameterization`` is provided.
+    """
+    if parameterization is None:
+        if not isinstance(optimizer, HasBestPoints):
+            raise TypeError(
+                f"The optimizer ({type(optimizer).__name__}) does not implement the HasBestPoints protocol. "
+                "Either pass an explicit parameterization or use an optimizer that implements get_best_points()."
+            )
+        best_points = optimizer.get_best_points()
+        if len(best_points) > 1:
+            raise ValueError(
+                f"The optimizer returned {len(best_points)} Pareto-optimal points. "
+                "Please call optimizer.get_best_points() to inspect them and pass your "
+                "chosen parameterization explicitly via the 'parameterization' argument."
+            )
+        _, parameterization, _ = best_points[0]
+
+    actuator_by_name = {actuator.name: actuator for actuator in actuators}
+    moves = []
+    for name, value in parameterization.items():
+        if name in actuator_by_name:
+            moves.append(actuator_by_name[name])
+            moves.append(value)
+
+    if moves:
+        yield from bps.mv(*moves)

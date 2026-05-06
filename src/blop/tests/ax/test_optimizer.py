@@ -259,3 +259,88 @@ def test_ax_optimizer_reconfigurable_search_space_rollback():
 
     # Rollback should restore the original state
     assert (p1.lower, p1.upper) == original_p1
+
+
+def test_ax_optimizer_get_best_points_single_objective():
+    """get_best_points returns the single best trial for single-objective optimization."""
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(-5.0, 5.0), parameter_type="float"),
+            RangeParameterConfig(name="x2", bounds=(-5.0, 5.0), parameter_type="float"),
+        ],
+        objective="y1",
+    )
+    # Ingest several points with different objective values
+    optimizer.ingest(
+        [
+            {"x1": 1.0, "x2": 2.0, "y1": 10.0},
+            {"x1": 3.0, "x2": 4.0, "y1": 50.0},
+            {"x1": -1.0, "x2": -2.0, "y1": 5.0},
+        ]
+    )
+    optimizer.ax_client.configure_generation_strategy()
+
+    best_points = optimizer.get_best_points()
+    assert len(best_points) == 1
+    trial_id, params, metrics = best_points[0]
+    # Best point should be the one with y1=50.0 (maximize by default)
+    assert params["x1"] == 3.0
+    assert params["x2"] == 4.0
+    assert metrics["y1"][0] == 50.0
+    assert isinstance(trial_id, int)
+
+
+def test_ax_optimizer_get_best_points_minimize():
+    """get_best_points returns the minimum for a minimization objective."""
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(-5.0, 5.0), parameter_type="float"),
+        ],
+        objective="-y1",
+    )
+    optimizer.ingest(
+        [
+            {"x1": 1.0, "y1": 10.0},
+            {"x1": 2.0, "y1": 3.0},
+            {"x1": 3.0, "y1": 7.0},
+        ]
+    )
+    optimizer.ax_client.configure_generation_strategy()
+
+    best_points = optimizer.get_best_points()
+    assert len(best_points) == 1
+    _trial_id, params, metrics = best_points[0]
+    assert params["x1"] == 2.0
+    assert metrics["y1"][0] == 3.0
+
+
+def test_ax_optimizer_get_best_points_multi_objective():
+    """get_best_points returns the Pareto frontier for multi-objective optimization."""
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(0.0, 10.0), parameter_type="float"),
+        ],
+        objective="y1, y2",
+    )
+    # Ingest points that form a Pareto frontier
+    # Point A: good at y1, bad at y2
+    # Point B: bad at y1, good at y2
+    # Point C: dominated by both A and B
+    optimizer.ingest(
+        [
+            {"x1": 1.0, "y1": 10.0, "y2": 1.0},  # A
+            {"x1": 5.0, "y1": 1.0, "y2": 10.0},  # B
+            {"x1": 3.0, "y1": 2.0, "y2": 2.0},  # C (dominated)
+        ]
+    )
+    optimizer.ax_client.configure_generation_strategy()
+
+    best_points = optimizer.get_best_points()
+    # Should return at least the two non-dominated points (A and B)
+    assert len(best_points) >= 2
+    # Each entry should be (trial_id, params, metrics)
+    for trial_id, params, metrics in best_points:
+        assert isinstance(trial_id, int)
+        assert "x1" in params
+        assert "y1" in metrics
+        assert "y2" in metrics
