@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Ax Integration &#8212; blop 1.0.0b2.dev12 documentation</title>
+    <title>Ax Integration &#8212; blop 1.0.0b2.dev13 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=ada92185"></script>
+    <script src="../_static/documentation_options.js?v=09d1a59c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/ax-integration';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://bluesky.github.io/blop/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://blueskyproject.io/blop/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
@@ -65,7 +65,7 @@
     <link rel="prev" title="Protocols for Optimization" href="protocols.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev12" />
+  <meta name="docsearch:version" content="1.0.0b2.dev13" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -503,7 +503,7 @@ an API wrapper is useful:</p>
 </section>
 <section id="using-the-ax-api-directly">
 <h2>Using the Ax API directly<a class="headerlink" href="#using-the-ax-api-directly" title="Link to this heading">#</a></h2>
-<p>You can access the underlying <code class="xref py py-class docutils literal notranslate"><span class="pre">ax.Client</span></code> instance via <a class="reference internal" href="../reference/agent.html#blop.ax.Agent.ax_client" title="blop.ax.Agent.ax_client"><code class="xref py py-attr docutils literal notranslate"><span class="pre">blop.ax.Agent.ax_client</span></code></a>.</p>
+<p>You can access the underlying <code class="xref py py-class docutils literal notranslate"><span class="pre">ax.Client</span></code> instance via <a class="reference internal" href="../reference/agent.html#blop.ax.Agent.ax_client" title="blop.ax.Agent.ax_client"><code class="xref py py-attr docutils literal notranslate"><span class="pre">blop.ax.Agent.ax_client</span></code></a>, and interact with the <a class="reference external" href="https://ax.readthedocs.io/en/stable/api.html#ax.api.client.Client">Client API</a></p>
 <p>You can learn all about the various Ax features in the <a class="reference external" href="https://ax.dev/docs/tutorials/quickstart">Ax documentation</a>. Some notable features that are not used by Blop by default are:</p>
 <ul class="simple">
 <li><p>Generation strategy configuration</p>
@@ -514,15 +514,14 @@ an API wrapper is useful:</p>
 </ul>
 </li>
 <li><p>Configuring early stopping: <a class="reference external" href="https://ax.dev/docs/tutorials/early_stopping/">https://ax.dev/docs/tutorials/early_stopping/</a> (first-class support for early stopping is coming soon, see <a class="github reference external" href="https://github.com/NSLS-II/blop/issues/129">NSLS-II/blop#129</a>)</p></li>
-<li><p>Analyzing the optimization results and model fit: <a class="reference external" href="https://ax.dev/docs/tutorials/analyses/">https://ax.dev/docs/tutorials/analyses/</a> (see <a class="reference internal" href="../reference/agent.html#blop.ax.Agent.plot_objective" title="blop.ax.Agent.plot_objective"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.ax.Agent.plot_objective()</span></code></a> for an example in Blop)</p></li>
-<li><p>Configuring tracking metrics: <a class="reference external" href="https://ax.dev/docs/tutorials/tracking_metrics/">https://ax.dev/docs/tutorials/tracking_metrics/</a></p></li>
+<li><p>Analyzing/Summarizing the optimization results and model fit: <a class="reference external" href="https://ax.dev/docs/tutorials/analyses/">https://ax.dev/docs/tutorials/analyses/</a> (see <a class="reference internal" href="../reference/agent.html#blop.ax.Agent.plot_objective" title="blop.ax.Agent.plot_objective"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.ax.Agent.plot_objective()</span></code></a> for an example in Blop)</p></li>
+<li><p>Configuring tracking metrics: <a class="reference external" href="https://ax.dev/docs/recipes/tracking-metrics/">https://ax.dev/docs/recipes/tracking-metrics/</a></p></li>
 <li><p>Saving and loading experiments</p>
 <ul>
 <li><p>To JSON: <a class="reference external" href="https://ax.dev/docs/recipes/experiment-to-json">https://ax.dev/docs/recipes/experiment-to-json</a></p></li>
 <li><p>To SQLite: <a class="reference external" href="https://ax.dev/docs/recipes/experiment-to-sqlite">https://ax.dev/docs/recipes/experiment-to-sqlite</a></p></li>
 </ul>
 </li>
-<li><p>Summarizing the experiment: <a class="reference external" href="https://ax.dev/docs/tutorials/quickstart/">https://ax.dev/docs/tutorials/quickstart/</a></p></li>
 </ul>
 </section>
 </section>

@@ -30,7 +30,7 @@ We chose this minimal approach because it encompasses the basic usage of Ax for 
 Using the Ax API directly
 -------------------------
 
-You can access the underlying :class:`ax.Client` instance via :attr:`blop.ax.Agent.ax_client`.
+You can access the underlying :class:`ax.Client` instance via :attr:`blop.ax.Agent.ax_client`, and interact with the `Client API <https://ax.readthedocs.io/en/stable/api.html#ax.api.client.Client>`_
 
 You can learn all about the various Ax features in the `Ax documentation <https://ax.dev/docs/tutorials/quickstart>`_. Some notable features that are not used by Blop by default are:
 
@@ -41,11 +41,9 @@ You can learn all about the various Ax features in the `Ax documentation <https:
   - Using external generators: `<https://ax.dev/docs/tutorials/external_generation_node/>`_
 
 - Configuring early stopping: `<https://ax.dev/docs/tutorials/early_stopping/>`_ (first-class support for early stopping is coming soon, see `<https://github.com/NSLS-II/blop/issues/129>`_)
-- Analyzing the optimization results and model fit: `<https://ax.dev/docs/tutorials/analyses/>`_ (see :func:`blop.ax.Agent.plot_objective` for an example in Blop)
-- Configuring tracking metrics: `<https://ax.dev/docs/tutorials/tracking_metrics/>`_
+- Analyzing/Summarizing the optimization results and model fit: `<https://ax.dev/docs/tutorials/analyses/>`_ (see :func:`blop.ax.Agent.plot_objective` for an example in Blop)
+- Configuring tracking metrics: `<https://ax.dev/docs/recipes/tracking-metrics/>`_
 - Saving and loading experiments
 
   - To JSON: `<https://ax.dev/docs/recipes/experiment-to-json>`_
   - To SQLite: `<https://ax.dev/docs/recipes/experiment-to-sqlite>`_
-
-- Summarizing the experiment: `<https://ax.dev/docs/tutorials/quickstart/>`_

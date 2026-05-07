@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Protocols &#8212; blop 1.0.0b2.dev12 documentation</title>
+    <title>Protocols &#8212; blop 1.0.0b2.dev13 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=ada92185"></script>
+    <script src="../_static/documentation_options.js?v=09d1a59c"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -51,7 +51,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'reference/protocols';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.17.1';
-        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://bluesky.github.io/blop/switcher.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://blueskyproject.io/blop/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
             false;
@@ -65,7 +65,7 @@
     <link rel="prev" title="Plans" href="plans.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev12" />
+  <meta name="docsearch:version" content="1.0.0b2.dev13" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -487,7 +487,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="blop.protocols.Actuator">
 <span class="sig-prename descclassname"><span class="pre">blop.protocols.</span></span><span class="sig-name descname"><span class="pre">Actuator</span></span><a class="headerlink" href="#blop.protocols.Actuator" title="Link to this definition">#</a></dt>
-<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">MovableHasName</span></code> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Flyable" title="(in bluesky v1.15.1.dev21+g5e1423146)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flyable</span></code></a></p>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">MovableHasName</span></code> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Flyable" title="(in bluesky v1.15.2.dev2+gd149731d6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flyable</span></code></a></p>
 </dd></dl>
 
 </section>
@@ -496,7 +496,7 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="blop.protocols.Sensor">
 <span class="sig-prename descclassname"><span class="pre">blop.protocols.</span></span><span class="sig-name descname"><span class="pre">Sensor</span></span><a class="headerlink" href="#blop.protocols.Sensor" title="Link to this definition">#</a></dt>
-<dd><p>alias of <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Readable" title="(in bluesky v1.15.1.dev21+g5e1423146)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventCollectable" title="(in bluesky v1.15.1.dev21+g5e1423146)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventCollectable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventPageCollectable" title="(in bluesky v1.15.1.dev21+g5e1423146)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPageCollectable</span></code></a></p>
+<dd><p>alias of <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Readable" title="(in bluesky v1.15.2.dev2+gd149731d6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventCollectable" title="(in bluesky v1.15.2.dev2+gd149731d6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventCollectable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventPageCollectable" title="(in bluesky v1.15.2.dev2+gd149731d6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPageCollectable</span></code></a></p>
 </dd></dl>
 
 </section>
@@ -674,7 +674,7 @@ the point as a “baseline” trial.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="blop.protocols.OptimizationProblem">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">blop.protocols.</span></span><span class="sig-name descname"><span class="pre">OptimizationProblem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actuators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/protocols.html#OptimizationProblem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.protocols.OptimizationProblem" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOptimizationProblem</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">MovableHasName</span></code> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Flyable" title="(in bluesky v1.15.1.dev21+g5e1423146)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flyable</span></code></a>, <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Readable" title="(in bluesky v1.15.1.dev21+g5e1423146)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventCollectable" title="(in bluesky v1.15.1.dev21+g5e1423146)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventCollectable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventPageCollectable" title="(in bluesky v1.15.1.dev21+g5e1423146)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPageCollectable</span></code></a>, <a class="reference internal" href="#blop.protocols.AcquisitionPlan" title="blop.protocols.AcquisitionPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">AcquisitionPlan</span></code></a>]</p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOptimizationProblem</span></code>[<code class="xref py py-class docutils literal notranslate"><span class="pre">MovableHasName</span></code> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Flyable" title="(in bluesky v1.15.2.dev2+gd149731d6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flyable</span></code></a>, <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Readable" title="(in bluesky v1.15.2.dev2+gd149731d6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventCollectable" title="(in bluesky v1.15.2.dev2+gd149731d6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventCollectable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventPageCollectable" title="(in bluesky v1.15.2.dev2+gd149731d6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPageCollectable</span></code></a>, <a class="reference internal" href="#blop.protocols.AcquisitionPlan" title="blop.protocols.AcquisitionPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">AcquisitionPlan</span></code></a>]</p>
 <p>An optimization problem to solve. Immutable once initialized.</p>
 <p>This dataclass encapsulates all components needed for optimization into a single
 immutable structure. It is typically created via <a class="reference internal" href="agent.html#blop.ax.Agent.to_optimization_problem" title="blop.ax.Agent.to_optimization_problem"><code class="xref py py-meth docutils literal notranslate"><span class="pre">blop.ax.Agent.to_optimization_problem()</span></code></a>
