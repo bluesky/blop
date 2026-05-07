@@ -148,7 +148,7 @@ html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "github_url": "https://github.com/bluesky/blop",
     "switcher": {
-        "json_url": "https://bluesky.github.io/blop/switcher.json",
+        "json_url": "https://blueskyproject.io/blop/switcher.json",
         "version_match": os.environ.get("DOCS_VERSION", "main"),
     },
     "logo": {
