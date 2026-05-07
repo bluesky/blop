@@ -138,7 +138,7 @@ Here we configure an agent with three DOFs and two objectives. The second object
 Acquire a baseline reading
 --------------------------
 
-To acquire a baseline reading, simply call the ``acquire_baseline`` method. Optionally, you can provide a parameterization which moves the DOFs to specific values prior to acquiring the baseline reading.
+To acquire a baseline reading, simply call the ``acquire_baseline`` method. Optionally, you can use the ``parameterizations`` argument, which moves the DOFs to specific values prior to acquiring the baseline reading.
 
 .. testcode::
 
