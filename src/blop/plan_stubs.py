@@ -6,7 +6,7 @@ import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import MsgGenerator, plan
 
-from .protocols import ID_KEY, Actuator, HasBestPoints, Optimizer
+from .protocols import ID_KEY, Actuator, Optimizer
 from .utils import InferredReadable, Source
 
 _BLUESKY_UID_KEY: Literal["bluesky_uid"] = "bluesky_uid"
@@ -123,8 +123,7 @@ def navigate_to_best(
     actuators : Sequence[Actuator]
         The actuators to move to the best parameterization.
     optimizer : Optimizer | None, optional
-        The optimizer to query for the best point. Must implement
-        :class:`~blop.protocols.HasBestPoints` if ``parameterization`` is None.
+        The optimizer to query for the best point.
     parameterization : Mapping | None, optional
         Explicit parameterization to navigate to. If None, queries the optimizer's
         best point. For multi-objective problems, call ``optimizer.get_best_points()``
@@ -132,19 +131,13 @@ def navigate_to_best(
 
     Raises
     ------
-    TypeError
-        If ``parameterization`` is None and the optimizer does not implement
-        :class:`~blop.protocols.HasBestPoints`.
     ValueError
         If the optimizer returns multiple Pareto-optimal points and no
         explicit ``parameterization`` is provided.
     """
     if parameterization is None:
-        if not isinstance(optimizer, HasBestPoints):
-            raise TypeError(
-                f"The optimizer ({type(optimizer).__name__}) does not implement the HasBestPoints protocol. "
-                "Either pass an explicit parameterization or use an optimizer that implements get_best_points()."
-            )
+        if optimizer is None:
+            raise ValueError("Either pass an explicit parameterization or use an optimizer.")
         best_points = optimizer.get_best_points()
         if len(best_points) > 1:
             raise ValueError(

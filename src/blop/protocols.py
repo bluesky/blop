@@ -33,30 +33,6 @@ TPlan = TypeVar("TPlan")
 
 
 @runtime_checkable
-class HasBestPoints(Protocol):
-    """
-    A protocol for optimizers that can report their best-found parameterization(s).
-    """
-
-    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
-        """
-        Get a list of the optimal points found during optimization.
-
-        For single-objective optimization, returns a single best point.
-        For multi-objective optimization, returns the Pareto-optimal set.
-
-        Returns
-        -------
-        list[tuple[Any, Mapping, Mapping]]
-            Each element in the list is a tuple of:
-              - "_id" of the suggestion
-              - suggested parameters
-              - measured outcomes
-        """
-        ...
-
-
-@runtime_checkable
 class CanRegisterSuggestions(Protocol):
     """
     A protocol for optimizers that can register suggestions. This
@@ -169,6 +145,23 @@ class Optimizer(Protocol):
         ----------
         points : list[dict]
             A list of dictionaries, each containing the outcomes of each suggested parameterization.
+        """
+        ...
+
+    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
+        """
+        Get a list of the optimal points found during optimization.
+
+        For single-objective optimization, returns a single best point.
+        For multi-objective optimization, returns the Pareto-optimal set.
+
+        Returns
+        -------
+        list[tuple[Any, Mapping, Mapping]]
+            Each element in the list is a tuple of:
+              - "_id" of the suggestion
+              - suggested parameters
+              - measured outcomes
         """
         ...
 

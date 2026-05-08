@@ -6,10 +6,10 @@ from ax.core.objective import MultiObjective
 from ax.core.parameter import ChoiceParameter, RangeParameter
 from ax.core.types import TParamValue
 
-from ..protocols import ID_KEY, CanRegisterSuggestions, Checkpointable, HasBestPoints, Optimizer, TrialFaultAware
+from ..protocols import ID_KEY, CanRegisterSuggestions, Checkpointable, Optimizer, TrialFaultAware
 
 
-class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultAware, HasBestPoints):
+class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultAware):
     """
     An optimizer that uses Ax as the backend for optimization and experiment tracking.
 
