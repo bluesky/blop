@@ -317,6 +317,30 @@ def test_runner_submit_suggestions_to_queueserver():
     assert submitted_plan.name == "my_acquire"
 
 
+def test_runner_submit_suggestions_register_fails():
+    """Test run() gets suggestions from optimizer and submits plan to queueserver."""
+    mock_client = MagicMock(spec=QueueserverClient)
+
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=MagicMock(spec=Optimizer),
+        actuators=["motor1"],
+        sensors=["det"],
+        evaluation_function=MagicMock(),
+        acquisition_plan="my_acquire",
+    )
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+
+    suggestions = [{"motor1": 5}]
+    with pytest.raises(ValueError, match="'_id'"):
+        runner.submit_suggestions(suggestions)
+
+    # Verify optimizer.suggest was NOT called
+    mock_optimization_problem.optimizer.suggest.assert_not_called()
+
+
 def test_runner_submit_suggestions_twice_fails():
     """Test 2 calls to submit_suggestions() fails."""
     submit_event = threading.Event()
@@ -417,3 +441,17 @@ def test_runner_on_acquisition_complete_raises_on_uid_mismatch(mock_optimization
 
     with pytest.raises(RuntimeError, match="current_uid did not match start document"):
         mock_client._on_stop(start_doc, stop_doc)
+
+
+def test_runner_private_method_calls_before_run(mock_optimization_problem):
+    mock_client = MagicMock(spec=QueueserverClient)
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+
+    with pytest.raises(RuntimeError, match="run()"):
+        runner._build_plan([{}])
+
+    with pytest.raises(RuntimeError, match="run()"):
+        runner._on_acquisition_complete({}, {})
