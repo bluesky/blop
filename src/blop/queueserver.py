@@ -314,6 +314,20 @@ class QueueserverOptimizationRunner:
             self._validate()
             self._state = _OptimizationState(max_iterations=1, num_points=len(suggestions))
             self._continuous = False
+
+        # Ensure all suggestions have an ID_KEY or register them with the optimizer
+        if not isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions) and any(
+            ID_KEY not in suggestion for suggestion in suggestions
+        ):
+            raise ValueError(
+                f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes or your optimizer must "
+                "implement the `blop.protocols.CanRegisterSuggestions` protocol. Please review your optimizer "
+                f"implementation. Got suggestions: {suggestions}"
+            )
+        elif isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions):
+            suggestions = self.optimization_problem.optimizer.register_suggestions(suggestions)
+
+        with self._state_lock:
             plan = self._build_plan(suggestions)
             logger.info(f"Submitting manually specified suggestion(s) with correlation uid: {self._state.current_uid}")
         self._client.start_listener(on_stop=self._on_acquisition_complete)
@@ -344,23 +358,9 @@ class QueueserverOptimizationRunner:
         self._client.check_plan_available(self._plan_name)
 
     def _build_plan(self, suggestions: list[dict]) -> BPlan:
-        """LOCKED: Register provided suggestions and build the plan to submit."""
+        """LOCKED: Build the plan to submit and update current state."""
         if self._state is None:
             raise RuntimeError("_build_plan() called before run() or submit_suggestions()")
-
-        # Ensure all suggestions have an ID_KEY or register them with the optimizer
-        if not isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions) and any(
-            ID_KEY not in suggestion for suggestion in suggestions
-        ):
-            raise ValueError(
-                f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes or your optimizer must "
-                "implement the `blop.protocols.CanRegisterSuggestions` protocol. Please review your optimizer "
-                f"implementation. Got suggestions: {suggestions}"
-            )
-        elif isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions) and all(
-            ID_KEY not in suggestion for suggestion in suggestions
-        ):
-            suggestions = self.optimization_problem.optimizer.register_suggestions(suggestions)
 
         self._state.current_iteration += 1
         self._state.current_suggestions = suggestions

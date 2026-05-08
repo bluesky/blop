@@ -237,6 +237,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
         registered = []
         for suggestion in suggestions:
             # Extract parameters (ignore _id if present)
+            # TODO: Overwrite ID_KEY or skip (assume already registered)?
             parameters = {k: v for k, v in suggestion.items() if k != ID_KEY}
 
             # Attach trial to Ax experiment
