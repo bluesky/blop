@@ -86,26 +86,34 @@ def tiled_wrap(
     static: dict[str, str] | None = None,
 ):
     """
-    a possibly more pythonic interface for directly generating and returning a tiled linked evaluation function
+    Wrap a cost function with Tiled-backed data access returning a full Evaluation function
 
     Parameters
     ----------
     f : Callable[[dict], dict]
-        a single sample context only cost function that returns a dict containing all objective values for a sample.
-        the provided function shall receive all the data relevent to its sample context described by channels, alt, static,
-        and its suggestion as a dictionary keyed by the provided names.
+        Function that evaluates a single sample and returns a dictionary
+        of objective values. The input dictionary contains the sample's
+        suggestion and all context data specified by `channels`, `alt`,
+        and `static` grabbed from Tiled
     tiled_client : Container
-        the uid servicing tiled container for which the runengine is to record to
+        Tiled container used to retrieve RunEngine data.
     channels : list[str] | list[Readable]
-        These are all of your standard detectors/ measures of which RunEngine is familiar with (implement read interface)
-        RunEngine puts these into the 'primary' data stream by name. Implicit index by sample point required
+        Primary RunEngine data channels. These are read per sample using
+        implicit index alignment across the primary stream.
     alt : dict[str, str] | None
-        An alternate indexing for streams which are labeled/ seperated from the primary stream. Implicit sampling index
-        like the primary stream is required (ie if sample x reports at primary index n then alt must also have x at index n)
+        Mapping of alternate stream names to channel names. Alternate
+        streams must share the same implicit sample indexing as the
+        primary stream.
     static : dict[str, str] | None
-        this is for static channels that are sampled only once per run like a background stream or data like start time.
-        data is accessed once per set of samples and passed to each evaluation as context.
-        ( Can be used as a channel of last resort for when implicit indexing doesn't work with your data scheme.
-        it will dump the entire sampled data structure so beware of data size)
+        Mapping of static stream names to channel names. These values are
+        sampled once per run and passed unchanged to every evaluation.
+        Useful for metadata, background measurements, or data that cannot
+        be aligned by sample index.
+
+    Returns
+    -------
+    EvaluationFunction
+        the function f wrapped in the default backended data management needed for tiled
+        to evaluate f on a set of samples within the primary optimization interface
     """
     return (tiled_link(tiled_client=tiled_client, channels=channels, alt=alt, static=static)(f)).linked
