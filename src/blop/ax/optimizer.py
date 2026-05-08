@@ -1,7 +1,8 @@
 from collections.abc import Sequence
 from typing import Any
 
-from ax import ChoiceParameterConfig, Client, RangeParameterConfig
+from ax import ChoiceParameterConfig, Client, RangeParameterConfig, TOutcome, TParameterization
+from ax.core.objective import MultiObjective
 from ax.core.parameter import ChoiceParameter, RangeParameter
 from ax.core.types import TParamValue
 
@@ -141,6 +142,39 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
             }
             for trial_index, parameterization in next_trials.items()
         ]
+
+    def get_best_points(self) -> list[tuple[int, TParameterization, TOutcome]]:
+        """
+        Get a list of the optimal points found during optimization.
+
+        For single-objective optimization, returns a single best point.
+        For multi-objective optimization, returns the Pareto-optimal set.
+
+        Returns
+        -------
+        list[tuple[int, TParameterization, TOutcome]]
+            Each element in the list is a tuple of:
+              - trial index (int)
+              - parameter values (dict)
+              - metric values (dict, where values may be (value, sem) tuples)
+
+        Raises
+        ------
+        ValueError
+            If the Ax client's optimization has not been configured yet.
+        """
+
+        opt_config = self._client._experiment.optimization_config
+        if opt_config is None:
+            raise ValueError("Somehow your optimization has not been configured yet...check `ax_client`.")
+        is_multi_objective = isinstance(opt_config.objective, MultiObjective)
+
+        if is_multi_objective:
+            frontier = self._client.get_pareto_frontier(use_model_predictions=False)
+            return [(trial_index, params, metrics) for params, metrics, trial_index, _ in frontier]
+        else:
+            params, metrics, trial_index, _ = self._client.get_best_parameterization(use_model_predictions=False)
+            return [(trial_index, params, metrics)]
 
     def _split_point(self, point: dict) -> tuple[dict, dict]:
         """Helper function to split a point into parameters and outcomes."""

@@ -490,3 +490,61 @@ def test_from_checkpoint_has_default_callbacks(mock_evaluation_function, tmp_pat
     )
     assert len(restored.callbacks) == 1
     assert isinstance(restored.callbacks[0], OptimizationLogger)
+
+
+def test_agent_get_best_points_single_objective(mock_evaluation_function):
+    """Agent.get_best_points returns the best trial for single-objective."""
+    movable1 = MovableSignal(name="test_movable1")
+    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+    agent = Agent(
+        sensors=[],
+        dofs=[dof1],
+        objectives=[objective],
+        evaluation_function=mock_evaluation_function,
+    )
+
+    agent.ingest(
+        [
+            {"test_movable1": 2.0, "test_objective": 5.0},
+            {"test_movable1": 7.0, "test_objective": 20.0},
+            {"test_movable1": 4.0, "test_objective": 10.0},
+        ]
+    )
+    agent.ax_client.configure_generation_strategy()
+
+    best_points = agent.get_best_points()
+    assert len(best_points) == 1
+    _, params, metrics = best_points[0]
+    assert params["test_movable1"] == 7.0
+    assert metrics["test_objective"][0] == 20.0
+
+
+def test_agent_get_best_points_multi_objective(mock_evaluation_function):
+    """Agent.get_best_points returns the Pareto set for multi-objective."""
+    dof1 = RangeDOF(name="x1", bounds=(0, 10), parameter_type="float")
+    obj1 = Objective(name="obj1", minimize=False)
+    obj2 = Objective(name="obj2", minimize=False)
+    agent = Agent(
+        sensors=[],
+        dofs=[dof1],
+        objectives=[obj1, obj2],
+        evaluation_function=mock_evaluation_function,
+    )
+
+    agent.ingest(
+        [
+            {"x1": 1.0, "obj1": 10.0, "obj2": 1.0},
+            {"x1": 5.0, "obj1": 1.0, "obj2": 10.0},
+            {"x1": 3.0, "obj1": 2.0, "obj2": 2.0},  # dominated
+        ]
+    )
+    agent.ax_client.configure_generation_strategy()
+
+    best_points = agent.get_best_points()
+    # Should return at least the non-dominated points
+    assert len(best_points) >= 2
+    for _, params, metrics in best_points:
+        assert "x1" in params
+        assert "obj1" in metrics
+        assert "obj2" in metrics
