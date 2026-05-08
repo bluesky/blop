@@ -131,7 +131,7 @@ def navigate_to_best(
 
     Raises
     ------
-    ValueError
+    TypeError
         If both ``parameterization`` and ``optimizer`` arguments are ``None``.
     ValueError
         If the optimizer returns multiple Pareto-optimal points and no
@@ -139,7 +139,7 @@ def navigate_to_best(
     """
     if parameterization is None:
         if optimizer is None:
-            raise ValueError("Either pass an explicit parameterization or use an optimizer.")
+            raise TypeError("Either pass an explicit parameterization or use an optimizer.")
         best_points = optimizer.get_best_points()
         if len(best_points) > 1:
             raise ValueError(

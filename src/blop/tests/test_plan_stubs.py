@@ -51,10 +51,10 @@ def test_navigate_raises_on_multiple_pareto_points(RE):
 
 
 def test_navigate_raises_on_missing_arguments(RE):
-    """navigate_to_best raises ValueError if both parameterization and optimizer are None."""
+    """navigate_to_best raises TypeError if both parameterization and optimizer are None."""
     x1 = MovableSignal("x1", initial_value=0.0)
 
-    with pytest.raises(ValueError, match="parameterization or use an optimizer"):
+    with pytest.raises(TypeError, match="parameterization or use an optimizer"):
         RE(navigate_to_best([x1]))
 
 
