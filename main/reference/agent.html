@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Agent &#8212; blop 1.0.0b2.dev13 documentation</title>
+    <title>Agent &#8212; blop 1.0.0b2.dev14 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=09d1a59c"></script>
+    <script src="../_static/documentation_options.js?v=c2583551"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="API Reference" href="../reference.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev13" />
+  <meta name="docsearch:version" content="1.0.0b2.dev14" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -769,6 +769,39 @@ optimizer suggestions and manual points.</p>
 </div>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="blop.ax.Agent.navigate_to_best">
+<span class="sig-name descname"><span class="pre">navigate_to_best</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameterization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#Agent.navigate_to_best"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.Agent.navigate_to_best" title="Link to this definition">#</a></dt>
+<dd><p>Move actuators to the best point found during optimization.</p>
+<p>If no explicit parameterization is provided, queries the optimizer for its
+best point(s). For multi-objective optimizers that return multiple Pareto-optimal
+points, an explicit parameterization must be provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>parameterization</strong><span class="classifier">Mapping | None, optional</span></dt><dd><p>Explicit parameterization to navigate to. If None, queries the optimizer’s
+best point. For multi-objective problems, call <code class="docutils literal notranslate"><span class="pre">get_best_points()</span></code>
+to inspect the Pareto set and select one.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ValueError</dt><dd><p>If the optimizer returns multiple Pareto-optimal points and no
+explicit <code class="docutils literal notranslate"><span class="pre">parameterization</span></code> is provided.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#blop.ax.Agent.get_best_points" title="blop.ax.Agent.get_best_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_points</span></code></a></dt><dd><p>Query the optimizer for best points.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="blop.ax.Agent.ax_client">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ax_client</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Client</span></span><a class="headerlink" href="#blop.ax.Agent.ax_client" title="Link to this definition">#</a></dt>
@@ -791,6 +824,36 @@ optimizer suggestions and manual points.</p>
 <dt class="sig sig-object py" id="blop.ax.Agent.fixed_dofs">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fixed_dofs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#blop.ax.Agent.fixed_dofs" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blop.ax.Agent.get_best_points">
+<span class="sig-name descname"><span class="pre">get_best_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.Agent.get_best_points" title="Link to this definition">#</a></dt>
+<dd><p>Get a list of the optimal points found during optimization.</p>
+<p>For single-objective optimization, returns a single best point.
+For multi-objective optimization, returns the Pareto-optimal set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>list[tuple[int, TParameterization, TOutcome]]</dt><dd><dl class="simple">
+<dt>Each element in the list is a tuple of:</dt><dd><ul class="simple">
+<li><p>trial index (int)</p></li>
+<li><p>parameter values (dict)</p></li>
+<li><p>metric values (dict, where values may be (value, sem) tuples)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#blop.ax.Agent.navigate_to_best" title="blop.ax.Agent.navigate_to_best"><code class="xref py py-obj docutils literal notranslate"><span class="pre">navigate_to_best</span></code></a></dt><dd><p>Plan stub to move actuators to a best point.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="blop.ax.Agent.ingest">
@@ -1016,6 +1079,36 @@ of sensors that are needed to compute the objectives.</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.get_best_points">
+<span class="sig-name descname"><span class="pre">get_best_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.QueueserverAgent.get_best_points" title="Link to this definition">#</a></dt>
+<dd><p>Get a list of the optimal points found during optimization.</p>
+<p>For single-objective optimization, returns a single best point.
+For multi-objective optimization, returns the Pareto-optimal set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>list[tuple[int, TParameterization, TOutcome]]</dt><dd><dl class="simple">
+<dt>Each element in the list is a tuple of:</dt><dd><ul class="simple">
+<li><p>trial index (int)</p></li>
+<li><p>parameter values (dict)</p></li>
+<li><p>metric values (dict, where values may be (value, sem) tuples)</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">navigate_to_best</span></code></dt><dd><p>Plan stub to move actuators to a best point.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="blop.ax.QueueserverAgent.ingest">
 <span class="sig-name descname"><span class="pre">ingest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.QueueserverAgent.ingest" title="Link to this definition">#</a></dt>
 <dd><p>Ingest evaluation results into the optimizer.</p>
@@ -1229,10 +1322,12 @@ optimizer suggestions and manual points.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.acquire_baseline"><code class="docutils literal notranslate"><span class="pre">Agent.acquire_baseline()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.optimize"><code class="docutils literal notranslate"><span class="pre">Agent.optimize()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.sample_suggestions"><code class="docutils literal notranslate"><span class="pre">Agent.sample_suggestions()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.navigate_to_best"><code class="docutils literal notranslate"><span class="pre">Agent.navigate_to_best()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.ax_client"><code class="docutils literal notranslate"><span class="pre">Agent.ax_client</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.checkpoint"><code class="docutils literal notranslate"><span class="pre">Agent.checkpoint()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.checkpoint_path"><code class="docutils literal notranslate"><span class="pre">Agent.checkpoint_path</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.fixed_dofs"><code class="docutils literal notranslate"><span class="pre">Agent.fixed_dofs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.get_best_points"><code class="docutils literal notranslate"><span class="pre">Agent.get_best_points()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.ingest"><code class="docutils literal notranslate"><span class="pre">Agent.ingest()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.plot_objective"><code class="docutils literal notranslate"><span class="pre">Agent.plot_objective()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.reconfigure_search_space"><code class="docutils literal notranslate"><span class="pre">Agent.reconfigure_search_space()</span></code></a></li>
@@ -1252,6 +1347,7 @@ optimizer suggestions and manual points.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.checkpoint"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.checkpoint()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.checkpoint_path"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.checkpoint_path</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.fixed_dofs"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.fixed_dofs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.get_best_points"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.get_best_points()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.ingest"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.ingest()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.plot_objective"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.plot_objective()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.reconfigure_search_space"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.reconfigure_search_space()</span></code></a></li>

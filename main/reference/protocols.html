@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Protocols &#8212; blop 1.0.0b2.dev13 documentation</title>
+    <title>Protocols &#8212; blop 1.0.0b2.dev14 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=09d1a59c"></script>
+    <script src="../_static/documentation_options.js?v=c2583551"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Plans" href="plans.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev13" />
+  <meta name="docsearch:version" content="1.0.0b2.dev14" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -666,6 +666,29 @@ the point as a “baseline” trial.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="blop.protocols.Optimizer.get_best_points">
+<span class="sig-name descname"><span class="pre">get_best_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/protocols.html#Optimizer.get_best_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.protocols.Optimizer.get_best_points" title="Link to this definition">#</a></dt>
+<dd><p>Get a list of the optimal points found during optimization.</p>
+<p>For single-objective optimization, returns a single best point.
+For multi-objective optimization, returns the Pareto-optimal set.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>list[tuple[Any, Mapping, Mapping]]</dt><dd><dl class="simple">
+<dt>Each element in the list is a tuple of:</dt><dd><ul class="simple">
+<li><p>“_id” of the suggestion</p></li>
+<li><p>suggested parameters</p></li>
+<li><p>measured outcomes</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -808,6 +831,7 @@ A subset of the actuators’ names must match the names of suggested parameteriz
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.protocols.Optimizer"><code class="docutils literal notranslate"><span class="pre">Optimizer</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.protocols.Optimizer.suggest"><code class="docutils literal notranslate"><span class="pre">Optimizer.suggest()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.protocols.Optimizer.ingest"><code class="docutils literal notranslate"><span class="pre">Optimizer.ingest()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.protocols.Optimizer.get_best_points"><code class="docutils literal notranslate"><span class="pre">Optimizer.get_best_points()</span></code></a></li>
 </ul>
 </li>
 </ul>

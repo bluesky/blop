@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.agent &#8212; blop 1.0.0b2.dev13 documentation</title>
+    <title>blop.ax.agent &#8212; blop 1.0.0b2.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=09d1a59c"></script>
+    <script src="../../../_static/documentation_options.js?v=c2583551"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -498,7 +498,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev13" />
+  <meta name="docsearch:version" content="1.0.0b2.dev14" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -889,10 +889,10 @@ window.runMermaid = runMermaid;</script>
   <h1>Source code for blop.ax.agent</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">importlib.util</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">cast</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">ax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Client</span><span class="p">,</span> <span class="n">TOutcome</span><span class="p">,</span> <span class="n">TParameterization</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ax.analysis.plotly.surface.contour</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContourPlot</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ax.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">TParamValue</span>
 
@@ -910,6 +910,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..callbacks.logger</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationLogger</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..callbacks.router</span><span class="w"> </span><span class="kn">import</span> <span class="n">OptimizationCallbackRouter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plan_stubs</span><span class="w"> </span><span class="kn">import</span> <span class="n">navigate_to_best</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..plans</span><span class="w"> </span><span class="kn">import</span> <span class="n">acquire_baseline</span><span class="p">,</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">sample_suggestions</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..protocols</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">AcquisitionPlan</span><span class="p">,</span>
@@ -1009,6 +1010,27 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        For complete examples, see :doc:`/how-to-guides/attach-data-to-experiments`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_best_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">TParameterization</span><span class="p">,</span> <span class="n">TOutcome</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a list of the optimal points found during optimization.</span>
+
+<span class="sd">        For single-objective optimization, returns a single best point.</span>
+<span class="sd">        For multi-objective optimization, returns the Pareto-optimal set.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list[tuple[int, TParameterization, TOutcome]]</span>
+<span class="sd">            Each element in the list is a tuple of:</span>
+<span class="sd">              - trial index (int)</span>
+<span class="sd">              - parameter values (dict)</span>
+<span class="sd">              - metric values (dict, where values may be (value, sem) tuples)</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        navigate_to_best : Plan stub to move actuators to a best point.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">get_best_points</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_objective</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">x_dof_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">y_dof_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">objective_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
@@ -1414,6 +1436,43 @@ window.runMermaid = runMermaid;</script>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">sample_suggestions_plan</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Agent.navigate_to_best">
+<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.navigate_to_best">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">navigate_to_best</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameterization</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Move actuators to the best point found during optimization.</span>
+
+<span class="sd">        If no explicit parameterization is provided, queries the optimizer for its</span>
+<span class="sd">        best point(s). For multi-objective optimizers that return multiple Pareto-optimal</span>
+<span class="sd">        points, an explicit parameterization must be provided.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        parameterization : Mapping | None, optional</span>
+<span class="sd">            Explicit parameterization to navigate to. If None, queries the optimizer&#39;s</span>
+<span class="sd">            best point. For multi-objective problems, call ``get_best_points()``</span>
+<span class="sd">            to inspect the Pareto set and select one.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If the optimizer returns multiple Pareto-optimal points and no</span>
+<span class="sd">            explicit ``parameterization`` is provided.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        get_best_points : Query the optimizer for best points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">optimization_problem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="k">yield from</span> <span class="n">navigate_to_best</span><span class="p">(</span>
+                <span class="n">optimization_problem</span><span class="o">.</span><span class="n">actuators</span><span class="p">,</span>
+                <span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span>
+                <span class="n">parameterization</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span></div>
 </div>
 
 
