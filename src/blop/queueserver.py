@@ -279,8 +279,6 @@ class QueueserverOptimizationRunner:
         ValueError
             If required devices or plans are not available.
         """
-        if self.is_running:
-            raise RuntimeError("Optimization loop is already running.")
         self._validate()
         self._state = _OptimizationState(max_iterations=iterations, num_points=num_points)
         self._continuous = True
@@ -300,8 +298,6 @@ class QueueserverOptimizationRunner:
             - Optimizer suggestions (with "_id" keys from suggest())
             - Manual points (without "_id", requires CanRegisterSuggestions protocol)
         """
-        if self.is_running:
-            raise RuntimeError("Optimization loop is already running.")
         self._validate()
         self._state = _OptimizationState(max_iterations=1, num_points=len(suggestions))
         self._continuous = False
@@ -322,6 +318,8 @@ class QueueserverOptimizationRunner:
 
     def _validate(self) -> None:
         """Validate queueserver environment, devices, and plan availability."""
+        if self.is_running:
+            raise RuntimeError("Optimization loop is already running.")
         self._client.check_environment()
 
         # Collect device names from actuators and sensors
