@@ -7,7 +7,6 @@ a queueserver, rather than directly through a RunEngine.
 
 import logging
 import threading
-import time
 import uuid
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
