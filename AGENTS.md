@@ -11,6 +11,11 @@ type checking, and `pytest` for tests.
   `docs`, and per-Python `py310-cpu`..`py313-cpu`.
 - Editable installs are configured in `pixi.toml`; do not `pip install`
   manually. Re-sync with `pixi install -e dev-cpu` if dependencies change.
+- `pyproject.toml` is the single source of truth for runtime/dev
+  dependencies. `pixi.toml` should pull them in via the editable install
+  (`blop = { path = ".", editable = true, extras = [...] }`) rather than
+  redeclare them; only platform-specific binary deps (e.g. `graphviz`)
+  belong directly in `pixi.toml`.
 
 ## Build / Lint / Test commands
 
@@ -52,7 +57,7 @@ Enforced by `ruff` (config in `pyproject.toml [tool.ruff]`) and `pyright`.
   (ruff format default).
 - Imports: sorted by ruff `I` (isort). Order: stdlib, third-party, first-party.
   Use **relative imports within `blop`** (e.g. `from .protocols import ...`,
-  see `src/blop/utils.py:12`). Avoid private/underscore imports across modules
+  as in `src/blop/utils.py`). Avoid private/underscore imports across modules
   (`PLC2701` enabled in preview).
 - Active rule sets: `B`, `C4`, `E`, `F`, `W`, `I`, `UP`, `SLF`, `PLC2701`,
   `LOG015`, `S101`, `D` (numpy convention). Currently ignored repo-wide:
@@ -79,7 +84,7 @@ Enforced by `ruff` (config in `pyproject.toml [tool.ruff]`) and `pyright`.
 
 - `snake_case` for functions, methods, variables, modules.
 - `PascalCase` for classes and `Enum` types (e.g. `Source(str, Enum)` in
-  `src/blop/utils.py:15`).
+  `src/blop/utils.py`).
 - `UPPER_SNAKE_CASE` for module-level constants (e.g. `ID_KEY`).
 - Leading underscore (`_name`) for module-private and internal attributes.
   Don't access `_private` members across module boundaries.
@@ -88,7 +93,7 @@ Enforced by `ruff` (config in `pyproject.toml [tool.ruff]`) and `pyright`.
 ## Docstrings & comments
 
 - Numpy-style docstrings (`[tool.ruff.lint.pydocstyle] convention = "numpy"`).
-  See `InferredReadable` in `src/blop/utils.py:42` for a canonical example
+  See `InferredReadable` in `src/blop/utils.py` for a canonical example
   (Parameters section with `name : type` lines).
 - Public classes, functions, and modules should have a one-line summary plus
   Parameters / Returns / Raises sections where applicable. Keep comments
