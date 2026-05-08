@@ -381,11 +381,11 @@ def test_runner_run_full_cycle(mock_optimization_problem):
     runner.run(iterations=3, num_points=2)
 
     # Simulate 3 acquisition completions by invoking the captured callback
-    for _ in range(3):
+    for i in range(3):
         current_uid = runner._state.current_uid
-        uid = f"fake-uid-{_}"
+        uid = f"fake-uid-{i}"
         start_doc = {"uid": uid, CORRELATION_UID_KEY: current_uid}
-        stop_doc = {"uid": uid}
+        stop_doc = {"uid": "other-fake-uid", "run_start": uid}
         mock_client._on_stop(start_doc, stop_doc)
 
     assert mock_client.submit_plan.call_count == 3
@@ -413,7 +413,7 @@ def test_runner_on_acquisition_complete_raises_on_uid_mismatch(mock_optimization
 
     # Callback with wrong blop_correlation_uid should raise
     start_doc = {"uid": "fake-uid", CORRELATION_UID_KEY: "wrong-uid"}
-    stop_doc = {"uid": "fake-uid"}
+    stop_doc = {"uid": "other-fake-uid", "run_start": "fake-uid"}
 
     with pytest.raises(RuntimeError, match="current_uid did not match start document"):
         mock_client._on_stop(start_doc, stop_doc)
