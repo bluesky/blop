@@ -52,6 +52,7 @@ extensions = [
     "numpydoc",
     "sphinx_copybutton",
     "myst_nb",
+    "sphinxcontrib.mermaid",
 ]
 
 # Configuration options for plot_directive. See:
@@ -89,7 +90,7 @@ nb_render_image_options = {
     "align": "center",
 }
 nb_execution_mode = "auto"
-if "doctest" in sys.argv:
+if "doctest" in sys.argv or os.environ.get("BLOP_DOCS_NO_EXEC"):
     nb_execution_mode = "off"
 
 # Enable ELLIPSIS option for doctest to match any substring including empty
@@ -147,10 +148,14 @@ html_theme = "pydata_sphinx_theme"
 html_theme_options = {
     "github_url": "https://github.com/bluesky/blop",
     "switcher": {
-        "json_url": "https://bluesky.github.io/blop/switcher.json",
+        "json_url": "https://blueskyproject.io/blop/switcher.json",
         "version_match": os.environ.get("DOCS_VERSION", "main"),
     },
-    "navbar_end": ["version-switcher", "theme-switcher", "navbar-icon-links"],
+    "logo": {
+        "text": "Blop",
+    },
+    "navbar_start": ["navbar-logo", "version-switcher"],
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
     "icon_links": [
         {
             "name": "PyPI",

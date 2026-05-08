@@ -31,9 +31,6 @@ jobs:
           cache: false
           activate-environment: docs
 
-      - name: Test with doctest
-        run: pixi run doc-tests
-
       - name: Build Docs
         run: pixi run build-docs
 

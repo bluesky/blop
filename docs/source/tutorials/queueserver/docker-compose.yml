@@ -1,0 +1,62 @@
+x-blop-service: &blop-service
+  build:
+    context: .
+    dockerfile: Dockerfile
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+
+  zmq-proxy:
+    <<: *blop-service
+    command: bluesky-0MQ-proxy 5577 5578
+    ports:
+      - "5577:5577"
+      - "5578:5578"
+
+  tiled:
+    <<: *blop-service
+    command: tiled serve catalog --temp --host 0.0.0.0 --port 8000 --api-key tutorialkey
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "pixi run python -c 'import urllib.request; urllib.request.urlopen(\"http://localhost:8000/api/v1/\")'"]
+      interval: 3s
+      timeout: 10s
+      retries: 10
+
+  re-manager:
+    <<: *blop-service
+    command: start-re-manager --startup-dir=/app/startup --zmq-publish-console OFF --redis-addr redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+      zmq-proxy:
+        condition: service_started
+    ports:
+      - "60615:60615"
+    environment:
+      BLUESKY_ZMQ_PROXY_IN_ADDR: "tcp://zmq-proxy:5577"
+    volumes:
+      - ./startup.py:/app/startup/00-startup.py:ro
+      - ./user_group_permissions.yaml:/app/startup/user_group_permissions.yaml:ro
+
+  zmq-tiled-bridge:
+    <<: *blop-service
+    command: python -u /app/zmq_tiled_bridge.py
+    depends_on:
+      zmq-proxy:
+        condition: service_started
+      tiled:
+        condition: service_healthy
+    environment:
+      ZMQ_ADDR: "tcp://zmq-proxy:5578"
+      TILED_URI: "http://tiled:8000"
+      TILED_API_KEY: "tutorialkey"
