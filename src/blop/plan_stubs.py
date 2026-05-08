@@ -132,6 +132,8 @@ def navigate_to_best(
     Raises
     ------
     ValueError
+        If both ``parameterization`` and ``optimizer`` arguments are ``None``.
+    ValueError
         If the optimizer returns multiple Pareto-optimal points and no
         explicit ``parameterization`` is provided.
     """
