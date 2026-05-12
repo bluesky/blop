@@ -48,8 +48,8 @@ def tiled_link(
 
                 if len(r_sugg) != len(suggestions):
                     print(
-                        '''!!! Bluesky has not completed all sent suggestions.
-                         If expected, be sure to manage failed and abandoned trials !!!'''
+                        """!!! Bluesky has not completed all sent suggestions.
+                         If expected, be sure to manage failed and abandoned trials !!!"""
                     )
                 chan = [(dev if not isinstance(dev, Readable) else dev.name) for dev in channels]
                 data = {ch: run["primary/" + ch] for ch in chan}

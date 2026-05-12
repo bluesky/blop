@@ -1,5 +1,3 @@
-
-
 from collections.abc import Callable
 
 from bluesky.protocols import Readable
@@ -8,10 +6,7 @@ from blop.callbacks.cache import OptimizationCache
 from blop.protocols import ID_KEY, EvaluationFunction
 
 
-def direct_link(
-    stream_store: OptimizationCache,
-    channels: list[str] | list[Readable] | None = None
-):
+def direct_link(stream_store: OptimizationCache, channels: list[str] | list[Readable] | None = None):
     def deco(f: Callable[[dict], dict]):
         class DirectEval(EvaluationFunction):
             def __call__(self, uid, suggestions) -> list[dict]:
@@ -38,5 +33,7 @@ def direct_link(
 
             def __call__(self, *args, **kwargs):
                 return f(*args, **kwargs)
+
         return link_wrapper()
+
     return deco
