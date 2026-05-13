@@ -23,6 +23,7 @@ First, let's import what we need and start the data infrastructure:
 import logging
 import time
 from typing import Any
+import warnings
 
 from blop.ax import Agent, RangeDOF, Objective
 
@@ -35,6 +36,8 @@ from tiled.server import SimpleTiledServer
 
 # Suppress noisy logs from httpx 
 logging.getLogger("httpx").setLevel(logging.WARNING)
+# Suppress noisy dependency deprecations from within Ax
+warnings.filterwarnings('ignore',category=FutureWarning)
 ```
 
 ```{code-cell} ipython3
@@ -122,13 +125,16 @@ class Himmelblau2DEvaluation():
     def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
         run = self.tiled_client[uid]
         outcomes = []
+        reordered_suggestions = run.start["blop_suggestions"]
         x1_data = run["primary/x1"].read()
         x2_data = run["primary/x2"].read()
 
-        for suggestion in suggestions:
+        print("[Himmelblau] evaluating suggestions: ", [s["_id"] for s in suggestions], " reordered to: ", [s["_id"] for s in reordered_suggestions])
+        for index, suggestion in enumerate(reordered_suggestions):
+            # Special key to identify a suggestion
             suggestion_id = suggestion["_id"]
-            x1 = x1_data[suggestion_id % len(x1_data)]
-            x2 = x2_data[suggestion_id % len(x2_data)]
+            x1 = x1_data[index]
+            x2 = x2_data[index]
             # Himmelblau function: has four global minima where value = 0
             outcomes.append({
                 "himmelblau_2d": (x1 ** 2 + x2 - 11) ** 2 + (x1 + x2 ** 2 - 7) ** 2,
@@ -152,7 +158,7 @@ agent = Agent(
     description="A simple experiment optimizing the Himmelblau function",
 )
 
-RE(agent.optimize(30))
+RE(agent.optimize(5,n_points=8))
 ```
 
 ## Viewing the results
