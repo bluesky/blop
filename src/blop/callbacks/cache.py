@@ -5,6 +5,9 @@ from blop.protocols import ID_KEY
 
 
 class OptimizationCache(CallbackBase):
+    """
+    a small callback that follows the same behavior as logger but collects internal event data to be using in evaluation
+    """
     def __init__(self):
         self.run_log = {}
         self.sample_seq = {}

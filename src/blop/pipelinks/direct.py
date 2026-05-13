@@ -7,6 +7,11 @@ from blop.protocols import ID_KEY, EvaluationFunction
 
 
 def direct_link(stream_store: OptimizationCache, channels: list[str] | list[Readable] | None = None):
+    """
+    This is a decorator class which converts a data processing function to have a side effect function allowing for
+    direct uid interface mode using a local OptimizationCache callback to collect run data and process through single
+    sample contexts
+    """
     def deco(f: Callable[[dict], dict]):
         class DirectEval(EvaluationFunction):
             def __call__(self, uid, suggestions) -> list[dict]:
