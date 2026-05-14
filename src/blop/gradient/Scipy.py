@@ -171,6 +171,7 @@ class ScipyOptimizer(Optimizer):
         self.final: OptimizeResult | None = None
         self.force_resiliance = False
         self._scale = np.ones(len(config.dofs))
+
         if config.rescale is not None:
             if isinstance(config.rescale, list):
                 self._scale = config.rescale
@@ -225,7 +226,6 @@ class ScipyOptimizer(Optimizer):
         else:
             raise NotImplementedError("")
 
-        # self.t = Thread(target=minimize, args=(cost, self._x), kwargs=kw, name="optimizer")
         self.t = Thread(target=mini_worker, name="optimizer")
         self.t.start()
 
@@ -265,8 +265,6 @@ class ScipyOptimizer(Optimizer):
         vector = [x_n * s for s, x_n in zip(self._scale, self._x, strict=True)]
         if self.final is not None:
             vector = [x_n * s for s, x_n in zip(self._scale, self.final.x, strict=True)]
-
-        print("sample:", self._x, " rescaled to:", vector)
 
         suggestion = dict(zip(self._params, vector, strict=True))
         suggestion[ID_KEY] = self._increment
