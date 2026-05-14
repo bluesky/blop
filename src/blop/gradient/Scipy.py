@@ -1,12 +1,13 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from enum import Enum
 from threading import Event, Thread
 from typing import Any, cast
 
 import bluesky.preprocessors as bpp
+import numpy as np
 from bluesky.callbacks import CallbackBase
-from scipy.optimize import Bounds, OptimizeResult, dual_annealing, minimize
+from scipy.optimize import OptimizeResult, dual_annealing, minimize
 
 from blop.ax.dof import RangeDOF
 from blop.callbacks.logger import OptimizationLogger
@@ -14,7 +15,15 @@ from blop.callbacks.router import OptimizationCallbackRouter
 from blop.plans import optimize
 from blop.utils import InferredReadable
 
-from ..protocols import ID_KEY, AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Optimizer, Sensor
+from ..protocols import (
+    ID_KEY,
+    AcquisitionPlan,
+    Actuator,
+    EvaluationFunction,
+    OptimizationProblem,
+    Optimizer,
+    Sensor,
+)
 
 
 class SCP(str, Enum):
@@ -29,6 +38,7 @@ class ScipyCFG:
     # outcome_constraints: Sequence[OutcomeConstraint] | None = None
     optimizer: str = "Default"
     initial: Sequence[float] | None = None
+    rescale: Sequence[float] | float | None = None
     max_iter: int | None = 100
     eps: float | None = None
 
@@ -73,7 +83,12 @@ class Scipy:
         if optimizer not in SCP:
             raise ValueError(f"optimizer {optimizer} not in supported optimizers:{list(SCP)}")
 
-        config = ScipyCFG(dofs=dofs, optimizer=optimizer, max_iter=kwargs.get("max_iter", None), eps=kwargs.get("eps", None))
+        config = ScipyCFG(
+            dofs=dofs,
+            optimizer=optimizer,
+            max_iter=kwargs.get("max_iter", None),
+            eps=kwargs.get("eps", None),
+        )
         return cls(sensors, config, evaluation_function, acquisition_plan)
 
     @property
@@ -123,8 +138,13 @@ class Scipy:
         )
 
     def optimize(self, iterations=10):
-        self._optimizer = ScipyOptimizer(self._config)
-        optimize_plan = optimize(self.to_optimization_problem(), iterations=iterations, readable_cache=self._readable_cache)
+        if self._optimizer.final is not None:
+            self._optimizer = ScipyOptimizer(self._config)
+        optimize_plan = optimize(
+            self.to_optimization_problem(),
+            iterations=iterations,
+            readable_cache=self._readable_cache,
+        )
 
         if self._callbacks:
             optimize_plan = bpp.subs_wrapper(
@@ -142,24 +162,28 @@ class ScipyOptimizer(Optimizer):
 
     def __init__(self, config: ScipyCFG):
         self._semaphore = Event()
-        self._params = []
-        self._bounds = []
-        self._increment = 0
+        self._params: list[str] = []
+        self._bounds: list[tuple[Any, Any]] = []
+        self._increment: int = 0
+        self._objective = None
         self._y = None
-        self.intermediate = None
-        self.final = None
+        self.intermediate: OptimizeResult | None = None
+        self.final: OptimizeResult | None = None
         self.force_resiliance = False
-        midp = []
+        self._scale = np.ones(len(config.dofs))
+        if config.rescale is not None:
+            if isinstance(config.rescale, list):
+                self._scale = config.rescale
+            else:
+                self._scale *= config.rescale
 
-        for dof in config.dofs:
+        for ind, dof in enumerate(config.dofs):
             self._params.append(dof.parameter_name)
-            self._bounds.append(Bounds(lb=dof.bounds[0], ub=dof.bounds[1]))
-            midp.append(0.5 * dof.bounds[0] + 0.5 * dof.bounds[1])
+            self._bounds.append(tuple(np.array(dof.bounds) / self._scale[ind]))
 
+        self._x = np.mean(self._bounds, axis=1)
         if config.initial is not None:
-            self._x = config.initial
-        else:
-            self._x = midp
+            self._x = np.array(config.initial) / self._scale
 
         def cost(x):
             self._x = x
@@ -181,12 +205,22 @@ class ScipyOptimizer(Optimizer):
         if config.optimizer in (SCP.Default):
 
             def mini_worker():
-                self.final = minimize(fun=cost, x0=self._x, bounds=self._bounds, callback=optim_callback, options=kw)
+                self.final = minimize(
+                    fun=cost,
+                    x0=self._x,
+                    bounds=self._bounds,
+                    callback=optim_callback,
+                    options=kw,
+                )
         elif config.optimizer in (SCP.Dual_Annealing):
 
             def mini_worker():
                 self.final = dual_annealing(
-                    func=cost, x0=self._x, bounds=self._bounds, callback=optim_callback, minimizer_kwargs=kw
+                    func=cost,
+                    x0=self._x,
+                    bounds=self._bounds,
+                    callback=optim_callback,
+                    minimizer_kwargs=kw,
                 )
         else:
             raise NotImplementedError("")
@@ -195,11 +229,20 @@ class ScipyOptimizer(Optimizer):
         self.t = Thread(target=mini_worker, name="optimizer")
         self.t.start()
 
-    def optimum(self):
+    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
+        result = self.intermediate
         if self.final is not None:
-            return self.final
+            result = self.final
+        if (result is None) or (self._objective is None):
+            raise ValueError("no optimization epoch has been recorded")
 
-        return self.intermediate
+        vector = [x_n * s for s, x_n in zip(self._scale, result.x, strict=True)]
+        cart = [
+            result.nit - 1,
+            cast(Mapping, dict(zip(self._params, vector, strict=True))),
+            cast(Mapping, {self._objective: result.fun}),
+        ]
+        return cart
 
     def suggest(self, num_points: int | None = None) -> list[dict]:
         """
@@ -219,10 +262,13 @@ class ScipyOptimizer(Optimizer):
             A list of dictionaries, each containing a parameterization of a point to evaluate next.
             Each dictionary must contain a unique "_id" key to identify each parameterization.
         """
-        if self.final is None:
-            suggestion = dict(zip(self._params, self._x, strict=True))
-        else:
-            suggestion = dict(zip(self._params, self.final.x, strict=True))
+        vector = [x_n * s for s, x_n in zip(self._scale, self._x, strict=True)]
+        if self.final is not None:
+            vector = [x_n * s for s, x_n in zip(self._scale, self.final.x, strict=True)]
+
+        print("sample:", self._x, " rescaled to:", vector)
+
+        suggestion = dict(zip(self._params, vector, strict=True))
         suggestion[ID_KEY] = self._increment
         self._increment += 1
         return [suggestion]
@@ -241,6 +287,7 @@ class ScipyOptimizer(Optimizer):
         if self._semaphore.is_set() and not self.force_resiliance:
             raise ValueError("optimizer did not expect to receive an update")
         res = points[0]
-        re_val = [res[param] for param in res if param not in (*self._params, ID_KEY)]
-        self._y = re_val[0]
+        if self._objective is None:
+            self._objective = [param for param in res if param not in (*self._params, ID_KEY)][0]
+        self._y = res[self._objective]
         self._semaphore.set()
