@@ -1,3 +1,4 @@
+import threading
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -232,6 +233,41 @@ def test_runner_run_submits_suggestions_to_queueserver():
     assert submitted_plan.name == "my_acquire"
 
 
+def test_runner_run_twice_fails():
+    """Test 2 calls to run() fails."""
+    submit_event = threading.Event()
+
+    def set_event(*args, **kwargs):
+        submit_event.set()
+
+    mock_client = MagicMock(spec=QueueserverClient)
+    mock_client.submit_plan.side_effect = set_event
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=MagicMock(),
+        actuators=["motor1"],
+        sensors=["det"],
+        evaluation_function=MagicMock(),
+        acquisition_plan="my_acquire",
+    )
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+    assert runner.optimization_problem == mock_optimization_problem
+
+    runner.run(iterations=1, num_points=1)
+    submit_event.wait(timeout=5)
+    if not submit_event.is_set():
+        pytest.fail("Submit event timed out")
+
+    with pytest.raises(RuntimeError, match="already running"):
+        runner.run(iterations=1, num_points=1)
+
+    with pytest.raises(RuntimeError, match="already running"):
+        suggestions = [{"motor1": 5}]
+        runner.submit_suggestions(suggestions)
+
+
 def test_runner_stop_sets_finished_state(mock_optimization_problem):
     """Test stop() marks the runner as finished and stops listener."""
     mock_client = MagicMock(spec=QueueserverClient)
@@ -281,6 +317,67 @@ def test_runner_submit_suggestions_to_queueserver():
     assert submitted_plan.name == "my_acquire"
 
 
+def test_runner_submit_suggestions_register_fails():
+    """Test run() gets suggestions from optimizer and submits plan to queueserver."""
+    mock_client = MagicMock(spec=QueueserverClient)
+
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=MagicMock(spec=Optimizer),
+        actuators=["motor1"],
+        sensors=["det"],
+        evaluation_function=MagicMock(),
+        acquisition_plan="my_acquire",
+    )
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+
+    suggestions = [{"motor1": 5}]
+    with pytest.raises(ValueError, match="'_id'"):
+        runner.submit_suggestions(suggestions)
+
+    # Verify optimizer.suggest was NOT called
+    mock_optimization_problem.optimizer.suggest.assert_not_called()
+
+
+def test_runner_submit_suggestions_twice_fails():
+    """Test 2 calls to submit_suggestions() fails."""
+    submit_event = threading.Event()
+
+    def set_event(*args, **kwargs):
+        submit_event.set()
+
+    mock_client = MagicMock(spec=QueueserverClient)
+    mock_client.submit_plan.side_effect = set_event
+
+    class CustomOptimizer(Optimizer, CanRegisterSuggestions): ...
+
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=MagicMock(spec=CustomOptimizer),
+        actuators=["motor1"],
+        sensors=["det"],
+        evaluation_function=MagicMock(),
+        acquisition_plan="my_acquire",
+    )
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+
+    suggestions = [{"motor1": 5}]
+    runner.submit_suggestions(suggestions)
+    submit_event.wait(timeout=5)
+    if not submit_event.is_set():
+        pytest.fail("Submit event timed out")
+
+    with pytest.raises(RuntimeError, match="already running"):
+        runner.submit_suggestions(suggestions)
+
+    with pytest.raises(RuntimeError, match="already running"):
+        runner.run(iterations=1)
+
+
 def test_runner_run_full_cycle(mock_optimization_problem):
     """Test run() completes full suggest -> acquire -> ingest cycle across 3 iterations."""
     # Configure for num_points=2: suggest returns 2 items, evaluation_function returns 2 outcomes
@@ -308,11 +405,11 @@ def test_runner_run_full_cycle(mock_optimization_problem):
     runner.run(iterations=3, num_points=2)
 
     # Simulate 3 acquisition completions by invoking the captured callback
-    for _ in range(3):
+    for i in range(3):
         current_uid = runner._state.current_uid
-        uid = f"fake-uid-{_}"
+        uid = f"fake-uid-{i}"
         start_doc = {"uid": uid, CORRELATION_UID_KEY: current_uid}
-        stop_doc = {"uid": uid}
+        stop_doc = {"uid": "other-fake-uid", "run_start": uid}
         mock_client._on_stop(start_doc, stop_doc)
 
     assert mock_client.submit_plan.call_count == 3
@@ -340,7 +437,21 @@ def test_runner_on_acquisition_complete_raises_on_uid_mismatch(mock_optimization
 
     # Callback with wrong blop_correlation_uid should raise
     start_doc = {"uid": "fake-uid", CORRELATION_UID_KEY: "wrong-uid"}
-    stop_doc = {"uid": "fake-uid"}
+    stop_doc = {"uid": "other-fake-uid", "run_start": "fake-uid"}
 
     with pytest.raises(RuntimeError, match="current_uid did not match start document"):
         mock_client._on_stop(start_doc, stop_doc)
+
+
+def test_runner_private_method_calls_before_run(mock_optimization_problem):
+    mock_client = MagicMock(spec=QueueserverClient)
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+
+    with pytest.raises(RuntimeError, match="run()"):
+        runner._build_plan([{}])
+
+    with pytest.raises(RuntimeError, match="run()"):
+        runner._on_acquisition_complete({}, {})

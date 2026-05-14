@@ -241,6 +241,7 @@ class QueueserverOptimizationRunner:
         self._state: _OptimizationState | None = None
         self._continuous = True
         self._autostart = True
+        self._state_lock = threading.RLock()
 
     @property
     def optimization_problem(self) -> QueueserverOptimizationProblem:
@@ -250,20 +251,22 @@ class QueueserverOptimizationRunner:
     @property
     def is_running(self) -> bool:
         """Whether an optimization run is currently in progress."""
-        return self._state is not None and not self._state.finished
+        with self._state_lock:
+            return self._state is not None and not self._state.finished
 
     @property
     def current_iteration(self) -> int:
         """The current iteration number (0 if not running)."""
-        return self._state.current_iteration if self._state else 0
+        with self._state_lock:
+            return self._state.current_iteration if self._state else 0
 
     def run(self, iterations: int = 1, num_points: int = 1) -> None:
         """
-        Start the optimization loop.
+        Run the optimization loop.
 
         Validates the queueserver state, then begins the suggest -> acquire -> ingest
         cycle. This method returns immediately; the optimization runs asynchronously
-        via callbacks.
+        via callbacks on the Bluesky document stream.
 
         Parameters
         ----------
@@ -279,17 +282,25 @@ class QueueserverOptimizationRunner:
         ValueError
             If required devices or plans are not available.
         """
-        # TODO: What if there is already a run in-progress?
-        self._validate()
-        self._state = _OptimizationState(max_iterations=iterations, num_points=num_points)
-        self._continuous = True
+        with self._state_lock:
+            self._validate()
+            self._state = _OptimizationState(max_iterations=iterations, num_points=num_points)
+            self._continuous = True
+        suggestions = self._problem.optimizer.suggest(num_points)
+        with self._state_lock:
+            plan = self._build_plan(suggestions)
+            logger.info(
+                f"Submitting iteration {self._state.current_iteration}/{self._state.max_iterations} "
+                f"with correlation uid: {self._state.current_uid}"
+            )
         self._client.start_listener(on_stop=self._on_acquisition_complete)
-        self._submit_next()
+        # TODO: Need to wait for connection handshake here
+        self._client.submit_plan(plan, autostart=self._autostart)
 
     def submit_suggestions(self, suggestions: list[dict]) -> None:
         """
         Manually submit suggestions to the queue. This method returns immediately; the
-        optimization runs asynchronously via callbacks.
+        optimization runs asynchronously via callbacks on the Bluesky document stream.
 
         Parameters
         ----------
@@ -299,41 +310,12 @@ class QueueserverOptimizationRunner:
             - Optimizer suggestions (with "_id" keys from suggest())
             - Manual points (without "_id", requires CanRegisterSuggestions protocol)
         """
-        self._validate()
-        self._state = _OptimizationState(max_iterations=1, num_points=len(suggestions))
-        self._continuous = False
-        self._client.start_listener(on_stop=self._on_acquisition_complete)
-        self._submit_next_manual(suggestions)
+        with self._state_lock:
+            self._validate()
+            self._state = _OptimizationState(max_iterations=1, num_points=len(suggestions))
+            self._continuous = False
 
-    def stop(self) -> None:
-        """
-        Stop the optimization loop gracefully.
-
-        The current acquisition will complete, but no further iterations will run.
-        """
-        self._continuous = False
-        self._client.stop_listener()
-        if self._state is not None:
-            self._state.finished = True
-        logger.info("Optimization stopped")
-
-    def _validate(self) -> None:
-        """Validate queueserver environment, devices, and plan availability."""
-        self._client.check_environment()
-
-        # Collect device names from actuators and sensors
-        actuator_names = list(self._problem.actuators)
-        sensor_names = list(self._problem.sensors)
-        self._client.check_devices_available(actuator_names + sensor_names)
-
-        self._client.check_plan_available(self._plan_name)
-
-    def _submit_next_manual(self, suggestions: list[dict]) -> None:
-        """Get suggestions from optimizer and submit plan to queueserver."""
-        if self._state is None:
-            raise RuntimeError("_submit_next called before run()")
-
-        # Ensure the suggestions have an ID_KEY or register them with the optimizer
+        # Ensure all suggestions have an ID_KEY or register them with the optimizer
         if not isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions) and any(
             ID_KEY not in suggestion for suggestion in suggestions
         ):
@@ -345,35 +327,45 @@ class QueueserverOptimizationRunner:
         elif isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions):
             suggestions = self.optimization_problem.optimizer.register_suggestions(suggestions)
 
+        with self._state_lock:
+            plan = self._build_plan(suggestions)
+            logger.info(f"Submitting manually specified suggestion(s) with correlation uid: {self._state.current_uid}")
+        self._client.start_listener(on_stop=self._on_acquisition_complete)
+        # TODO: Need to wait for connection handshake here
+        self._client.submit_plan(plan, autostart=self._autostart)
+
+    def stop(self) -> None:
+        """
+        Stop the optimization loop gracefully.
+        """
+        self._client.stop_listener()
+        with self._state_lock:
+            self._continuous = False
+            if self._state is not None:
+                self._state.finished = True
+        logger.info("Optimization stopped")
+
+    def _validate(self) -> None:
+        """LOCKED: Validate not already running, queueserver environment, devices, and plan availability."""
+        if self.is_running:
+            raise RuntimeError("Optimization loop is already running.")
+        self._client.check_environment()
+
+        # Collect device names from actuators and sensors
+        actuator_names = list(self._problem.actuators)
+        sensor_names = list(self._problem.sensors)
+        self._client.check_devices_available(actuator_names + sensor_names)
+        self._client.check_plan_available(self._plan_name)
+
+    def _build_plan(self, suggestions: list[dict]) -> BPlan:
+        """LOCKED: Build the plan to submit and update current state."""
+        if self._state is None:
+            raise RuntimeError("_build_plan() called before run() or submit_suggestions()")
+
         self._state.current_iteration += 1
         self._state.current_suggestions = suggestions
         self._state.current_uid = str(uuid.uuid4())
 
-        logger.info(f"Submitting manually specified suggestion(s) with correlation uid: {self._state.current_uid}")
-
-        plan = self._build_plan()
-        self._client.submit_plan(plan, autostart=self._autostart)
-
-    def _submit_next(self) -> None:
-        """Get suggestions from optimizer and submit plan to queueserver."""
-        if self._state is None:
-            raise RuntimeError("_submit_next called before run()")
-        self._state.current_iteration += 1
-        self._state.current_suggestions = self._problem.optimizer.suggest(self._state.num_points)
-        self._state.current_uid = str(uuid.uuid4())
-
-        logger.info(
-            f"Submitting iteration {self._state.current_iteration}/{self._state.max_iterations} "
-            f"with correlation uid: {self._state.current_uid}"
-        )
-
-        plan = self._build_plan()
-        self._client.submit_plan(plan, autostart=self._autostart)
-
-    def _build_plan(self) -> BPlan:
-        """Construct a BPlan from the current suggestions."""
-        if self._state is None:
-            raise RuntimeError("_build_plan called before run()")
         # Build metadata
         md: dict[str, Any] = {
             CORRELATION_UID_KEY: self._state.current_uid,
@@ -390,32 +382,44 @@ class QueueserverOptimizationRunner:
 
     def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Callback when acquisition finishes. Ingest results and maybe continue."""
-        if self._state is None:
-            raise RuntimeError("_on_acquisition_complete called before run()")
-        if self._state.current_uid is None:
-            raise RuntimeError("current_uid not set")
-        if self._state.current_uid != start_doc.get("blop_correlation_uid", None):
-            raise RuntimeError(
-                "current_uid did not match start document. "
-                f"Got: {start_doc.get('blop_correlation_uid', None)}, Expected: {self._state.current_uid}"
-            )
-        logger.info(f"Acquisition complete for uid: {self._state.current_uid}")
+        with self._state_lock:
+            if self._state is None:
+                raise RuntimeError("_on_acquisition_complete called before run()")
+            if self._state.current_uid is None:
+                raise RuntimeError("current_uid not set")
+            if self._state.current_uid != start_doc.get("blop_correlation_uid", None):
+                raise RuntimeError(
+                    "current_uid did not match start document. "
+                    f"Got: {start_doc.get('blop_correlation_uid', None)}, Expected: {self._state.current_uid}"
+                )
+            logger.info(f"Acquisition complete for uid: {self._state.current_uid}")
+            suggestions = self._state.current_suggestions
 
         # Evaluate the results
-        outcomes = self._problem.evaluation_function(
-            uid=start_doc["uid"],
-            suggestions=self._state.current_suggestions,
-        )
-
+        outcomes = self._problem.evaluation_function(uid=start_doc["uid"], suggestions=suggestions)
         logger.info(f"Evaluated {len(outcomes)} outcomes")
 
         # Ingest into optimizer
         self._problem.optimizer.ingest(outcomes)
 
+        # Check if done
+        with self._state_lock:
+            if not self._continuous or self._state.current_iteration >= self._state.max_iterations:
+                logger.info(f"Optimization complete after {self._state.current_iteration} iterations")
+                self._state.finished = True
+                should_continue = False
+            else:
+                should_continue = True
+
         # Continue if appropriate
-        if self._continuous and self._state.current_iteration < self._state.max_iterations:
-            logger.info("Continuing to next iteration")
-            self._submit_next()
-        else:
-            self._state.finished = True
-            logger.info(f"Optimization complete after {self._state.current_iteration} iterations")
+        if should_continue:
+            with self._state_lock:
+                num_points = self._state.num_points
+            suggestions = self._problem.optimizer.suggest(num_points)
+            with self._state_lock:
+                plan = self._build_plan(suggestions)
+                logger.info(
+                    f"Submitting iteration {self._state.current_iteration}/{self._state.max_iterations} "
+                    f"with correlation uid: {self._state.current_uid}"
+                )
+            self._client.submit_plan(plan, autostart=self._autostart)
