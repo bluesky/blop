@@ -50,7 +50,7 @@ class _PrimaryStreamFilter(CallbackBase):
     Descriptor documents whose stream name (``doc["name"]``) is not
     ``"primary"`` are silently dropped. Event documents are forwarded only
     when their corresponding descriptor was accepted. All other document
-    types (``start``, ``stop``) are passed through unconditionally, as 
+    types (``start``, ``stop``) are passed through unconditionally, as
     they are run-level rather than stream-level.
 
     Parameters
