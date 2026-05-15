@@ -428,6 +428,7 @@ class QueueserverOptimizationRunner:
                 self._problem.optimizer.register_failures(suggestions)
             except Exception:
                 logger.exception("Failed to register trial failures with the optimizer")
+                raise
 
     def _validate(self) -> None:
         """LOCKED: Validate not already running, queueserver environment, devices, and plan availability."""
