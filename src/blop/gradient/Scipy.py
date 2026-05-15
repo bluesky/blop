@@ -88,6 +88,7 @@ class Scipy:
             optimizer=optimizer,
             max_iter=kwargs.get("max_iter", None),
             eps=kwargs.get("eps", None),
+            rescale=kwargs.get("scale", None),
         )
         return cls(sensors, config, evaluation_function, acquisition_plan)
 
@@ -167,10 +168,18 @@ class ScipyOptimizer(Optimizer):
         self._increment: int = 0
         self._objective = None
         self._y = None
-        self.intermediate: OptimizeResult | None = None
-        self.final: OptimizeResult | None = None
         self.force_resiliance = False
         self._scale = np.ones(len(config.dofs))
+
+        @dataclass
+        class Result:
+            x: list
+            fun: float
+            nit: int
+            status: int = 2
+
+        self.intermediate: OptimizeResult | Result | None = None
+        self.final: OptimizeResult | Result | None = None
 
         if config.rescale is not None:
             if isinstance(config.rescale, list):
@@ -194,33 +203,36 @@ class ScipyOptimizer(Optimizer):
                 raise ValueError("return value is not present")
             return self._y
 
-        def optim_callback(intermediate_result: OptimizeResult):
-            self.intermediate = intermediate_result
-
         kw = {}
-        if config.eps is not None:
-            kw["eps"] = config.eps
-        if config.max_iter is not None:
-            kw["max_iter"] = config.max_iter
 
         if config.optimizer in (SCP.Default):
+            if config.max_iter is not None:
+                kw["max_iter"] = config.max_iter
+            if config.eps is not None:
+                kw["eps"] = config.eps
+
+            def default_callback(intermediate_result: OptimizeResult):
+                self.intermediate = intermediate_result
 
             def mini_worker():
                 self.final = minimize(
                     fun=cost,
                     x0=self._x,
                     bounds=self._bounds,
-                    callback=optim_callback,
+                    callback=default_callback,
                     options=kw,
                 )
         elif config.optimizer in (SCP.Dual_Annealing):
+
+            def dual_callback(x, f, context):
+                self.intermediate = Result(x, f, self._increment, context)
 
             def mini_worker():
                 self.final = dual_annealing(
                     func=cost,
                     x0=self._x,
                     bounds=self._bounds,
-                    callback=optim_callback,
+                    callback=dual_callback,
                     minimizer_kwargs=kw,
                 )
         else:
