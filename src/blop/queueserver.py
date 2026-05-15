@@ -233,7 +233,6 @@ class _OptimizationState:
     current_iteration: int = 0
     current_suggestions: list[dict] = field(default_factory=list)
     current_uid: str | None = None
-    finished: bool = False
     run_uids: list[str] = field(default_factory=list)
 
     def build_result(self) -> OptimizationResult:
@@ -326,6 +325,7 @@ class QueueserverOptimizationRunner:
             future: Future[OptimizationResult] = Future()
             self._current_future = future
         suggestions = self._problem.optimizer.suggest(num_points)
+        # TODO: Need to wait for connection handshake here
         with self._state_lock:
             plan = self._build_plan(suggestions)
             logger.info(
@@ -333,7 +333,6 @@ class QueueserverOptimizationRunner:
                 f"with correlation uid: {self._state.current_uid}"
             )
         self._client.start_listener(on_stop=self._on_acquisition_complete)
-        # TODO: Need to wait for connection handshake here
         self._client.submit_plan(plan, autostart=self._autostart)
         return future
 
@@ -395,18 +394,35 @@ class QueueserverOptimizationRunner:
         self._client.stop_listener()
         with self._state_lock:
             self._continuous = False
-            if self._state is not None:
-                self._state.finished = True
-                result = self._state.build_result()
-            else:
-                result = OptimizationResult(iterations_completed=0, num_points=0, run_uids=())
-            if self._current_future is not None and not self._current_future.done():
-                self._current_future.set_result(result)
+            result = (
+                self._state.build_result()
+                if self._state is not None
+                else OptimizationResult(iterations_completed=0, num_points=0, run_uids=())
+            )
+            self._resolve_future(result)
         logger.info("Optimization stopped")
+
+    def _resolve_future(self, result: OptimizationResult) -> None:
+        """LOCKED: Resolve the current future with a result if it is not already done."""
+        if self._current_future is not None and not self._current_future.done():
+            self._current_future.set_result(result)
+
+    def _fail_future(self, exc: Exception) -> None:
+        """LOCKED: Resolve the current future with an exception if it is not already done."""
+        if self._current_future is not None and not self._current_future.done():
+            self._current_future.set_exception(exc)
+
+    def _try_register_failures(self, suggestions: list[dict]) -> None:
+        """Notify a TrialFaultAware optimizer of failed suggestions, if supported."""
+        if suggestions and isinstance(self._problem.optimizer, TrialFaultAware):
+            try:
+                self._problem.optimizer.register_failures(suggestions)
+            except Exception:
+                logger.exception("Failed to register trial failures with the optimizer")
 
     def _validate(self) -> None:
         """LOCKED: Validate not already running, queueserver environment, devices, and plan availability."""
-        if self._state is not None and not self._state.finished:
+        if self._current_future is not None and not self._current_future.done():
             raise RuntimeError("Optimization loop is already running.")
         self._client.check_environment()
 
@@ -449,18 +465,9 @@ class QueueserverOptimizationRunner:
                 "Optimization has been stopped. Inspect the future's exception for details."
             )
             with self._state_lock:
-                if self._state is not None:
-                    suggestions = self._state.current_suggestions
-                    self._state.finished = True
-                else:
-                    suggestions = []
-                if self._current_future is not None and not self._current_future.done():
-                    self._current_future.set_exception(exc)
-            if suggestions and isinstance(self._problem.optimizer, TrialFaultAware):
-                try:
-                    self._problem.optimizer.register_failures(suggestions)
-                except Exception:
-                    logger.exception("Failed to register trial failures with the optimizer")
+                suggestions = self._state.current_suggestions if self._state is not None else []
+                self._fail_future(exc)
+            self._try_register_failures(suggestions)
 
     def _process_acquisition(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Core acquisition-complete logic (called from _on_acquisition_complete)."""
@@ -469,11 +476,15 @@ class QueueserverOptimizationRunner:
                 raise RuntimeError("_on_acquisition_complete called before run()")
             if self._state.current_uid is None:
                 raise RuntimeError("current_uid not set")
-            if self._state.current_uid != start_doc.get("blop_correlation_uid", None):
+            if self._state.current_uid != start_doc.get(CORRELATION_UID_KEY):
                 raise RuntimeError(
                     "current_uid did not match start document. "
-                    f"Got: {start_doc.get('blop_correlation_uid', None)}, Expected: {self._state.current_uid}"
+                    f"Got: {start_doc.get(CORRELATION_UID_KEY)}, Expected: {self._state.current_uid}"
                 )
+            exit_status = stop_doc.get("exit_status")
+            if exit_status != "success":
+                reason = stop_doc.get("reason") or "(no reason given)"
+                raise RuntimeError(f"Acquisition run {start_doc['uid']!r} ended with status {exit_status!r}: {reason}")
             logger.info(f"Acquisition complete for uid: {self._state.current_uid}")
             suggestions = self._state.current_suggestions
             self._state.run_uids.append(start_doc["uid"])
@@ -489,12 +500,8 @@ class QueueserverOptimizationRunner:
         with self._state_lock:
             if not self._continuous or self._state.current_iteration >= self._state.max_iterations:
                 logger.info(f"Optimization complete after {self._state.current_iteration} iterations")
-                self._state.finished = True
                 result = self._state.build_result()
-                if self._current_future is None:
-                    raise RuntimeError("_current_future is None at completion — this is a bug")
-                if not self._current_future.done():
-                    self._current_future.set_result(result)
+                self._resolve_future(result)
                 return
 
         # Continue: get next suggestions and submit

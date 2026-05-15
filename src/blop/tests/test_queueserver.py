@@ -411,12 +411,14 @@ def _make_runner_with_captured_callback(mock_optimization_problem, iterations=3)
     return runner, mock_client, future
 
 
-def _fire_callback(runner, mock_client, iteration: int) -> None:
+def _fire_callback(
+    runner, mock_client, iteration: int, exit_status: str = "success", reason: str = ""
+) -> None:
     """Fire the on_stop callback with a matching start/stop document pair."""
     current_uid = runner._state.current_uid
     uid = f"fake-uid-{iteration}"
     start_doc = {"uid": uid, CORRELATION_UID_KEY: current_uid}
-    stop_doc = {"uid": f"stop-{iteration}", "run_start": uid}
+    stop_doc = {"uid": f"stop-{iteration}", "run_start": uid, "exit_status": exit_status, "reason": reason}
     mock_client._on_stop(start_doc, stop_doc)
 
 
@@ -453,7 +455,7 @@ def test_runner_run_full_cycle(mock_optimization_problem):
         uid = f"fake-uid-{i}"
         run_uids.append(uid)
         start_doc = {"uid": uid, CORRELATION_UID_KEY: current_uid}
-        stop_doc = {"uid": "other-fake-uid", "run_start": uid}
+        stop_doc = {"uid": "other-fake-uid", "run_start": uid, "exit_status": "success"}
         mock_client._on_stop(start_doc, stop_doc)
 
     assert mock_client.submit_plan.call_count == 3
@@ -573,6 +575,55 @@ def test_runner_future_resolves_none_on_successful_run(mock_optimization_problem
     assert isinstance(result, OptimizationResult)
     assert result.iterations_completed == 1
     assert result.run_uids == ("fake-uid-0",)
+
+
+@pytest.mark.parametrize("exit_status", ["fail", "abort"])
+def test_runner_plan_failure_sets_future_exception(mock_optimization_problem, exit_status):
+    """A failed/aborted plan stores a RuntimeError in the future."""
+    runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem, iterations=3)
+    _fire_callback(runner, mock_client, 0)  # one success
+    _fire_callback(runner, mock_client, 1, exit_status=exit_status, reason="hardware fault")
+
+    assert future.done()
+    exc = future.exception()
+    assert isinstance(exc, RuntimeError)
+    assert exit_status in str(exc)
+    assert "hardware fault" in str(exc)
+
+
+@pytest.mark.parametrize("exit_status", ["fail", "abort"])
+def test_runner_plan_failure_calls_register_failures_when_supported(exit_status):
+    """register_failures is called on TrialFaultAware optimizers when a plan fails."""
+
+    class FaultAwareOptimizer(Optimizer, TrialFaultAware): ...
+
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=MagicMock(spec=FaultAwareOptimizer),
+        actuators=["motor1"],
+        sensors=["detector"],
+        evaluation_function=MagicMock(),
+    )
+    mock_optimization_problem.optimizer.suggest.return_value = [{"_id": 0, "motor1": 5.0}]
+
+    runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem)
+    _fire_callback(runner, mock_client, 0, exit_status=exit_status, reason="beam lost")
+
+    assert future.done()
+    assert isinstance(future.exception(), RuntimeError)
+    mock_optimization_problem.optimizer.register_failures.assert_called_once()
+
+
+@pytest.mark.parametrize("exit_status", ["fail", "abort"])
+def test_runner_plan_failure_does_not_call_register_failures_when_unsupported(mock_optimization_problem, exit_status):
+    """register_failures is NOT called on optimizers that don't implement TrialFaultAware."""
+    assert not isinstance(mock_optimization_problem.optimizer, TrialFaultAware)
+
+    runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem)
+    _fire_callback(runner, mock_client, 0, exit_status=exit_status)
+
+    assert future.done()
+    assert isinstance(future.exception(), RuntimeError)
+    mock_optimization_problem.optimizer.register_failures.assert_not_called()
 
 
 def test_runner_stop_races_final_callback_does_not_raise(mock_optimization_problem):
