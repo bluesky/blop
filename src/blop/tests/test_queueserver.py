@@ -16,7 +16,7 @@ from blop.queueserver import (
 @pytest.fixture(scope="function")
 def mock_optimization_problem():
     """Create a mock OptimizationProblem with necessary components."""
-    mock_optimizer = MagicMock()
+    mock_optimizer = MagicMock(spec=Optimizer)
     mock_optimizer.suggest.return_value = [
         {"_id": 0, "motor1": 5.0, "motor2": 3.0},
     ]
@@ -545,7 +545,6 @@ def test_runner_error_does_not_call_register_failures_when_optimizer_lacks_suppo
     _fire_callback(runner, mock_client, 0)
 
     assert future.exception() is not None
-    mock_optimization_problem.optimizer.register_failures.assert_not_called()
 
 
 def test_runner_error_in_ingest_sets_future_exception(mock_optimization_problem):
@@ -619,7 +618,6 @@ def test_runner_plan_failure_does_not_call_register_failures_when_unsupported(mo
 
     assert future.done()
     assert isinstance(future.exception(), RuntimeError)
-    mock_optimization_problem.optimizer.register_failures.assert_not_called()
 
 
 def test_runner_stop_races_final_callback_does_not_raise(mock_optimization_problem):
