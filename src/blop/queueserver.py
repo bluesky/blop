@@ -9,6 +9,7 @@ import logging
 import threading
 import uuid
 from collections.abc import Callable, Sequence
+from concurrent.futures import Future
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -19,13 +20,37 @@ from bluesky_queueserver_api.zmq import REManagerAPI
 from event_model import RunStart, RunStop
 
 from .plans import default_acquire
-from .protocols import ID_KEY, CanRegisterSuggestions, QueueserverOptimizationProblem
+from .protocols import ID_KEY, CanRegisterSuggestions, QueueserverOptimizationProblem, TrialFaultAware
 
 logger = logging.getLogger("blop")
 
 
 DEFAULT_ACQUIRE_PLAN_NAME: str = default_acquire.__name__
 CORRELATION_UID_KEY: Literal["blop_correlation_uid"] = "blop_correlation_uid"
+
+
+@dataclass(frozen=True)
+class OptimizationResult:
+    """
+    The result of a completed or stopped optimization run.
+
+    Parameters
+    ----------
+    iterations_completed : int
+        The number of suggest -> acquire -> ingest cycles that finished
+        successfully. For a run stopped early via :meth:`QueueserverOptimizationRunner.stop`,
+        this reflects however many iterations completed before the stop.
+    num_points : int
+        The number of points suggested per iteration.
+    run_uids : tuple[str, ...]
+        The Bluesky run UIDs for each completed acquisition, in order.
+        These can be used to retrieve raw data from a Tiled or databroker
+        catalog for post-hoc analysis.
+    """
+
+    iterations_completed: int
+    num_points: int
+    run_uids: tuple[str, ...]
 
 
 class ConsumerCallback(CallbackBase):
@@ -209,6 +234,15 @@ class _OptimizationState:
     current_suggestions: list[dict] = field(default_factory=list)
     current_uid: str | None = None
     finished: bool = False
+    run_uids: list[str] = field(default_factory=list)
+
+    def build_result(self) -> OptimizationResult:
+        """Build an :class:`OptimizationResult` from the current state."""
+        return OptimizationResult(
+            iterations_completed=len(self.run_uids),
+            num_points=self.num_points,
+            run_uids=tuple(self.run_uids),
+        )
 
 
 class QueueserverOptimizationRunner:
@@ -242,6 +276,7 @@ class QueueserverOptimizationRunner:
         self._continuous = True
         self._autostart = True
         self._state_lock = threading.RLock()
+        self._current_future: Future[OptimizationResult] | None = None
 
     @property
     def optimization_problem(self) -> QueueserverOptimizationProblem:
@@ -249,18 +284,12 @@ class QueueserverOptimizationRunner:
         return self._problem
 
     @property
-    def is_running(self) -> bool:
-        """Whether an optimization run is currently in progress."""
-        with self._state_lock:
-            return self._state is not None and not self._state.finished
-
-    @property
     def current_iteration(self) -> int:
         """The current iteration number (0 if not running)."""
         with self._state_lock:
             return self._state.current_iteration if self._state else 0
 
-    def run(self, iterations: int = 1, num_points: int = 1) -> None:
+    def run(self, iterations: int = 1, num_points: int = 1) -> Future[OptimizationResult]:
         """
         Run the optimization loop.
 
@@ -275,6 +304,14 @@ class QueueserverOptimizationRunner:
         num_points : int
             Number of points to suggest per iteration.
 
+        Returns
+        -------
+        concurrent.futures.Future[OptimizationResult]
+            A future that resolves to an :class:`OptimizationResult` when all
+            iterations complete, or when :meth:`stop` is called. If the
+            optimization loop raises an unhandled exception the future will
+            hold that exception and re-raise it on ``.result()``.
+
         Raises
         ------
         RuntimeError
@@ -286,6 +323,8 @@ class QueueserverOptimizationRunner:
             self._validate()
             self._state = _OptimizationState(max_iterations=iterations, num_points=num_points)
             self._continuous = True
+            future: Future[OptimizationResult] = Future()
+            self._current_future = future
         suggestions = self._problem.optimizer.suggest(num_points)
         with self._state_lock:
             plan = self._build_plan(suggestions)
@@ -296,8 +335,9 @@ class QueueserverOptimizationRunner:
         self._client.start_listener(on_stop=self._on_acquisition_complete)
         # TODO: Need to wait for connection handshake here
         self._client.submit_plan(plan, autostart=self._autostart)
+        return future
 
-    def submit_suggestions(self, suggestions: list[dict]) -> None:
+    def submit_suggestions(self, suggestions: list[dict]) -> Future[OptimizationResult]:
         """
         Manually submit suggestions to the queue. This method returns immediately; the
         optimization runs asynchronously via callbacks on the Bluesky document stream.
@@ -309,11 +349,20 @@ class QueueserverOptimizationRunner:
 
             - Optimizer suggestions (with "_id" keys from suggest())
             - Manual points (without "_id", requires CanRegisterSuggestions protocol)
+
+        Returns
+        -------
+        concurrent.futures.Future[OptimizationResult]
+            A future that resolves to an :class:`OptimizationResult` when the
+            acquisition completes. If an unhandled exception occurs the future
+            will hold it and re-raise on ``.result()``.
         """
         with self._state_lock:
             self._validate()
             self._state = _OptimizationState(max_iterations=1, num_points=len(suggestions))
             self._continuous = False
+            future: Future[OptimizationResult] = Future()
+            self._current_future = future
 
         # Ensure all suggestions have an ID_KEY or register them with the optimizer
         if not isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions) and any(
@@ -333,21 +382,31 @@ class QueueserverOptimizationRunner:
         self._client.start_listener(on_stop=self._on_acquisition_complete)
         # TODO: Need to wait for connection handshake here
         self._client.submit_plan(plan, autostart=self._autostart)
+        return future
 
     def stop(self) -> None:
         """
         Stop the optimization loop gracefully.
+
+        The future returned by :meth:`run` or :meth:`submit_suggestions` will
+        be resolved with a partial :class:`OptimizationResult` containing however
+        many iterations completed before the stop.
         """
         self._client.stop_listener()
         with self._state_lock:
             self._continuous = False
             if self._state is not None:
                 self._state.finished = True
+                result = self._state.build_result()
+            else:
+                result = OptimizationResult(iterations_completed=0, num_points=0, run_uids=())
+            if self._current_future is not None and not self._current_future.done():
+                self._current_future.set_result(result)
         logger.info("Optimization stopped")
 
     def _validate(self) -> None:
         """LOCKED: Validate not already running, queueserver environment, devices, and plan availability."""
-        if self.is_running:
+        if self._state is not None and not self._state.finished:
             raise RuntimeError("Optimization loop is already running.")
         self._client.check_environment()
 
@@ -382,6 +441,29 @@ class QueueserverOptimizationRunner:
 
     def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Callback when acquisition finishes. Ingest results and maybe continue."""
+        try:
+            self._process_acquisition(start_doc, stop_doc)
+        except Exception as exc:
+            logger.exception(
+                "Unhandled exception in optimization background thread. "
+                "Optimization has been stopped. Inspect the future's exception for details."
+            )
+            with self._state_lock:
+                if self._state is not None:
+                    suggestions = self._state.current_suggestions
+                    self._state.finished = True
+                else:
+                    suggestions = []
+                if self._current_future is not None and not self._current_future.done():
+                    self._current_future.set_exception(exc)
+            if suggestions and isinstance(self._problem.optimizer, TrialFaultAware):
+                try:
+                    self._problem.optimizer.register_failures(suggestions)
+                except Exception:
+                    logger.exception("Failed to register trial failures with the optimizer")
+
+    def _process_acquisition(self, start_doc: RunStart, stop_doc: RunStop) -> None:
+        """Core acquisition-complete logic (called from _on_acquisition_complete)."""
         with self._state_lock:
             if self._state is None:
                 raise RuntimeError("_on_acquisition_complete called before run()")
@@ -394,6 +476,7 @@ class QueueserverOptimizationRunner:
                 )
             logger.info(f"Acquisition complete for uid: {self._state.current_uid}")
             suggestions = self._state.current_suggestions
+            self._state.run_uids.append(start_doc["uid"])
 
         # Evaluate the results
         outcomes = self._problem.evaluation_function(uid=start_doc["uid"], suggestions=suggestions)
@@ -407,19 +490,21 @@ class QueueserverOptimizationRunner:
             if not self._continuous or self._state.current_iteration >= self._state.max_iterations:
                 logger.info(f"Optimization complete after {self._state.current_iteration} iterations")
                 self._state.finished = True
-                should_continue = False
-            else:
-                should_continue = True
+                result = self._state.build_result()
+                if self._current_future is None:
+                    raise RuntimeError("_current_future is None at completion — this is a bug")
+                if not self._current_future.done():
+                    self._current_future.set_result(result)
+                return
 
-        # Continue if appropriate
-        if should_continue:
-            with self._state_lock:
-                num_points = self._state.num_points
-            suggestions = self._problem.optimizer.suggest(num_points)
-            with self._state_lock:
-                plan = self._build_plan(suggestions)
-                logger.info(
-                    f"Submitting iteration {self._state.current_iteration}/{self._state.max_iterations} "
-                    f"with correlation uid: {self._state.current_uid}"
-                )
-            self._client.submit_plan(plan, autostart=self._autostart)
+        # Continue: get next suggestions and submit
+        with self._state_lock:
+            num_points = self._state.num_points
+        suggestions = self._problem.optimizer.suggest(num_points)
+        with self._state_lock:
+            plan = self._build_plan(suggestions)
+            logger.info(
+                f"Submitting iteration {self._state.current_iteration}/{self._state.max_iterations} "
+                f"with correlation uid: {self._state.current_uid}"
+            )
+        self._client.submit_plan(plan, autostart=self._autostart)

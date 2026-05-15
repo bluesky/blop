@@ -1,3 +1,4 @@
+from ..queueserver import OptimizationResult
 from .agent import Agent as Agent
 from .agent import QueueserverAgent as QueueserverAgent
 from .dof import DOF, ChoiceDOF, DOFConstraint, RangeDOF
@@ -16,4 +17,5 @@ __all__ = [
     "ScalarizedObjective",
     "to_ax_objective_str",
     "AxOptimizer",
+    "OptimizationResult",
 ]

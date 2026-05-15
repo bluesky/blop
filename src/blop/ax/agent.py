@@ -1,6 +1,7 @@
 import importlib.util
 import logging
 from collections.abc import Mapping, Sequence
+from concurrent.futures import Future
 from typing import Any, cast
 
 from ax import Client, TOutcome, TParameterization
@@ -31,7 +32,7 @@ from ..protocols import (
     QueueserverOptimizationProblem,
     Sensor,
 )
-from ..queueserver import QueueserverClient, QueueserverOptimizationRunner
+from ..queueserver import OptimizationResult, QueueserverClient, QueueserverOptimizationRunner
 from ..utils import InferredReadable
 from .dof import DOF, DOFConstraint
 from .objective import Objective, OutcomeConstraint, ScalarizedObjective, to_ax_objective_str
@@ -659,16 +660,12 @@ class QueueserverAgent(_AxAgentMixin):
     def acquisition_plan(self) -> str | None:
         return self._acquisition_plan
 
-    @property
-    def is_running(self) -> bool:
-        return self._runner.is_running
+    def stop(self) -> None:
+        self._runner.stop()
 
     @property
     def current_iteration(self) -> int:
         return self._runner.current_iteration
-
-    def stop(self) -> None:
-        self._runner.stop()
 
     def to_optimization_problem(self) -> QueueserverOptimizationProblem:
         return QueueserverOptimizationProblem(
@@ -679,7 +676,7 @@ class QueueserverAgent(_AxAgentMixin):
             acquisition_plan=self._acquisition_plan,
         )
 
-    def run(self, iterations=1, n_points=1) -> None:
+    def run(self, iterations: int = 1, n_points: int = 1) -> Future[OptimizationResult]:
         """
         Start the optimization loop.
 
@@ -691,8 +688,16 @@ class QueueserverAgent(_AxAgentMixin):
         ----------
         iterations : int
             Number of optimization iterations to run.
-        num_points : int
+        n_points : int
             Number of points to suggest per iteration.
+
+        Returns
+        -------
+        concurrent.futures.Future[OptimizationResult]
+            A future that resolves to an :class:`~blop.queueserver.OptimizationResult`
+            when all iterations complete or when :meth:`stop` is called. If an
+            unhandled exception occurs the future will hold it and re-raise on
+            ``.result()``.
 
         Raises
         ------
@@ -701,10 +706,9 @@ class QueueserverAgent(_AxAgentMixin):
         ValueError
             If required devices or plans are not available.
         """
+        return self._runner.run(iterations, n_points)
 
-        self._runner.run(iterations, n_points)
-
-    def submit_suggestions(self, suggestions: list[dict]) -> None:
+    def submit_suggestions(self, suggestions: list[dict]) -> Future[OptimizationResult]:
         """
         Evaluate specific parameter combinations.
 
@@ -716,8 +720,14 @@ class QueueserverAgent(_AxAgentMixin):
         suggestions : list[dict]
             Either optimizer suggestions (with "_id") or manual points (without "_id").
 
+        Returns
+        -------
+        concurrent.futures.Future[OptimizationResult]
+            A future that resolves to an :class:`~blop.queueserver.OptimizationResult`
+            when the acquisition completes.
+
         See Also
         --------
-        suggest : Get optimizer suggestions.
+        run : Run the full optimization loop.
         """
-        self._runner.submit_suggestions(suggestions)
+        return self._runner.submit_suggestions(suggestions)
