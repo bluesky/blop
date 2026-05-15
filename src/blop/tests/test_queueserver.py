@@ -536,6 +536,35 @@ def test_runner_error_calls_register_failures_when_optimizer_supports_it():
     mock_optimization_problem.optimizer.register_failures.assert_called_once()
 
 
+def test_runner_register_failures_raises_original_error_preserved_in_future():
+    """If register_failures() itself raises, the original acquisition error is still in the future."""
+
+    class FaultAwareOptimizer(Optimizer, TrialFaultAware): ...
+
+    acquisition_error = RuntimeError("evaluation failed")
+    register_error = RuntimeError("register_failures exploded")
+
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=MagicMock(spec=FaultAwareOptimizer),
+        actuators=["motor1"],
+        sensors=["detector"],
+        evaluation_function=MagicMock(side_effect=acquisition_error),
+    )
+    mock_optimization_problem.optimizer.suggest.return_value = [{"_id": 0, "motor1": 5.0}]
+    mock_optimization_problem.optimizer.register_failures.side_effect = register_error
+
+    runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem, iterations=1)
+
+    # register_failures re-raises after logging, so it propagates out of the callback
+    with pytest.raises(RuntimeError, match="register_failures exploded"):
+        _fire_callback(runner, mock_client, 0)
+
+    assert future.done()
+    # The original acquisition error is what the caller sees
+    assert future.exception() is acquisition_error
+    mock_optimization_problem.optimizer.register_failures.assert_called_once()
+
+
 def test_runner_error_does_not_call_register_failures_when_optimizer_lacks_support(mock_optimization_problem):
     """register_failures is NOT called on optimizers that don't implement TrialFaultAware."""
     mock_optimization_problem.evaluation_function.side_effect = RuntimeError("boom")
@@ -630,3 +659,46 @@ def test_runner_stop_races_final_callback_does_not_raise(mock_optimization_probl
 
     # stop() should be safe to call even though the future is already resolved
     runner.stop()  # Must not raise
+
+
+@pytest.mark.parametrize("failing_method", ["start_listener", "submit_plan"])
+def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_problem, failing_method):
+    """An exception from start_listener or submit_plan in run() fails the future and re-raises."""
+    error = RuntimeError("connection refused")
+    mock_client = MagicMock(spec=QueueserverClient)
+    getattr(mock_client, failing_method).side_effect = error
+
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+
+    with pytest.raises(RuntimeError, match="connection refused"):
+        runner.run(iterations=1, num_points=1)
+
+    future = runner._current_future
+    assert future is not None
+    assert future.done()
+    assert future.exception() is error
+
+
+@pytest.mark.parametrize("failing_method", ["start_listener", "submit_plan"])
+def test_runner_submit_suggestions_submit_error_fails_future_and_reraises(mock_optimization_problem, failing_method):
+    """An exception from start_listener or submit_plan in submit_suggestions() fails the future and re-raises."""
+    error = RuntimeError("connection refused")
+    mock_client = MagicMock(spec=QueueserverClient)
+    getattr(mock_client, failing_method).side_effect = error
+
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+
+    suggestions = [{"_id": 0, "motor1": 1.0}]
+    with pytest.raises(RuntimeError, match="connection refused"):
+        runner.submit_suggestions(suggestions)
+
+    future = runner._current_future
+    assert future is not None
+    assert future.done()
+    assert future.exception() is error
