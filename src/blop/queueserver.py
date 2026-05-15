@@ -322,18 +322,23 @@ class QueueserverOptimizationRunner:
             self._validate()
             self._state = _OptimizationState(max_iterations=iterations, num_points=num_points)
             self._continuous = True
-            future: Future[OptimizationResult] = Future()
-            self._current_future = future
         suggestions = self._problem.optimizer.suggest(num_points)
-        # TODO: Need to wait for connection handshake here
         with self._state_lock:
             plan = self._build_plan(suggestions)
             logger.info(
                 f"Submitting iteration {self._state.current_iteration}/{self._state.max_iterations} "
                 f"with correlation uid: {self._state.current_uid}"
             )
-        self._client.start_listener(on_stop=self._on_acquisition_complete)
-        self._client.submit_plan(plan, autostart=self._autostart)
+            future: Future[OptimizationResult] = Future()
+            self._current_future = future
+        try:
+            self._client.start_listener(on_stop=self._on_acquisition_complete)
+            # TODO: Need to wait for connection handshake here
+            self._client.submit_plan(plan, autostart=self._autostart)
+        except Exception as exc:
+            with self._state_lock:
+                self._fail_future(exc)
+            raise
         return future
 
     def submit_suggestions(self, suggestions: list[dict]) -> Future[OptimizationResult]:
@@ -360,9 +365,6 @@ class QueueserverOptimizationRunner:
             self._validate()
             self._state = _OptimizationState(max_iterations=1, num_points=len(suggestions))
             self._continuous = False
-            future: Future[OptimizationResult] = Future()
-            self._current_future = future
-
         # Ensure all suggestions have an ID_KEY or register them with the optimizer
         if not isinstance(self.optimization_problem.optimizer, CanRegisterSuggestions) and any(
             ID_KEY not in suggestion for suggestion in suggestions
@@ -378,9 +380,16 @@ class QueueserverOptimizationRunner:
         with self._state_lock:
             plan = self._build_plan(suggestions)
             logger.info(f"Submitting manually specified suggestion(s) with correlation uid: {self._state.current_uid}")
-        self._client.start_listener(on_stop=self._on_acquisition_complete)
-        # TODO: Need to wait for connection handshake here
-        self._client.submit_plan(plan, autostart=self._autostart)
+            future: Future[OptimizationResult] = Future()
+            self._current_future = future
+        try:
+            self._client.start_listener(on_stop=self._on_acquisition_complete)
+            # TODO: Need to wait for connection handshake here
+            self._client.submit_plan(plan, autostart=self._autostart)
+        except Exception as exc:
+            with self._state_lock:
+                self._fail_future(exc)
+            raise
         return future
 
     def stop(self) -> None:

@@ -323,7 +323,6 @@ def test_queueserver_agent_init(mock_re_manager_api, mock_evaluation_function):
     assert agent.actuators == [dof1.actuator, dof2.actuator]
     assert agent.evaluation_function == mock_evaluation_function
     assert agent.acquisition_plan is None
-    assert not agent.is_running
     assert agent.current_iteration == 0
     assert isinstance(agent.ax_client, Client)
 

@@ -411,9 +411,7 @@ def _make_runner_with_captured_callback(mock_optimization_problem, iterations=3)
     return runner, mock_client, future
 
 
-def _fire_callback(
-    runner, mock_client, iteration: int, exit_status: str = "success", reason: str = ""
-) -> None:
+def _fire_callback(runner, mock_client, iteration: int, exit_status: str = "success", reason: str = "") -> None:
     """Fire the on_stop callback with a matching start/stop document pair."""
     current_uid = runner._state.current_uid
     uid = f"fake-uid-{iteration}"
