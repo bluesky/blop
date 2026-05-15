@@ -301,10 +301,10 @@ result = future.result()
 
 print(f"Iterations completed : {result.iterations_completed}")
 print(f"Points per iteration : {result.num_points}")
-print(f"Total acquisitions   : {len(result.run_uids)}")
+print(f"Total acquisitions   : {len(result.uids)}")
 print()
 print("Run UIDs:")
-for uid in result.run_uids:
+for uid in result.uids:
     print(f"  {uid}")
 ```
 

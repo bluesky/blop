@@ -42,7 +42,7 @@ class OptimizationResult:
         this reflects however many iterations completed before the stop.
     num_points : int
         The number of points suggested per iteration.
-    run_uids : tuple[str, ...]
+    uids : tuple[str, ...]
         The Bluesky run UIDs for each completed acquisition, in order.
         These can be used to retrieve raw data from a Tiled or databroker
         catalog for post-hoc analysis.
@@ -50,7 +50,7 @@ class OptimizationResult:
 
     iterations_completed: int
     num_points: int
-    run_uids: tuple[str, ...]
+    uids: tuple[str, ...]
 
 
 class ConsumerCallback(CallbackBase):
@@ -233,14 +233,14 @@ class _OptimizationState:
     current_iteration: int = 0
     current_suggestions: list[dict] = field(default_factory=list)
     current_uid: str | None = None
-    run_uids: list[str] = field(default_factory=list)
+    uids: list[str] = field(default_factory=list)
 
     def build_result(self) -> OptimizationResult:
         """Build an :class:`OptimizationResult` from the current state."""
         return OptimizationResult(
-            iterations_completed=len(self.run_uids),
+            iterations_completed=len(self.uids),
             num_points=self.num_points,
-            run_uids=tuple(self.run_uids),
+            uids=tuple(self.uids),
         )
 
 
@@ -406,7 +406,7 @@ class QueueserverOptimizationRunner:
             result = (
                 self._state.build_result()
                 if self._state is not None
-                else OptimizationResult(iterations_completed=0, num_points=0, run_uids=())
+                else OptimizationResult(iterations_completed=0, num_points=0, uids=())
             )
             self._resolve_future(result)
         logger.info("Optimization stopped")
@@ -496,7 +496,7 @@ class QueueserverOptimizationRunner:
                 raise RuntimeError(f"Acquisition run {start_doc['uid']!r} ended with status {exit_status!r}: {reason}")
             logger.info(f"Acquisition complete for uid: {self._state.current_uid}")
             suggestions = self._state.current_suggestions
-            self._state.run_uids.append(start_doc["uid"])
+            self._state.uids.append(start_doc["uid"])
 
         # Evaluate the results
         outcomes = self._problem.evaluation_function(uid=start_doc["uid"], suggestions=suggestions)

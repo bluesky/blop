@@ -297,7 +297,7 @@ def test_runner_stop_returns_partial_result(mock_optimization_problem):
     result = future.result()
     assert isinstance(result, OptimizationResult)
     assert result.iterations_completed == 0
-    assert result.run_uids == ()
+    assert result.uids == ()
 
 
 def test_runner_submit_suggestions_to_queueserver():
@@ -447,11 +447,11 @@ def test_runner_run_full_cycle(mock_optimization_problem):
     future = runner.run(iterations=3, num_points=2)
 
     # Simulate 3 acquisition completions by invoking the captured callback
-    run_uids = []
+    uids = []
     for i in range(3):
         current_uid = runner._state.current_uid
         uid = f"fake-uid-{i}"
-        run_uids.append(uid)
+        uids.append(uid)
         start_doc = {"uid": uid, CORRELATION_UID_KEY: current_uid}
         stop_doc = {"uid": "other-fake-uid", "run_start": uid, "exit_status": "success"}
         mock_client._on_stop(start_doc, stop_doc)
@@ -467,7 +467,7 @@ def test_runner_run_full_cycle(mock_optimization_problem):
     assert isinstance(result, OptimizationResult)
     assert result.iterations_completed == 3
     assert result.num_points == 2
-    assert result.run_uids == tuple(run_uids)
+    assert result.uids == tuple(uids)
 
 
 def test_runner_on_acquisition_complete_uid_mismatch_sets_future_exception(mock_optimization_problem):
@@ -572,7 +572,7 @@ def test_runner_future_resolves_none_on_successful_run(mock_optimization_problem
     result = future.result()
     assert isinstance(result, OptimizationResult)
     assert result.iterations_completed == 1
-    assert result.run_uids == ("fake-uid-0",)
+    assert result.uids == ("fake-uid-0",)
 
 
 @pytest.mark.parametrize("exit_status", ["fail", "abort"])
