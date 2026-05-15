@@ -400,7 +400,6 @@ class QueueserverOptimizationRunner:
         be resolved with a partial :class:`OptimizationResult` containing however
         many iterations completed before the stop.
         """
-        self._client.stop_listener()
         with self._state_lock:
             self._continuous = False
             result = (
