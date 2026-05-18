@@ -11,3 +11,4 @@ API Reference
     reference/outcome-constraint.rst
     reference/plans.rst
     reference/protocols.rst
+    reference/queueserver.rst

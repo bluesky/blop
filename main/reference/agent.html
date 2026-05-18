@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Agent &#8212; blop 1.0.0b2.dev19 documentation</title>
+    <title>Agent &#8212; blop 1.0.0b2.dev20 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../_static/documentation_options.js?v=b9c298e0"></script>
+    <script src="../_static/documentation_options.js?v=93795f3a"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="API Reference" href="../reference.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev19" />
+  <meta name="docsearch:version" content="1.0.0b2.dev20" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -420,6 +420,7 @@
 <li class="toctree-l1"><a class="reference internal" href="outcome-constraint.html">Outcome Constraint</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plans.html">Plans</a></li>
 <li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="queueserver.html">Queueserver</a></li>
 </ul>
 </div>
 </nav></div>
@@ -1031,22 +1032,17 @@ of sensors that are needed to compute the objectives.</p>
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">acquisition_plan</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#blop.ax.QueueserverAgent.acquisition_plan" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.is_running">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">is_running</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><a class="headerlink" href="#blop.ax.QueueserverAgent.is_running" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.current_iteration">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_iteration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#blop.ax.QueueserverAgent.current_iteration" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="blop.ax.QueueserverAgent.stop">
 <span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#QueueserverAgent.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.QueueserverAgent.stop" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 </dl>
 </dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.current_iteration">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_iteration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#blop.ax.QueueserverAgent.current_iteration" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="blop.ax.QueueserverAgent.to_optimization_problem">
@@ -1195,12 +1191,21 @@ via callbacks.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>iterations</strong><span class="classifier">int</span></dt><dd><p>Number of optimization iterations to run.</p>
 </dd>
-<dt><strong>num_points</strong><span class="classifier">int</span></dt><dd><p>Number of points to suggest per iteration.</p>
+<dt><strong>n_points</strong><span class="classifier">int</span></dt><dd><p>Number of points to suggest per iteration.</p>
 </dd>
 </dl>
 </dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
+<dt>concurrent.futures.Future[OptimizationResult]</dt><dd><p>A future that resolves to an <a class="reference internal" href="queueserver.html#blop.queueserver.OptimizationResult" title="blop.queueserver.OptimizationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizationResult</span></code></a>
+when all iterations complete or when <a class="reference internal" href="#blop.ax.QueueserverAgent.stop" title="blop.ax.QueueserverAgent.stop"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stop()</span></code></a> is called. If an
+unhandled exception occurs the future will hold it and re-raise on
+<code class="docutils literal notranslate"><span class="pre">.result()</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
 <dt>RuntimeError</dt><dd><p>If the queueserver environment is not ready.</p>
 </dd>
 <dt>ValueError</dt><dd><p>If required devices or plans are not available.</p>
@@ -1248,11 +1253,18 @@ optimizer suggestions and manual points.</p>
 </dd>
 </dl>
 </dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>concurrent.futures.Future[OptimizationResult]</dt><dd><p>A future that resolves to an <a class="reference internal" href="queueserver.html#blop.queueserver.OptimizationResult" title="blop.queueserver.OptimizationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizationResult</span></code></a>
+when the acquisition completes.</p>
+</dd>
+</dl>
+</dd>
 </dl>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="#blop.ax.QueueserverAgent.suggest" title="blop.ax.QueueserverAgent.suggest"><code class="xref py py-obj docutils literal notranslate"><span class="pre">suggest</span></code></a></dt><dd><p>Get optimizer suggestions.</p>
+<dt><a class="reference internal" href="#blop.ax.QueueserverAgent.run" title="blop.ax.QueueserverAgent.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a></dt><dd><p>Run the full optimization loop.</p>
 </dd>
 </dl>
 </div>
@@ -1339,9 +1351,8 @@ optimizer suggestions and manual points.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.actuators"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.actuators</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.sensors"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.sensors</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.acquisition_plan"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.acquisition_plan</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.is_running"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.is_running</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.current_iteration"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.current_iteration</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.stop"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.stop()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.current_iteration"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.current_iteration</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.to_optimization_problem"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.to_optimization_problem()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.ax_client"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.ax_client</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.checkpoint"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.checkpoint()</span></code></a></li>

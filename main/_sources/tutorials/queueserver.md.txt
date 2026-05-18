@@ -291,17 +291,21 @@ ZMQ proxy output port (5578) where Bluesky documents are published.
 The `run()` method is **non-blocking** — it submits the first plan and returns immediately. The agent reacts asynchronously to plan completions via ZMQ callbacks.
 
 ```{code-cell} ipython3
-agent.run(iterations=10, n_points=1)
+future = agent.run(iterations=10, n_points=1)
 ```
 
-Wait for the optimization to complete:
+Wait for the optimization to complete and inspect the result:
 
 ```{code-cell} ipython3
-while agent.is_running:
-    print(f"  Iteration {agent.current_iteration} in progress...")
-    time.sleep(5)
+result = future.result()
 
-print(f"Optimization complete after {agent.current_iteration} iterations")
+print(f"Iterations completed : {result.iterations_completed}")
+print(f"Points per iteration : {result.num_points}")
+print(f"Total acquisitions   : {len(result.uids)}")
+print()
+print("Run UIDs:")
+for uid in result.uids:
+    print(f"  {uid}")
 ```
 
 ## Viewing Results
