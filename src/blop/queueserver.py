@@ -259,8 +259,6 @@ class QueueserverOptimizationRunner:
         sensors, and evaluation function.
     queueserver_client : QueueserverClient
         Client for communicating with the queueserver.
-    acquisition_plan_name : str
-        Name of the acquisition plan registered in the queueserver.
     """
 
     def __init__(
@@ -462,6 +460,7 @@ class QueueserverOptimizationRunner:
             list(self._problem.actuators),
             list(self._problem.sensors),
             md=md,
+            **(self._problem.acquisition_plan_kwargs or {}),
         )
 
     def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:

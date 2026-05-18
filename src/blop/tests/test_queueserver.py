@@ -242,6 +242,29 @@ def test_runner_run_submits_suggestions_to_queueserver():
     assert not future.done()
 
 
+def test_runner_run_passes_acquisition_plan_kwargs_to_bplan():
+    """Test that acquisition_plan_kwargs are forwarded to the submitted BPlan."""
+    mock_client = MagicMock(spec=QueueserverClient)
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=MagicMock(),
+        actuators=["motor1"],
+        sensors=["det"],
+        evaluation_function=MagicMock(),
+        acquisition_plan="my_acquire",
+        acquisition_plan_kwargs={"exposure_time": 0.5, "num_frames": 10},
+    )
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+
+    runner.run(iterations=1, num_points=1)
+
+    submitted_plan = mock_client.submit_plan.call_args[0][0]
+    assert submitted_plan.kwargs["exposure_time"] == 0.5
+    assert submitted_plan.kwargs["num_frames"] == 10
+
+
 def test_runner_run_twice_fails():
     """Test 2 calls to run() fails."""
     submit_event = threading.Event()

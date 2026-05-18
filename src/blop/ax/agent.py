@@ -602,7 +602,7 @@ class QueueserverAgent(_AxAgentMixin):
     blop.ax.dof.ChoiceDOF : For discrete parameters.
     blop.ax.objective.Objective : For defining objectives.
     blop.ax.optimizer.AxOptimizer : The optimizer used internally.
-    blop.queueserver.QueueservverOptimizatonRunner : Runner that handles interaction with bluesky-queueserver.
+    blop.queueserver.QueueserverOptimizatonRunner : Runner that handles interaction with bluesky-queueserver.
     """
 
     def __init__(
@@ -617,6 +617,7 @@ class QueueserverAgent(_AxAgentMixin):
         dof_constraints: Sequence[DOFConstraint] | None = None,
         outcome_constraints: Sequence[OutcomeConstraint] | None = None,
         checkpoint_path: str | None = None,
+        acquisition_plan_kwargs: Mapping[str, Any] | None = None,
         **kwargs: Any,
     ):
         self._sensors = sensors
@@ -629,6 +630,7 @@ class QueueserverAgent(_AxAgentMixin):
                     self._actuators.append(dof.actuator)
         self._evaluation_function = evaluation_function
         self._acquisition_plan = acquisition_plan
+        self._acquisition_plan_kwargs = acquisition_plan_kwargs or {}
         self._optimizer = AxOptimizer(
             parameters=[dof.to_ax_parameter_config() for dof in dofs],
             objective=to_ax_objective_str(objectives),
@@ -674,6 +676,7 @@ class QueueserverAgent(_AxAgentMixin):
             sensors=self._sensors,
             evaluation_function=self._evaluation_function,
             acquisition_plan=self._acquisition_plan,
+            acquisition_plan_kwargs=self._acquisition_plan_kwargs,
         )
 
     def run(self, iterations: int = 1, n_points: int = 1) -> Future[OptimizationResult]:

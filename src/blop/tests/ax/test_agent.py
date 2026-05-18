@@ -333,6 +333,22 @@ def test_queueserver_agent_init(mock_re_manager_api, mock_evaluation_function):
     assert problem.evaluation_function == mock_evaluation_function
 
 
+def test_queueserver_agent_init_acquisition_plan_kwargs(mock_re_manager_api, mock_evaluation_function):
+    dof1 = RangeDOF(actuator="test_motor1", bounds=(0, 10), parameter_type="float")
+    agent = QueueserverAgent(
+        mock_re_manager_api,
+        "inproc://test",
+        ["det"],
+        [dof1],
+        [Objective(name="obj1", minimize=False)],
+        mock_evaluation_function,
+        acquisition_plan_kwargs={"exposure_time": 0.5, "num_frames": 10},
+    )
+
+    problem = agent.to_optimization_problem()
+    assert problem.acquisition_plan_kwargs == {"exposure_time": 0.5, "num_frames": 10}
+
+
 def test_queueserver_agent_init_actuator_instance(mock_re_manager_api, mock_evaluation_function):
     movable1 = MovableSignal(name="test_movable1")
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
