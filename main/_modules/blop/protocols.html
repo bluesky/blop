@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.protocols &#8212; blop 1.0.0b2.dev20 documentation</title>
+    <title>blop.protocols &#8212; blop 1.0.0b2.dev21 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../_static/documentation_options.js?v=93795f3a"></script>
+    <script src="../../_static/documentation_options.js?v=3701db23"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -498,7 +498,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev20" />
+  <meta name="docsearch:version" content="1.0.0b2.dev21" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -1205,6 +1205,7 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="OptimizationProblem">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.OptimizationProblem">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptimizationProblem</span><span class="p">(</span><span class="n">BaseOptimizationProblem</span><span class="p">[</span><span class="n">Actuator</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">,</span> <span class="n">AcquisitionPlan</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An optimization problem to solve. Immutable once initialized.</span>
@@ -1237,6 +1238,7 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">QueueserverOptimizationProblem</span><span class="p">(</span><span class="n">BaseOptimizationProblem</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An optimization problem to solve. Immutable once initialized.</span>
@@ -1258,8 +1260,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    evaluation_function: EvaluationFunction</span>
 <span class="sd">        A callable to evaluate data from a Bluesky run and produce outcomes.</span>
 <span class="sd">    acquisition_plan: str, optional</span>
-<span class="sd">        The name of a Bluesky plan to acquire data from the beamline. If not provided, a default plan name will be used.</span>
+<span class="sd">        The name of a Bluesky plan to acquire data. If not provided, a default plan name will be used.</span>
 <span class="sd">        The plan must match the arguments of :ref:`AcquisitionPlan`.</span>
+<span class="sd">    acquisition_plan_kwargs: Mapping[str, Any], optional</span>
+<span class="sd">        Additional plan arguments to pass to the Bluesky plan.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -1267,7 +1271,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="o">...</span>
+    <span class="n">acquisition_plan_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 </pre></div>
 
                 </article>

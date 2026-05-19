@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.agent &#8212; blop 1.0.0b2.dev20 documentation</title>
+    <title>blop.ax.agent &#8212; blop 1.0.0b2.dev21 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
 
-    <script src="../../../_static/documentation_options.js?v=93795f3a"></script>
+    <script src="../../../_static/documentation_options.js?v=3701db23"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -498,7 +498,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev20" />
+  <meta name="docsearch:version" content="1.0.0b2.dev21" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -1520,7 +1520,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    blop.ax.dof.ChoiceDOF : For discrete parameters.</span>
 <span class="sd">    blop.ax.objective.Objective : For defining objectives.</span>
 <span class="sd">    blop.ax.optimizer.AxOptimizer : The optimizer used internally.</span>
-<span class="sd">    blop.queueserver.QueueservverOptimizatonRunner : Runner that handles interaction with bluesky-queueserver.</span>
+<span class="sd">    blop.queueserver.QueueserverOptimizatonRunner : Runner that handles interaction with bluesky-queueserver.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1535,6 +1535,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">dof_constraints</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DOFConstraint</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">outcome_constraints</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">OutcomeConstraint</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">acquisition_plan_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span> <span class="o">=</span> <span class="n">sensors</span>
@@ -1547,6 +1548,7 @@ window.runMermaid = runMermaid;</script>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span> <span class="o">=</span> <span class="n">evaluation_function</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span> <span class="o">=</span> <span class="n">acquisition_plan</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan_kwargs</span> <span class="o">=</span> <span class="n">acquisition_plan_kwargs</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">AxOptimizer</span><span class="p">(</span>
             <span class="n">parameters</span><span class="o">=</span><span class="p">[</span><span class="n">dof</span><span class="o">.</span><span class="n">to_ax_parameter_config</span><span class="p">()</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span><span class="p">],</span>
             <span class="n">objective</span><span class="o">=</span><span class="n">to_ax_objective_str</span><span class="p">(</span><span class="n">objectives</span><span class="p">),</span>
@@ -1597,6 +1599,7 @@ window.runMermaid = runMermaid;</script>
             <span class="n">sensors</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span><span class="p">,</span>
             <span class="n">evaluation_function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span><span class="p">,</span>
             <span class="n">acquisition_plan</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span><span class="p">,</span>
+            <span class="n">acquisition_plan_kwargs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan_kwargs</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 
