@@ -7,6 +7,7 @@ a queueserver, rather than directly through a RunEngine.
 
 import logging
 import threading
+import time
 import uuid
 from collections.abc import Callable, Sequence
 from concurrent.futures import Future
@@ -332,6 +333,7 @@ class QueueserverOptimizationRunner:
         try:
             self._client.start_listener(on_stop=self._on_acquisition_complete)
             # TODO: Need to wait for connection handshake here
+            time.sleep(2)
             self._client.submit_plan(plan, autostart=self._autostart)
         except Exception as exc:
             with self._state_lock:
@@ -383,6 +385,7 @@ class QueueserverOptimizationRunner:
         try:
             self._client.start_listener(on_stop=self._on_acquisition_complete)
             # TODO: Need to wait for connection handshake here
+            time.sleep(2)
             self._client.submit_plan(plan, autostart=self._autostart)
         except Exception as exc:
             with self._state_lock:
