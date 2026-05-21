@@ -201,7 +201,7 @@ class QueueserverClient:
             logger.warning("Listener already running")
             return
 
-        dispatcher = RemoteDispatcher(self._zmq_consumer_addr)
+        dispatcher = RemoteDispatcher(self._zmq_consumer_addr, prefix=b"raw")
         self._consumer_callback = ConsumerCallback(callback=on_stop)
         dispatcher.subscribe(self._consumer_callback)
 
