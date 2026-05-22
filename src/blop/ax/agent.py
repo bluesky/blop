@@ -17,6 +17,7 @@ else:
 # ===============================
 import bluesky.preprocessors as bpp
 from bluesky.callbacks import CallbackBase
+from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky.utils import MsgGenerator
 from bluesky_queueserver_api.zmq import REManagerAPI
 
@@ -571,9 +572,8 @@ class QueueserverAgent(_AxAgentMixin):
     ----------
     re_manager_api : REManagerAPI
         The manager API for interaction with Bluesky queueserver.
-    zmq_consumer_addr : str
-        A ZMQ address to consume Bluesky messages from, to react to plan execution on the
-        remote server.
+    document_dispatcher : RemoteDispatcher
+        Dispatcher for consuming Bluesky documents from the remote server.
     sensors : Sequence[str]
         The sensors to use for acquisition. These should be the minimal set
         of sensors that are needed to compute the objectives.
@@ -608,7 +608,7 @@ class QueueserverAgent(_AxAgentMixin):
     def __init__(
         self,
         re_manager_api: REManagerAPI,
-        zmq_consumer_addr: str,
+        document_dispatcher: RemoteDispatcher,
         sensors: Sequence[str],
         dofs: Sequence[DOF],
         objectives: Sequence[Objective],
@@ -643,7 +643,7 @@ class QueueserverAgent(_AxAgentMixin):
         )
         self._runner = QueueserverOptimizationRunner(
             self.to_optimization_problem(),
-            QueueserverClient(re_manager_api, zmq_consumer_addr),
+            QueueserverClient(re_manager_api, document_dispatcher),
         )
 
     @property

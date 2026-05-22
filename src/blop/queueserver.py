@@ -91,26 +91,24 @@ class QueueserverClient:
     """
     Handles communication with a Bluesky queueserver.
 
-    This class encapsulates all ZMQ and HTTP communication with the queueserver,
-    including plan submission and event listening.
+    This class encapsulates queueserver communication, including plan submission
+    and event listening.
 
     Parameters
     ----------
     re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI
         Manager instance for communication with Bluesky Queueserver
-    zmq_consumer_addr : str
-        Address for ZMQ document consumer (e.g., "localhost:5578").
+    document_dispatcher : bluesky.callbacks.zmq.RemoteDispatcher
+        Dispatcher for the Bluesky document stream.
     """
 
     def __init__(
         self,
         re_manager_api: REManagerAPI,
-        zmq_consumer_addr: str,
+        document_dispatcher: RemoteDispatcher,
     ):
-        self._zmq_consumer_addr = zmq_consumer_addr
-
         self._rm = re_manager_api
-        self._dispatcher: RemoteDispatcher | None = None
+        self._dispatcher = document_dispatcher
         self._consumer_callback: ConsumerCallback | None = None
         self._listener_thread: threading.Thread | None = None
 
@@ -201,27 +199,24 @@ class QueueserverClient:
             logger.warning("Listener already running")
             return
 
-        dispatcher = RemoteDispatcher(self._zmq_consumer_addr)
         self._consumer_callback = ConsumerCallback(callback=on_stop)
-        dispatcher.subscribe(self._consumer_callback)
+        self._dispatcher.subscribe(self._consumer_callback)
 
-        logger.info("Starting ZMQ listener thread")
+        logger.info("Starting document listener thread")
         self._listener_thread = threading.Thread(
-            target=dispatcher.start,
-            name="qserver-zmq-consumer",
+            target=self._dispatcher.start,
+            name="qserver-document-consumer",
             daemon=True,
         )
         self._listener_thread.start()
-        self._dispatcher = dispatcher
 
     def stop_listener(self) -> None:
-        """Stop the ZMQ listener thread."""
-        if self._dispatcher is not None:
+        """Stop the document listener thread."""
+        if self._listener_thread is not None:
             self._dispatcher.stop()
-            self._dispatcher = None
         self._consumer_callback = None
         self._listener_thread = None
-        logger.info("Stopped ZMQ listener")
+        logger.info("Stopped document listener")
 
 
 @dataclass

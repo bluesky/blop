@@ -241,6 +241,7 @@ from blop.protocols import EvaluationFunction
 from tiled.client.container import Container
 from tiled.queries import Eq
 from blop.ax import QueueserverAgent 
+from bluesky.callbacks.zmq import RemoteDispatcher
 import numpy as np
 
 class DetectorEvaluation(EvaluationFunction):
@@ -288,6 +289,8 @@ Finally we put everything together, instantiate the agent and start an optimizat
 
 ```{code-cell} ipython3
 
+document_dispatcher = RemoteDispatcher(("localhost", 5578))
+
 agent = QueueserverAgent(
     sensors=sensors,                                # The list of sensors to read from
     dofs=dofs,                                      # The list of DOFs to search over 
@@ -296,8 +299,7 @@ agent = QueueserverAgent(
     acquisition_plan= "acquire",                    # The name of the plan in the Queueserver environment
     Queueserver_control_addr="tcp://localhost:60615",
     Queueserver_info_addr="tcp://localhost:60625",
-    zmq_consumer_ip= "localhost",
-    zmq_consumer_port= "5578", 
+    document_dispatcher=document_dispatcher,
 )
 ```
 
