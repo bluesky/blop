@@ -13,6 +13,12 @@ kernelspec:
 
 # Asynchronous Optimization with Bluesky Queueserver
 
+```{warning}
+The queueserver integration is **experimental**. The API is not yet stable and
+may change in future releases without a deprecation period. It is not
+recommended for production use.
+```
+
 In this tutorial, you will learn how to run Blop optimization against a remote [Bluesky Queueserver](https://blueskyproject.io/bluesky-queueserver/). This architecture is used when:
 
 - The experiment hardware is controlled by a shared instrument server

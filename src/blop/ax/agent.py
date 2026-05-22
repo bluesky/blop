@@ -567,6 +567,12 @@ class QueueserverAgent(_AxAgentMixin):
     An asynchronous interface that uses Ax as the backend for optimization and experiment tracking
     and the bluesky-queueserver-api for scheduling plan execution.
 
+    .. warning::
+
+        This class is **experimental**. The API is not yet stable and may change
+        in future releases without a deprecation period. It is not recommended for
+        production use.
+
     Parameters
     ----------
     re_manager_api : REManagerAPI
