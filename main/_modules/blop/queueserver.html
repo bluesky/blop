@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.queueserver &#8212; blop 1.0.0b2.dev21 documentation</title>
+    <title>blop.queueserver &#8212; blop 1.0.0b2.dev22 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
-    <script src="../../_static/documentation_options.js?v=3701db23"></script>
+    <script src="../../_static/documentation_options.js?v=00f95149"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -498,7 +498,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev21" />
+  <meta name="docsearch:version" content="1.0.0b2.dev22" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -900,6 +900,12 @@ window.runMermaid = runMermaid;</script>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Queueserver integration for running optimization through a Bluesky queueserver.</span>
 
+<span class="sd">.. warning::</span>
+
+<span class="sd">    This module is **experimental**. The API is not yet stable and may change</span>
+<span class="sd">    in future releases without a deprecation period. It is not recommended for</span>
+<span class="sd">    production use.</span>
+
 <span class="sd">This module provides components for running optimization loops remotely through</span>
 <span class="sd">a queueserver, rather than directly through a RunEngine.</span>
 <span class="sd">&quot;&quot;&quot;</span>
@@ -934,6 +940,11 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptimizationResult</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The result of a completed or stopped optimization run.</span>
+
+<span class="sd">    .. warning::</span>
+
+<span class="sd">        This class is part of the **experimental** queueserver integration.</span>
+<span class="sd">        The API may change in future releases without a deprecation period.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -997,6 +1008,11 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    This class encapsulates all ZMQ and HTTP communication with the queueserver,</span>
 <span class="sd">    including plan submission and event listening.</span>
+
+<span class="sd">    .. warning::</span>
+
+<span class="sd">        This class is part of the **experimental** queueserver integration.</span>
+<span class="sd">        The API may change in future releases without a deprecation period.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -1176,6 +1192,11 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    This class coordinates the optimization workflow by getting suggestions from</span>
 <span class="sd">    the optimizer, submitting acquisition plans to the queueserver, and ingesting</span>
 <span class="sd">    results when plans complete.</span>
+
+<span class="sd">    .. warning::</span>
+
+<span class="sd">        This class is part of the **experimental** queueserver integration.</span>
+<span class="sd">        The API may change in future releases without a deprecation period.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
