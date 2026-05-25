@@ -288,28 +288,18 @@ Let's start the optimization. We'll begin with a batch of 10 points to build an 
 RE(agent.optimize(1, n_points=10))
 ```
 
-## Checking Optimization Health
-
-After running some iterations, it's good practice to check how the optimization is progressing. Ax provides built-in health checks and diagnostics through `compute_analyses()`:
-
-```{code-cell} ipython3
-_ = agent.ax_client.compute_analyses()
-```
-
-This runs all applicable analyses for the current experiment state, including health checks that flag potential issues like model fit problems or exploration gaps. Review these before continuing.
-
 ## Continuing the Optimization
 
 The optimization state is preserved, so we can simply run more iterations:
 
 ```{code-cell} ipython3
-# Run remaining 20 iterations
-RE(agent.optimize(20))
+# Run remaining 10 iterations
+RE(agent.optimize(10))
 ```
 
 ## Understanding the Results
 
-After optimization, we can examine what the agent learned. Let's run the analyses again to see the final model quality and optimization trace:
+After optimization, we can examine what the agent learned. Ax's `compute_analyses()` runs diagnostics including cross-validation of the surrogate model and optimization trace plots:
 
 ```{code-cell} ipython3
 _ = agent.ax_client.compute_analyses()
