@@ -326,7 +326,7 @@ This plot reveals the landscape the optimizer explored. The valley (minimum) sho
 Let's retrieve the best configuration found during optimization and apply it to see the resulting beam:
 
 ```{code-cell} ipython3
-_, optimal_parameters, metrics = agent.ax_client.get_best_parameterization(use_model_predictions=False)
+optimal_parameters, metrics, _, _ = agent.ax_client.get_best_parameterization(use_model_predictions=False)
 optimal_parameters
 ```
 
