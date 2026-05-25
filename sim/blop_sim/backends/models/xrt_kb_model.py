@@ -49,7 +49,7 @@ def build_beamline():
     beamLine = raycing.BeamLine()
 
     beamLine.geometricSource01 = rsources.GeometricSource(
-        bl=beamLine, center=[0, 0, 0], nrays=25000, energies=(9000, 100), distE="normal", dx=0.2, dz=0.1, dxprime=0.00015
+        bl=beamLine, center=[0, 0, 0], nrays=50000, energies=(9000, 100), distE="normal", dx=0.2, dz=0.1, dxprime=0.00015
     )
 
     beamLine.toroidMirror01 = roes.ToroidMirror(
