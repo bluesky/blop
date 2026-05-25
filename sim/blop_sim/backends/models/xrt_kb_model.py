@@ -64,7 +64,7 @@ def build_beamline():
 
     beamLine.toroidMirror02 = roes.ToroidMirror(
         bl=beamLine,
-        center=[0, 11000, r"auto"],
+        center=[0, 11000, 176.33353257489432],
         pitch=r"5deg",
         yaw=r"10deg",
         positionRoll=r"90deg",
