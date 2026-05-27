@@ -95,27 +95,26 @@ def test_queueserver_client_check_plan_raises_for_missing_plan(mock_re_manager):
 
 @patch("blop.queueserver.REManagerAPI")
 def test_queueserver_client_submit_plan_with_autostart(mock_re_manager):
-    """Test submit_plan adds item and starts queue when autostart=True."""
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    """Test submit_plan adds item to queue; autostart is configured at construction."""
+    client = QueueserverClient(mock_re_manager, "inproc://test", autostart=True)
     mock_plan = MagicMock()
 
-    client.submit_plan(mock_plan, autostart=True)
+    client.submit_plan(mock_plan)
 
+    mock_re_manager.queue_autostart.assert_called_once_with(True)
     mock_re_manager.item_add.assert_called_once_with(mock_plan)
-    mock_re_manager.wait_for_idle_or_paused.assert_called_once()
-    mock_re_manager.queue_start.assert_called_once()
 
 
 @patch("blop.queueserver.REManagerAPI")
 def test_queueserver_client_submit_plan_without_autostart(mock_re_manager):
-    """Test submit_plan only adds item when autostart=False."""
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    """Test submit_plan only adds item when autostart=False at construction."""
+    client = QueueserverClient(mock_re_manager, "inproc://test", autostart=False)
     mock_plan = MagicMock()
 
-    client.submit_plan(mock_plan, autostart=False)
+    client.submit_plan(mock_plan)
 
+    mock_re_manager.queue_autostart.assert_called_once_with(False)
     mock_re_manager.item_add.assert_called_once_with(mock_plan)
-    mock_re_manager.queue_start.assert_not_called()
 
 
 @patch("blop.queueserver.threading.Thread")
