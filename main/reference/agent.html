@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Agent &#8212; blop 1.0.0b2.dev25 documentation</title>
+    <title>Agent &#8212; blop 1.0.0b2.dev26 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
-    <script src="../_static/documentation_options.js?v=cb70c184"></script>
+    <script src="../_static/documentation_options.js?v=fc884bee"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="API Reference" href="../reference.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev25" />
+  <meta name="docsearch:version" content="1.0.0b2.dev26" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -970,7 +970,7 @@ evaluate next. Each dictionary includes an “_id” key for identification.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="blop.ax.QueueserverAgent">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">blop.ax.</span></span><span class="sig-name descname"><span class="pre">QueueserverAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">re_manager_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zmq_consumer_addr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objectives</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dof_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcome_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#QueueserverAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.QueueserverAgent" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">blop.ax.</span></span><span class="sig-name descname"><span class="pre">QueueserverAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">re_manager_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document_dispatcher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objectives</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dof_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcome_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#QueueserverAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.QueueserverAgent" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_AxAgentMixin</span></code></p>
 <p>An asynchronous interface that uses Ax as the backend for optimization and experiment tracking
 and the bluesky-queueserver-api for scheduling plan execution.</p>
@@ -985,8 +985,7 @@ production use.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>re_manager_api</strong><span class="classifier">REManagerAPI</span></dt><dd><p>The manager API for interaction with Bluesky queueserver.</p>
 </dd>
-<dt><strong>zmq_consumer_addr</strong><span class="classifier">str</span></dt><dd><p>A ZMQ address to consume Bluesky messages from, to react to plan execution on the
-remote server.</p>
+<dt><strong>document_dispatcher</strong><span class="classifier">RemoteDispatcher</span></dt><dd><p>Dispatcher for consuming Bluesky documents from the remote server.</p>
 </dd>
 <dt><strong>sensors</strong><span class="classifier">Sequence[str]</span></dt><dd><p>The sensors to use for acquisition. These should be the minimal set
 of sensors that are needed to compute the objectives.</p>

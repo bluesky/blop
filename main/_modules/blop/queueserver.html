@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.queueserver &#8212; blop 1.0.0b2.dev25 documentation</title>
+    <title>blop.queueserver &#8212; blop 1.0.0b2.dev26 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
-    <script src="../../_static/documentation_options.js?v=cb70c184"></script>
+    <script src="../../_static/documentation_options.js?v=fc884bee"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -498,7 +498,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev25" />
+  <meta name="docsearch:version" content="1.0.0b2.dev26" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -1006,8 +1006,8 @@ window.runMermaid = runMermaid;</script>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Handles communication with a Bluesky queueserver.</span>
 
-<span class="sd">    This class encapsulates all ZMQ and HTTP communication with the queueserver,</span>
-<span class="sd">    including plan submission and event listening.</span>
+<span class="sd">    This class encapsulates queueserver communication, including plan submission</span>
+<span class="sd">    and event listening.</span>
 
 <span class="sd">    .. warning::</span>
 
@@ -1018,19 +1018,17 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    ----------</span>
 <span class="sd">    re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI</span>
 <span class="sd">        Manager instance for communication with Bluesky Queueserver</span>
-<span class="sd">    zmq_consumer_addr : str</span>
-<span class="sd">        Address for ZMQ document consumer (e.g., &quot;localhost:5578&quot;).</span>
+<span class="sd">    document_dispatcher : bluesky.callbacks.zmq.RemoteDispatcher</span>
+<span class="sd">        Dispatcher for the Bluesky document stream.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">re_manager_api</span><span class="p">:</span> <span class="n">REManagerAPI</span><span class="p">,</span>
-        <span class="n">zmq_consumer_addr</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">document_dispatcher</span><span class="p">:</span> <span class="n">RemoteDispatcher</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_zmq_consumer_addr</span> <span class="o">=</span> <span class="n">zmq_consumer_addr</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_rm</span> <span class="o">=</span> <span class="n">re_manager_api</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dispatcher</span><span class="p">:</span> <span class="n">RemoteDispatcher</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dispatcher</span> <span class="o">=</span> <span class="n">document_dispatcher</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_consumer_callback</span><span class="p">:</span> <span class="n">ConsumerCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_listener_thread</span><span class="p">:</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -1135,30 +1133,27 @@ window.runMermaid = runMermaid;</script>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Listener already running&quot;</span><span class="p">)</span>
             <span class="k">return</span>
 
-        <span class="n">dispatcher</span> <span class="o">=</span> <span class="n">RemoteDispatcher</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_zmq_consumer_addr</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_consumer_callback</span> <span class="o">=</span> <span class="n">ConsumerCallback</span><span class="p">(</span><span class="n">callback</span><span class="o">=</span><span class="n">on_stop</span><span class="p">)</span>
-        <span class="n">dispatcher</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_callback</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dispatcher</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_consumer_callback</span><span class="p">)</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting ZMQ listener thread&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting document listener thread&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_listener_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span>
-            <span class="n">target</span><span class="o">=</span><span class="n">dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;qserver-zmq-consumer&quot;</span><span class="p">,</span>
+            <span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dispatcher</span><span class="o">.</span><span class="n">start</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;qserver-document-consumer&quot;</span><span class="p">,</span>
             <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_listener_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_dispatcher</span> <span class="o">=</span> <span class="n">dispatcher</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_listener_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="QueueserverClient.stop_listener">
 <a class="viewcode-back" href="../../reference/queueserver.html#blop.queueserver.QueueserverClient.stop_listener">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">stop_listener</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the ZMQ listener thread.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dispatcher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the document listener thread.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_listener_thread</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dispatcher</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_dispatcher</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_consumer_callback</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_listener_thread</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stopped ZMQ listener&quot;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stopped document listener&quot;</span><span class="p">)</span></div>
 </div>
 
 

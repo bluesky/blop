@@ -98,6 +98,7 @@ Once the containers are up, proceed with the tutorial below.
 ```{code-cell} ipython3
 import time
 
+from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky_queueserver_api.zmq import REManagerAPI
 
 RM = REManagerAPI(zmq_control_addr="tcp://localhost:60615")
@@ -270,13 +271,15 @@ class HimmelblauEvaluation:
 Now we bring everything together. The `QueueserverAgent` needs:
 
 - `re_manager_api`: how to communicate with the queueserver (submit plans, check status)
-- `zmq_consumer_addr`: where to listen for document completion events
+- `document_dispatcher`: a `RemoteDispatcher` that subscribes to the Bluesky document stream
 - The DOFs, objectives, sensors, and evaluation function
 
 ```{code-cell} ipython3
+document_dispatcher = RemoteDispatcher(("localhost", 5578))
+
 agent = QueueserverAgent(
     re_manager_api=RM,
-    zmq_consumer_addr=("localhost", 5578),
+    document_dispatcher=document_dispatcher,
     sensors=sensors,
     dofs=dofs,
     objectives=objectives,
@@ -288,8 +291,9 @@ agent = QueueserverAgent(
 ```{note}
 The `re_manager_api` argument also accepts an HTTP-based client
 (`bluesky_queueserver_api.http.REManagerAPI`) for deployments that expose the
-queueserver over HTTP rather than ZMQ. The `zmq_consumer_addr` points to the
-ZMQ proxy output port (5578) where Bluesky documents are published.
+queueserver over HTTP rather than ZMQ. Construct the `RemoteDispatcher` with
+whatever arguments your document stream requires, such as a ZMQ address or
+message prefix.
 ```
 
 ## Running the Optimization
