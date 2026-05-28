@@ -11,8 +11,10 @@ class InferredVariable(MovableHasName, Readable):
         self.root = name
         self.PV = PV
         self.member_route = PV.split(":")
-        self.type = type(self.val) if self.val != "auto" and self.val is not None else float
-        if self.val == "auto" or self.val is None:
+        if self.val != "auto" and self.val is not None:
+            self.type = type(self.val)
+        else:
+            self.type = float
             print(f"""created inferred variable {self.name} of float type as value is None or auto. 
                 Be careful when setting this variable as the type is guessed as float by default.""")
 
@@ -25,7 +27,7 @@ class InferredVariable(MovableHasName, Readable):
         if type(submember) is list:  # list branch
             return submember[l_index[self.member_route[1]]]
         return submember[self.member_route[1]]  # dict branch
-    
+
     @val.setter
     def val(self, value):
         if self.member_route is None:
@@ -49,7 +51,7 @@ class InferredVariable(MovableHasName, Readable):
     @property
     def name(self):
         return f"{self.root}:{self.PV}"
-    
+
     def __repr__(self):
         return f"<InferredVariable::{self.name}={self.type}:{self.val}>"
 
