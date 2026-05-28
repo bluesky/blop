@@ -1,4 +1,11 @@
+import time
+from collections import OrderedDict
+
+from bluesky.protocols import Triggerable
+
 from blop.protocols import MovableHasName, Readable
+
+from ...backends.models.xrt_kb_model import build_histRGB
 
 primitives = {int, float, bool, str, type(None)}
 aliases = "xyzwhijk"
@@ -11,7 +18,7 @@ class InferredVariable(MovableHasName, Readable):
         self.root = name
         self.PV = PV
         self.member_route = PV.split(":")
-        if self.val != "auto" and self.val is not None:
+        if self.val is not None and not (isinstance(self.val, str) and self.val == "auto"):
             self.type = type(self.val)
         else:
             self.type = float
@@ -83,3 +90,30 @@ def element_to_variables(element, name) -> dict[str, InferredVariable]:
                 inferred = InferredVariable(name=name, element=element, PV=f"{key}:{x}")
                 lib[inferred.name] = inferred
     return lib
+
+
+class InferredDetector(Readable, Triggerable):  # this is by element
+    def __init__(self, beamLine, name: str, shape: tuple[int, int], primary: bool = False):
+        self._beamline = beamLine
+        self._name = name
+        self._prime = primary
+        self.shape = shape
+
+    def trigger(self):
+        if self is self._beamline.primary:
+            self._beamline.generate_beam()
+
+    def read(self) -> OrderedDict:  # strong implementations look at more than one of the device beams
+        beam = self._beamline[self.name][0]
+        hist, _, _ = build_histRGB(beam, isScreen=True, shape=self.shape)
+        return OrderedDict([(self._name, {"value": hist, "timestamp": time.time()})])
+
+    def describe(self):
+        return OrderedDict([(self._name, {"source": self._name, "dtype": "ndarray", "shape": list(self.shape)})])
+
+
+def infer_detectors(beamLine):
+    dets = []
+    for name in beamLine.elements.keys():
+        dets.append(InferredDetector(beamLine, name, shape=[256, 256], primary=("screen" in name)))
+    return dets
