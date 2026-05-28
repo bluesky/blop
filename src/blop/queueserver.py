@@ -1,6 +1,12 @@
 """
 Queueserver integration for running optimization through a Bluesky queueserver.
 
+.. warning::
+
+    This module is **experimental**. The API is not yet stable and may change
+    in future releases without a deprecation period. It is not recommended for
+    production use.
+
 This module provides components for running optimization loops remotely through
 a queueserver, rather than directly through a RunEngine.
 """
@@ -33,6 +39,11 @@ CORRELATION_UID_KEY: Literal["blop_correlation_uid"] = "blop_correlation_uid"
 class OptimizationResult:
     """
     The result of a completed or stopped optimization run.
+
+    .. warning::
+
+        This class is part of the **experimental** queueserver integration.
+        The API may change in future releases without a deprecation period.
 
     Parameters
     ----------
@@ -93,6 +104,11 @@ class QueueserverClient:
 
     This class encapsulates all ZMQ and HTTP communication with the queueserver,
     including plan submission and event listening.
+
+    .. warning::
+
+        This class is part of the **experimental** queueserver integration.
+        The API may change in future releases without a deprecation period.
 
     Parameters
     ----------
@@ -251,6 +267,11 @@ class QueueserverOptimizationRunner:
     This class coordinates the optimization workflow by getting suggestions from
     the optimizer, submitting acquisition plans to the queueserver, and ingesting
     results when plans complete.
+
+    .. warning::
+
+        This class is part of the **experimental** queueserver integration.
+        The API may change in future releases without a deprecation period.
 
     Parameters
     ----------
