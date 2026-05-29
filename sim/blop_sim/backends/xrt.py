@@ -120,7 +120,7 @@ class XRTBackend(SimBackend, Readable):
             self.generate_beam()
         if key in self.render.keys():
             return [self.render[key]]
-        return [k: v for k, v in self.render.items() if key in k and 'local' in k]
+        return [v for k, v in self.render.items() if key in k and 'local' in k]
 
     @property
     def variables(self):
