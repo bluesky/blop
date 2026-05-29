@@ -2,16 +2,13 @@
 
 import time
 from collections import OrderedDict
+from pathlib import Path
 
 import numpy as np
 import xrt.backends.raycing as raycing
 from bluesky.protocols import Readable
-from xrt.backends.raycing import BeamLine
 
 from .core import SimBackend
-from blop.protocols import MovableHasName, Readable
-from pathlib import Path
-
 
 limits = [[-0.6, 0.6], [-0.45, 0.45]]
 
@@ -63,7 +60,6 @@ class XRTBackend(SimBackend, Readable):
         if self._beamline is None:
             raise ValueError("beamline has not been initialized")
 
-
     def generate_beam(self) -> np.ndarray:
         """Generate beam using XRT ray-tracing.
 
@@ -109,7 +105,7 @@ class XRTBackend(SimBackend, Readable):
         return result
 
     def describe(self):
-        return OrderedDict([(k, {"source": k, "dtype": type(v['value']), 'shape': v.shape}) for k, v in self.read().items()])
+        return OrderedDict([(k, {"source": k, "dtype": type(v["value"]), "shape": v.shape}) for k, v in self.read().items()])
 
     @property
     def name(self):
@@ -120,7 +116,7 @@ class XRTBackend(SimBackend, Readable):
             self.generate_beam()
         if key in self.render.keys():
             return [self.render[key]]
-        return [v for k, v in self.render.items() if key in k and 'local' in k]
+        return [v for k, v in self.render.items() if key in k and "local" in k]
 
     @property
     def variables(self):
@@ -129,4 +125,3 @@ class XRTBackend(SimBackend, Readable):
     @property
     def elements(self):
         return self._elements
-

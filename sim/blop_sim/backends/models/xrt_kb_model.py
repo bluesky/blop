@@ -18,7 +18,9 @@ import xrt.backends.raycing.screens as rscreens
 import xrt.backends.raycing.sources as rsources
 import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
+
 from ..core import SimBackend
+from ..xrt import build_histRGB, limits
 
 
 def build_beamline():
@@ -104,6 +106,7 @@ def main():
     beamLine.alignE = E0
     plots = define_plots()
     xrtrun.run_ray_tracing(plots=plots, backend=r"raycing", beamLine=beamLine)
+
 
 class KBBackend(SimBackend):
     """XRT ray-tracing simulation backend.

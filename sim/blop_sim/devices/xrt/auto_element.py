@@ -1,14 +1,17 @@
 import time
 from collections import OrderedDict
 
-from bluesky.protocols import Triggerable, Readable
-from blop.protocols import MovableHasName
-from ...backends import XRTBackend, build_histRGB
+from bluesky.protocols import Readable, Triggerable
 
+from blop.protocols import MovableHasName
+
+from ...backends import XRTBackend, build_histRGB
 
 primitives = {int, float, bool, str, type(None)}
 aliases = "xyzwhijk"
 l_index = {k: i for i, k in enumerate(aliases)}
+known_vars = {"_center", "_roll", "_yaw", "_pitch", "R"}
+
 
 class InferredVariable(MovableHasName, Readable):
     def __init__(self, name: str, element: object, PV: str):
@@ -72,9 +75,46 @@ class InferredVariable(MovableHasName, Readable):
         return {self.name: {"source": f"{self.root}:inferred", "dtype": str(self.type), "shape": []}}
 
 
-def element_to_variables(element, name) -> dict[str, InferredVariable]:
+class InferredDetector(Readable, Triggerable):  # this is by element
+    def __init__(self, beamLine: XRTBackend, name: str, shape: tuple[int, int], primary: bool = False):
+        self._beamline = beamLine
+        self._name = name
+        self.shape = shape
+        if primary:
+            self.set_primary()
+
+    @property
+    def primary(self):
+        return self is self._beamline.target
+
+    def set_primary(self):
+        self._beamline.target = self
+
+    def trigger(self):
+        if self.primary:
+            self._beamline.generate_beam()
+
+    def read(self) -> OrderedDict:
+        beam = self._beamline[self._name][:1]  # for now, only 1
+        result = OrderedDict()
+        for _face in beam:
+            hist, _, _ = build_histRGB(beam, isScreen=True, shape=self.shape)
+            result[self._name] = {"value": hist, "timestamp": time.time()}
+        return result
+
+    def describe(self):
+        return OrderedDict([(self._name, {"source": self._name, "dtype": "ndarray", "shape": list(self.shape)})])
+
+    @property
+    def name(self):
+        return self._name
+
+
+def element_to_variables(element, name: str, filter_for: set = None) -> dict[str, InferredVariable]:
     lib = {}
     for key, item in vars(element).items():
+        if filter_for is not None and key not in filter_for:
+            continue
         member = type(item)
         if member in primitives:
             inferred = InferredVariable(name=name, element=element, PV=key)
@@ -89,50 +129,16 @@ def element_to_variables(element, name) -> dict[str, InferredVariable]:
                 lib[inferred.name] = inferred
     return lib
 
-class InferredDetector(Readable, Triggerable):  # this is by element
-    def __init__(self, beamLine: XRTBackend, name: str, shape: tuple[int, int], primary: bool = False):
-        self._beamline = beamLine
-        self._name = name
-        self.shape = shape
-        if primary:
-            self.set_primary()
 
-    @property
-    def primary(self):
-        return self is self._beamline.target
-    
-    def set_primary(self):
-        self._beamline.target = self
-    
-    def trigger(self):
-        if self.primary:
-            self._beamline.generate_beam()
-
-    def read(self) -> OrderedDict:
-        beam = self._beamline[self._name][:0]  # for now, only 1
-        result = OrderedDict()
-        for face in beam:
-            hist, _, _ = build_histRGB(beam, isScreen=True, shape=self.shape)
-            result[self._name] =  {"value": hist, "timestamp": time.time()}
-        return result
-
-
-    def describe(self):
-        return OrderedDict([(self._name, {"source": self._name, "dtype": "ndarray", "shape": list(self.shape)})])
-    
-    @property
-    def name(self):
-        return self._name
-    
-
-def infer_variables(beamLine: XRTBackend):
+def infer_variables(beamLine: XRTBackend, filter_for: set[str] = known_vars):
     variables = {}
     for name, element in beamLine.elements.items():
-        variables[name] = element_to_variables(element, name)
+        variables[name] = element_to_variables(element, name, filter_for=filter_for)
     return variables
+
 
 def infer_detectors(beamLine: XRTBackend):
     dets = {}
     for name in beamLine.elements.keys():
-        dets[name] = InferredDetector(beamLine, name, shape=[256, 256], primary=("Screen" in name))
+        dets[name] = InferredDetector(beamLine, name, shape=[256, 256], primary=("Sample" | "Screen" in name))
     return dets
