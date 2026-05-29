@@ -1,6 +1,6 @@
 """XRTBackend-specific devices."""
 
-from .auto_element import InferredDetector, InferredVariable, element_to_variables
+from .auto_element import infer_variables, infer_detectors, element_to_variables
 from .kb_mirror import KBMirror
 
-__all__ = ["KBMirror", "InferredVariable", "element_to_variables", "InferredDetector"]
+__all__ = ["KBMirror","infer_variables", "infer_detectors", "element_to_variables"]
