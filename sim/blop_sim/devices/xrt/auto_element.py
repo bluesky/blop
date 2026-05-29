@@ -23,7 +23,7 @@ class InferredVariable(MovableHasName, Readable):
             self.type = type(self.val)
         else:
             self.type = float
-            print(f"""created inferred variable {self.name} of float type as value is None or auto. 
+            print(f"""created inferred variable {self.name} of float type as value is None or auto.
                 Be careful when setting this variable as the type is guessed as float by default.""")
 
     @property
@@ -97,8 +97,8 @@ class InferredDetector(Readable, Triggerable):  # this is by element
     def read(self) -> OrderedDict:
         beam = self._beamline[self._name][:1]  # for now, only 1
         result = OrderedDict()
-        for _face in beam:
-            hist, _, _ = build_histRGB(beam, isScreen=True, shape=self.shape)
+        for face in beam:
+            hist, _, _ = build_histRGB(face, face, isScreen=True, shape=self.shape)
             result[self._name] = {"value": hist, "timestamp": time.time()}
         return result
 
@@ -140,5 +140,5 @@ def infer_variables(beamLine: XRTBackend, filter_for: set[str] = known_vars):
 def infer_detectors(beamLine: XRTBackend):
     dets = {}
     for name in beamLine.elements.keys():
-        dets[name] = InferredDetector(beamLine, name, shape=[256, 256], primary=("Sample" | "Screen" in name))
+        dets[name] = InferredDetector(beamLine, name, shape=[128, 128], primary=("Screen" in name))
     return dets
