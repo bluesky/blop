@@ -44,6 +44,7 @@ from pathlib import PurePath
 import matplotlib.pyplot as plt
 import numpy as np
 from ax.api.protocols import IMetric
+
 from bluesky.run_engine import RunEngine
 from bluesky_tiled_plugins import TiledWriter
 from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
@@ -56,7 +57,7 @@ from blop.ax.objective import OutcomeConstraint
 from blop.protocols import EvaluationFunction
 
 # Import simulation devices (requires: pip install -e sim/)
-from blop_sim.backends.xrt import XRTBackend
+from blop_sim.backends.models.xrt_kb_model import KBBackend
 from blop_sim.devices import DetectorDevice
 from blop_sim.devices.xrt import KBMirror
 
