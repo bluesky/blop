@@ -7,6 +7,7 @@ from typing import Any, cast
 from ax import Client, TOutcome, TParameterization
 from ax.analysis.plotly.surface.contour import ContourPlot
 from ax.core.types import TParamValue
+from ax.generation_strategy.generation_strategy import GenerationStrategy
 
 # ===============================
 # TODO: Remove when Python 3.10 is no longer supported
@@ -266,6 +267,7 @@ class Agent(_AxAgentMixin):
         dof_constraints: Sequence[DOFConstraint] | None = None,
         outcome_constraints: Sequence[OutcomeConstraint] | None = None,
         checkpoint_path: str | None = None,
+        generation_strategy: GenerationStrategy | None = None,
         **kwargs: Any,
     ):
         if any(isinstance(dof.actuator, str) for dof in dofs):
@@ -290,6 +292,9 @@ class Agent(_AxAgentMixin):
         self._readable_cache: dict[str, InferredReadable] = {}
         self._callbacks: list[CallbackBase] = [OptimizationLogger()]
         self._callback_router = OptimizationCallbackRouter(self._callbacks)
+
+        if generation_strategy is not None:
+            self.ax_client.set_generation_strategy(generation_strategy)
 
     @classmethod
     def from_checkpoint(
