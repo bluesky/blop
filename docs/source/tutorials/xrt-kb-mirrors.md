@@ -98,7 +98,7 @@ Now we create the simulation backend and individual devices. Each `RangeDOF` wra
 
 ```{code-cell} ipython3
 # Create XRT simulation backend
-backend = XRTBackend()
+backend = KBBackend()
 
 # Create individual KB mirror devices
 kbv = KBMirror(backend, mirror_index=0, initial_radius=38000, name="kbv")
