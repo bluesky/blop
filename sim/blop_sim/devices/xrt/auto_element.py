@@ -10,7 +10,6 @@ from ...backends import XRTBackend, build_histRGB
 primitives = {int, float, bool, str, type(None)}
 aliases = "xyzwhijk"
 l_index = {k: i for i, k in enumerate(aliases)}
-known_vars = {"_center", "_roll", "_yaw", "_pitch", "R"}
 
 
 class InferredVariable(MovableHasName, Readable):
@@ -42,6 +41,7 @@ class InferredVariable(MovableHasName, Readable):
             raise ValueError("the variable has yet to be inferred")
         if type(value) is not self.type and value != "auto":
             raise ValueError("attempting to set an inferred variable to a different inferred type outside of auto")
+        # setattr(self.base_object, self.member_route[0], value)
 
         if len(self.member_route) == 1:
             setattr(self.base_object, self.member_route[0], value)
@@ -50,8 +50,8 @@ class InferredVariable(MovableHasName, Readable):
         submember = getattr(self.base_object, self.member_route[0])
         if type(submember) is list:  # list branch
             submember[l_index[self.member_route[1]]] = value
-        elif type(submember) is dict:  # dict branch
-            submember[self.member_route[1]] = value
+        # elif type(submember) is dict:  # dict branch
+        #     submember[self.member_route[1]] = value
         else:
             raise ValueError("member route is broken or type is not primitive/inferrable")
 
@@ -112,28 +112,36 @@ class InferredDetector(Readable, Triggerable):  # this is by element
 
 def element_to_variables(element, name: str, filter_for: set = None) -> dict[str, InferredVariable]:
     lib = {}
-    for key, item in vars(element).items():
+    for key, item in vars(type(element)).items():
+        if type(item) is not property:
+            continue
         if filter_for is not None and key not in filter_for:
             continue
-        member = type(item)
+
+        val = getattr(element, key)
+        member = type(val)
+        # print(key, member, val)
         if member in primitives:
             inferred = InferredVariable(name=name, element=element, PV=key)
             lib[inferred.name] = inferred
         elif member is list:
-            for x in range(len(item)):
+            for x in range(len(val)):
                 inferred = InferredVariable(name=name, element=element, PV=f"{key}:{aliases[x]}")
                 lib[inferred.name] = inferred
-        elif member is dict:
-            for x in item.keys():
-                inferred = InferredVariable(name=name, element=element, PV=f"{key}:{x}")
-                lib[inferred.name] = inferred
+        # elif member is dict:
+        #     print(f"inferring dict {key} for element {name}")
+        #     for x in val.keys():
+        #         inferred = InferredVariable(name=name, element=element, PV=f"{key}:{x}")
+        #         lib[inferred.name] = inferred
     return lib
 
 
-def infer_variables(beamLine: XRTBackend, filter_for: set[str] = known_vars):
+def infer_variables(beamLine: XRTBackend, filter_for: set[str] = None):
     variables = {}
     for name, element in beamLine.elements.items():
-        variables[name] = element_to_variables(element, name, filter_for=filter_for)
+        eles = element_to_variables(element, name, filter_for=filter_for)
+        if eles: 
+            variables[name] = eles
     return variables
 
 
