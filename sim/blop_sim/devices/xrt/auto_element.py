@@ -118,7 +118,10 @@ def element_to_variables(element, name: str, filter_for: set = None) -> dict[str
         if filter_for is not None and key not in filter_for:
             continue
 
-        val = getattr(element, key)
+        try:
+            val = getattr(element, key)
+        except Exception:
+            continue
         member = type(val)
         # print(key, member, val)
         if member in primitives:

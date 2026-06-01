@@ -2,6 +2,7 @@
 
 import time
 from collections import OrderedDict
+from multiprocessing import Pool
 from pathlib import Path
 
 import numpy as np
@@ -43,7 +44,7 @@ class XRTBackend(SimBackend, Readable):
     Much slower than SimpleBackend but more physically accurate.
     """
 
-    def __init__(self, file, limits=None, noise: bool = False):
+    def __init__(self, file, limits=None, noise: bool = False, n_iters=4, n_workers=4):
         """Initialize XRT backend."""
         super().__init__()
         self._beamline = raycing.BeamLine(fileName=file)
@@ -54,11 +55,21 @@ class XRTBackend(SimBackend, Readable):
         beamLine = self._beamline
         self._elements = {k: beamLine.oesDict[v][0] for k, v in beamLine.oenamesToUUIDs.items()}
         self._ensure_beamline()
+        self.n_iters = n_iters
+        self.n_workers = n_workers
 
     def _ensure_beamline(self):
         """Build XRT beamline if not already built."""
         if self._beamline is None:
             raise ValueError("beamline has not been initialized")
+
+    @staticmethod
+    def render_worker(stuple):
+        beamstr, seed = stuple
+        print(f"worker {seed} executing")
+        np.random.seed(seed=seed)
+        outDict = raycing.run_process_from_file(beamLine=beamstr)
+        return outDict
 
     def generate_beam(self) -> np.ndarray:
         """Generate beam using XRT ray-tracing.
@@ -68,9 +79,14 @@ class XRTBackend(SimBackend, Readable):
         """
         self._ensure_beamline()
 
-        # Run ray tracing
-        outDict = raycing.run_process_from_file(self._beamline)
-        self.render = outDict
+        with Pool(processes=self.n_workers) as pool:
+            result = pool.imap_unordered(
+                self.render_worker, zip([self._beamline] * self.n_iters, range(self.n_iters), strict=True)
+            )
+            outDict = next(result)
+            for out in result:
+                [outDict[k].concatenate(v) for k, v in out.items() if k in outDict.keys()]
+            self.render = outDict
         if self.target is not None:
             lb = [v for k, v in outDict.items() if self.target.name in k][0]
         else:
@@ -98,7 +114,7 @@ class XRTBackend(SimBackend, Readable):
     def read(self):
         if self.render is None:
             self.generate_beam()
-        result = OrderedDict
+        result = OrderedDict()
         for name, beam in self.render.items():
             hist2d, _, _ = build_histRGB(beam, beam, limits=self._limits, isScreen=True, shape=self._image_shape)
             result[name] = {"value": hist2d, "timestamp": time.time()}
