@@ -140,7 +140,7 @@ def infer_variables(beamLine: XRTBackend, filter_for: set[str] = None):
     variables = {}
     for name, element in beamLine.elements.items():
         eles = element_to_variables(element, name, filter_for=filter_for)
-        if eles: 
+        if eles:
             variables[name] = eles
     return variables
 
