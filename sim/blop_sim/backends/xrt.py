@@ -4,6 +4,7 @@ import time
 from collections import OrderedDict
 from multiprocessing import Pool
 from pathlib import Path
+from pprint import pprint
 
 import numpy as np
 import xrt.backends.raycing as raycing
@@ -37,6 +38,20 @@ def build_histRGB(lb, gb, limits=None, isScreen=False, shape=None):
     return hist2d, hist2dRGB, limits
 
 
+def run_cached_process_from_file(beamLine, start_index):
+    outDict = {}
+    sequence = list(beamLine.flowU.items())[start_index:]
+    # print(f"starting from: {start_index}")
+    for oeid, meth in sequence:
+        oe = beamLine.oesDict[oeid][0]
+        for func, fkwargs in meth.items():
+            getattr(oe, func)(**fkwargs)
+    for beamName, beamTag in beamLine.beamNamesDict.items():
+        outDict[beamName] = beamLine.beamsDictU[beamTag[0]][beamTag[1]]
+
+    return outDict
+
+
 class XRTBackend(SimBackend, Readable):
     """XRT ray-tracing simulation backend.
 
@@ -57,6 +72,7 @@ class XRTBackend(SimBackend, Readable):
         self._ensure_beamline()
         self.n_iters = n_iters
         self.n_workers = n_workers
+        self._cache_invalidator = [0] * len(beamLine.flowU.items())
 
     def _ensure_beamline(self):
         """Build XRT beamline if not already built."""
@@ -65,10 +81,10 @@ class XRTBackend(SimBackend, Readable):
 
     @staticmethod
     def render_worker(stuple):
-        beamstr, seed = stuple
-        print(f"worker {seed} executing")
+        beamLine, seed, minvalid_index = stuple
+        # print(f"worker {seed} executing")
         np.random.seed(seed=seed)
-        outDict = raycing.run_process_from_file(beamLine=beamstr)
+        outDict = run_cached_process_from_file(beamLine=beamLine, start_index=minvalid_index)
         return outDict
 
     def generate_beam(self) -> np.ndarray:
@@ -80,13 +96,16 @@ class XRTBackend(SimBackend, Readable):
         self._ensure_beamline()
 
         with Pool(processes=self.n_workers) as pool:
-            result = pool.imap_unordered(
-                self.render_worker, zip([self._beamline] * self.n_iters, range(self.n_iters), strict=True)
-            )
-            outDict = next(result)
+            n_disp = self.n_iters - 1
+            minvalid_index = [self._cache_invalidator.index(1) if 1 in self._cache_invalidator else 0] * n_disp
+            b_refs = [self._beamline] * n_disp
+            result = pool.imap_unordered(self.render_worker,
+                                         zip(b_refs, range(n_disp), minvalid_index, strict=True))
+            outDict = run_cached_process_from_file(self._beamline, start_index=minvalid_index[0])
             for out in result:
                 [outDict[k].concatenate(v) for k, v in out.items() if k in outDict.keys()]
-            self.render = outDict
+        self.render = outDict
+        self._cache_invalidator = [0] * len(self._cache_invalidator)
         if self.target is not None:
             lb = [v for k, v in outDict.items() if self.target.name in k][0]
         else:
@@ -141,3 +160,13 @@ class XRTBackend(SimBackend, Readable):
     @property
     def elements(self):
         return self._elements
+
+    def invalidate(self, id: int | str):
+        if type(id) is int and id in range(len(self._cache_invalidator)):
+            self._cache_invalidator[id] = 1
+
+        print(f"invalidating cache element {id} ->", end="")
+        if id in self.elements.keys():
+            print("success")
+            index = list(self._beamline.flowU.keys()).index(self._beamline.oenamesToUUIDs[id])
+            self._cache_invalidator[index] = 1

@@ -13,9 +13,10 @@ l_index = {k: i for i, k in enumerate(aliases)}
 
 
 class InferredVariable(MovableHasName, Readable):
-    def __init__(self, name: str, element: object, PV: str):
+    def __init__(self, name: str, element: object, PV: str, root: XRTBackend | None = None):
         self.base_object = element
-        self.root = name
+        self.base = name
+        self.root = root
         self.PV = PV
         self.member_route = PV.split(":")
         if self.val is not None and not (isinstance(self.val, str) and self.val == "auto"):
@@ -43,6 +44,9 @@ class InferredVariable(MovableHasName, Readable):
             raise ValueError("attempting to set an inferred variable to a different inferred type outside of auto")
         # setattr(self.base_object, self.member_route[0], value)
 
+        if self.root is not None:
+            self.root.invalidate(self.base)
+
         if len(self.member_route) == 1:
             setattr(self.base_object, self.member_route[0], value)
             return
@@ -58,7 +62,8 @@ class InferredVariable(MovableHasName, Readable):
     # has name interface
     @property
     def name(self):
-        return f"{self.root}:{self.PV}"
+        root = "" if self.root is None else self.root.name + ":"
+        return f"{root}{self.base}:{self.PV}"
 
     def __repr__(self):
         return f"<InferredVariable::{self.name}={self.type}:{self.val}>"
@@ -72,7 +77,7 @@ class InferredVariable(MovableHasName, Readable):
         return {self.name: {"value": self.val, "timestamp": -1}}
 
     def describe(self):
-        return {self.name: {"source": f"{self.root}:inferred", "dtype": str(self.type), "shape": []}}
+        return {self.name: {"source": f"{self.base}:inferred", "dtype": str(self.type), "shape": []}}
 
 
 class InferredDetector(Readable, Triggerable):  # this is by element
@@ -110,7 +115,9 @@ class InferredDetector(Readable, Triggerable):  # this is by element
         return self._name
 
 
-def element_to_variables(element, name: str, filter_for: set = None) -> dict[str, InferredVariable]:
+def element_to_variables(
+    element, name: str, filter_for: set = None, root: XRTBackend | None = None
+) -> dict[str, InferredVariable]:
     lib = {}
     for key, item in vars(type(element)).items():
         if type(item) is not property:
@@ -123,14 +130,13 @@ def element_to_variables(element, name: str, filter_for: set = None) -> dict[str
         except Exception:
             continue
         member = type(val)
-        # print(key, member, val)
         if member in primitives:
-            inferred = InferredVariable(name=name, element=element, PV=key)
-            lib[inferred.name] = inferred
+            inferred = InferredVariable(name=name, element=element, PV=key, root=root)
+            lib[inferred.PV] = inferred
         elif member is list:
             for x in range(len(val)):
-                inferred = InferredVariable(name=name, element=element, PV=f"{key}:{aliases[x]}")
-                lib[inferred.name] = inferred
+                inferred = InferredVariable(name=name, element=element, PV=f"{key}:{aliases[x]}", root=root)
+                lib[inferred.PV] = inferred
         # elif member is dict:
         #     print(f"inferring dict {key} for element {name}")
         #     for x in val.keys():
@@ -142,7 +148,7 @@ def element_to_variables(element, name: str, filter_for: set = None) -> dict[str
 def infer_variables(beamLine: XRTBackend, filter_for: set[str] = None):
     variables = {}
     for name, element in beamLine.elements.items():
-        eles = element_to_variables(element, name, filter_for=filter_for)
+        eles = element_to_variables(element, name, filter_for=filter_for, root=beamLine)
         if eles:
             variables[name] = eles
     return variables
