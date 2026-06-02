@@ -1,8 +1,9 @@
 """XRT ray-tracing beam simulation backend."""
 
+import pickle
 import time
 from collections import OrderedDict
-from multiprocessing import Pool
+from multiprocessing import Pool, shared_memory
 from pathlib import Path
 from pprint import pprint
 
@@ -84,7 +85,8 @@ class XRTBackend(SimBackend, Readable):
         beamLine, seed, minvalid_index = stuple
         # print(f"worker {seed} executing")
         np.random.seed(seed=seed)
-        outDict = run_cached_process_from_file(beamLine=beamLine, start_index=minvalid_index)
+        beam = pickle.loads(beamLine.buf[:beamLine.size])
+        outDict = run_cached_process_from_file(beamLine=beam, start_index=minvalid_index)
         return outDict
 
     def generate_beam(self) -> np.ndarray:
@@ -96,14 +98,19 @@ class XRTBackend(SimBackend, Readable):
         self._ensure_beamline()
 
         with Pool(processes=self.n_workers) as pool:
+            binary = pickle.dumps(self._beamline)
+            shm = shared_memory.SharedMemory(create=True, size=len(binary))
+            shm.buf[:len(binary)] = binary
             n_disp = self.n_iters - 1
             minvalid_index = [self._cache_invalidator.index(1) if 1 in self._cache_invalidator else 0] * n_disp
-            b_refs = [self._beamline] * n_disp
+            b_refs = [shm] * n_disp
             result = pool.imap_unordered(self.render_worker,
                                          zip(b_refs, range(n_disp), minvalid_index, strict=True))
             outDict = run_cached_process_from_file(self._beamline, start_index=minvalid_index[0])
             for out in result:
                 [outDict[k].concatenate(v) for k, v in out.items() if k in outDict.keys()]
+            shm.close()
+            shm.unlink()
         self.render = outDict
         self._cache_invalidator = [0] * len(self._cache_invalidator)
         if self.target is not None:
