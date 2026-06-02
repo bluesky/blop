@@ -87,9 +87,7 @@ class ConsumerCallback(CallbackBase):
 
     def start(self, doc: RunStart) -> None:
         """Caches the start document if it came from Blop"""
-        if doc.get(CORRELATION_UID_KEY, None) and (
-            self._start_doc_filter is None or self._start_doc_filter(doc)
-        ):
+        if doc.get(CORRELATION_UID_KEY, None) and (self._start_doc_filter is None or self._start_doc_filter(doc)):
             self._start_doc_cache = doc
         else:
             self._start_doc_cache = None
