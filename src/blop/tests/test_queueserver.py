@@ -70,6 +70,35 @@ def test_consumer_callback_clears_cache_after_stop():
     assert mock_callback.call_count == 1
 
 
+def test_consumer_callback_ignores_start_without_correlation_uid():
+    """Test ConsumerCallback ignores non-Blop start documents."""
+    mock_callback = MagicMock()
+    callback = ConsumerCallback(callback=mock_callback)
+    run_uid = "test-uid"
+    start_doc = {"uid": run_uid}
+    stop_doc = {"uid": "test-uid2", "run_start": run_uid}
+
+    callback.start(start_doc)
+    callback.stop(stop_doc)
+
+    mock_callback.assert_not_called()
+
+
+def test_consumer_callback_ignores_start_rejected_by_filter():
+    """Test ConsumerCallback ignores Blop start documents rejected by the predicate."""
+    mock_callback = MagicMock()
+    callback = ConsumerCallback(callback=mock_callback)
+    callback.set_start_doc_filter(lambda doc: doc[CORRELATION_UID_KEY] == "expected")
+    run_uid = "test-uid"
+    start_doc = {"uid": run_uid, CORRELATION_UID_KEY: "other"}
+    stop_doc = {"uid": "test-uid2", "run_start": run_uid}
+
+    callback.start(start_doc)
+    callback.stop(stop_doc)
+
+    mock_callback.assert_not_called()
+
+
 @patch("blop.queueserver.REManagerAPI")
 def test_queueserver_client_check_environment_raises_when_not_ready(mock_re_manager, mock_document_dispatcher):
     """Test check_environment raises RuntimeError when environment not open."""
@@ -142,6 +171,7 @@ def test_queueserver_client_start_listener(mock_re_manager, mock_thread_cls, moc
     subscribed_callback = mock_document_dispatcher.subscribe.call_args[0][0]
     assert isinstance(subscribed_callback, ConsumerCallback)
     assert subscribed_callback._callback is mock_callback
+    assert subscribed_callback._start_doc_filter is None
 
     mock_thread_cls.assert_called_once()
     call_kwargs = mock_thread_cls.call_args[1]
@@ -236,6 +266,7 @@ def test_runner_run_submits_suggestions_to_queueserver():
     # Verify listener is started once during runner construction, not per run
     mock_client.start_listener.assert_called_once()
     assert mock_client.start_listener.call_args.kwargs["on_stop"] == runner._on_acquisition_complete
+    assert mock_client.start_listener.call_args.kwargs["start_doc_filter"] == runner._is_expected_start_doc
 
     # Verify optimizer.suggest was called
     mock_optimization_problem.optimizer.suggest.assert_called_once_with(1)
@@ -355,6 +386,7 @@ def test_runner_submit_suggestions_to_queueserver():
     # Verify listener is started once during runner construction, not per submission
     mock_client.start_listener.assert_called_once()
     assert mock_client.start_listener.call_args.kwargs["on_stop"] == runner._on_acquisition_complete
+    assert mock_client.start_listener.call_args.kwargs["start_doc_filter"] == runner._is_expected_start_doc
 
     # Verify optimizer.suggest was NOT called
     mock_optimization_problem.optimizer.suggest.assert_not_called()
@@ -433,8 +465,9 @@ def _make_runner_with_captured_callback(mock_optimization_problem, iterations=3)
     """Helper: build a runner and capture the on_stop callback via start_listener side-effect."""
     mock_client = MagicMock(spec=QueueserverClient)
 
-    def capture_callback(on_stop):
+    def capture_callback(on_stop, start_doc_filter=None):
         mock_client._on_stop = on_stop
+        mock_client._start_doc_filter = start_doc_filter
 
     mock_client.start_listener.side_effect = capture_callback
 
@@ -469,8 +502,9 @@ def test_runner_run_full_cycle(mock_optimization_problem):
 
     mock_client = MagicMock(spec=QueueserverClient)
 
-    def capture_callback(on_stop):
+    def capture_callback(on_stop, start_doc_filter=None):
         mock_client._on_stop = on_stop
+        mock_client._start_doc_filter = start_doc_filter
 
     mock_client.start_listener.side_effect = capture_callback
 
@@ -522,6 +556,16 @@ def test_runner_on_acquisition_complete_uid_mismatch_sets_future_exception(mock_
     exc = future.exception()
     assert isinstance(exc, RuntimeError)
     assert "current_uid did not match start document" in str(exc)
+
+
+def test_runner_start_doc_filter_ignores_other_blop_runs(mock_optimization_problem):
+    """Test runner-level start filter rejects Blop documents for other correlation UIDs."""
+    runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem)
+    start_doc = {"uid": "other-run", CORRELATION_UID_KEY: "wrong-uid"}
+
+    assert mock_client._start_doc_filter(start_doc) is False
+    assert not future.done()
+    mock_optimization_problem.evaluation_function.assert_not_called()
 
 
 def test_runner_private_method_calls_before_run(mock_optimization_problem):

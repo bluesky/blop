@@ -79,10 +79,17 @@ class ConsumerCallback(CallbackBase):
         super().__init__()
         self._start_doc_cache: RunStart | None = None
         self._callback = callback
+        self._start_doc_filter: Callable[[RunStart], bool] | None = None
+
+    def set_start_doc_filter(self, start_doc_filter: Callable[[RunStart], bool] | None) -> None:
+        """Set an optional predicate used to ignore unrelated start documents."""
+        self._start_doc_filter = start_doc_filter
 
     def start(self, doc: RunStart) -> None:
         """Caches the start document if it came from Blop"""
-        if doc.get(CORRELATION_UID_KEY, None):
+        if doc.get(CORRELATION_UID_KEY, None) and (
+            self._start_doc_filter is None or self._start_doc_filter(doc)
+        ):
             self._start_doc_cache = doc
         else:
             self._start_doc_cache = None
@@ -201,7 +208,11 @@ class QueueserverClient:
             response = self._rm.queue_start()
             logger.debug(f"Started queue. Response: {response}")
 
-    def start_listener(self, on_stop: Callable[[RunStart, RunStop], None]) -> None:
+    def start_listener(
+        self,
+        on_stop: Callable[[RunStart, RunStop], None],
+        start_doc_filter: Callable[[RunStart], bool] | None = None,
+    ) -> None:
         """
         Start listening for document events from the queueserver.
 
@@ -210,12 +221,15 @@ class QueueserverClient:
         on_stop : callable
             Callback invoked when a stop document is received.
             Signature: on_stop(start_doc, stop_doc)
+        start_doc_filter : callable, optional
+            Predicate used to ignore unrelated start documents before caching.
         """
         if self._listener_thread is not None:
             logger.warning("Listener already running")
             return
 
         self._consumer_callback = ConsumerCallback(callback=on_stop)
+        self._consumer_callback.set_start_doc_filter(start_doc_filter)
         self._dispatcher.subscribe(self._consumer_callback)
 
         logger.info("Starting document listener thread")
@@ -292,7 +306,10 @@ class QueueserverOptimizationRunner:
         self._autostart = True
         self._state_lock = threading.RLock()
         self._current_future: Future[OptimizationResult] | None = None
-        self._client.start_listener(on_stop=self._on_acquisition_complete)
+        self._client.start_listener(
+            on_stop=self._on_acquisition_complete,
+            start_doc_filter=self._is_expected_start_doc,
+        )
 
     @property
     def optimization_problem(self) -> QueueserverOptimizationProblem:
@@ -477,6 +494,11 @@ class QueueserverOptimizationRunner:
             md=md,
             **(self._problem.acquisition_plan_kwargs or {}),
         )
+
+    def _is_expected_start_doc(self, start_doc: RunStart) -> bool:
+        """Return True only for the acquisition currently expected by this runner."""
+        with self._state_lock:
+            return self._state is not None and self._state.current_uid == start_doc.get(CORRELATION_UID_KEY)
 
     def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Callback when acquisition finishes. Ingest results and maybe continue."""
