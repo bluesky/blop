@@ -275,6 +275,8 @@ class QueueserverOptimizationRunner:
         sensors, and evaluation function.
     queueserver_client : QueueserverClient
         Client for communicating with the queueserver.
+        The document listener is started once during runner construction so it
+        is ready before any submitted plan can emit documents.
     """
 
     def __init__(
@@ -290,6 +292,7 @@ class QueueserverOptimizationRunner:
         self._autostart = True
         self._state_lock = threading.RLock()
         self._current_future: Future[OptimizationResult] | None = None
+        self._client.start_listener(on_stop=self._on_acquisition_complete)
 
     @property
     def optimization_problem(self) -> QueueserverOptimizationProblem:
@@ -346,8 +349,6 @@ class QueueserverOptimizationRunner:
             future: Future[OptimizationResult] = Future()
             self._current_future = future
         try:
-            self._client.start_listener(on_stop=self._on_acquisition_complete)
-            # TODO: Need to wait for connection handshake here
             self._client.submit_plan(plan, autostart=self._autostart)
         except Exception as exc:
             with self._state_lock:
@@ -397,8 +398,6 @@ class QueueserverOptimizationRunner:
             future: Future[OptimizationResult] = Future()
             self._current_future = future
         try:
-            self._client.start_listener(on_stop=self._on_acquisition_complete)
-            # TODO: Need to wait for connection handshake here
             self._client.submit_plan(plan, autostart=self._autostart)
         except Exception as exc:
             with self._state_lock:

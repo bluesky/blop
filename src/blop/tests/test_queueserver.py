@@ -233,6 +233,10 @@ def test_runner_run_submits_suggestions_to_queueserver():
 
     future = runner.run(iterations=1, num_points=1)
 
+    # Verify listener is started once during runner construction, not per run
+    mock_client.start_listener.assert_called_once()
+    assert mock_client.start_listener.call_args.kwargs["on_stop"] == runner._on_acquisition_complete
+
     # Verify optimizer.suggest was called
     mock_optimization_problem.optimizer.suggest.assert_called_once_with(1)
 
@@ -347,6 +351,10 @@ def test_runner_submit_suggestions_to_queueserver():
 
     suggestions = [{"motor1": 5}]
     future = runner.submit_suggestions(suggestions)
+
+    # Verify listener is started once during runner construction, not per submission
+    mock_client.start_listener.assert_called_once()
+    assert mock_client.start_listener.call_args.kwargs["on_stop"] == runner._on_acquisition_complete
 
     # Verify optimizer.suggest was NOT called
     mock_optimization_problem.optimizer.suggest.assert_not_called()
@@ -471,6 +479,8 @@ def test_runner_run_full_cycle(mock_optimization_problem):
         queueserver_client=mock_client,
     )
 
+    mock_client.start_listener.assert_called_once()
+
     future = runner.run(iterations=3, num_points=2)
 
     # Simulate 3 acquisition completions by invoking the captured callback
@@ -484,6 +494,7 @@ def test_runner_run_full_cycle(mock_optimization_problem):
         mock_client._on_stop(start_doc, stop_doc)
 
     assert mock_client.submit_plan.call_count == 3
+    mock_client.start_listener.assert_called_once()
     assert mock_optimization_problem.optimizer.suggest.call_count == 3
     assert mock_optimization_problem.optimizer.ingest.call_count == 3
     assert mock_optimization_problem.evaluation_function.call_count == 3
@@ -687,12 +698,24 @@ def test_runner_stop_races_final_callback_does_not_raise(mock_optimization_probl
     runner.stop()  # Must not raise
 
 
-@pytest.mark.parametrize("failing_method", ["start_listener", "submit_plan"])
-def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_problem, failing_method):
-    """An exception from start_listener or submit_plan in run() fails the future and re-raises."""
+def test_runner_init_listener_error_reraises(mock_optimization_problem):
+    """An exception from start_listener in __init__ is re-raised."""
     error = RuntimeError("connection refused")
     mock_client = MagicMock(spec=QueueserverClient)
-    getattr(mock_client, failing_method).side_effect = error
+    mock_client.start_listener.side_effect = error
+
+    with pytest.raises(RuntimeError, match="connection refused"):
+        QueueserverOptimizationRunner(
+            optimization_problem=mock_optimization_problem,
+            queueserver_client=mock_client,
+        )
+
+
+def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_problem):
+    """An exception from submit_plan in run() fails the future and re-raises."""
+    error = RuntimeError("connection refused")
+    mock_client = MagicMock(spec=QueueserverClient)
+    mock_client.submit_plan.side_effect = error
 
     runner = QueueserverOptimizationRunner(
         optimization_problem=mock_optimization_problem,
@@ -708,12 +731,11 @@ def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_pro
     assert future.exception() is error
 
 
-@pytest.mark.parametrize("failing_method", ["start_listener", "submit_plan"])
-def test_runner_submit_suggestions_submit_error_fails_future_and_reraises(mock_optimization_problem, failing_method):
-    """An exception from start_listener or submit_plan in submit_suggestions() fails the future and re-raises."""
+def test_runner_submit_suggestions_submit_error_fails_future_and_reraises(mock_optimization_problem):
+    """An exception from submit_plan in submit_suggestions() fails the future and re-raises."""
     error = RuntimeError("connection refused")
     mock_client = MagicMock(spec=QueueserverClient)
-    getattr(mock_client, failing_method).side_effect = error
+    mock_client.submit_plan.side_effect = error
 
     runner = QueueserverOptimizationRunner(
         optimization_problem=mock_optimization_problem,
