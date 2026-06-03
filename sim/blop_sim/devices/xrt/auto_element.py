@@ -7,7 +7,7 @@ from blop.protocols import MovableHasName
 
 from ...backends import XRTBackend, build_histRGB
 
-primitives = {int, float, bool, str, type(None)}
+primitives = (int, float, bool, str, type(None))
 aliases = "xyzwhijk"
 l_index = {k: i for i, k in enumerate(aliases)}
 known_variables = {
@@ -54,15 +54,15 @@ class InferredVariable(MovableHasName, Readable):
             return getattr(self.base_object, self.member_route[0])
 
         submember = getattr(self.base_object, self.member_route[0])
-        if type(submember) is list:  # list branch
-            return submember[l_index[self.member_route[1]]]
-        return submember[self.member_route[1]]  # dict branch
+        # if type(submember) is list:  # list branch
+        return submember[l_index[self.member_route[1]]]
+        # return submember[self.member_route[1]]  # dict branch
 
     @val.setter
     def val(self, value):
         if self.member_route is None:
             raise ValueError("the variable has yet to be inferred")
-        if type(value) is not self.type and value != "auto":
+        if not isinstance(value, self.type) and value != "auto":
             raise ValueError("attempting to set an inferred variable to a different inferred type outside of auto")
         # setattr(self.base_object, self.member_route[0], value)
 
@@ -74,12 +74,13 @@ class InferredVariable(MovableHasName, Readable):
             return
 
         submember = getattr(self.base_object, self.member_route[0])
-        if type(submember) is list:  # list branch
-            submember[l_index[self.member_route[1]]] = value
+        print(type(submember))
+        # if isinstance(submember, list):  # list branch
+        submember[l_index[self.member_route[1]]] = value
         # elif type(submember) is dict:  # dict branch
         #     submember[self.member_route[1]] = value
-        else:
-            raise ValueError("member route is broken or type is not primitive/inferrable")
+        # else:
+        #     raise ValueError("member route is broken or type is not primitive/inferrable")
 
     # has name interface
     @property
@@ -152,11 +153,11 @@ def element_to_variables(
             val = getattr(element, key)
         except Exception:
             continue
-        member = type(val)
-        if member in primitives:
+        # member = type(val)
+        if isinstance(val, primitives):
             inferred = InferredVariable(name=name, element=element, PV=key, root=root)
             lib[inferred.PV] = inferred
-        elif member is list:
+        elif isinstance(val, list):
             for x in range(len(val)):
                 inferred = InferredVariable(name=name, element=element, PV=f"{key}:{aliases[x]}", root=root)
                 lib[inferred.PV] = inferred
