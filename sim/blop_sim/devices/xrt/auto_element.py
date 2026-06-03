@@ -1,13 +1,16 @@
 import time
 from collections import OrderedDict
+from collections.abc import Callable
 
-from bluesky.protocols import Readable, Triggerable
+import numpy as np
+from bluesky.protocols import Readable, Status, Triggerable
 
 from blop.protocols import MovableHasName
 
 from ...backends import XRTBackend, build_histRGB
 
 primitives = (int, float, bool, str, type(None))
+data_map = {int: "integer", float: "number", bool: "boolean", str: "string"}
 aliases = "xyzwhijk"
 l_index = {k: i for i, k in enumerate(aliases)}
 known_variables = {
@@ -34,6 +37,29 @@ known_variables = {
 }
 
 
+class always_good_stat(Status):
+    def add_callback(self, callback: Callable[["Status"], None]) -> None:
+        """Add a callback function to be called upon completion.
+
+        The function must take the status as an argument.
+
+        If the Status object is done when the function is added, it should be
+        called immediately.
+        """
+        callback(self)
+
+    def exception(self, timeout: float | None = 0.0) -> BaseException | None:
+        return FileNotFoundError()
+
+    def done(self) -> bool:
+        """If done return True, otherwise return False."""
+        return True
+
+    def success(self) -> bool:
+        """If done return whether the operation was successful."""
+        return True
+
+
 class InferredVariable(MovableHasName, Readable):
     def __init__(self, name: str, element: object, PV: str, root: XRTBackend | None = None):
         self.base_object = element
@@ -41,6 +67,8 @@ class InferredVariable(MovableHasName, Readable):
         self.root = root
         self.PV = PV
         self.member_route = PV.split(":")
+        self.parent = None
+        self.alias = None
         if self.val is not None and not (isinstance(self.val, str) and self.val == "auto"):
             self.type = type(self.val)
         else:
@@ -74,7 +102,6 @@ class InferredVariable(MovableHasName, Readable):
             return
 
         submember = getattr(self.base_object, self.member_route[0])
-        print(type(submember))
         # if isinstance(submember, list):  # list branch
         submember[l_index[self.member_route[1]]] = value
         # elif type(submember) is dict:  # dict branch
@@ -85,6 +112,8 @@ class InferredVariable(MovableHasName, Readable):
     # has name interface
     @property
     def name(self):
+        if self.alias is not None:
+            return str(self.alias)
         root = "" if self.root is None else self.root.name + ":"
         return f"{root}{self.base}:{self.PV}"
 
@@ -94,13 +123,14 @@ class InferredVariable(MovableHasName, Readable):
     # movable interface
     def set(self, value):
         self.val = value
+        return always_good_stat()
 
     # readable interface
     def read(self):
         return {self.name: {"value": self.val, "timestamp": -1}}
 
     def describe(self):
-        return {self.name: {"source": f"{self.base}:inferred", "dtype": str(self.type), "shape": []}}
+        return OrderedDict({self.name: {"source": f"{self.base}:inferred", "dtype": data_map[self.type], "shape": []}})
 
 
 class InferredDetector(Readable, Triggerable):  # this is by element
@@ -108,6 +138,7 @@ class InferredDetector(Readable, Triggerable):  # this is by element
         self._beamline = beamLine
         self._name = name
         self.shape = shape
+        self.parent = None
         if primary:
             self.set_primary()
 
@@ -121,6 +152,7 @@ class InferredDetector(Readable, Triggerable):  # this is by element
     def trigger(self):
         if self.primary:
             self._beamline.generate_beam()
+        return always_good_stat()
 
     def read(self) -> OrderedDict:
         beam = self._beamline[self._name]
@@ -128,11 +160,24 @@ class InferredDetector(Readable, Triggerable):  # this is by element
         result = OrderedDict()
         for face in beam[:1]:  # for now, only 1
             hist, _, _ = build_histRGB(face, face, isScreen=True, shape=self.shape)
-            result[self._name] = {"value": hist, "timestamp": time.time()}
+            data = {"value": hist, "timestamp": time.time()}
+            result[self._name] = data
         return result
 
     def describe(self):
-        return OrderedDict([(self._name, {"source": self.name, "dtype": "ndarray", "shape": list(self.shape)})])
+        return OrderedDict(
+            [
+                (
+                    self._name,
+                    {
+                        "source": self._beamline.name,
+                        "shape": [*self.shape],
+                        "dtype": "array",
+                        "dtype_numpy": np.dtype(np.float64).str,
+                    },
+                )
+            ]
+        )
 
     @property
     def name(self):

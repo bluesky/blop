@@ -107,6 +107,7 @@ class XRTBackend(SimBackend, Readable):
         print(f"worker {seed} executing")
         np.random.seed(seed=seed)
         beam = pickle.loads(beamLine.buf[: beamLine.size])
+        beamLine.close()
         # outDict = _run_cached_process_from_file(beamLine=beam, start_index=minvalid_index)
         outDict = _run_shelved_process_from_file(beamLine=beam, start_index=minvalid_index, shelf=seed)
         return outDict
