@@ -47,7 +47,7 @@ DETECTOR_STORAGE = "/tmp/blop/sim"
 
 ```python
 fileName = r"toroid_focus.xml"
-beam = XRTBackend(file=fileName,n_iters=4,n_workers=4)
+beam = XRTBackend(file=fileName, n_iters=4, n_workers=4)
 dets = infer_detectors(beam)
 motors = infer_variables(beam, filter_for=None)
 ```
@@ -67,16 +67,16 @@ pprint(dets)
 # Setting up an optimization
 
 ```python
-toro_R = motors['toroidMirror01']['R']
-toro_R.alias = 'big_r'
-toro_r = motors['toroidMirror01']['r']
+toro_R = motors["toroidMirror01"]["R"]
+toro_R.alias = "big_r"
+toro_r = motors["toroidMirror01"]["r"]
 
 screen = dets["screen01"]
 screen.set_primary()
 
 
-VERTICAL_BOUNDS = (toro_R.val-10000, toro_R.val+10000)
-HORIZONTAL_BOUNDS = (toro_r.val-500, toro_r.val +500)
+VERTICAL_BOUNDS = (toro_R.val - 10000, toro_R.val + 10000)
+HORIZONTAL_BOUNDS = (toro_r.val - 500, toro_r.val + 500)
 # Define DOFs using mirror radius signals
 dofs = [
     RangeDOF(actuator=toro_R, bounds=VERTICAL_BOUNDS, parameter_type="float"),
@@ -240,11 +240,15 @@ optimal_parameters
 ```python
 from bluesky.plans import list_scan
 
-uid = RE(list_scan(
-    [screen],
-    toro_r, [optimal_parameters[toro_r.name]],
-    toro_R, [optimal_parameters[toro_R.name]],
-))
+uid = RE(
+    list_scan(
+        [screen],
+        toro_r,
+        [optimal_parameters[toro_r.name]],
+        toro_R,
+        [optimal_parameters[toro_R.name]],
+    )
+)
 ```
 
 ```python
