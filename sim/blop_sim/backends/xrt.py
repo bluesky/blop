@@ -83,7 +83,7 @@ class XRTBackend(SimBackend, Readable):
     @staticmethod
     def render_worker(stuple):
         beamLine, seed, minvalid_index = stuple
-        # print(f"worker {seed} executing")
+        print(f"worker {seed} executing")
         np.random.seed(seed=seed)
         beam = pickle.loads(beamLine.buf[:beamLine.size])
         outDict = run_cached_process_from_file(beamLine=beam, start_index=minvalid_index)
@@ -109,6 +109,7 @@ class XRTBackend(SimBackend, Readable):
             outDict = run_cached_process_from_file(self._beamline, start_index=minvalid_index[0])
             for out in result:
                 [outDict[k].concatenate(v) for k, v in out.items() if k in outDict.keys()]
+                del out
             shm.close()
             shm.unlink()
         self.render = outDict

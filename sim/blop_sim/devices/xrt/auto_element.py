@@ -123,9 +123,9 @@ class InferredDetector(Readable, Triggerable):  # this is by element
 
     def read(self) -> OrderedDict:
         beam = self._beamline[self._name]
-        print(beam)
+        # print(beam)
         result = OrderedDict()
-        for face in beam[:1]: # for now, only 1
+        for face in beam[:1]:  # for now, only 1
             hist, _, _ = build_histRGB(face, face, isScreen=True, shape=self.shape)
             result[self._name] = {"value": hist, "timestamp": time.time()}
         return result
