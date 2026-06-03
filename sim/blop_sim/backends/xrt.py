@@ -6,7 +6,6 @@ import time
 from collections import OrderedDict
 from multiprocessing import Pool, shared_memory
 from pathlib import Path
-from pprint import pprint
 
 import numpy as np
 import xrt.backends.raycing as raycing
