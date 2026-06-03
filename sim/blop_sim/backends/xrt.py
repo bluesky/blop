@@ -1,8 +1,11 @@
 """XRT ray-tracing beam simulation backend."""
 
+import pickle
 import time
 from collections import OrderedDict
+from multiprocessing import Pool, shared_memory
 from pathlib import Path
+from pprint import pprint
 
 import numpy as np
 import xrt.backends.raycing as raycing
@@ -36,6 +39,20 @@ def build_histRGB(lb, gb, limits=None, isScreen=False, shape=None):
     return hist2d, hist2dRGB, limits
 
 
+def run_cached_process_from_file(beamLine, start_index):
+    outDict = {}
+    sequence = list(beamLine.flowU.items())[start_index:]
+    # print(f"starting from: {start_index}")
+    for oeid, meth in sequence:
+        oe = beamLine.oesDict[oeid][0]
+        for func, fkwargs in meth.items():
+            getattr(oe, func)(**fkwargs)
+    for beamName, beamTag in beamLine.beamNamesDict.items():
+        outDict[beamName] = beamLine.beamsDictU[beamTag[0]][beamTag[1]]
+
+    return outDict
+
+
 class XRTBackend(SimBackend, Readable):
     """XRT ray-tracing simulation backend.
 
@@ -43,7 +60,7 @@ class XRTBackend(SimBackend, Readable):
     Much slower than SimpleBackend but more physically accurate.
     """
 
-    def __init__(self, file, limits=None, noise: bool = False):
+    def __init__(self, file, limits=None, noise: bool = False, n_iters=4, n_workers=4):
         """Initialize XRT backend."""
         super().__init__()
         self._beamline = raycing.BeamLine(fileName=file)
@@ -54,11 +71,23 @@ class XRTBackend(SimBackend, Readable):
         beamLine = self._beamline
         self._elements = {k: beamLine.oesDict[v][0] for k, v in beamLine.oenamesToUUIDs.items()}
         self._ensure_beamline()
+        self.n_iters = n_iters
+        self.n_workers = n_workers
+        self._cache_invalidator = [0] * len(beamLine.flowU.items())
 
     def _ensure_beamline(self):
         """Build XRT beamline if not already built."""
         if self._beamline is None:
             raise ValueError("beamline has not been initialized")
+
+    @staticmethod
+    def render_worker(stuple):
+        beamLine, seed, minvalid_index = stuple
+        # print(f"worker {seed} executing")
+        np.random.seed(seed=seed)
+        beam = pickle.loads(beamLine.buf[:beamLine.size])
+        outDict = run_cached_process_from_file(beamLine=beam, start_index=minvalid_index)
+        return outDict
 
     def generate_beam(self) -> np.ndarray:
         """Generate beam using XRT ray-tracing.
@@ -68,9 +97,22 @@ class XRTBackend(SimBackend, Readable):
         """
         self._ensure_beamline()
 
-        # Run ray tracing
-        outDict = raycing.run_process_from_file(self._beamline)
+        with Pool(processes=self.n_workers) as pool:
+            binary = pickle.dumps(self._beamline)
+            shm = shared_memory.SharedMemory(create=True, size=len(binary))
+            shm.buf[:len(binary)] = binary
+            n_disp = self.n_iters - 1
+            minvalid_index = [self._cache_invalidator.index(1) if 1 in self._cache_invalidator else 0] * n_disp
+            b_refs = [shm] * n_disp
+            result = pool.imap_unordered(self.render_worker,
+                                         zip(b_refs, range(n_disp), minvalid_index, strict=True))
+            outDict = run_cached_process_from_file(self._beamline, start_index=minvalid_index[0])
+            for out in result:
+                [outDict[k].concatenate(v) for k, v in out.items() if k in outDict.keys()]
+            shm.close()
+            shm.unlink()
         self.render = outDict
+        self._cache_invalidator = [0] * len(self._cache_invalidator)
         if self.target is not None:
             lb = [v for k, v in outDict.items() if self.target.name in k][0]
         else:
@@ -125,3 +167,13 @@ class XRTBackend(SimBackend, Readable):
     @property
     def elements(self):
         return self._elements
+
+    def invalidate(self, id: int | str):
+        if type(id) is int and id in range(len(self._cache_invalidator)):
+            self._cache_invalidator[id] = 1
+
+        print(f"invalidating cache element {id} ->", end="")
+        if id in self.elements.keys():
+            print("success")
+            index = list(self._beamline.flowU.keys()).index(self._beamline.oenamesToUUIDs[id])
+            self._cache_invalidator[index] = 1
