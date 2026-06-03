@@ -10,6 +10,28 @@ from ...backends import XRTBackend, build_histRGB
 primitives = {int, float, bool, str, type(None)}
 aliases = "xyzwhijk"
 l_index = {k: i for i, k in enumerate(aliases)}
+known_variables = {
+    "center",
+    "opening",
+    "alpha",
+    "extraPitch",
+    "extraRoll",
+    "extraYaw",
+    "roll",
+    "pitch",
+    "yaw",
+    "R",
+    "r",
+    "K",
+    "n",
+    "cryst1roll",
+    "cryst1pitch",
+    "cryst1yaw",
+    "cryst2roll",
+    "cryst2pitch",
+    "cryst2finePitch",
+    "cryst2yaw",
+}
 
 
 class InferredVariable(MovableHasName, Readable):
@@ -95,15 +117,16 @@ class InferredDetector(Readable, Triggerable):  # this is by element
             self._beamline.generate_beam()
 
     def read(self) -> OrderedDict:
-        beam = self._beamline[self._name][:1]  # for now, only 1
+        beam = self._beamline[self._name]
+        print(beam)
         result = OrderedDict()
-        for face in beam:
+        for face in beam[:1]: # for now, only 1
             hist, _, _ = build_histRGB(face, face, isScreen=True, shape=self.shape)
             result[self._name] = {"value": hist, "timestamp": time.time()}
         return result
 
     def describe(self):
-        return OrderedDict([(self._name, {"source": self._name, "dtype": "ndarray", "shape": list(self.shape)})])
+        return OrderedDict([(self._name, {"source": self.name, "dtype": "ndarray", "shape": list(self.shape)})])
 
     @property
     def name(self):
@@ -136,11 +159,11 @@ def element_to_variables(element, name: str, filter_for: set = None) -> dict[str
     return lib
 
 
-def infer_variables(beamLine: XRTBackend, filter_for: set[str] = None):
+def infer_variables(beamLine: XRTBackend, filter_for: set[str] = known_variables):
     variables = {}
     for name, element in beamLine.elements.items():
         eles = element_to_variables(element, name, filter_for=filter_for)
-        if eles: 
+        if eles:
             variables[name] = eles
     return variables
 

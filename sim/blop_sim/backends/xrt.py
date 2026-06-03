@@ -98,7 +98,7 @@ class XRTBackend(SimBackend, Readable):
     def read(self):
         if self.render is None:
             self.generate_beam()
-        result = OrderedDict
+        result = OrderedDict()
         for name, beam in self.render.items():
             hist2d, _, _ = build_histRGB(beam, beam, limits=self._limits, isScreen=True, shape=self._image_shape)
             result[name] = {"value": hist2d, "timestamp": time.time()}
@@ -116,7 +116,7 @@ class XRTBackend(SimBackend, Readable):
             self.generate_beam()
         if key in self.render.keys():
             return [self.render[key]]
-        return [v for k, v in self.render.items() if key in k and "local" in k]
+        return [v for k, v in self.render.items() if key in k]
 
     @property
     def variables(self):
