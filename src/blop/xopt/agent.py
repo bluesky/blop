@@ -37,12 +37,14 @@ class XoptAgent:
         outcome_constraints: Sequence[OutcomeConstraint] | None = None,
         checkpoint_path: str | None = None,
     ):
+        # Keep behavior parity with Ax Agent: local agents expect real actuator objects, not names.
         if any(isinstance(dof.actuator, str) for dof in dofs):
             dof_actuator_strs = [dof.actuator for dof in dofs if isinstance(dof.actuator, str)]
             raise ValueError(
                 f"DOFs with actuators must be `Actuator` instances, not strings. Got strings for: {dof_actuator_strs}"
             )
 
+        # Build VOCS from blop objects and initialize runtime dependencies.
         vocs = build_vocs(
             dofs=dofs,
             objectives=objectives,
@@ -51,6 +53,7 @@ class XoptAgent:
             outcome_constraints=outcome_constraints,
         )
 
+        # Cache acquisition and optimizer state needed by optimize/sample plans.
         self._sensors = sensors
         self._actuators: Sequence[Actuator] = [cast(Actuator, dof.actuator) for dof in dofs if dof.actuator is not None]
         self._evaluation_function = evaluation_function
@@ -74,6 +77,7 @@ class XoptAgent:
         evaluation_function: EvaluationFunction,
         acquisition_plan: AcquisitionPlan | None = None,
     ) -> "XoptAgent":
+        # Rehydrate optimizer state while restoring runtime-only dependencies explicitly.
         instance = object.__new__(cls)
         instance._optimizer = XoptOptimizer.from_checkpoint(checkpoint_path)
         instance._actuators = actuators
@@ -100,6 +104,7 @@ class XoptAgent:
 
     @fixed_dofs.setter
     def fixed_dofs(self, fixed_dofs: dict[DOF, Any] | None) -> None:
+        # Convert DOF objects to parameter-name keyed fixed-parameter mapping.
         if not fixed_dofs:
             self._optimizer.fixed_parameters = None
             return
@@ -107,15 +112,19 @@ class XoptAgent:
         self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
 
     def suggest(self, num_points: int = 1) -> list[dict]:
+        # Delegate candidate generation to the optimizer adapter.
         return self._optimizer.suggest(num_points)
 
     def ingest(self, points: list[dict]) -> None:
+        # Delegate outcome ingestion and model-state updates to optimizer adapter.
         self._optimizer.ingest(points)
 
     def get_best_points(self):
+        # Return optimizer-derived best point(s) for current objective configuration.
         return self._optimizer.get_best_points()
 
     def checkpoint(self) -> None:
+        # Persist optimizer state to configured checkpoint artifact.
         self._optimizer.checkpoint()
 
     @property
@@ -123,11 +132,13 @@ class XoptAgent:
         return self._callbacks
 
     def subscribe(self, callback: CallbackBase) -> None:
+        # Register callback for optimize/sample run documents.
         if callback in self._callbacks:
             raise ValueError(f"Callback {callback!r} is already subscribed.")
         self._callbacks.append(callback)
 
     def unsubscribe(self, callback: CallbackBase) -> None:
+        # Remove callback from active optimization subscriptions.
         self._callbacks.remove(callback)
 
     @property
@@ -147,6 +158,7 @@ class XoptAgent:
         return self._acquisition_plan
 
     def to_optimization_problem(self) -> OptimizationProblem:
+        # Package runtime components into immutable protocol object used by plans.
         return OptimizationProblem(
             optimizer=self._optimizer,
             actuators=self.actuators,
@@ -156,9 +168,11 @@ class XoptAgent:
         )
 
     def acquire_baseline(self, parameterization: dict[str, Any] | None = None) -> MsgGenerator[None]:
+        # Reuse standard baseline acquisition plan against this agent's optimization context.
         yield from acquire_baseline(self.to_optimization_problem(), parameterization=parameterization)
 
     def optimize(self, iterations: int = 1, n_points: int = 1) -> MsgGenerator[None]:
+        # Build plan from shared optimize loop and attach callback routing when enabled.
         optimize_plan = optimize(
             self.to_optimization_problem(), iterations=iterations, n_points=n_points, readable_cache=self._readable_cache
         )
@@ -168,6 +182,7 @@ class XoptAgent:
         yield from optimize_plan
 
     def sample_suggestions(self, suggestions: list[dict]) -> MsgGenerator[tuple[str, list[dict], list[dict]]]:
+        # Evaluate caller-provided suggestions through shared sampling plan.
         sample_suggestions_plan = sample_suggestions(
             self.to_optimization_problem(), suggestions=suggestions, readable_cache=self._readable_cache
         )
@@ -177,6 +192,7 @@ class XoptAgent:
         return (yield from sample_suggestions_plan)
 
     def navigate_to_best(self, parameterization: Mapping | None = None) -> MsgGenerator[None]:
+        # Move actuators to an explicit or optimizer-derived best parameterization.
         optimization_problem = self.to_optimization_problem()
         return (
             yield from navigate_to_best(

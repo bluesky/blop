@@ -11,9 +11,11 @@ from ..protocols import ID_KEY, CanRegisterSuggestions, Checkpointable, Optimize
 
 
 def _objective_minimize_flag(objective: Any) -> bool:
+    # Handle string objective specs first (common VOCS representation).
     if isinstance(objective, str):
         return objective.strip().upper() == "MINIMIZE"
 
+    # Fall back to class-name inspection for typed objective objects.
     objective_name = objective.__class__.__name__.lower()
     if "minimize" in objective_name:
         return True
@@ -24,6 +26,7 @@ def _objective_minimize_flag(objective: Any) -> bool:
 
 
 def _constraint_satisfied(value: float, op: str, threshold: float) -> bool:
+    # Evaluate one normalized constraint against a single numeric value.
     if op == "LESS_THAN":
         return value <= threshold
     if op == "GREATER_THAN":
@@ -32,9 +35,11 @@ def _constraint_satisfied(value: float, op: str, threshold: float) -> bool:
 
 
 def _constraint_to_pair(constraint: Any) -> tuple[str, float]:
+    # Convert common VOCS list/tuple form into a normalized operator/value pair.
     if isinstance(constraint, (list, tuple)) and len(constraint) == 2:
         return str(constraint[0]).upper(), float(constraint[1])
 
+    # Support typed constraint objects from gest_api.vocs by class-name convention.
     name = constraint.__class__.__name__.lower()
     if hasattr(constraint, "value"):
         value = float(constraint.value)
@@ -59,6 +64,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
     ):
         generator_kwargs = generator_kwargs or {}
 
+        # Accept either an already-instantiated generator or a generator class.
         if isinstance(generator, type):
             if vocs is None and "vocs" not in generator_kwargs:
                 raise ValueError("vocs must be provided when initializing XoptOptimizer with a generator class.")
@@ -71,6 +77,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             if vocs is not None and self._generator.vocs != vocs:
                 raise ValueError("Provided vocs does not match generator.vocs.")
 
+        # Internal state tracks IDs, pending/known parameterizations, and checkpoint metadata.
         self._checkpoint_path = checkpoint_path
         self._fixed_parameters: dict[str, Any] | None = None
         self._next_id = 0
@@ -79,6 +86,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
     @classmethod
     def from_checkpoint(cls, checkpoint_path: str) -> "XoptOptimizer":
+        # Restore all persistent adapter state from pickle payload.
         path = Path(checkpoint_path)
         with path.open("rb") as stream:
             payload = pickle.load(stream)
@@ -122,11 +130,13 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         self._fixed_parameters = dict(fixed_parameters)
 
     def _seed_state_from_existing_data(self) -> None:
+        # Recover known trial IDs/parameters from existing generator data when available.
         data = self._generator.data
         if data is None or len(data) == 0:
             return
 
         for _, row in data.iterrows():
+            # Reuse stored IDs when present, otherwise allocate synthetic IDs.
             if ID_KEY in row and pd.notna(row[ID_KEY]):
                 trial_id = row[ID_KEY]
             else:
@@ -141,15 +151,18 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
                 self._next_id = max(self._next_id, trial_id + 1)
 
     def suggest(self, num_points: int | None = None) -> list[dict]:
+        # Default to single-point suggestion when caller does not specify cardinality.
         if num_points is None:
             num_points = 1
 
+        # Delegate candidate generation to Xopt and optionally enforce fixed variables.
         suggestions = self._generator.generate(num_points)
         if self._fixed_parameters:
             suggestions = [{**suggestion, **self._fixed_parameters} for suggestion in suggestions]
         return self.register_suggestions(suggestions)
 
     def register_suggestions(self, suggestions: list[dict]) -> list[dict]:
+        # Attach stable blop trial IDs and cache suggested parameterizations by ID.
         registered: list[dict] = []
         for suggestion in suggestions:
             trial_id = self._next_id
@@ -162,14 +175,17 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         return registered
 
     def ingest(self, points: list[dict]) -> None:
+        # Convert outcome payloads to DataFrame rows expected by Xopt generator.add_data().
         rows: list[dict[str, Any]] = []
 
         for point in points:
+            # Preserve provided IDs when available, else allocate a new one.
             trial_id = point.get(ID_KEY)
             if trial_id is None:
                 trial_id = self._next_id
                 self._next_id += 1
 
+            # Merge known suggested parameters with any explicit parameters in incoming point.
             point_parameters = {name: point[name] for name in self.vocs.variable_names if name in point}
             if trial_id in self._params_by_id:
                 parameters = {**self._params_by_id[trial_id], **point_parameters}
@@ -177,24 +193,29 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
                 parameters = point_parameters
 
             self._params_by_id[trial_id] = parameters
+            # Everything not in variables and not _id is treated as measured output.
             outcomes = {k: v for k, v in point.items() if k not in set(self.vocs.variable_names) | {ID_KEY}}
             rows.append({ID_KEY: trial_id, **parameters, **outcomes})
 
+        # Persist all new observations into the underlying generator state.
         new_data = pd.DataFrame(rows)
         self._generator.add_data(new_data)
 
     def register_failures(self, suggestions: list[dict]) -> None:
+        # Remove failed suggestions from pending parameter cache.
         for suggestion in suggestions:
             trial_id = suggestion.get(ID_KEY)
             if trial_id in self._params_by_id:
                 self._params_by_id.pop(trial_id)
 
     def _feasible_mask(self, data: pd.DataFrame) -> pd.Series:
+        # Compute row-wise feasibility mask from VOCS constraints.
         if not self.vocs.constraints:
             return pd.Series([True] * len(data), index=data.index)
 
         mask = pd.Series([True] * len(data), index=data.index)
         for constraint_name, constraint in self.vocs.constraints.items():
+            # Missing constraint columns imply non-feasible rows.
             if constraint_name not in data:
                 mask &= False
                 continue
@@ -205,9 +226,11 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         return mask
 
     def _objective_names(self) -> list[str]:
+        # Preserve VOCS-defined objective ordering where available.
         return list(self.vocs.objectives.keys()) if self.vocs.objectives else []
 
     def _output_names(self) -> list[str]:
+        # Outputs include objectives, constraints, and optional observables.
         names = self._objective_names()
         if self.vocs.constraints:
             names.extend(self.vocs.constraints.keys())
@@ -216,15 +239,18 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         return names
 
     def get_best_points(self) -> list[tuple[int | str, Mapping, Mapping]]:
+        # Return no points when no data has been ingested.
         data = self._generator.data
         if data is None or len(data) == 0:
             return []
 
+        # Prefer feasible points first; if none exist, fall back to all data.
         candidates = data[self._feasible_mask(data)]
         if len(candidates) == 0:
             candidates = data
 
         objective_names = self._objective_names()
+        # For single-objective problems, return the single extremum according to direction.
         if len(objective_names) == 1 and objective_names[0] in candidates:
             objective_name = objective_names[0]
             objective_spec = self.vocs.objectives[objective_name]
@@ -233,11 +259,13 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             best_index = objective_values.idxmin() if minimize else objective_values.idxmax()
             selected = candidates.loc[[best_index]]
         else:
+            # For multi-objective and objective-less modes, return the available candidate set.
             selected = candidates
 
         output_names = self._output_names()
         results: list[tuple[int | str, Mapping, Mapping]] = []
         for _, row in selected.iterrows():
+            # Normalize IDs and split into parameter and outcome mappings.
             trial_id = row[ID_KEY] if ID_KEY in row else _
             if isinstance(trial_id, float) and trial_id.is_integer():
                 trial_id = int(trial_id)
@@ -249,9 +277,11 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         return results
 
     def checkpoint(self) -> None:
+        # Enforce explicit checkpoint path configuration before writing state.
         if not self._checkpoint_path:
             raise ValueError("Checkpoint path is not set. Please set a checkpoint path when initializing the optimizer.")
 
+        # Persist generator and adapter bookkeeping to a single pickle artifact.
         payload = {
             "generator": self._generator,
             "fixed_parameters": self._fixed_parameters,
