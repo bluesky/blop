@@ -7,7 +7,7 @@ import pandas as pd
 from xopt import VOCS
 from xopt.generator import Generator
 
-from ..protocols import CanRegisterSuggestions, Checkpointable, ID_KEY, Optimizer, TrialFaultAware
+from ..protocols import ID_KEY, CanRegisterSuggestions, Checkpointable, Optimizer, TrialFaultAware
 
 
 def _objective_minimize_flag(objective: Any) -> bool:

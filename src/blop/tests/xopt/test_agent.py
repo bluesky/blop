@@ -70,10 +70,7 @@ def test_xopt_agent_expected_improvement_simple_minimization(RE):
     objective = Objective(name="score", minimize=True)
 
     def evaluate(uid, suggestions):
-        return [
-            {"_id": suggestion["_id"], "score": (float(suggestion["x"]) - 0.25) ** 2}
-            for suggestion in suggestions
-        ]
+        return [{"_id": suggestion["_id"], "score": (float(suggestion["x"]) - 0.25) ** 2} for suggestion in suggestions]
 
     agent = XoptAgent(
         sensors=[],
@@ -84,11 +81,13 @@ def test_xopt_agent_expected_improvement_simple_minimization(RE):
     )
 
     # Seed EI with initial measurements before optimization iterations.
-    agent.ingest([
-        {"x": 0.0, "score": (0.0 - 0.25) ** 2},
-        {"x": 0.5, "score": (0.5 - 0.25) ** 2},
-        {"x": 1.0, "score": (1.0 - 0.25) ** 2},
-    ])
+    agent.ingest(
+        [
+            {"x": 0.0, "score": (0.0 - 0.25) ** 2},
+            {"x": 0.5, "score": (0.5 - 0.25) ** 2},
+            {"x": 1.0, "score": (1.0 - 0.25) ** 2},
+        ]
+    )
 
     RE(agent.optimize(iterations=3, n_points=1))
 

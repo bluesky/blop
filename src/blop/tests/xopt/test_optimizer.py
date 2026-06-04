@@ -145,11 +145,13 @@ def test_xopt_optimizer_get_best_points_single_objective_minimize():
     vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
     optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
 
-    optimizer.ingest([
-        {"x": 0.1, "y": 5.0},
-        {"x": 0.2, "y": 1.0},
-        {"x": 0.3, "y": 3.0},
-    ])
+    optimizer.ingest(
+        [
+            {"x": 0.1, "y": 5.0},
+            {"x": 0.2, "y": 1.0},
+            {"x": 0.3, "y": 3.0},
+        ]
+    )
 
     best_points = optimizer.get_best_points()
     assert len(best_points) == 1
@@ -162,11 +164,13 @@ def test_xopt_optimizer_get_best_points_single_objective_maximize():
     vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MAXIMIZE"})
     optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
 
-    optimizer.ingest([
-        {"x": 0.1, "y": 5.0},
-        {"x": 0.2, "y": 1.0},
-        {"x": 0.3, "y": 3.0},
-    ])
+    optimizer.ingest(
+        [
+            {"x": 0.1, "y": 5.0},
+            {"x": 0.2, "y": 1.0},
+            {"x": 0.3, "y": 3.0},
+        ]
+    )
 
     best_points = optimizer.get_best_points()
     assert len(best_points) == 1
@@ -204,11 +208,13 @@ def test_xopt_expected_improvement_runs_simple_minimization():
     )
 
     # Seed EI with initial evaluations for model training.
-    optimizer.ingest([
-        {"x": 0.0, "y": (0.0 - 0.25) ** 2},
-        {"x": 0.5, "y": (0.5 - 0.25) ** 2},
-        {"x": 1.0, "y": (1.0 - 0.25) ** 2},
-    ])
+    optimizer.ingest(
+        [
+            {"x": 0.0, "y": (0.0 - 0.25) ** 2},
+            {"x": 0.5, "y": (0.5 - 0.25) ** 2},
+            {"x": 1.0, "y": (1.0 - 0.25) ** 2},
+        ]
+    )
 
     for _ in range(3):
         suggestion = optimizer.suggest(1)[0]

@@ -4,10 +4,9 @@ from typing import Any
 
 from xopt import VOCS
 
-from ..ax.dof import ChoiceDOF, DOF, DOFConstraint, RangeDOF
+from ..ax.dof import DOF, ChoiceDOF, DOFConstraint, RangeDOF
 from ..ax.objective import Objective, OutcomeConstraint, ScalarizedObjective
 from ..protocols import Sensor
-
 
 _INEQUALITY_RE = re.compile(r"^\s*(?P<left>.+?)\s*(?P<op><=|>=|<|>)\s*(?P<right>.+?)\s*$")
 _SYMBOL_RE = re.compile(r"^[A-Za-z_]\w*$")
@@ -51,8 +50,7 @@ def _apply_dof_constraints(
         parsed = _parse_single_symbol_inequality(constraint.ax_constraint)
         if parsed is None:
             raise ValueError(
-                "Xopt mapping currently supports only single-variable DOF constraints, "
-                f"got: {constraint.ax_constraint!r}."
+                f"Xopt mapping currently supports only single-variable DOF constraints, got: {constraint.ax_constraint!r}."
             )
 
         name, op, value = parsed
@@ -86,8 +84,7 @@ def _outcome_constraints_to_vocs_constraints(outcome_constraints: Sequence[Outco
         parsed = _parse_single_symbol_inequality(constraint.ax_constraint)
         if parsed is None:
             raise ValueError(
-                "Xopt mapping currently supports only single-metric outcome constraints, "
-                f"got: {constraint.ax_constraint!r}."
+                f"Xopt mapping currently supports only single-metric outcome constraints, got: {constraint.ax_constraint!r}."
             )
 
         metric_name, op, value = parsed

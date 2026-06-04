@@ -6,14 +6,14 @@ import bluesky.preprocessors as bpp
 from bluesky.callbacks import CallbackBase
 from bluesky.utils import MsgGenerator
 
+from ..ax.dof import DOF, DOFConstraint
+from ..ax.objective import Objective, OutcomeConstraint, ScalarizedObjective
 from ..callbacks.logger import OptimizationLogger
 from ..callbacks.router import OptimizationCallbackRouter
 from ..plan_stubs import navigate_to_best
 from ..plans import acquire_baseline, optimize, sample_suggestions
 from ..protocols import AcquisitionPlan, Actuator, EvaluationFunction, OptimizationProblem, Sensor
 from ..utils import InferredReadable
-from ..ax.dof import DOF, DOFConstraint
-from ..ax.objective import Objective, OutcomeConstraint, ScalarizedObjective
 from .mapping import build_vocs
 from .optimizer import XoptOptimizer
 

@@ -2,7 +2,7 @@ import pytest
 
 xopt = pytest.importorskip("xopt")
 
-from blop.ax.dof import DOFConstraint, ChoiceDOF, RangeDOF
+from blop.ax.dof import ChoiceDOF, DOFConstraint, RangeDOF
 from blop.ax.objective import Objective, OutcomeConstraint, ScalarizedObjective
 from blop.tests.conftest import ReadableSignal
 from blop.xopt.mapping import build_vocs
