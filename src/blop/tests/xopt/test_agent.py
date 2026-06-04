@@ -3,8 +3,6 @@ from unittest.mock import MagicMock
 import pytest
 from bluesky.run_engine import RunEngine
 
-xopt = pytest.importorskip("xopt")
-
 from xopt.generators.bayesian import ExpectedImprovementGenerator
 from xopt.generators.random import RandomGenerator
 

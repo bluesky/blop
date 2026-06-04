@@ -199,8 +199,8 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
                 mask &= False
                 continue
 
-            op, value = _constraint_to_pair(constraint)
-            mask &= data[constraint_name].astype(float).apply(lambda x: _constraint_satisfied(x, op, value))
+            op, threshold = _constraint_to_pair(constraint)
+            mask &= data[constraint_name].astype(float).apply(lambda x: _constraint_satisfied(x, op, threshold))
 
         return mask
 

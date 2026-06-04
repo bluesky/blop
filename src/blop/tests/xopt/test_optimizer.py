@@ -1,8 +1,6 @@
 import numpy as np
 import pytest
 
-xopt = pytest.importorskip("xopt")
-
 from xopt.generators.bayesian import ExpectedImprovementGenerator
 from xopt.generators.random import RandomGenerator
 from xopt.vocs import VOCS
