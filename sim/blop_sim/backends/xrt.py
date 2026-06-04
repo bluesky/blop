@@ -18,7 +18,7 @@ cache_dir = Path.cwd() / "tmp" / "render"
 cache_dir.mkdir(parents=True, exist_ok=True)
 
 
-def build_histRGB(lb, gb, limits=None, isScreen=False, shape=None):
+def build_histRGB(lb, gb, limits=None, isScreen=False, shape=None) -> tuple[np.array, np.array, np.array]:
     if shape is None:
         shape = [256, 256]
     good = (lb.state == 1) | (lb.state == 2)
@@ -41,7 +41,7 @@ def build_histRGB(lb, gb, limits=None, isScreen=False, shape=None):
     return hist2d, hist2dRGB, limits
 
 
-def _run_cached_process_from_file(beamLine, start_index):
+def _run_cached_process_from_file(beamLine, start_index) -> dict[str, raycing.sources.beams.Beam]:
     outDict = {}
     sequence = list(beamLine.flowU.items())[start_index:]
     print(f"starting from: {start_index}")
@@ -55,7 +55,7 @@ def _run_cached_process_from_file(beamLine, start_index):
     return outDict
 
 
-def _run_shelved_process_from_file(beamLine, start_index, shelf):
+def _run_shelved_process_from_file(beamLine, start_index, shelf) -> str:
     filepath = f"tmp/render/iterbuf_{shelf}"
     with shelve.open(filepath, flag="c") as outDict:
         sequence = list(beamLine.flowU.items())[start_index:]
@@ -81,7 +81,7 @@ class XRTBackend(SimBackend, Readable):
     """
 
     def __init__(self, file, limits=None, noise: bool = False, n_iters=4, n_workers=4):
-        """Initialize XRT backend."""
+        """Initialize XRT backend. requiring at least the beamline description file"""
         super().__init__()
         self._beamline = raycing.BeamLine(fileName=file)
         self._name = Path(file).stem
@@ -97,12 +97,14 @@ class XRTBackend(SimBackend, Readable):
         self.render = None
 
     def _ensure_beamline(self):
-        """Build XRT beamline if not already built."""
+        """legacy check to make sure beamline exists"""
         if self._beamline is None:
             raise ValueError("beamline has not been initialized")
 
     @staticmethod
-    def _render_worker(stuple):
+    def _render_worker(stuple: tuple[raycing.BeamLine, int, int]):
+        """primary run function for each dispatched process.
+        main responsibility to manage the data transfer contracts to and from main"""
         beamLine, seed, minvalid_index = stuple
         print(f"worker {seed} executing")
         np.random.seed(seed=seed)
@@ -116,7 +118,7 @@ class XRTBackend(SimBackend, Readable):
         """Generate beam using XRT ray-tracing.
 
         Returns:
-            2D numpy array with shape (300, 400)
+            2D numpy histogram array with shape of primary detector
         """
         self._ensure_beamline()
         if self.render is None:
@@ -171,7 +173,8 @@ class XRTBackend(SimBackend, Readable):
     def target(self, detector):
         self._target = detector
 
-    def read(self):
+    # readable interface
+    def read(self) -> OrderedDict[str, dict]:
         if self.render is None:
             self.generate_beam()
         result = OrderedDict()

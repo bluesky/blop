@@ -117,7 +117,7 @@ class InferredVariable(MovableHasName, Readable):
         root = "" if self.root is None else self.root.name + ":"
         return f"{root}{self.base}:{self.PV}"
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"<InferredVariable::{self.name}={self.type}:{self.val}>"
 
     # movable interface
@@ -126,11 +126,11 @@ class InferredVariable(MovableHasName, Readable):
         return always_good_stat()
 
     # readable interface
-    def read(self):
-        return {self.name: {"value": self.val, "timestamp": -1}}
+    def read(self) -> OrderedDict[str, dict]:
+        return OrderedDict([(self.name, {"value": self.val, "timestamp": -1})])
 
-    def describe(self):
-        return OrderedDict({self.name: {"source": f"{self.base}:inferred", "dtype": data_map[self.type], "shape": []}})
+    def describe(self) -> OrderedDict[str, dict]:
+        return OrderedDict([(self.name, {"source": f"{self.base}:inferred", "dtype": data_map[self.type], "shape": []})])
 
 
 class InferredDetector(Readable, Triggerable):  # this is by element
@@ -149,7 +149,7 @@ class InferredDetector(Readable, Triggerable):  # this is by element
     def set_primary(self):
         self._beamline.target = self
 
-    def trigger(self):
+    def trigger(self) -> Status:
         if self.primary:
             self._beamline.generate_beam()
         return always_good_stat()
@@ -164,7 +164,7 @@ class InferredDetector(Readable, Triggerable):  # this is by element
             result[self._name] = data
         return result
 
-    def describe(self):
+    def describe(self) -> OrderedDict:
         return OrderedDict(
             [
                 (
@@ -198,7 +198,6 @@ def element_to_variables(
             val = getattr(element, key)
         except Exception:
             continue
-        # member = type(val)
         if isinstance(val, primitives):
             inferred = InferredVariable(name=name, element=element, PV=key, root=root)
             lib[inferred.PV] = inferred
@@ -214,7 +213,7 @@ def element_to_variables(
     return lib
 
 
-def infer_variables(beamLine: XRTBackend, filter_for: set[str] = known_variables):
+def infer_variables(beamLine: XRTBackend, filter_for: set[str] = known_variables) -> dict[str, dict[str, InferredVariable]]:
     variables = {}
     for name, element in beamLine.elements.items():
         eles = element_to_variables(element, name, filter_for=filter_for, root=beamLine)
@@ -223,7 +222,7 @@ def infer_variables(beamLine: XRTBackend, filter_for: set[str] = known_variables
     return variables
 
 
-def infer_detectors(beamLine: XRTBackend):
+def infer_detectors(beamLine: XRTBackend) -> dict[str, InferredDetector]:
     dets = {}
     for name in beamLine.elements.keys():
         dets[name] = InferredDetector(beamLine, name, shape=[128, 128], primary=("Screen" in name))
