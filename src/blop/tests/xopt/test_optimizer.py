@@ -2,6 +2,7 @@ import pytest
 
 xopt = pytest.importorskip("xopt")
 
+from xopt.generators.bayesian import ExpectedImprovementGenerator
 from xopt.generators.random import RandomGenerator
 from xopt.vocs import VOCS
 
@@ -61,3 +62,31 @@ def test_xopt_optimizer_applies_fixed_parameters():
 
     suggestions = optimizer.suggest(3)
     assert all(suggestion["z"] == 1.25 for suggestion in suggestions)
+
+
+def test_xopt_expected_improvement_runs_simple_minimization():
+    vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
+    optimizer = XoptOptimizer(
+        generator=ExpectedImprovementGenerator,
+        vocs=vocs,
+    )
+
+    # Seed EI with initial evaluations for model training.
+    optimizer.ingest([
+        {"x": 0.0, "y": (0.0 - 0.25) ** 2},
+        {"x": 0.5, "y": (0.5 - 0.25) ** 2},
+        {"x": 1.0, "y": (1.0 - 0.25) ** 2},
+    ])
+
+    for _ in range(3):
+        suggestion = optimizer.suggest(1)[0]
+        x_val = float(suggestion["x"])
+        optimizer.ingest([{"_id": suggestion["_id"], "y": (x_val - 0.25) ** 2}])
+
+    assert optimizer.generator.data is not None
+    assert len(optimizer.generator.data) == 6
+
+    best_points = optimizer.get_best_points()
+    assert len(best_points) == 1
+    _, _, outcomes = best_points[0]
+    assert outcomes["y"] <= 0.0625
