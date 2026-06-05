@@ -242,6 +242,50 @@ def test_xopt_optimizer_get_best_points_multi_objective():
         assert "y2" in metrics
 
 
+def test_xopt_optimizer_get_best_points_returns_empty_when_all_infeasible():
+    vocs = VOCS(
+        variables={"x": [0.0, 1.0]},
+        objectives={"y": "MINIMIZE"},
+        constraints={"c": ["LESS_THAN", 0.0]},
+    )
+    optimizer = _random_optimizer(vocs)
+
+    optimizer.ingest(
+        [
+            {"x": 0.1, "y": 5.0, "c": 1.0},
+            {"x": 0.2, "y": 1.0, "c": 2.0},
+            {"x": 0.3, "y": 3.0, "c": 3.0},
+        ]
+    )
+
+    best_points = optimizer.get_best_points()
+    assert best_points == []
+
+
+def test_xopt_optimizer_get_best_points_selects_best_feasible_only():
+    vocs = VOCS(
+        variables={"x": [0.0, 1.0]},
+        objectives={"y": "MINIMIZE"},
+        constraints={"c": ["LESS_THAN", 0.5]},
+    )
+    optimizer = _random_optimizer(vocs)
+
+    optimizer.ingest(
+        [
+            {"x": 0.1, "y": 10.0, "c": 0.1},
+            {"x": 0.2, "y": 1.0, "c": 0.9},
+            {"x": 0.3, "y": 2.0, "c": 0.2},
+        ]
+    )
+
+    best_points = optimizer.get_best_points()
+    assert len(best_points) == 1
+    _, params, outcomes = best_points[0]
+    assert params["x"] == 0.3
+    assert outcomes["y"] == 2.0
+    assert outcomes["c"] == 0.2
+
+
 def test_xopt_expected_improvement_runs_simple_minimization():
     vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
     optimizer = XoptOptimizer(generator=ExpectedImprovementGenerator(vocs=vocs))
