@@ -6,50 +6,9 @@ from typing import Any
 import pandas as pd
 from xopt import VOCS
 from xopt.generator import Generator
+from xopt.vocs import get_feasibility_data, select_best
 
 from ..protocols import ID_KEY, CanRegisterSuggestions, Checkpointable, Optimizer, TrialFaultAware
-
-
-def _objective_minimize_flag(objective: Any) -> bool:
-    # Handle string objective specs first (common VOCS representation).
-    if isinstance(objective, str):
-        return objective.strip().upper() == "MINIMIZE"
-
-    # Fall back to class-name inspection for typed objective objects.
-    objective_name = objective.__class__.__name__.lower()
-    if "minimize" in objective_name:
-        return True
-    if "maximize" in objective_name:
-        return False
-
-    return True
-
-
-def _constraint_satisfied(value: float, op: str, threshold: float) -> bool:
-    # Evaluate one normalized constraint against a single numeric value.
-    if op == "LESS_THAN":
-        return value <= threshold
-    if op == "GREATER_THAN":
-        return value >= threshold
-    raise ValueError(f"Unsupported VOCS constraint operator: {op!r}")
-
-
-def _constraint_to_pair(constraint: Any) -> tuple[str, float]:
-    # Convert common VOCS list/tuple form into a normalized operator/value pair.
-    if isinstance(constraint, (list, tuple)) and len(constraint) == 2:
-        return str(constraint[0]).upper(), float(constraint[1])
-
-    # Support typed constraint objects from gest_api.vocs by class-name convention.
-    name = constraint.__class__.__name__.lower()
-    value_attr = getattr(constraint, "value", None)
-    if value_attr is not None and not callable(value_attr):
-        value = float(value_attr)
-        if "lessthan" in name:
-            return "LESS_THAN", value
-        if "greaterthan" in name:
-            return "GREATER_THAN", value
-
-    raise ValueError(f"Unsupported VOCS constraint representation: {constraint!r}")
 
 
 def _normalize_trial_id(value: Any) -> int | str:
@@ -207,36 +166,21 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
                 self._params_by_id.pop(trial_id)
 
     def _feasible_mask(self, data: pd.DataFrame) -> pd.Series:
-        # Compute row-wise feasibility mask from VOCS constraints.
+        # Delegate feasibility computation to Xopt's native VOCS helper.
         constraints = self.vocs.constraints
         if not isinstance(constraints, Mapping) or len(constraints) == 0:
             return pd.Series([True] * len(data), index=data.index)
 
-        mask = pd.Series([True] * len(data), index=data.index)
-        for constraint_name, constraint in constraints.items():
-            # Missing constraint columns imply non-feasible rows.
-            if constraint_name not in data:
-                mask &= False
-                continue
-
-            op, threshold = _constraint_to_pair(constraint)
-            mask &= (
-                data[constraint_name]
-                .astype(float)
-                .apply(lambda x, op=op, threshold=threshold: _constraint_satisfied(x, op, threshold))
-            )
-
-        return mask
-
-    def _objective_names(self) -> list[str]:
-        # Preserve VOCS-defined objective ordering where available.
-        return list(self.vocs.objectives.keys()) if self.vocs.objectives else []
+        feasibility = get_feasibility_data(self.vocs, data)
+        if "feasible" not in feasibility:
+            return pd.Series([True] * len(data), index=data.index)
+        return pd.Series(feasibility["feasible"], index=data.index, dtype=bool)
 
     def _output_names(self) -> list[str]:
         # Outputs include objectives, constraints, and optional observables.
-        names = self._objective_names()
+        names = list(self.vocs.objective_names)
         if self.vocs.constraints:
-            names.extend(self.vocs.constraints.keys())
+            names.extend(self.vocs.constraint_names)
         if getattr(self.vocs, "observables", None):
             names.extend(self.vocs.observables)
         return names
@@ -247,19 +191,16 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         if not isinstance(data, pd.DataFrame) or data.empty:
             return []
 
-        # Prefer feasible points first; if none exist, fall back to all data.
-        candidates = data[self._feasible_mask(data)]
+        # Best points are only defined over feasible observations.
+        candidates: pd.DataFrame = data.loc[self._feasible_mask(data)]
         if len(candidates) == 0:
-            candidates = data
+            return []
 
-        objective_names = self._objective_names()
+        objective_names = list(self.vocs.objective_names)
         # For single-objective problems, return the single extremum according to direction.
         if len(objective_names) == 1 and objective_names[0] in candidates:
-            objective_name = objective_names[0]
-            objective_spec = self.vocs.objectives[objective_name]
-            minimize = _objective_minimize_flag(objective_spec)
-            objective_values = pd.Series(candidates[objective_name], index=candidates.index, dtype=float)
-            best_index = objective_values.idxmin() if minimize else objective_values.idxmax()
+            best_indices, _, _ = select_best(self.vocs, candidates, n=1)
+            best_index = best_indices[0]
             selected = candidates.loc[[best_index]]
         else:
             # For multi-objective and objective-less modes, return the available candidate set.
