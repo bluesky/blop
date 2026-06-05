@@ -20,7 +20,7 @@ maintainers = [
   { name = "Jennefer Maldonado", email = "jmaldonad@bnl.gov" },
   { name = "Roman Chernikov", email = "rcherniko@bnl.gov" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
   "ax-platform>=1.1.0,<1.3",
   "xopt",
