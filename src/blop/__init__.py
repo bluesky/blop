@@ -1,6 +1,6 @@
 from .ax import DOF, Agent, ChoiceDOF, DOFConstraint, Objective, OutcomeConstraint, RangeDOF, ScalarizedObjective
 from .plans import acquire_baseline, default_acquire, optimize, optimize_step, sample_suggestions
-from .xopt import XoptAgent, XoptOptimizer, build_vocs
+from .xopt import XoptOptimizer
 
 try:
     from ._version import __version__
@@ -22,7 +22,5 @@ __all__ = [
     "optimize",
     "optimize_step",
     "sample_suggestions",
-    "XoptAgent",
     "XoptOptimizer",
-    "build_vocs",
 ]

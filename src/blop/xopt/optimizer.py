@@ -56,26 +56,12 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
     def __init__(
         self,
-        generator: Generator | type[Generator],
+        generator: Generator,
         *,
-        vocs: VOCS | None = None,
-        generator_kwargs: dict[str, Any] | None = None,
         checkpoint_path: str | None = None,
     ):
-        generator_kwargs = generator_kwargs or {}
-
-        # Accept either an already-instantiated generator or a generator class.
-        if isinstance(generator, type):
-            if vocs is None and "vocs" not in generator_kwargs:
-                raise ValueError("vocs must be provided when initializing XoptOptimizer with a generator class.")
-            if "vocs" not in generator_kwargs:
-                self._generator = generator(vocs=vocs, **generator_kwargs)
-            else:
-                self._generator = generator(**generator_kwargs)
-        else:
-            self._generator = generator
-            if vocs is not None and self._generator.vocs != vocs:
-                raise ValueError("Provided vocs does not match generator.vocs.")
+        # Keep API simple: caller provides a fully configured Xopt generator instance.
+        self._generator = generator
 
         # Internal state tracks IDs, pending/known parameterizations, and checkpoint metadata.
         self._checkpoint_path = checkpoint_path

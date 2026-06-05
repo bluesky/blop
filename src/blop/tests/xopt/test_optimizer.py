@@ -1,6 +1,7 @@
+from collections.abc import Callable
+
 import numpy as np
 import pytest
-
 from xopt.generators.bayesian import ExpectedImprovementGenerator
 from xopt.generators.random import RandomGenerator
 from xopt.vocs import VOCS
@@ -8,21 +9,47 @@ from xopt.vocs import VOCS
 from blop.xopt.optimizer import XoptOptimizer
 
 
-def test_xopt_optimizer_init():
-    vocs = VOCS(
-        variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]},
-        objectives={"y1": "MAXIMIZE", "y2": "MINIMIZE"},
-        constraints={"y1": ["GREATER_THAN", 0.0], "y2": ["LESS_THAN", 0.0]},
+def _random_optimizer(vocs: VOCS, *, checkpoint_path: str | None = None) -> XoptOptimizer:
+    return XoptOptimizer(
+        generator=RandomGenerator(vocs=vocs),
+        checkpoint_path=checkpoint_path,
     )
 
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+
+def _bo_optimizer(vocs: VOCS, *, checkpoint_path: str | None = None) -> XoptOptimizer:
+    return XoptOptimizer(
+        generator=ExpectedImprovementGenerator(vocs=vocs),
+        checkpoint_path=checkpoint_path,
+    )
+
+
+@pytest.fixture(params=[_random_optimizer, _bo_optimizer], ids=["random", "bo"])
+def optimizer_factory(request: pytest.FixtureRequest) -> Callable[[VOCS], XoptOptimizer]:
+    return request.param
+
+
+def test_xopt_optimizer_init(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
+    if optimizer_factory is _bo_optimizer:
+        vocs = VOCS(
+            variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]},
+            objectives={"y1": "MINIMIZE"},
+            constraints={"y1": ["LESS_THAN", 10.0]},
+        )
+    else:
+        vocs = VOCS(
+            variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]},
+            objectives={"y1": "MAXIMIZE", "y2": "MINIMIZE"},
+            constraints={"y1": ["GREATER_THAN", 0.0], "y2": ["LESS_THAN", 0.0]},
+        )
+
+    optimizer = optimizer_factory(vocs)
     assert optimizer.generator is not None
     assert set(optimizer.vocs.variable_names) == {"x1", "x2", "x3"}
 
 
-def test_xopt_fixed_parameters():
+def test_xopt_fixed_parameters(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
     vocs = VOCS(variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]}, objectives={"y1": "MINIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = optimizer_factory(vocs)
 
     with pytest.raises(KeyError):
         optimizer.fixed_parameters = {"x4": 3}
@@ -33,7 +60,7 @@ def test_xopt_fixed_parameters():
 
 def test_xopt_optimizer_suggest_ids_and_keys():
     vocs = VOCS(variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]}, objectives={"y1": "MINIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = _random_optimizer(vocs)
 
     suggestions = optimizer.suggest(num_points=2)
     assert len(suggestions) == 2
@@ -44,19 +71,33 @@ def test_xopt_optimizer_suggest_ids_and_keys():
         assert "x3" in suggestion
 
 
-def test_xopt_optimizer_ingest_multiple_columns():
-    vocs = VOCS(
-        variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]},
-        objectives={"y1": "MAXIMIZE", "y2": "MINIMIZE"},
-    )
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+def test_xopt_optimizer_ingest_multiple_columns(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
+    if optimizer_factory is _bo_optimizer:
+        vocs = VOCS(
+            variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]},
+            objectives={"y1": "MINIMIZE"},
+        )
+    else:
+        vocs = VOCS(
+            variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]},
+            objectives={"y1": "MAXIMIZE", "y2": "MINIMIZE"},
+        )
+    optimizer = optimizer_factory(vocs)
 
-    optimizer.ingest(
-        [
-            {"x1": 0.0, "x2": 0.0, "x3": 0.0, "y1": 1.0, "y2": 2.0},
-            {"x1": 0.1, "x2": 0.2, "x3": 1.0, "y1": 3.0, "y2": 4.0},
-        ]
-    )
+    if optimizer_factory is _bo_optimizer:
+        optimizer.ingest(
+            [
+                {"x1": 0.0, "x2": 0.0, "x3": 0.0, "y1": 1.0},
+                {"x1": 0.1, "x2": 0.2, "x3": 1.0, "y1": 3.0},
+            ]
+        )
+    else:
+        optimizer.ingest(
+            [
+                {"x1": 0.0, "x2": 0.0, "x3": 0.0, "y1": 1.0, "y2": 2.0},
+                {"x1": 0.1, "x2": 0.2, "x3": 1.0, "y1": 3.0, "y2": 4.0},
+            ]
+        )
 
     data = optimizer.generator.data
     assert data is not None
@@ -65,12 +106,15 @@ def test_xopt_optimizer_ingest_multiple_columns():
     assert np.allclose(data["x2"].to_numpy(dtype=float), [0.0, 0.2])
     assert np.allclose(data["x3"].to_numpy(dtype=float), [0.0, 1.0])
     assert np.allclose(data["y1"].to_numpy(dtype=float), [1.0, 3.0])
-    assert np.allclose(data["y2"].to_numpy(dtype=float), [2.0, 4.0])
+    if optimizer_factory is _bo_optimizer:
+        assert "y2" not in data.columns
+    else:
+        assert np.allclose(data["y2"].to_numpy(dtype=float), [2.0, 4.0])
 
 
-def test_xopt_optimizer_ingest_baseline_id():
+def test_xopt_optimizer_ingest_baseline_id(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
     vocs = VOCS(variables={"x1": [-5.0, 5.0]}, objectives={"y1": "MINIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = optimizer_factory(vocs)
 
     optimizer.ingest([{"x1": 0.0, "y1": 1.0, "_id": "baseline"}])
     data = optimizer.generator.data
@@ -81,7 +125,7 @@ def test_xopt_optimizer_ingest_baseline_id():
 
 def test_xopt_optimizer_suggest_ingest():
     vocs = VOCS(variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0]}, objectives={"y1": "MINIMIZE", "y2": "MINIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = _random_optimizer(vocs)
 
     suggestions = optimizer.suggest(num_points=2)
     outcomes = [
@@ -99,7 +143,7 @@ def test_xopt_optimizer_suggest_ingest():
 
 def test_xopt_optimizer_register_failures():
     vocs = VOCS(variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0]}, objectives={"y1": "MINIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = _random_optimizer(vocs)
 
     suggestions = optimizer.suggest(num_points=5)
     optimizer.register_failures(suggestions)
@@ -110,7 +154,7 @@ def test_xopt_optimizer_register_failures():
 def test_xopt_optimizer_checkpoint_roundtrip(tmp_path):
     vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
     checkpoint_path = tmp_path / "xopt_optimizer.pkl"
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs, checkpoint_path=str(checkpoint_path))
+    optimizer = _random_optimizer(vocs, checkpoint_path=str(checkpoint_path))
 
     suggestions = optimizer.suggest(1)
     optimizer.ingest([{"_id": suggestions[0]["_id"], "y": 0.5}])
@@ -124,7 +168,7 @@ def test_xopt_optimizer_checkpoint_roundtrip(tmp_path):
 
 def test_xopt_optimizer_checkpoint_no_path():
     vocs = VOCS(variables={"x1": [-5.0, 5.0]}, objectives={"y1": "MINIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = _random_optimizer(vocs)
 
     with pytest.raises(ValueError):
         optimizer.checkpoint()
@@ -132,16 +176,16 @@ def test_xopt_optimizer_checkpoint_no_path():
 
 def test_xopt_optimizer_applies_fixed_parameters():
     vocs = VOCS(variables={"x": [0.0, 1.0], "z": [0.0, 2.0]}, objectives={"y": "MINIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = _random_optimizer(vocs)
     optimizer.fixed_parameters = {"z": 1.25}
 
     suggestions = optimizer.suggest(3)
     assert all(suggestion["z"] == 1.25 for suggestion in suggestions)
 
 
-def test_xopt_optimizer_get_best_points_single_objective_minimize():
+def test_xopt_optimizer_get_best_points_single_objective_minimize(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
     vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = optimizer_factory(vocs)
 
     optimizer.ingest(
         [
@@ -158,9 +202,9 @@ def test_xopt_optimizer_get_best_points_single_objective_minimize():
     assert outcomes["y"] == 1.0
 
 
-def test_xopt_optimizer_get_best_points_single_objective_maximize():
+def test_xopt_optimizer_get_best_points_single_objective_maximize(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
     vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MAXIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = optimizer_factory(vocs)
 
     optimizer.ingest(
         [
@@ -179,7 +223,7 @@ def test_xopt_optimizer_get_best_points_single_objective_maximize():
 
 def test_xopt_optimizer_get_best_points_multi_objective():
     vocs = VOCS(variables={"x": [0.0, 10.0]}, objectives={"y1": "MAXIMIZE", "y2": "MAXIMIZE"})
-    optimizer = XoptOptimizer(generator=RandomGenerator, vocs=vocs)
+    optimizer = _random_optimizer(vocs)
 
     optimizer.ingest(
         [
@@ -200,10 +244,7 @@ def test_xopt_optimizer_get_best_points_multi_objective():
 
 def test_xopt_expected_improvement_runs_simple_minimization():
     vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
-    optimizer = XoptOptimizer(
-        generator=ExpectedImprovementGenerator,
-        vocs=vocs,
-    )
+    optimizer = XoptOptimizer(generator=ExpectedImprovementGenerator(vocs=vocs))
 
     # Seed EI with initial evaluations for model training.
     optimizer.ingest(
