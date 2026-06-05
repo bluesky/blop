@@ -41,14 +41,27 @@ def _constraint_to_pair(constraint: Any) -> tuple[str, float]:
 
     # Support typed constraint objects from gest_api.vocs by class-name convention.
     name = constraint.__class__.__name__.lower()
-    if hasattr(constraint, "value"):
-        value = float(constraint.value)
+    value_attr = getattr(constraint, "value", None)
+    if value_attr is not None and not callable(value_attr):
+        value = float(value_attr)
         if "lessthan" in name:
             return "LESS_THAN", value
         if "greaterthan" in name:
             return "GREATER_THAN", value
 
     raise ValueError(f"Unsupported VOCS constraint representation: {constraint!r}")
+
+
+def _normalize_trial_id(value: Any) -> int | str:
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    return str(value)
+
+
+def _is_missing_scalar(value: Any) -> bool:
+    return value is None or (isinstance(value, float) and pd.isna(value))
 
 
 class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultAware):
@@ -118,19 +131,16 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
     def _seed_state_from_existing_data(self) -> None:
         # Recover known trial IDs/parameters from existing generator data when available.
         data = self._generator.data
-        if data is None or len(data) == 0:
+        if not isinstance(data, pd.DataFrame) or data.empty:
             return
 
         for _, row in data.iterrows():
             # Reuse stored IDs when present, otherwise allocate synthetic IDs.
-            if ID_KEY in row and pd.notna(row[ID_KEY]):
-                trial_id = row[ID_KEY]
+            if ID_KEY in row and not _is_missing_scalar(row[ID_KEY]):
+                trial_id = _normalize_trial_id(row[ID_KEY])
             else:
                 trial_id = self._next_id
                 self._next_id += 1
-
-            if isinstance(trial_id, float) and trial_id.is_integer():
-                trial_id = int(trial_id)
 
             self._params_by_id[trial_id] = {name: row[name] for name in self.vocs.variable_names if name in row}
             if isinstance(trial_id, int):
@@ -166,10 +176,12 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
         for point in points:
             # Preserve provided IDs when available, else allocate a new one.
-            trial_id = point.get(ID_KEY)
-            if trial_id is None:
-                trial_id = self._next_id
+            raw_trial_id = point.get(ID_KEY)
+            if raw_trial_id is None:
+                trial_id: int | str = self._next_id
                 self._next_id += 1
+            else:
+                trial_id = _normalize_trial_id(raw_trial_id)
 
             # Merge known suggested parameters with any explicit parameters in incoming point.
             point_parameters = {name: point[name] for name in self.vocs.variable_names if name in point}
@@ -196,11 +208,12 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
     def _feasible_mask(self, data: pd.DataFrame) -> pd.Series:
         # Compute row-wise feasibility mask from VOCS constraints.
-        if not self.vocs.constraints:
+        constraints = self.vocs.constraints
+        if not isinstance(constraints, Mapping) or len(constraints) == 0:
             return pd.Series([True] * len(data), index=data.index)
 
         mask = pd.Series([True] * len(data), index=data.index)
-        for constraint_name, constraint in self.vocs.constraints.items():
+        for constraint_name, constraint in constraints.items():
             # Missing constraint columns imply non-feasible rows.
             if constraint_name not in data:
                 mask &= False
@@ -231,7 +244,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
     def get_best_points(self) -> list[tuple[int | str, Mapping, Mapping]]:
         # Return no points when no data has been ingested.
         data = self._generator.data
-        if data is None or len(data) == 0:
+        if not isinstance(data, pd.DataFrame) or data.empty:
             return []
 
         # Prefer feasible points first; if none exist, fall back to all data.
@@ -245,7 +258,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             objective_name = objective_names[0]
             objective_spec = self.vocs.objectives[objective_name]
             minimize = _objective_minimize_flag(objective_spec)
-            objective_values = candidates[objective_name].astype(float)
+            objective_values = pd.Series(candidates[objective_name], index=candidates.index, dtype=float)
             best_index = objective_values.idxmin() if minimize else objective_values.idxmax()
             selected = candidates.loc[[best_index]]
         else:
@@ -256,9 +269,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         results: list[tuple[int | str, Mapping, Mapping]] = []
         for _, row in selected.iterrows():
             # Normalize IDs and split into parameter and outcome mappings.
-            trial_id = row[ID_KEY] if ID_KEY in row else _
-            if isinstance(trial_id, float) and trial_id.is_integer():
-                trial_id = int(trial_id)
+            trial_id = _normalize_trial_id(row[ID_KEY] if ID_KEY in row else _)
 
             parameterization = {name: row[name] for name in self.vocs.variable_names if name in row}
             outcomes = {name: row[name] for name in output_names if name in row}
