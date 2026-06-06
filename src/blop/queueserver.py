@@ -77,30 +77,19 @@ class ConsumerCallback(CallbackBase):
 
     def __init__(self, callback: Callable[[RunStart, RunStop], None] | None = None):
         super().__init__()
-        self._start_doc_cache: RunStart | None = None
+        self._start_doc_cache: dict[str, RunStart] = {}
         self._callback = callback
-        self._start_doc_filter: Callable[[RunStart], bool] | None = None
-
-    def set_start_doc_filter(self, start_doc_filter: Callable[[RunStart], bool] | None) -> None:
-        """Set an optional predicate used to ignore unrelated start documents."""
-        self._start_doc_filter = start_doc_filter
 
     def start(self, doc: RunStart) -> None:
         """Caches the start document if it came from Blop"""
-        if doc.get(CORRELATION_UID_KEY, None) and (self._start_doc_filter is None or self._start_doc_filter(doc)):
-            self._start_doc_cache = doc
-        else:
-            self._start_doc_cache = None
+        if doc.get(CORRELATION_UID_KEY):
+            self._start_doc_cache[doc["uid"]] = doc
 
     def stop(self, doc: RunStop) -> None:
         """Executes the callback if the cached start and stop document match"""
-        if (
-            self._callback is not None
-            and self._start_doc_cache is not None
-            and self._start_doc_cache["uid"] == doc["run_start"]
-        ):
-            self._callback(self._start_doc_cache, doc)
-        self._start_doc_cache = None
+        start_doc = self._start_doc_cache.pop(doc["run_start"], None)
+        if self._callback is not None and start_doc is not None:
+            self._callback(start_doc, doc)
 
 
 class QueueserverClient:
@@ -209,7 +198,6 @@ class QueueserverClient:
     def start_listener(
         self,
         on_stop: Callable[[RunStart, RunStop], None],
-        start_doc_filter: Callable[[RunStart], bool] | None = None,
     ) -> None:
         """
         Start listening for document events from the queueserver.
@@ -219,15 +207,12 @@ class QueueserverClient:
         on_stop : callable
             Callback invoked when a stop document is received.
             Signature: on_stop(start_doc, stop_doc)
-        start_doc_filter : callable, optional
-            Predicate used to ignore unrelated start documents before caching.
         """
         if self._listener_thread is not None:
             logger.warning("Listener already running")
             return
 
         self._consumer_callback = ConsumerCallback(callback=on_stop)
-        self._consumer_callback.set_start_doc_filter(start_doc_filter)
         self._dispatcher.subscribe(self._consumer_callback)
 
         logger.info("Starting document listener thread")
@@ -306,7 +291,6 @@ class QueueserverOptimizationRunner:
         self._current_future: Future[OptimizationResult] | None = None
         self._client.start_listener(
             on_stop=self._on_acquisition_complete,
-            start_doc_filter=self._is_expected_start_doc,
         )
 
     @property
@@ -493,13 +477,11 @@ class QueueserverOptimizationRunner:
             **(self._problem.acquisition_plan_kwargs or {}),
         )
 
-    def _is_expected_start_doc(self, start_doc: RunStart) -> bool:
-        """Return True only for the acquisition currently expected by this runner."""
-        with self._state_lock:
-            return self._state is not None and self._state.current_uid == start_doc.get(CORRELATION_UID_KEY)
-
     def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Callback when acquisition finishes. Ingest results and maybe continue."""
+        with self._state_lock:
+            if self._state is None or self._state.current_uid != start_doc.get(CORRELATION_UID_KEY):
+                return
         try:
             self._process_acquisition(start_doc, stop_doc)
         except Exception as exc:
@@ -519,11 +501,6 @@ class QueueserverOptimizationRunner:
                 raise RuntimeError("_on_acquisition_complete called before run()")
             if self._state.current_uid is None:
                 raise RuntimeError("current_uid not set")
-            if self._state.current_uid != start_doc.get(CORRELATION_UID_KEY):
-                raise RuntimeError(
-                    "current_uid did not match start document. "
-                    f"Got: {start_doc.get(CORRELATION_UID_KEY)}, Expected: {self._state.current_uid}"
-                )
             exit_status = stop_doc.get("exit_status")
             if exit_status != "success":
                 reason = stop_doc.get("reason") or "(no reason given)"
