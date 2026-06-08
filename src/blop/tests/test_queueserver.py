@@ -70,6 +70,35 @@ def test_consumer_callback_clears_cache_after_stop():
     assert mock_callback.call_count == 1
 
 
+def test_consumer_callback_ignores_start_without_correlation_uid():
+    """Test ConsumerCallback ignores non-Blop start documents."""
+    mock_callback = MagicMock()
+    callback = ConsumerCallback(callback=mock_callback)
+    run_uid = "test-uid"
+    start_doc = {"uid": run_uid}
+    stop_doc = {"uid": "test-uid2", "run_start": run_uid}
+
+    callback.start(start_doc)
+    callback.stop(stop_doc)
+
+    mock_callback.assert_not_called()
+
+
+def test_consumer_callback_matches_stop_to_cached_start_by_run_uid():
+    """Test ConsumerCallback matches stops to the correct cached Blop start."""
+    mock_callback = MagicMock()
+    callback = ConsumerCallback(callback=mock_callback)
+    start_doc_1 = {"uid": "run-1", CORRELATION_UID_KEY: "one"}
+    start_doc_2 = {"uid": "run-2", CORRELATION_UID_KEY: "two"}
+    stop_doc = {"uid": "stop-2", "run_start": "run-2"}
+
+    callback.start(start_doc_1)
+    callback.start(start_doc_2)
+    callback.stop(stop_doc)
+
+    mock_callback.assert_called_once_with(start_doc_2, stop_doc)
+
+
 @patch("blop.queueserver.REManagerAPI")
 def test_queueserver_client_check_environment_raises_when_not_ready(mock_re_manager, mock_document_dispatcher):
     """Test check_environment raises RuntimeError when environment not open."""
@@ -233,6 +262,9 @@ def test_runner_run_submits_suggestions_to_queueserver():
 
     future = runner.run(iterations=1, num_points=1)
 
+    # Verify listener is started once during runner construction, not per run
+    mock_client.start_listener.assert_called_once_with(on_stop=runner._on_acquisition_complete)
+
     # Verify optimizer.suggest was called
     mock_optimization_problem.optimizer.suggest.assert_called_once_with(1)
 
@@ -347,6 +379,9 @@ def test_runner_submit_suggestions_to_queueserver():
 
     suggestions = [{"motor1": 5}]
     future = runner.submit_suggestions(suggestions)
+
+    # Verify listener is started once during runner construction, not per submission
+    mock_client.start_listener.assert_called_once_with(on_stop=runner._on_acquisition_complete)
 
     # Verify optimizer.suggest was NOT called
     mock_optimization_problem.optimizer.suggest.assert_not_called()
@@ -471,6 +506,8 @@ def test_runner_run_full_cycle(mock_optimization_problem):
         queueserver_client=mock_client,
     )
 
+    mock_client.start_listener.assert_called_once()
+
     future = runner.run(iterations=3, num_points=2)
 
     # Simulate 3 acquisition completions by invoking the captured callback
@@ -484,6 +521,7 @@ def test_runner_run_full_cycle(mock_optimization_problem):
         mock_client._on_stop(start_doc, stop_doc)
 
     assert mock_client.submit_plan.call_count == 3
+    mock_client.start_listener.assert_called_once()
     assert mock_optimization_problem.optimizer.suggest.call_count == 3
     assert mock_optimization_problem.optimizer.ingest.call_count == 3
     assert mock_optimization_problem.evaluation_function.call_count == 3
@@ -497,14 +535,13 @@ def test_runner_run_full_cycle(mock_optimization_problem):
     assert result.uids == tuple(uids)
 
 
-def test_runner_on_acquisition_complete_uid_mismatch_sets_future_exception(mock_optimization_problem):
-    """Test _on_acquisition_complete stores error in future on UID mismatch."""
+def test_runner_on_acquisition_complete_ignores_other_blop_runs(mock_optimization_problem):
+    """Test _on_acquisition_complete ignores Blop documents for other correlation UIDs."""
     runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem)
 
     start_doc = {"uid": "fake-uid", CORRELATION_UID_KEY: "wrong-uid"}
     stop_doc = {"uid": "other-fake-uid", "run_start": "fake-uid"}
 
-    # Should NOT raise — exception is captured in the future
     mock_client._on_stop(start_doc, stop_doc)
 
     assert future.done()
@@ -687,12 +724,24 @@ def test_runner_stop_races_final_callback_does_not_raise(mock_optimization_probl
     runner.stop()  # Must not raise
 
 
-@pytest.mark.parametrize("failing_method", ["start_listener", "submit_plan"])
-def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_problem, failing_method):
-    """An exception from start_listener or submit_plan in run() fails the future and re-raises."""
+def test_runner_init_listener_error_reraises(mock_optimization_problem):
+    """An exception from start_listener in __init__ is re-raised."""
     error = RuntimeError("connection refused")
     mock_client = MagicMock(spec=QueueserverClient)
-    getattr(mock_client, failing_method).side_effect = error
+    mock_client.start_listener.side_effect = error
+
+    with pytest.raises(RuntimeError, match="connection refused"):
+        QueueserverOptimizationRunner(
+            optimization_problem=mock_optimization_problem,
+            queueserver_client=mock_client,
+        )
+
+
+def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_problem):
+    """An exception from submit_plan in run() fails the future and re-raises."""
+    error = RuntimeError("connection refused")
+    mock_client = MagicMock(spec=QueueserverClient)
+    mock_client.submit_plan.side_effect = error
 
     runner = QueueserverOptimizationRunner(
         optimization_problem=mock_optimization_problem,
@@ -708,12 +757,11 @@ def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_pro
     assert future.exception() is error
 
 
-@pytest.mark.parametrize("failing_method", ["start_listener", "submit_plan"])
-def test_runner_submit_suggestions_submit_error_fails_future_and_reraises(mock_optimization_problem, failing_method):
-    """An exception from start_listener or submit_plan in submit_suggestions() fails the future and re-raises."""
+def test_runner_submit_suggestions_submit_error_fails_future_and_reraises(mock_optimization_problem):
+    """An exception from submit_plan in submit_suggestions() fails the future and re-raises."""
     error = RuntimeError("connection refused")
     mock_client = MagicMock(spec=QueueserverClient)
-    getattr(mock_client, failing_method).side_effect = error
+    mock_client.submit_plan.side_effect = error
 
     runner = QueueserverOptimizationRunner(
         optimization_problem=mock_optimization_problem,
