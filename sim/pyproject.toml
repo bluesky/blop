@@ -11,7 +11,7 @@ authors = [{ name = "Thomas Hopkins", email = "thopkins1@bnl.gov" }]
 requires-python = ">=3.11"
 dependencies = [
   "blop",
-  "ophyd-async",
+  "ophyd-async<0.17",
   "h5py",
   "area-detector-handlers",
   "bluesky-tiled-plugins",
