@@ -1,11 +1,13 @@
 from collections.abc import Callable
 
 import numpy as np
+import pandas as pd
 import pytest
 from xopt.generators.bayesian import ExpectedImprovementGenerator
 from xopt.generators.random import RandomGenerator
 from xopt.vocs import VOCS
 
+from blop.xopt import optimizer as xopt_optimizer_module
 from blop.xopt.optimizer import XoptOptimizer
 
 
@@ -57,6 +59,9 @@ def test_xopt_fixed_parameters(optimizer_factory: Callable[[VOCS], XoptOptimizer
     optimizer.fixed_parameters = {"x3": 3}
     assert optimizer.fixed_parameters == {"x3": 3}
 
+    optimizer.fixed_parameters = {}
+    assert optimizer.fixed_parameters is None
+
 
 def test_xopt_optimizer_suggest_ids_and_keys():
     vocs = VOCS(variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]}, objectives={"y1": "MINIMIZE"})
@@ -69,6 +74,15 @@ def test_xopt_optimizer_suggest_ids_and_keys():
         assert "x1" in suggestion
         assert "x2" in suggestion
         assert "x3" in suggestion
+
+
+def test_xopt_optimizer_suggest_defaults_to_single_point():
+    vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
+    optimizer = _random_optimizer(vocs)
+
+    suggestions = optimizer.suggest()
+    assert len(suggestions) == 1
+    assert suggestions[0]["_id"] == 0
 
 
 def test_xopt_optimizer_ingest_multiple_columns(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
@@ -121,6 +135,17 @@ def test_xopt_optimizer_ingest_baseline_id(optimizer_factory: Callable[[VOCS], X
     assert data is not None
     assert len(data) == 1
     assert data.iloc[0]["_id"] == "baseline"
+
+
+def test_xopt_optimizer_seeds_state_when_existing_data_lacks_id():
+    vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
+    generator = RandomGenerator(vocs=vocs)
+    generator.add_data(pd.DataFrame([{"x": 0.4, "y": 1.2}]))
+
+    optimizer = XoptOptimizer(generator=generator)
+
+    assert optimizer._params_by_id[0] == {"x": 0.4}
+    assert optimizer._next_id == 1
 
 
 def test_xopt_optimizer_suggest_ingest():
@@ -284,6 +309,50 @@ def test_xopt_optimizer_get_best_points_selects_best_feasible_only():
     assert params["x"] == 0.3
     assert outcomes["y"] == 2.0
     assert outcomes["c"] == 0.2
+
+
+def test_xopt_optimizer_get_best_points_empty_without_data():
+    vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
+    optimizer = _random_optimizer(vocs)
+
+    assert optimizer.get_best_points() == []
+
+
+def test_xopt_optimizer_feasible_mask_defaults_true_when_missing_feasible(monkeypatch: pytest.MonkeyPatch):
+    vocs = VOCS(
+        variables={"x": [0.0, 1.0]},
+        objectives={"y": "MINIMIZE"},
+        constraints={"c": ["LESS_THAN", 1.0]},
+    )
+    optimizer = _random_optimizer(vocs)
+    data = pd.DataFrame([{"x": 0.1, "y": 1.0, "c": 0.1}, {"x": 0.2, "y": 2.0, "c": 0.2}])
+
+    monkeypatch.setattr(xopt_optimizer_module, "get_feasibility_data", lambda _vocs, _data: {"c": [True, False]})
+
+    mask = optimizer._feasible_mask(data)
+    assert mask.tolist() == [True, True]
+
+
+def test_xopt_optimizer_get_best_points_includes_observables():
+    vocs = VOCS(
+        variables={"x": [0.0, 1.0]},
+        objectives={"y": "MINIMIZE"},
+        observables=["obs"],
+    )
+    optimizer = _random_optimizer(vocs)
+
+    optimizer.ingest(
+        [
+            {"x": 0.1, "y": 2.0, "obs": 10.0},
+            {"x": 0.2, "y": 1.0, "obs": 20.0},
+        ]
+    )
+
+    best_points = optimizer.get_best_points()
+    assert len(best_points) == 1
+    _, _, outcomes = best_points[0]
+    assert outcomes["y"] == 1.0
+    assert outcomes["obs"] == 20.0
 
 
 def test_xopt_expected_improvement_runs_simple_minimization():
