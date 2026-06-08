@@ -479,9 +479,7 @@ class QueueserverOptimizationRunner:
 
     def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Callback when acquisition finishes. Ingest results and maybe continue."""
-        with self._state_lock:
-            if self._state is None or self._state.current_uid != start_doc.get(CORRELATION_UID_KEY):
-                return
+        
         try:
             self._process_acquisition(start_doc, stop_doc)
         except Exception as exc:
@@ -496,12 +494,19 @@ class QueueserverOptimizationRunner:
 
     def _process_acquisition(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Core acquisition-complete logic (called from _on_acquisition_complete)."""
+
+        
         with self._state_lock:
             if self._state is None:
                 raise RuntimeError("_on_acquisition_complete called before run()")
             if self._state.current_uid is None:
                 raise RuntimeError("current_uid not set")
             exit_status = stop_doc.get("exit_status")
+            if self._state.current_uid != start_doc.get(CORRELATION_UID_KEY):
+                raise RuntimeError(
+                    "current_uid did not match start document. "
+                    f"Got: {start_doc.get(CORRELATION_UID_KEY)}, Expected: {self._state.current_uid}"
+                )
             if exit_status != "success":
                 reason = stop_doc.get("reason") or "(no reason given)"
                 raise RuntimeError(f"Acquisition run {start_doc['uid']!r} ended with status {exit_status!r}: {reason}")
