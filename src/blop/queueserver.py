@@ -21,8 +21,14 @@ from typing import Any, Literal
 
 from bluesky.callbacks import CallbackBase
 from bluesky.callbacks.zmq import RemoteDispatcher
-from bluesky_queueserver_api import BPlan
-from bluesky_queueserver_api.zmq import REManagerAPI
+
+try:
+    from bluesky_queueserver_api import BPlan
+    from bluesky_queueserver_api.zmq import REManagerAPI
+except ImportError as e:
+    raise ImportError(
+        "The queueserver integration requires additional dependencies. Install them with: pip install blop[qs]"
+    ) from e
 from event_model import RunStart, RunStop
 
 from .plans import default_acquire
