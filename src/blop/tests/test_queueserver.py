@@ -544,8 +544,10 @@ def test_runner_on_acquisition_complete_ignores_other_blop_runs(mock_optimizatio
 
     mock_client._on_stop(start_doc, stop_doc)
 
-    assert not future.done()
-    mock_optimization_problem.evaluation_function.assert_not_called()
+    assert future.done()
+    exc = future.exception()
+    assert isinstance(exc, RuntimeError)
+    assert "current_uid did not match start document" in str(exc)
 
 
 def test_runner_private_method_calls_before_run(mock_optimization_problem):
