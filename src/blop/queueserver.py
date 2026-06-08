@@ -479,7 +479,7 @@ class QueueserverOptimizationRunner:
 
     def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Callback when acquisition finishes. Ingest results and maybe continue."""
-        
+
         try:
             self._process_acquisition(start_doc, stop_doc)
         except Exception as exc:
@@ -495,7 +495,6 @@ class QueueserverOptimizationRunner:
     def _process_acquisition(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Core acquisition-complete logic (called from _on_acquisition_complete)."""
 
-        
         with self._state_lock:
             if self._state is None:
                 raise RuntimeError("_on_acquisition_complete called before run()")
