@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.protocols &#8212; blop 1.0.0b2.dev26 documentation</title>
+    <title>blop.protocols &#8212; blop 1.0.0b2.dev28 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
-    <script src="../../_static/documentation_options.js?v=fc884bee"></script>
+    <script src="../../_static/documentation_options.js?v=b0ea6c35"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -498,7 +498,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev26" />
+  <meta name="docsearch:version" content="1.0.0b2.dev28" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -1254,7 +1254,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    An optimization problem to solve. Immutable once initialized.</span>
 
 <span class="sd">    This dataclass encapsulates all components needed for optimization into a single</span>
-<span class="sd">    immutable structure. It is typically created via :meth:`blop.ax.QueueserverAgent.to_optimization_problem`</span>
+<span class="sd">    immutable structure. It is typically created via</span>
+<span class="sd">    :meth:`blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem`</span>
 <span class="sd">    and used with bluesky-queueserver-api. Actuators, sensors, and the acquisition plan are referenced</span>
 <span class="sd">    by their names, since their instances live on a remote server.</span>
 
@@ -1277,7 +1278,8 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    blop.ax.QueueserverAgent.to_optimization_problem : Creates a QueueserverOptimizationProblem from an agent.</span>
+<span class="sd">    blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem :</span>
+<span class="sd">        Creates a QueueserverOptimizationProblem from an agent.</span>
 <span class="sd">    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

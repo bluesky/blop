@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Agent &#8212; blop 1.0.0b2.dev26 documentation</title>
+    <title>Agent &#8212; blop 1.0.0b2.dev28 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
-    <script src="../_static/documentation_options.js?v=fc884bee"></script>
+    <script src="../_static/documentation_options.js?v=b0ea6c35"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="API Reference" href="../reference.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev26" />
+  <meta name="docsearch:version" content="1.0.0b2.dev28" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -780,39 +780,6 @@ optimizer suggestions and manual points.</p>
 </div>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.Agent.navigate_to_best">
-<span class="sig-name descname"><span class="pre">navigate_to_best</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameterization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#Agent.navigate_to_best"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.Agent.navigate_to_best" title="Link to this definition">#</a></dt>
-<dd><p>Move actuators to the best point found during optimization.</p>
-<p>If no explicit parameterization is provided, queries the optimizer for its
-best point(s). For multi-objective optimizers that return multiple Pareto-optimal
-points, an explicit parameterization must be provided.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>parameterization</strong><span class="classifier">Mapping | None, optional</span></dt><dd><p>Explicit parameterization to navigate to. If None, queries the optimizer’s
-best point. For multi-objective problems, call <code class="docutils literal notranslate"><span class="pre">get_best_points()</span></code>
-to inspect the Pareto set and select one.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>ValueError</dt><dd><p>If the optimizer returns multiple Pareto-optimal points and no
-explicit <code class="docutils literal notranslate"><span class="pre">parameterization</span></code> is provided.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="#blop.ax.Agent.get_best_points" title="blop.ax.Agent.get_best_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_points</span></code></a></dt><dd><p>Query the optimizer for best points.</p>
-</dd>
-</dl>
-</div>
-</dd></dl>
-
 <dl class="py property">
 <dt class="sig sig-object py" id="blop.ax.Agent.ax_client">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ax_client</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Client</span></span><a class="headerlink" href="#blop.ax.Agent.ax_client" title="Link to this definition">#</a></dt>
@@ -886,6 +853,39 @@ objective values, and omit “_id”.</p>
 <p>This method is typically called automatically by <a class="reference internal" href="#blop.ax.Agent.optimize" title="blop.ax.Agent.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">optimize()</span></code></a>. Manual usage
 is only needed for custom workflows or when ingesting external data.</p>
 <p>For complete examples, see <a class="reference internal" href="../how-to-guides/attach-data-to-experiments.html"><span class="doc">Attach external data to experiments</span></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blop.ax.Agent.navigate_to_best">
+<span class="sig-name descname"><span class="pre">navigate_to_best</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parameterization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#Agent.navigate_to_best"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.Agent.navigate_to_best" title="Link to this definition">#</a></dt>
+<dd><p>Move actuators to the best point found during optimization.</p>
+<p>If no explicit parameterization is provided, queries the optimizer for its
+best point(s). For multi-objective optimizers that return multiple Pareto-optimal
+points, an explicit parameterization must be provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>parameterization</strong><span class="classifier">Mapping | None, optional</span></dt><dd><p>Explicit parameterization to navigate to. If None, queries the optimizer’s
+best point. For multi-objective problems, call <code class="docutils literal notranslate"><span class="pre">get_best_points()</span></code>
+to inspect the Pareto set and select one.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ValueError</dt><dd><p>If the optimizer returns multiple Pareto-optimal points and no
+explicit <code class="docutils literal notranslate"><span class="pre">parameterization</span></code> is provided.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#blop.ax.Agent.get_best_points" title="blop.ax.Agent.get_best_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_best_points</span></code></a></dt><dd><p>Query the optimizer for best points.</p>
+</dd>
+</dl>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -969,8 +969,8 @@ evaluate next. Each dictionary includes an “_id” key for identification.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">blop.ax.</span></span><span class="sig-name descname"><span class="pre">QueueserverAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">re_manager_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document_dispatcher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objectives</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dof_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcome_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#QueueserverAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.QueueserverAgent" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">blop.ax.queueserver_agent.</span></span><span class="sig-name descname"><span class="pre">QueueserverAgent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">re_manager_api</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document_dispatcher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dofs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objectives</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dof_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcome_constraints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan_kwargs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/queueserver_agent.html#QueueserverAgent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent" title="Link to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">_AxAgentMixin</span></code></p>
 <p>An asynchronous interface that uses Ax as the backend for optimization and experiment tracking
 and the bluesky-queueserver-api for scheduling plan execution.</p>
@@ -1028,70 +1028,136 @@ of sensors that are needed to compute the objectives.</p>
 </dl>
 </div>
 <dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.evaluation_function">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">evaluation_function</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="protocols.html#blop.protocols.EvaluationFunction" title="blop.protocols.EvaluationFunction"><span class="pre">EvaluationFunction</span></a></span><a class="headerlink" href="#blop.ax.QueueserverAgent.evaluation_function" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.evaluation_function">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">evaluation_function</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="protocols.html#blop.protocols.EvaluationFunction" title="blop.protocols.EvaluationFunction"><span class="pre">EvaluationFunction</span></a></span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.evaluation_function" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.actuators">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">actuators</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#blop.ax.QueueserverAgent.actuators" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.actuators">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">actuators</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.actuators" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.sensors">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sensors</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#blop.ax.QueueserverAgent.sensors" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.sensors">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">sensors</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Sequence" title="(in Python v3.14)"><span class="pre">Sequence</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.sensors" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.acquisition_plan">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">acquisition_plan</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#blop.ax.QueueserverAgent.acquisition_plan" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.acquisition_plan">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">acquisition_plan</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.acquisition_plan" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.stop">
-<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#QueueserverAgent.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.QueueserverAgent.stop" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.stop">
+<span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/queueserver_agent.html#QueueserverAgent.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.stop" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 </dl>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.current_iteration">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_iteration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#blop.ax.QueueserverAgent.current_iteration" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.current_iteration">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">current_iteration</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.current_iteration" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.to_optimization_problem">
-<span class="sig-name descname"><span class="pre">to_optimization_problem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#QueueserverAgent.to_optimization_problem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.QueueserverAgent.to_optimization_problem" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem">
+<span class="sig-name descname"><span class="pre">to_optimization_problem</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/queueserver_agent.html#QueueserverAgent.to_optimization_problem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem" title="Link to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/queueserver_agent.html#QueueserverAgent.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.run" title="Link to this definition">#</a></dt>
+<dd><p>Start the optimization loop.</p>
+<p>Validates the queueserver state, then begins the suggest -&gt; acquire -&gt; ingest
+cycle. This method returns immediately; the optimization runs asynchronously
+via callbacks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>iterations</strong><span class="classifier">int</span></dt><dd><p>Number of optimization iterations to run.</p>
+</dd>
+<dt><strong>n_points</strong><span class="classifier">int</span></dt><dd><p>Number of points to suggest per iteration.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>concurrent.futures.Future[OptimizationResult]</dt><dd><p>A future that resolves to an <a class="reference internal" href="queueserver.html#blop.queueserver.OptimizationResult" title="blop.queueserver.OptimizationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizationResult</span></code></a>
+when all iterations complete or when <a class="reference internal" href="#blop.ax.queueserver_agent.QueueserverAgent.stop" title="blop.ax.queueserver_agent.QueueserverAgent.stop"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stop()</span></code></a> is called. If an
+unhandled exception occurs the future will hold it and re-raise on
+<code class="docutils literal notranslate"><span class="pre">.result()</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>RuntimeError</dt><dd><p>If the queueserver environment is not ready.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If required devices or plans are not available.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.submit_suggestions">
+<span class="sig-name descname"><span class="pre">submit_suggestions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suggestions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/queueserver_agent.html#QueueserverAgent.submit_suggestions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.submit_suggestions" title="Link to this definition">#</a></dt>
+<dd><p>Evaluate specific parameter combinations.</p>
+<p>Acquires data for given suggestions and ingests results. Supports both
+optimizer suggestions and manual points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>suggestions</strong><span class="classifier">list[dict]</span></dt><dd><p>Either optimizer suggestions (with “_id”) or manual points (without “_id”).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>concurrent.futures.Future[OptimizationResult]</dt><dd><p>A future that resolves to an <a class="reference internal" href="queueserver.html#blop.queueserver.OptimizationResult" title="blop.queueserver.OptimizationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizationResult</span></code></a>
+when the acquisition completes.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#blop.ax.queueserver_agent.QueueserverAgent.run" title="blop.ax.queueserver_agent.QueueserverAgent.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a></dt><dd><p>Run the full optimization loop.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
 <dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.ax_client">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ax_client</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Client</span></span><a class="headerlink" href="#blop.ax.QueueserverAgent.ax_client" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.ax_client">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">ax_client</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Client</span></span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.ax_client" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.checkpoint">
-<span class="sig-name descname"><span class="pre">checkpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.QueueserverAgent.checkpoint" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.checkpoint">
+<span class="sig-name descname"><span class="pre">checkpoint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.checkpoint" title="Link to this definition">#</a></dt>
 <dd><p>Save the agent’s state to a JSON file.</p>
 <dl class="field-list simple">
 </dl>
 </dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.checkpoint_path">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">checkpoint_path</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#blop.ax.QueueserverAgent.checkpoint_path" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.checkpoint_path">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">checkpoint_path</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.checkpoint_path" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.fixed_dofs">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fixed_dofs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#blop.ax.QueueserverAgent.fixed_dofs" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.fixed_dofs">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">fixed_dofs</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.fixed_dofs" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.get_best_points">
-<span class="sig-name descname"><span class="pre">get_best_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.QueueserverAgent.get_best_points" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.get_best_points">
+<span class="sig-name descname"><span class="pre">get_best_points</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.get_best_points" title="Link to this definition">#</a></dt>
 <dd><p>Get a list of the optimal points found during optimization.</p>
 <p>For single-objective optimization, returns a single best point.
 For multi-objective optimization, returns the Pareto-optimal set.</p>
@@ -1120,8 +1186,8 @@ For multi-objective optimization, returns the Pareto-optimal set.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.ingest">
-<span class="sig-name descname"><span class="pre">ingest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.QueueserverAgent.ingest" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.ingest">
+<span class="sig-name descname"><span class="pre">ingest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.ingest" title="Link to this definition">#</a></dt>
 <dd><p>Ingest evaluation results into the optimizer.</p>
 <p>Updates the optimizer’s model with new data. Can ingest both suggested points
 (with “_id” key) and external data (without “_id” key).</p>
@@ -1142,8 +1208,8 @@ is only needed for custom workflows or when ingesting external data.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.plot_objective">
-<span class="sig-name descname"><span class="pre">plot_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dof_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dof_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objective_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.QueueserverAgent.plot_objective" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.plot_objective">
+<span class="sig-name descname"><span class="pre">plot_objective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_dof_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_dof_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">objective_name</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.plot_objective" title="Link to this definition">#</a></dt>
 <dd><p>Plot the predicted objective as a function of two DOFs.</p>
 <p>Creates a contour plot showing the model’s prediction of an objective across
 the space defined by two DOFs. Useful for visualizing the optimization landscape.</p>
@@ -1181,8 +1247,8 @@ the space defined by two DOFs. Useful for visualizing the optimization landscape
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.reconfigure_search_space">
-<span class="sig-name descname"><span class="pre">reconfigure_search_space</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dof_mappings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.QueueserverAgent.reconfigure_search_space" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.reconfigure_search_space">
+<span class="sig-name descname"><span class="pre">reconfigure_search_space</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dof_mappings</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.reconfigure_search_space" title="Link to this definition">#</a></dt>
 <dd><p>Update bounds or values of existing DOFs for future optimizations.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1195,44 +1261,8 @@ the space defined by two DOFs. Useful for visualizing the optimization landscape
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#QueueserverAgent.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.QueueserverAgent.run" title="Link to this definition">#</a></dt>
-<dd><p>Start the optimization loop.</p>
-<p>Validates the queueserver state, then begins the suggest -&gt; acquire -&gt; ingest
-cycle. This method returns immediately; the optimization runs asynchronously
-via callbacks.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>iterations</strong><span class="classifier">int</span></dt><dd><p>Number of optimization iterations to run.</p>
-</dd>
-<dt><strong>n_points</strong><span class="classifier">int</span></dt><dd><p>Number of points to suggest per iteration.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>concurrent.futures.Future[OptimizationResult]</dt><dd><p>A future that resolves to an <a class="reference internal" href="queueserver.html#blop.queueserver.OptimizationResult" title="blop.queueserver.OptimizationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizationResult</span></code></a>
-when all iterations complete or when <a class="reference internal" href="#blop.ax.QueueserverAgent.stop" title="blop.ax.QueueserverAgent.stop"><code class="xref py py-meth docutils literal notranslate"><span class="pre">stop()</span></code></a> is called. If an
-unhandled exception occurs the future will hold it and re-raise on
-<code class="docutils literal notranslate"><span class="pre">.result()</span></code>.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt>RuntimeError</dt><dd><p>If the queueserver environment is not ready.</p>
-</dd>
-<dt>ValueError</dt><dd><p>If required devices or plans are not available.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.suggest">
-<span class="sig-name descname"><span class="pre">suggest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.QueueserverAgent.suggest" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="blop.ax.queueserver_agent.QueueserverAgent.suggest">
+<span class="sig-name descname"><span class="pre">suggest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#blop.ax.queueserver_agent.QueueserverAgent.suggest" title="Link to this definition">#</a></dt>
 <dd><p>Get the next point(s) to evaluate in the search space.</p>
 <p>Uses the Bayesian optimization algorithm to suggest promising points based
 on all previously acquired data. Each suggestion includes an “_id” key for
@@ -1253,36 +1283,6 @@ evaluate next. Each dictionary includes an “_id” key for identification.</p>
 </dl>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="blop.ax.QueueserverAgent.submit_suggestions">
-<span class="sig-name descname"><span class="pre">submit_suggestions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suggestions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/ax/agent.html#QueueserverAgent.submit_suggestions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.ax.QueueserverAgent.submit_suggestions" title="Link to this definition">#</a></dt>
-<dd><p>Evaluate specific parameter combinations.</p>
-<p>Acquires data for given suggestions and ingests results. Supports both
-optimizer suggestions and manual points.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>suggestions</strong><span class="classifier">list[dict]</span></dt><dd><p>Either optimizer suggestions (with “_id”) or manual points (without “_id”).</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>concurrent.futures.Future[OptimizationResult]</dt><dd><p>A future that resolves to an <a class="reference internal" href="queueserver.html#blop.queueserver.OptimizationResult" title="blop.queueserver.OptimizationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">OptimizationResult</span></code></a>
-when the acquisition completes.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<dl class="simple">
-<dt><a class="reference internal" href="#blop.ax.QueueserverAgent.run" title="blop.ax.QueueserverAgent.run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">run</span></code></a></dt><dd><p>Run the full optimization loop.</p>
-</dd>
-</dl>
-</div>
 </dd></dl>
 
 </dd></dl>
@@ -1349,37 +1349,37 @@ when the acquisition completes.</p>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.acquire_baseline"><code class="docutils literal notranslate"><span class="pre">Agent.acquire_baseline()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.optimize"><code class="docutils literal notranslate"><span class="pre">Agent.optimize()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.sample_suggestions"><code class="docutils literal notranslate"><span class="pre">Agent.sample_suggestions()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.navigate_to_best"><code class="docutils literal notranslate"><span class="pre">Agent.navigate_to_best()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.ax_client"><code class="docutils literal notranslate"><span class="pre">Agent.ax_client</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.checkpoint"><code class="docutils literal notranslate"><span class="pre">Agent.checkpoint()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.checkpoint_path"><code class="docutils literal notranslate"><span class="pre">Agent.checkpoint_path</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.fixed_dofs"><code class="docutils literal notranslate"><span class="pre">Agent.fixed_dofs</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.get_best_points"><code class="docutils literal notranslate"><span class="pre">Agent.get_best_points()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.ingest"><code class="docutils literal notranslate"><span class="pre">Agent.ingest()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.navigate_to_best"><code class="docutils literal notranslate"><span class="pre">Agent.navigate_to_best()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.plot_objective"><code class="docutils literal notranslate"><span class="pre">Agent.plot_objective()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.reconfigure_search_space"><code class="docutils literal notranslate"><span class="pre">Agent.reconfigure_search_space()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.Agent.suggest"><code class="docutils literal notranslate"><span class="pre">Agent.suggest()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.evaluation_function"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.evaluation_function</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.actuators"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.actuators</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.sensors"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.sensors</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.acquisition_plan"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.acquisition_plan</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.stop"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.stop()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.current_iteration"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.current_iteration</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.to_optimization_problem"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.to_optimization_problem()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.ax_client"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.ax_client</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.checkpoint"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.checkpoint()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.checkpoint_path"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.checkpoint_path</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.fixed_dofs"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.fixed_dofs</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.get_best_points"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.get_best_points()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.ingest"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.ingest()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.plot_objective"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.plot_objective()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.reconfigure_search_space"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.reconfigure_search_space()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.run"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.run()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.suggest"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.suggest()</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.QueueserverAgent.submit_suggestions"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.submit_suggestions()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.evaluation_function"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.evaluation_function</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.actuators"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.actuators</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.sensors"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.sensors</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.acquisition_plan"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.acquisition_plan</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.stop"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.stop()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.current_iteration"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.current_iteration</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.to_optimization_problem()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.run"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.run()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.submit_suggestions"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.submit_suggestions()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.ax_client"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.ax_client</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.checkpoint"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.checkpoint()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.checkpoint_path"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.checkpoint_path</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.fixed_dofs"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.fixed_dofs</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.get_best_points"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.get_best_points()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.ingest"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.ingest()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.plot_objective"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.plot_objective()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.reconfigure_search_space"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.reconfigure_search_space()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.ax.queueserver_agent.QueueserverAgent.suggest"><code class="docutils literal notranslate"><span class="pre">QueueserverAgent.suggest()</span></code></a></li>
 </ul>
 </li>
 </ul>

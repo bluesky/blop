@@ -185,7 +185,8 @@ tiled_client = from_uri("http://localhost:8000", api_key="tutorialkey")
 Just as in the simple experiment tutorial, we define **DOFs** and **objectives**. The key difference: since devices exist only in the remote queueserver environment, DOFs reference device names as strings (no `actuator` objects).
 
 ```{code-cell} ipython3
-from blop.ax import QueueserverAgent, RangeDOF, Objective
+from blop.ax import RangeDOF, Objective
+from blop.ax.queueserver_agent import QueueserverAgent
 
 dofs = [
     RangeDOF(actuator="motor1", bounds=(-5.0, 5.0), parameter_type="float"),

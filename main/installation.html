@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; blop 1.0.0b2.dev26 documentation</title>
+    <title>Installation &#8212; blop 1.0.0b2.dev28 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=0790524f97105ba85085" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=0790524f97105ba85085" />
 
-    <script src="_static/documentation_options.js?v=fc884bee"></script>
+    <script src="_static/documentation_options.js?v=b0ea6c35"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Blop" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev26" />
+  <meta name="docsearch:version" content="1.0.0b2.dev28" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -494,6 +494,41 @@
 </pre></div>
 </div>
 </section>
+<section id="optional-extras">
+<h3>Optional Extras<a class="headerlink" href="#optional-extras" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">blop</span></code> is modular — install only what you need by appending one or more extras:</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Extra</p></th>
+<th class="head"><p>Installs</p></th>
+<th class="head"><p>Notes</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">blop[ax]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">ax-platform</span></code>, <code class="docutils literal notranslate"><span class="pre">botorch</span></code>, <code class="docutils literal notranslate"><span class="pre">gpytorch</span></code>, <code class="docutils literal notranslate"><span class="pre">torch</span></code></p></td>
+<td><p>GPU torch by default; pair with <code class="docutils literal notranslate"><span class="pre">[cpu]</span></code> for CPU-only</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">blop[queueserver]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bluesky-queueserver-api</span></code></p></td>
+<td><p>Transport layer only; pair with <code class="docutils literal notranslate"><span class="pre">[ax]</span></code> for <code class="docutils literal notranslate"><span class="pre">QueueserverAgent</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">blop[cpu]</span></code></p></td>
+<td><p><em>(uv index routing)</em></p></td>
+<td><p>Routes <code class="docutils literal notranslate"><span class="pre">torch</span></code> to the CPU-only PyTorch index; requires <code class="docutils literal notranslate"><span class="pre">uv</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">blop[all]</span></code></p></td>
+<td><p>All backends + <code class="docutils literal notranslate"><span class="pre">[queueserver]</span></code></p></td>
+<td><p>No dev tooling; will grow as new backends are added</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">blop[dev]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">blop[all]</span></code> + dev tooling</p></td>
+<td><p>For contributors</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
 <section id="pytorch-acceleration-options">
 <h3>PyTorch Acceleration Options<a class="headerlink" href="#pytorch-acceleration-options" title="Link to this heading">#</a></h3>
 <p>By default, <code class="docutils literal notranslate"><span class="pre">blop</span></code> installs PyTorch with GPU support (~7GB). For environments without GPU support,
@@ -611,6 +646,7 @@ $<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span>
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#for-users">For users</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Installation</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-extras">Optional Extras</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pytorch-acceleration-options">PyTorch Acceleration Options</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-tutorials">Running the tutorials</a></li>
 </ul>

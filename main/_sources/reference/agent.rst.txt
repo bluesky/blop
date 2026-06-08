@@ -7,7 +7,7 @@ Agent
    :show-inheritance:
    :inherited-members:
 
-.. autoclass:: blop.ax.QueueserverAgent
+.. autoclass:: blop.ax.queueserver_agent.QueueserverAgent
    :members:
    :undoc-members:
    :show-inheritance:
