@@ -6,7 +6,7 @@ authors = [
 channels = ["conda-forge"]
 name = "blop"
 platforms = ["linux-64", "osx-arm64"]
-version = "0.9.0"
+version = "1.0.0b1"
 
 [dependencies]
 python = ">=3.11.0,<3.14"
@@ -32,7 +32,6 @@ tests = "pytest src/blop/tests"
 graphviz = ">=14.1.2,<15"
 
 [feature.docs.pypi-dependencies]
-blop = { path = ".", editable = true, extras = ["cpu"] }
 blop-sim = { path = "sim", editable = true }
 numpydoc = "*"
 sphinx-copybutton = "*"
@@ -55,10 +54,6 @@ python = "3.12.*"
 [feature.py313.dependencies]
 python = "3.13.*"
 
-[feature.dev.tasks]
-check = "pre-commit run --all-files"
-tests = "pytest src/blop/tests"
-
 [feature.docs.tasks]
 start-queueserver = "docker compose -f docs/source/tutorials/queueserver/docker-compose.yml up -d --build --wait"
 stop-queueserver = "docker compose -f docs/source/tutorials/queueserver/docker-compose.yml down"
@@ -74,7 +69,7 @@ convert-tutorials-to-ipynb = "jupytext --to notebook docs/source/tutorials/*.md"
 [environments]
 dev = ["dev"]
 dev-cpu = ["dev-cpu"]
-docs = ["docs"]
+docs = ["dev-cpu", "docs"]
 py311-cpu = ["dev-cpu", "py311"]
 py312-cpu = ["dev-cpu", "py312"]
 py313-cpu = ["dev-cpu", "py313"]

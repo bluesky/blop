@@ -328,7 +328,8 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
     An optimization problem to solve. Immutable once initialized.
 
     This dataclass encapsulates all components needed for optimization into a single
-    immutable structure. It is typically created via :meth:`blop.ax.QueueserverAgent.to_optimization_problem`
+    immutable structure. It is typically created via
+    :meth:`blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem`
     and used with bluesky-queueserver-api. Actuators, sensors, and the acquisition plan are referenced
     by their names, since their instances live on a remote server.
 
@@ -351,7 +352,8 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
 
     See Also
     --------
-    blop.ax.QueueserverAgent.to_optimization_problem : Creates a QueueserverOptimizationProblem from an agent.
+    blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem :
+        Creates a QueueserverOptimizationProblem from an agent.
     blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.
     """
 

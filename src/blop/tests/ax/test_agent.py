@@ -7,10 +7,11 @@ from bluesky.callbacks import CallbackBase
 from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky_queueserver_api.zmq import REManagerAPI
 
-from blop.ax.agent import Agent, QueueserverAgent
+from blop.ax.agent import Agent
 from blop.ax.dof import ChoiceDOF, DOFConstraint, RangeDOF
 from blop.ax.objective import Objective, ScalarizedObjective
 from blop.ax.optimizer import AxOptimizer
+from blop.ax.queueserver_agent import QueueserverAgent
 from blop.callbacks.logger import OptimizationLogger
 from blop.protocols import AcquisitionPlan, EvaluationFunction
 
@@ -373,8 +374,8 @@ def test_queueserver_agent_init_actuator_instance(mock_re_manager_api, mock_docu
     assert agent.actuators == [movable1.name, dof2.parameter_name]
 
 
-@patch("blop.ax.agent.QueueserverClient")
-@patch("blop.ax.agent.QueueserverOptimizationRunner")
+@patch("blop.ax.queueserver_agent.QueueserverClient")
+@patch("blop.ax.queueserver_agent.QueueserverOptimizationRunner")
 def test_queueserver_agent_run(
     mock_queueserver_runner_cls,
     mock_queueserver_client_cls,
@@ -399,8 +400,8 @@ def test_queueserver_agent_run(
     mock_queueserver_runner_cls.return_value.run.assert_called_once_with(1, 1)
 
 
-@patch("blop.ax.agent.QueueserverClient")
-@patch("blop.ax.agent.QueueserverOptimizationRunner")
+@patch("blop.ax.queueserver_agent.QueueserverClient")
+@patch("blop.ax.queueserver_agent.QueueserverOptimizationRunner")
 def test_queueserver_agent_submit_suggestions(
     mock_queueserver_runner_cls,
     mock_queueserver_client_cls,
@@ -426,8 +427,8 @@ def test_queueserver_agent_submit_suggestions(
     mock_queueserver_runner_cls.return_value.submit_suggestions.assert_called_once_with(suggestions)
 
 
-@patch("blop.ax.agent.QueueserverClient")
-@patch("blop.ax.agent.QueueserverOptimizationRunner")
+@patch("blop.ax.queueserver_agent.QueueserverClient")
+@patch("blop.ax.queueserver_agent.QueueserverOptimizationRunner")
 def test_queueserver_agent_stop(
     mock_queueserver_runner_cls,
     mock_queueserver_client_cls,

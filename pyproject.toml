@@ -34,6 +34,7 @@ dependencies = [
   "numpy",
   "rich>=13",
 ]
+
 classifiers = [
   "Development Status :: 4 - Beta",
   "License :: OSI Approved :: BSD License",
@@ -46,7 +47,9 @@ classifiers = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-qs = ["bluesky-queueserver-api"]
+ax = ["ax-platform>=1.3.0,<1.4", "botorch>=0.18.0,<0.19.0", "gpytorch", "torch"]
+queueserver = ["bluesky-queueserver-api"]
+all = ["blop[ax,queueserver]"]
 dev = [
   "pytest",
   "pytest-cov",
@@ -54,10 +57,9 @@ dev = [
   "ruff",
   "nbstripout",
   "pre-commit",
-  "pandas-stubs",
   "coverage",
   "pyright",
-  "blop[qs]",
+  "blop[all]",
 ]
 cpu = [
   # Empty extra - the source configuration below routes to CPU-only index

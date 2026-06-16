@@ -240,7 +240,7 @@ The EvaluationFunction is called every time a stop document is recieved. It must
 from blop.protocols import EvaluationFunction
 from tiled.client.container import Container
 from tiled.queries import Eq
-from blop.ax import QueueserverAgent 
+from blop.ax.queueserver_agent import QueueserverAgent 
 from bluesky.callbacks.zmq import RemoteDispatcher
 import numpy as np
 

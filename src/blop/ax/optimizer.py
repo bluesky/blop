@@ -2,7 +2,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from ax import ChoiceParameterConfig, Client, RangeParameterConfig, TOutcome, TParameterization
-from ax.core.objective import MultiObjective
+from ax.core import MultiObjectiveOptimizationConfig
 from ax.core.parameter import ChoiceParameter, RangeParameter
 from ax.core.types import TParamValue
 
@@ -137,7 +137,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
         next_trials = self._client.get_next_trials(max_trials=num_points, fixed_parameters=self._fixed_parameters)
         return [
             {
-                "_id": trial_index,
+                ID_KEY: trial_index,
                 **parameterization,
             }
             for trial_index, parameterization in next_trials.items()
@@ -167,7 +167,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
         opt_config = self._client._experiment.optimization_config
         if opt_config is None:
             raise ValueError("Somehow your optimization has not been configured yet...check `ax_client`.")
-        is_multi_objective = isinstance(opt_config.objective, MultiObjective)
+        is_multi_objective = isinstance(opt_config, MultiObjectiveOptimizationConfig)
 
         if is_multi_objective:
             frontier = self._client.get_pareto_frontier(use_model_predictions=False)
