@@ -36,7 +36,7 @@ dynamic = ["version"]
 [project.optional-dependencies]
 ax = ["ax-platform>=1.3.0,<1.4", "botorch>=0.18.0,<0.19.0", "gpytorch", "torch"]
 queueserver = ["bluesky-queueserver-api"]
-xopt = ["xopt"]
+xopt = ["xopt>3.0.0"]
 all = ["blop[ax,queueserver,xopt]"]
 dev = [
   "pytest",
