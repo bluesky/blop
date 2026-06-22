@@ -21,6 +21,34 @@ To install the package using the ``conda`` package manager, run the following co
    :start-after: .. snippet-conda-standard-start
    :end-before: .. snippet-conda-standard-end
 
+Optional Extras
+^^^^^^^^^^^^^^^
+
+``blop`` is modular — install only what you need by appending one or more extras:
+
+.. list-table::
+   :header-rows: 1
+   :widths: auto
+
+   * - Extra
+     - Installs
+     - Notes
+   * - ``blop[ax]``
+     - ``ax-platform``, ``botorch``, ``gpytorch``, ``torch``
+     - GPU torch by default; pair with ``[cpu]`` for CPU-only
+   * - ``blop[queueserver]``
+     - ``bluesky-queueserver-api``
+     - Transport layer only; pair with ``[ax]`` for ``QueueserverAgent``
+   * - ``blop[cpu]``
+     - *(uv index routing)*
+     - Routes ``torch`` to the CPU-only PyTorch index; requires ``uv``
+   * - ``blop[all]``
+     - All backends + ``[queueserver]``
+     - No dev tooling; will grow as new backends are added
+   * - ``blop[dev]``
+     - ``blop[all]`` + dev tooling
+     - For contributors
+
 PyTorch Acceleration Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

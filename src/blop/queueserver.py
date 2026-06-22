@@ -21,8 +21,14 @@ from typing import Any, Literal
 
 from bluesky.callbacks import CallbackBase
 from bluesky.callbacks.zmq import RemoteDispatcher
-from bluesky_queueserver_api import BPlan
-from bluesky_queueserver_api.zmq import REManagerAPI
+
+try:
+    from bluesky_queueserver_api import BPlan
+    from bluesky_queueserver_api.zmq import REManagerAPI
+except ImportError as e:
+    raise ImportError(
+        "The queueserver integration requires additional dependencies. Install them with: pip install blop[qs]"
+    ) from e
 from event_model import RunStart, RunStop
 
 from .plans import default_acquire
@@ -77,33 +83,27 @@ class ConsumerCallback(CallbackBase):
 
     def __init__(self, callback: Callable[[RunStart, RunStop], None] | None = None):
         super().__init__()
-        self._start_doc_cache: RunStart | None = None
+        self._start_doc_cache: dict[str, RunStart] = {}
         self._callback = callback
 
     def start(self, doc: RunStart) -> None:
         """Caches the start document if it came from Blop"""
-        if doc.get(CORRELATION_UID_KEY, None):
-            self._start_doc_cache = doc
-        else:
-            self._start_doc_cache = None
+        if doc.get(CORRELATION_UID_KEY):
+            self._start_doc_cache[doc["uid"]] = doc
 
     def stop(self, doc: RunStop) -> None:
         """Executes the callback if the cached start and stop document match"""
-        if (
-            self._callback is not None
-            and self._start_doc_cache is not None
-            and self._start_doc_cache["uid"] == doc["run_start"]
-        ):
-            self._callback(self._start_doc_cache, doc)
-        self._start_doc_cache = None
+        start_doc = self._start_doc_cache.pop(doc["run_start"], None)
+        if self._callback is not None and start_doc is not None:
+            self._callback(start_doc, doc)
 
 
 class QueueserverClient:
     """
     Handles communication with a Bluesky queueserver.
 
-    This class encapsulates all ZMQ and HTTP communication with the queueserver,
-    including plan submission and event listening.
+    This class encapsulates queueserver communication, including plan submission
+    and event listening.
 
     .. warning::
 
@@ -114,19 +114,17 @@ class QueueserverClient:
     ----------
     re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI
         Manager instance for communication with Bluesky Queueserver
-    zmq_consumer_addr : str
-        Address for ZMQ document consumer (e.g., "localhost:5578").
+    document_dispatcher : bluesky.callbacks.zmq.RemoteDispatcher
+        Dispatcher for the Bluesky document stream.
     """
 
     def __init__(
         self,
         re_manager_api: REManagerAPI,
-        zmq_consumer_addr: str,
+        document_dispatcher: RemoteDispatcher,
     ):
-        self._zmq_consumer_addr = zmq_consumer_addr
-
         self._rm = re_manager_api
-        self._dispatcher: RemoteDispatcher | None = None
+        self._dispatcher = document_dispatcher
         self._consumer_callback: ConsumerCallback | None = None
         self._listener_thread: threading.Thread | None = None
 
@@ -203,7 +201,10 @@ class QueueserverClient:
             response = self._rm.queue_start()
             logger.debug(f"Started queue. Response: {response}")
 
-    def start_listener(self, on_stop: Callable[[RunStart, RunStop], None]) -> None:
+    def start_listener(
+        self,
+        on_stop: Callable[[RunStart, RunStop], None],
+    ) -> None:
         """
         Start listening for document events from the queueserver.
 
@@ -217,27 +218,24 @@ class QueueserverClient:
             logger.warning("Listener already running")
             return
 
-        dispatcher = RemoteDispatcher(self._zmq_consumer_addr)
         self._consumer_callback = ConsumerCallback(callback=on_stop)
-        dispatcher.subscribe(self._consumer_callback)
+        self._dispatcher.subscribe(self._consumer_callback)
 
-        logger.info("Starting ZMQ listener thread")
+        logger.info("Starting document listener thread")
         self._listener_thread = threading.Thread(
-            target=dispatcher.start,
-            name="qserver-zmq-consumer",
+            target=self._dispatcher.start,
+            name="qserver-document-consumer",
             daemon=True,
         )
         self._listener_thread.start()
-        self._dispatcher = dispatcher
 
     def stop_listener(self) -> None:
-        """Stop the ZMQ listener thread."""
-        if self._dispatcher is not None:
+        """Stop the document listener thread."""
+        if self._listener_thread is not None:
             self._dispatcher.stop()
-            self._dispatcher = None
         self._consumer_callback = None
         self._listener_thread = None
-        logger.info("Stopped ZMQ listener")
+        logger.info("Stopped document listener")
 
 
 @dataclass
@@ -280,6 +278,8 @@ class QueueserverOptimizationRunner:
         sensors, and evaluation function.
     queueserver_client : QueueserverClient
         Client for communicating with the queueserver.
+        The document listener is started once during runner construction so it
+        is ready before any submitted plan can emit documents.
     """
 
     def __init__(
@@ -295,6 +295,9 @@ class QueueserverOptimizationRunner:
         self._autostart = True
         self._state_lock = threading.RLock()
         self._current_future: Future[OptimizationResult] | None = None
+        self._client.start_listener(
+            on_stop=self._on_acquisition_complete,
+        )
 
     @property
     def optimization_problem(self) -> QueueserverOptimizationProblem:
@@ -351,8 +354,6 @@ class QueueserverOptimizationRunner:
             future: Future[OptimizationResult] = Future()
             self._current_future = future
         try:
-            self._client.start_listener(on_stop=self._on_acquisition_complete)
-            # TODO: Need to wait for connection handshake here
             self._client.submit_plan(plan, autostart=self._autostart)
         except Exception as exc:
             with self._state_lock:
@@ -402,8 +403,6 @@ class QueueserverOptimizationRunner:
             future: Future[OptimizationResult] = Future()
             self._current_future = future
         try:
-            self._client.start_listener(on_stop=self._on_acquisition_complete)
-            # TODO: Need to wait for connection handshake here
             self._client.submit_plan(plan, autostart=self._autostart)
         except Exception as exc:
             with self._state_lock:
@@ -486,6 +485,7 @@ class QueueserverOptimizationRunner:
 
     def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Callback when acquisition finishes. Ingest results and maybe continue."""
+
         try:
             self._process_acquisition(start_doc, stop_doc)
         except Exception as exc:
@@ -500,17 +500,18 @@ class QueueserverOptimizationRunner:
 
     def _process_acquisition(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Core acquisition-complete logic (called from _on_acquisition_complete)."""
+
         with self._state_lock:
             if self._state is None:
                 raise RuntimeError("_on_acquisition_complete called before run()")
             if self._state.current_uid is None:
                 raise RuntimeError("current_uid not set")
+            exit_status = stop_doc.get("exit_status")
             if self._state.current_uid != start_doc.get(CORRELATION_UID_KEY):
                 raise RuntimeError(
                     "current_uid did not match start document. "
                     f"Got: {start_doc.get(CORRELATION_UID_KEY)}, Expected: {self._state.current_uid}"
                 )
-            exit_status = stop_doc.get("exit_status")
             if exit_status != "success":
                 reason = stop_doc.get("reason") or "(no reason given)"
                 raise RuntimeError(f"Acquisition run {start_doc['uid']!r} ended with status {exit_status!r}: {reason}")

@@ -20,19 +20,8 @@ maintainers = [
   { name = "Jennefer Maldonado", email = "jmaldonad@bnl.gov" },
   { name = "Roman Chernikov", email = "rcherniko@bnl.gov" },
 ]
-requires-python = ">=3.10"
-dependencies = [
-  "ax-platform>=1.1.0,<1.3",
-  "bluesky>=1.14.2",
-  "bluesky-queueserver-api>=0.0.12",
-  "torch",
-  "botorch>=0.16.0",
-  "gpytorch",
-  "scipy",
-  "networkx>=3",
-  "numpy",
-  "rich>=13",
-]
+requires-python = ">=3.11"
+dependencies = ["bluesky>=1.14.2", "networkx>=3", "numpy", "rich>=13"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "License :: OSI Approved :: BSD License",
@@ -45,7 +34,9 @@ classifiers = [
 dynamic = ["version"]
 
 [project.optional-dependencies]
-qs = ["bluesky-queueserver-api"]
+ax = ["ax-platform>=1.3.0,<1.4", "botorch>=0.18.0,<0.19.0", "gpytorch", "torch"]
+queueserver = ["bluesky-queueserver-api"]
+all = ["blop[ax,queueserver]"]
 dev = [
   "pytest",
   "pytest-cov",
@@ -53,10 +44,9 @@ dev = [
   "ruff",
   "nbstripout",
   "pre-commit",
-  "pandas-stubs",
   "coverage",
   "pyright",
-  "blop[qs]",
+  "blop[all]",
 ]
 cpu = [
   # Empty extra - the source configuration below routes to CPU-only index
