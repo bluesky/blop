@@ -59,6 +59,7 @@ class Scipy:
         config: ScipyCFG,
         evaluation_function: EvaluationFunction,
         acquisition_plan: AcquisitionPlan | None = None,
+        **kwargs: Any,
     ):
 
         self._config = config
@@ -218,6 +219,51 @@ class Scipy:
             evaluation_function=self._evaluation_function,
             acquisition_plan=self._acquisition_plan,
         )
+
+    def suggest(self, num_points: int = 1) -> list[dict]:
+        """
+        Get the next point(s) to evaluate in the search space.
+
+        Uses the Bayesian optimization algorithm to suggest promising points based
+        on all previously acquired data. Each suggestion includes an "_id" key for
+        tracking.
+
+        Parameters
+        ----------
+        num_points : int, optional
+            The number of points to suggest. Default is 1. Higher values enable
+            batch optimization but may reduce optimization efficiency per iteration.
+
+        Returns
+        -------
+        list[dict]
+            A list of dictionaries, each containing a parameterization of a point to
+            evaluate next. Each dictionary includes an "_id" key for identification.
+        """
+        return self._optimizer.suggest(num_points)
+
+    def ingest(self, points: list[dict]) -> None:
+        """
+        Ingest evaluation results into the optimizer.
+
+        Updates the optimizer's model with new data. Can ingest both suggested points
+        (with "_id" key) and external data (without "_id" key).
+
+        Parameters
+        ----------
+        points : list[dict]
+            A list of dictionaries, each containing outcomes for a trial. For suggested
+            points, include the "_id" key. For external data, include DOF names and
+            objective values, and omit "_id".
+
+        Notes
+        -----
+        This method is typically called automatically by :meth:`optimize`. Manual usage
+        is only needed for custom workflows or when ingesting external data.
+
+        For complete examples, see :doc:`/how-to-guides/attach-data-to-experiments`.
+        """
+        self._optimizer.ingest(points)
 
     def optimize(self, iterations=10):
         if self._optimizer.final is not None:
