@@ -5,7 +5,7 @@ import pytest
 from blop.ax.dof import RangeDOF
 from blop.ax.objective import Objective
 from blop.gradient.Scipy import SCP, Scipy, ScipyCFG, ScipyOptimizer
-from blop.protocols import AcquisitionPlan, EvaluationFunction
+from blop.protocols import AcquisitionPlan, EvaluationFunction, ID_KEY
 
 from ..conftest import MovableSignal, ReadableSignal
 
@@ -130,4 +130,4 @@ def test_agent_ingest(mock_evaluation_function):
         sensors=[], dofs=[dof1, dof2], objectives=[objective], evaluation_function=mock_evaluation_function
     )
 
-    agent.ingest([{"test_movable1": 0.1, "test_movable2": 0.2, "test_objective": 0.3}])
+    agent.ingest([{"test_movable1": 0.1, "test_movable2": 0.2, "test_objective": 0.3, ID_KEY: 0}])
