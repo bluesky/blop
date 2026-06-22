@@ -85,7 +85,7 @@ class Scipy:
         # outcome_constraints: Sequence[OutcomeConstraint] | None = None,
         **kwargs: Any,
     ):
-        '''
+        """
         A nearly emcompassing interface to provide strong interoperability with Ax agent formalism.
 
         Parameters
@@ -113,7 +113,7 @@ class Scipy:
         --------
         blop.ax.Agent
 
-        '''
+        """
 
         if optimizer not in SCP:
             raise ValueError(f"optimizer {optimizer} not in supported optimizers:{list(SCP)}")
@@ -287,6 +287,7 @@ class ScipyOptimizer(Optimizer):
     """
     An optimizer object to supply an interactive interface for the scipy optimizers, with some caveats.
     """
+
     @dataclass
     class Request:
         args: tuple
@@ -325,9 +326,9 @@ class ScipyOptimizer(Optimizer):
             _x = np.array(config.initial) / self._scale
 
         def cost(x):
-            '''
-                simple cooperative thread that defers evaluation of cost call by scipy to the run engine
-            '''
+            """
+            simple cooperative thread that defers evaluation of cost call by scipy to the run engine
+            """
             req = self.Request(args=x, future=Future())
             self._active[self._increment] = req
             self._increment += 1
@@ -399,7 +400,7 @@ class ScipyOptimizer(Optimizer):
             return [suggestion]
 
         suggestions = []
-        for id in list(self._active.keys())[:num_points if num_points is not None else 1]:
+        for id in list(self._active.keys())[: num_points if num_points is not None else 1]:
             x = self._active[id].args
             vector = [x_n * s for s, x_n in zip(self._scale, x, strict=True)]
 
@@ -423,7 +424,7 @@ class ScipyOptimizer(Optimizer):
             if self._objective is None:
                 self._objective = [param for param in res if param not in (*self._params, ID_KEY)][0]
             y = res[self._objective]
-            if (res[ID_KEY] not in self._active):
+            if res[ID_KEY] not in self._active:
                 if not self.force_resiliance:
                     raise ValueError("optimizer did not expect to receive an update")
                 continue

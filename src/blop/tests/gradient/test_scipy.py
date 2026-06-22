@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -126,6 +126,8 @@ def test_agent_ingest(mock_evaluation_function):
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    agent = scp.Scipy.Agent(sensors=[], dofs=[dof1, dof2], objectives=[objective], evaluation_function=mock_evaluation_function)
+    agent = scp.Scipy.Agent(
+        sensors=[], dofs=[dof1, dof2], objectives=[objective], evaluation_function=mock_evaluation_function
+    )
 
     agent.ingest([{"test_movable1": 0.1, "test_movable2": 0.2, "test_objective": 0.3}])
