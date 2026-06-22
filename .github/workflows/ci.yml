@@ -33,6 +33,8 @@ jobs:
     needs: lint
     if: needs.check.outputs.branch-pr == ''
     uses: ./.github/workflows/_docs.yml
+    with:
+      publish: ${{ github.event_name != 'schedule' }}
     permissions:
       contents: write
   

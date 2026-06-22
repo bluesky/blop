@@ -2,6 +2,7 @@ from bluesky.callbacks import CallbackBase
 from event_model import RunRouter
 
 from ..plans import OPTIMIZE_RUN_KEY, SAMPLE_SUGGESTIONS_RUN_KEY
+from .utils import _PrimaryStreamFilter
 
 
 class OptimizationCallbackRouter:
@@ -27,7 +28,7 @@ class OptimizationCallbackRouter:
 
     def _factory(self, name, doc):
         if name == "start" and doc.get("run_key") in (OPTIMIZE_RUN_KEY, SAMPLE_SUGGESTIONS_RUN_KEY):
-            return list(self._callbacks), []
+            return [_PrimaryStreamFilter(cb) for cb in self._callbacks], []
         return [], []
 
     def __call__(self, name, doc):

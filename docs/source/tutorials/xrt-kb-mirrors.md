@@ -17,6 +17,7 @@ In this tutorial, you will learn how to use Blop to optimize a Kirkpatrick-Baez 
 
 - How **degrees of freedom (DOFs)** represent the parameters you can adjust in an experiment
 - How **objectives** define what you're trying to optimize
+- How **tracking metrics** let you monitor values without optimizing them
 - How to write an **evaluation function** that extracts results from experimental data
 - How the **Agent** coordinates the optimization loop
 - How to **check optimization health** mid-run and continue
@@ -25,7 +26,7 @@ We'll work with a simulated KB mirror beamline, but the concepts apply directly 
 
 ## What are KB Mirrors?
 
-KB mirror systems use two curved mirrors to focus X-ray beams. Each mirror has adjustable curvature—getting both just right produces a tight, intense focal spot. This is a multi-objective optimization problem: we want to maximize beam intensity while minimizing the spot size in both X and Y directions.
+KB mirror systems use two curved mirrors to focus X-ray beams. Each mirror has adjustable curvature—getting both just right produces a tight, intense focal spot. We'll frame this as a single-objective optimization problem: minimize the beam's FWHM (full width at half maximum) on the detector, subject to a minimum intensity constraint.
 
 The image below shows our simulated setup: a beam from a geometric source propagates through a pair of toroidal mirrors that focus it onto a screen.
 
@@ -37,28 +38,31 @@ Before we can optimize, we need to set up the data infrastructure. Blop uses [Bl
 
 ```{code-cell} ipython3
 import logging
+import warnings
 from pathlib import PurePath
 
-import cv2
-import numpy as np
 import matplotlib.pyplot as plt
-from tiled.client.container import Container
-from bluesky_tiled_plugins import TiledWriter
+import numpy as np
+from ax.api.protocols import IMetric
 from bluesky.run_engine import RunEngine
-from tiled.client import from_uri  # type: ignore[import-untyped]
-from tiled.server import SimpleTiledServer
+from bluesky_tiled_plugins import TiledWriter
 from ophyd_async.core import StaticPathProvider, UUIDFilenameProvider
+from tiled.client import from_uri  # type: ignore[import-untyped]
+from tiled.client.container import Container
+from tiled.server import SimpleTiledServer
 
-from blop.ax import Agent, RangeDOF, Objective
+from blop.ax import Agent, Objective, RangeDOF
+from blop.ax.objective import OutcomeConstraint
 from blop.protocols import EvaluationFunction
 
 # Import simulation devices (requires: pip install -e sim/)
 from blop_sim.backends.xrt import XRTBackend
-from blop_sim.devices.xrt import KBMirror
 from blop_sim.devices import DetectorDevice
+from blop_sim.devices.xrt import KBMirror
 
-# Suppress noisy logs from httpx 
+# Suppress noisy logs from httpx and dependency deprecation warnings
 logging.getLogger("httpx").setLevel(logging.WARNING)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 # Enable interactive plotting
 plt.ion()
@@ -111,105 +115,129 @@ dofs = [
 
 The `actuator` is the device that physically changes the parameter. The `bounds` tell the optimizer what range of values to explore. Think of DOFs as the "knobs" the optimizer can turn.
 
-## Defining Objectives
+## Defining the Objective and Constraints
 
-**Objectives** specify what you want to optimize. Each objective has a name (matching a value your evaluation function will return) and a direction: `minimize=True` for things you want smaller, `minimize=False` for things you want larger.
+For beam focusing, we use a single objective: **minimize the beam FWHM** (full width at half maximum). This is more sample-efficient than multi-objective optimization because the optimizer only needs to model one response surface.
 
-For our KB mirrors, we have three objectives:
-
-- **Intensity** (`intensity`): We want *more* signal → `minimize=False`
-- **Spot width** (`width`): We want a *tighter* spot → `minimize=True`
-- **Spot height** (`height`): We want a *tighter* spot → `minimize=True`
+We also track **intensity** as a metric without optimizing it directly. An `OutcomeConstraint` ensures the optimizer avoids configurations where the beam misses the detector entirely:
 
 ```{code-cell} ipython3
+# Single objective: minimize the geometric-mean FWHM
 objectives = [
-    Objective(name="intensity", minimize=False),
-    Objective(name="width", minimize=True),
-    Objective(name="height", minimize=True),
+    Objective(name="fwhm", minimize=True),
+]
+
+# Track intensity without optimizing it
+intensity_metric = IMetric(name="intensity")
+
+# Soft constraint: reject configurations where most rays miss the screen
+outcome_constraints = [
+    OutcomeConstraint(constraint="i >= 10000", i=intensity_metric),
 ]
 ```
 
-With multiple objectives that can conflict (maximizing intensity might increase spot size), the optimizer finds the *Pareto frontier*—the set of solutions where you can't improve one objective without sacrificing another.
+Using a single objective with an outcome constraint gives us the best of both worlds: focused optimization on spot size, with a safety net ensuring we don't "optimize" toward configurations where the beam is simply lost.
 
 ## Writing an Evaluation Function
 
-The **evaluation function** is the bridge between raw experimental data and the optimizer. After each measurement, the optimizer needs to know how well that configuration performed. Your evaluation function:
+The **evaluation function** is the bridge between raw experimental data and the optimizer. After each measurement, the optimizer needs to know how well that configuration performed. Our evaluation function:
 
 1. Receives a run UID and the suggestions that were tested
 1. Reads the beam images from Tiled
-1. Computes statistics (intensity, width, centroid, etc.) from the images
+1. Computes FWHM from the marginal beam profiles
 1. Returns outcome values for each suggestion
+
+We compute FWHM using **marginal profiles** — projecting the 2D image onto each axis by summing, then finding where the 1D profile crosses half its peak value. This approach is robust to noise and dead pixels (they get averaged out in the projection) and doesn't require curve fitting.
 
 ```{code-cell} ipython3
 class DetectorEvaluation(EvaluationFunction):
     def __init__(self, tiled_client: Container):
         self.tiled_client = tiled_client
 
-    def _compute_stats(self, image: np.array) -> tuple[str, str, str]:
-        """Compute integrated intensity and beam width/height from a beam image."""
-        # Convert to grayscale
-        gray = image.squeeze()
+    def _fwhm_from_profile(self, profile: np.ndarray) -> float:
+        """Compute FWHM from a 1D marginal profile.
+
+        Finds the half-maximum crossing points with sub-pixel interpolation.
+        Returns a large value if the beam is too dim or fills the entire detector.
+        """
+        peak = profile.max()
+        if peak == 0:
+            return float(len(profile))  # No signal — return detector width as penalty
+
+        half_max = peak / 2.0
+        above = profile >= half_max
+        if not above.any():
+            return float(len(profile))
+
+        indices = np.where(above)[0]
+        left_idx = indices[0]
+        right_idx = indices[-1]
+
+        # Sub-pixel interpolation at left crossing
+        if left_idx > 0:
+            left = left_idx - 1 + (half_max - profile[left_idx - 1]) / (profile[left_idx] - profile[left_idx - 1])
+        else:
+            left = 0.0
+
+        # Sub-pixel interpolation at right crossing
+        if right_idx < len(profile) - 1:
+            right = right_idx + (half_max - profile[right_idx]) / (profile[right_idx + 1] - profile[right_idx])
+        else:
+            right = float(len(profile) - 1)
+
+        return right - left
+
+    def _compute_stats(self, image: np.ndarray) -> tuple[float, float]:
+        """Compute FWHM and integrated intensity from a beam image.
+
+        Returns
+        -------
+        fwhm : float
+            Geometric mean of the horizontal and vertical FWHM (in pixels).
+        intensity : float
+            Total integrated intensity (sum of all pixel values).
+        """
+        gray = image.squeeze().astype(np.float64)
         if gray.ndim == 3:
-            gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
-        
-        # Convert data type for numerical stability
-        gray = gray.astype(np.float32)
+            gray = gray.mean(axis=-1)
 
-        # Smooth w/ (5, 5) kernel and threshold
-        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-        max_val = np.max(blurred)
-        if max_val == 0:
-            return 0.0, 0.0, 0.0
+        # Integrated intensity (total flux on detector)
+        intensity = gray.sum()
 
-        thresh_value = 0.2 * max_val
-        _, thresh = cv2.threshold(blurred, thresh_value, 255, cv2.THRESH_TOZERO)
+        if intensity == 0:
+            return 400.0, 0.0  # No beam — return max FWHM penalty
 
-        # Total integrated intensity
-        total_intensity = np.sum(thresh)
+        # Marginal profiles: project onto each axis
+        x_profile = gray.sum(axis=0)  # sum along Y rows -> X profile
+        y_profile = gray.sum(axis=1)  # sum along X cols -> Y profile
 
-        # Beam width/height from intensity-weighted second moment (σ)
-        total_weight = np.sum(thresh)
-        if total_weight <= 0:
-            return total_intensity, 0.0, 0.0
+        fwhm_x = self._fwhm_from_profile(x_profile)
+        fwhm_y = self._fwhm_from_profile(y_profile)
 
-        h, w = thresh.shape
-        y_coords = np.arange(h, dtype=np.float32)
-        x_coords = np.arange(w, dtype=np.float32)
+        # Geometric mean FWHM — targets a small, round spot
+        fwhm = np.sqrt(fwhm_x * fwhm_y)
 
-        x_bar = np.sum(x_coords * np.sum(thresh, axis=0)) / total_weight
-        y_bar = np.sum(y_coords * np.sum(thresh, axis=1)) / total_weight
-
-        x_var = np.sum((x_coords - x_bar) ** 2 * np.sum(thresh, axis=0)) / total_weight
-        y_var = np.sum((y_coords - y_bar) ** 2 * np.sum(thresh, axis=1)) / total_weight
-
-        width = 2 * np.sqrt(x_var)   # ~2σ width
-        height = 2 * np.sqrt(y_var)   # ~2σ height
-
-        return total_intensity, width, height
+        return float(fwhm), float(intensity)
 
     def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
         outcomes = []
         run = self.tiled_client[uid]
-        
+
         # Read beam images from detector
         images = run["primary/det_image"].read()
 
-        # Suggestions are stored in the start document's metadata when
-        # using the `blop.plans.default_acquire` plan.
-        # You may want to store them differently in your experiment when writing
-        # a custom acquisition plan.
+        # Suggestion IDs stored in start document metadata
         suggestion_ids = [suggestion["_id"] for suggestion in run.metadata["start"]["blop_suggestions"]]
 
         # Compute statistics from each image
         for idx, sid in enumerate(suggestion_ids):
             image = images[idx]
-            intensity, width, height = self._compute_stats(image)
-            
+            fwhm, intensity = self._compute_stats(image)
+
             outcome = {
                 "_id": sid,
+                "fwhm": fwhm,
                 "intensity": intensity,
-                "width": width,
-                "height": height,
             }
             outcomes.append(outcome)
         return outcomes
@@ -217,8 +245,10 @@ class DetectorEvaluation(EvaluationFunction):
 
 Note how we:
 
-1. Read the image data from the stored detector data
-1. Use image processing techniques to compute beam metrics from the raw detector images
+1. Project the 2D image onto each axis to get 1D profiles
+1. Find the FWHM of each profile using half-maximum crossings
+1. Combine them into a single geometric-mean FWHM metric
+1. Track integrated intensity for the outcome constraint
 1. Link each outcome back to its suggestion via the `_id` field
 
 ## Creating and Running the Agent
@@ -237,45 +267,39 @@ agent = Agent(
     dofs=dofs,
     objectives=objectives,
     evaluation_function=DetectorEvaluation(tiled_client),
+    outcome_constraints=outcome_constraints,
     name="xrt-blop-demo",
     description="A demo of the Blop agent with XRT simulated beamline",
     experiment_type="demo",
 )
+
+# Register intensity as a tracking metric (monitored but not optimized)
+agent.ax_client.configure_metrics([intensity_metric])
 ```
 
-The `sensors` list contains any devices that produce data during acquisition. Here, `det` is our detector device.
+The `sensors` list contains any devices that produce data during acquisition. The `outcome_constraints` tell the optimizer to prefer configurations satisfying the intensity constraint. The `configure_metrics` call registers intensity as a tracking metric so it appears in analyses and summaries.
 
 ## Running the Optimization
 
-Let's start the optimization. Rather than running all iterations at once, we'll pause partway through to check the optimization's health—a practical workflow you'll use in real experiments.
+Let's start the optimization. We'll begin with a batch of 10 points to build an initial model of the parameter space—this includes a center-of-space sample plus quasi-random exploration points.
 
 ```{code-cell} ipython3
-# Run first 10 iterations
-RE(agent.optimize(10))
+# Run 1 iteration with a batch of 10 points for initial exploration
+RE(agent.optimize(1, n_points=10))
 ```
-
-## Checking Optimization Health
-
-After running some iterations, it's good practice to check how the optimization is progressing. Ax provides built-in health checks and diagnostics through `compute_analyses()`:
-
-```{code-cell} ipython3
-_ = agent.ax_client.compute_analyses()
-```
-
-This runs all applicable analyses for the current experiment state, including health checks that flag potential issues like model fit problems or exploration gaps. Review these before continuing.
 
 ## Continuing the Optimization
 
 The optimization state is preserved, so we can simply run more iterations:
 
 ```{code-cell} ipython3
-# Run remaining 20 iterations
-RE(agent.optimize(20))
+# Run remaining 10 iterations
+RE(agent.optimize(10))
 ```
 
 ## Understanding the Results
 
-After optimization, we can examine what the agent learned. Let's run the full suite of analyses again to see how things have improved:
+After optimization, we can examine what the agent learned. Ax's `compute_analyses()` runs diagnostics including cross-validation of the surrogate model and optimization trace plots:
 
 ```{code-cell} ipython3
 _ = agent.ax_client.compute_analyses()
@@ -289,20 +313,20 @@ agent.ax_client.summarize()
 
 ### Visualizing the Surrogate Model
 
-The `plot_objective` method shows how an objective varies across the DOF space, based on the surrogate model the agent built:
+The `plot_objective` method shows how the FWHM varies across the DOF space, based on the surrogate model the agent built:
 
 ```{code-cell} ipython3
-_ = agent.plot_objective(x_dof_name="kbh-radius", y_dof_name="kbv-radius", objective_name="intensity")
+_ = agent.plot_objective(x_dof_name="kbh-radius", y_dof_name="kbv-radius", objective_name="fwhm")
 ```
 
-This plot reveals the landscape the optimizer explored. Peaks (for maximization) or valleys (for minimization) show where good configurations lie.
+This plot reveals the landscape the optimizer explored. The valley (minimum) shows where the optimal mirror curvatures lie.
 
 ## Applying the Optimal Configuration
 
-The Pareto frontier contains all optimal trade-off solutions. Let's retrieve one and apply it to see the resulting beam:
+Let's retrieve the best configuration found during optimization and apply it to see the resulting beam:
 
 ```{code-cell} ipython3
-optimal_parameters = next(iter(agent.ax_client.get_pareto_frontier()))[0]
+optimal_parameters, metrics, _, _ = agent.ax_client.get_best_parameterization(use_model_predictions=False)
 optimal_parameters
 ```
 
@@ -322,17 +346,24 @@ uid = RE(list_scan(
 image = tiled_client[uid[0]]["primary/det_image"].read().squeeze()
 plt.imshow(image)
 plt.colorbar()
+plt.title("Optimized KB Mirror Beam")
 plt.show()
+```
+
+```{code-cell} ipython3
+tiled_server.close()
 ```
 
 ## What You've Learned
 
 In this tutorial, you worked through a complete Bayesian optimization workflow:
 
-1. **DOFs** define the search space—the parameters you can control and their allowed ranges
-1. **Objectives** specify your goals and whether to minimize or maximize each one
-1. **Evaluation functions** extract meaningful metrics from experimental data
-1. **The Agent** coordinates everything, building a model of your system and intelligently exploring the parameter space
+1. **DOFs** define the search space — the parameters you can control and their allowed ranges
+1. **Objectives** specify your optimization goal (here: minimize FWHM for a tight focal spot)
+1. **Tracking metrics** (`IMetric`) let you monitor values like intensity without optimizing them directly
+1. **Outcome constraints** enforce safety bounds on tracked metrics (e.g., minimum beam intensity)
+1. **Evaluation functions** extract meaningful metrics from experimental data using robust techniques like marginal-profile FWHM
+1. **The Agent** coordinates everything, building a surrogate model of your system and intelligently exploring the parameter space
 1. **Health checks** let you diagnose optimization progress and catch issues early
 
 These same components apply to any optimization problem: swap the simulated devices for real hardware, adjust the DOFs and objectives for your system, and write an evaluation function that extracts your metrics.

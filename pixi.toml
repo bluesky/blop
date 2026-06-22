@@ -6,10 +6,10 @@ authors = [
 channels = ["conda-forge"]
 name = "blop"
 platforms = ["linux-64", "osx-arm64"]
-version = "0.9.0"
+version = "1.0.0b1"
 
 [dependencies]
-python = ">=3.10.0,<3.14"
+python = ">=3.11.0,<3.14"
 
 [feature.dev.dependencies]
 
@@ -32,7 +32,6 @@ tests = "pytest src/blop/tests"
 graphviz = ">=14.1.2,<15"
 
 [feature.docs.pypi-dependencies]
-blop = { path = ".", editable = true, extras = ["cpu"] }
 blop-sim = { path = "sim", editable = true }
 numpydoc = "*"
 sphinx-copybutton = "*"
@@ -46,9 +45,6 @@ bluesky-tiled-plugins = "*"
 ophyd-async = "*"
 opencv-python = "*"
 
-[feature.py310.dependencies]
-python = "3.10.*"
-
 [feature.py311.dependencies]
 python = "3.11.*"
 
@@ -57,10 +53,6 @@ python = "3.12.*"
 
 [feature.py313.dependencies]
 python = "3.13.*"
-
-[feature.dev.tasks]
-check = "pre-commit run --all-files"
-tests = "pytest src/blop/tests"
 
 [feature.docs.tasks]
 start-queueserver = "docker compose -f docs/source/tutorials/queueserver/docker-compose.yml up -d --build --wait"
@@ -77,8 +69,7 @@ convert-tutorials-to-ipynb = "jupytext --to notebook docs/source/tutorials/*.md"
 [environments]
 dev = ["dev"]
 dev-cpu = ["dev-cpu"]
-docs = ["docs"]
-py310-cpu = ["dev-cpu", "py310"]
+docs = ["dev-cpu", "docs"]
 py311-cpu = ["dev-cpu", "py311"]
 py312-cpu = ["dev-cpu", "py312"]
 py313-cpu = ["dev-cpu", "py313"]

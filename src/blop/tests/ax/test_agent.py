@@ -4,12 +4,14 @@ import numpy as np
 import pytest
 from ax import Client
 from bluesky.callbacks import CallbackBase
+from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky_queueserver_api.zmq import REManagerAPI
 
-from blop.ax.agent import Agent, QueueserverAgent
-from blop.ax.dof import DOFConstraint, RangeDOF
+from blop.ax.agent import Agent
+from blop.ax.dof import ChoiceDOF, DOFConstraint, RangeDOF
 from blop.ax.objective import Objective, ScalarizedObjective
 from blop.ax.optimizer import AxOptimizer
+from blop.ax.queueserver_agent import QueueserverAgent
 from blop.callbacks.logger import OptimizationLogger
 from blop.protocols import AcquisitionPlan, EvaluationFunction
 
@@ -29,6 +31,11 @@ def mock_acquisition_plan():
 @pytest.fixture(scope="function")
 def mock_re_manager_api():
     return MagicMock(spec=REManagerAPI)
+
+
+@pytest.fixture(scope="function")
+def mock_document_dispatcher():
+    return MagicMock(spec=RemoteDispatcher)
 
 
 def test_agent_init(mock_evaluation_function, mock_acquisition_plan):
@@ -146,12 +153,14 @@ def test_agent_suggest_multiple(mock_evaluation_function):
 def test_agent_suggest_fixed_dofs(mock_evaluation_function):
     movable1 = MovableSignal(name="test_movable1")
     movable2 = MovableSignal(name="test_movable2")
+    movable3 = MovableSignal(name="test_movable3")
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
+    dof3 = ChoiceDOF(actuator=movable3, values=["A", "B", "C", "D", "E"], parameter_type="str")
     objective = Objective(name="test_objective", minimize=False)
     agent = Agent(
         sensors=[],
-        dofs=[dof1, dof2],
+        dofs=[dof1, dof2, dof3],
         objectives=[objective],
         evaluation_function=mock_evaluation_function,
     )
@@ -160,12 +169,13 @@ def test_agent_suggest_fixed_dofs(mock_evaluation_function):
         agent.fixed_dofs = {"test_movable1": 3}
 
     # Valid updates should fix the DOF
-    agent.fixed_dofs = {dof2: 4}
-    parameterizations = agent.suggest(5)
-    for i in range(5):
+    agent.fixed_dofs = {dof2: 4, dof3: "B"}
+    parameterizations = agent.suggest(10)
+    for i in range(10):
         assert "test_movable2" in parameterizations[i]
         if i != 0:  # first trial will default to CenterOfSearchSpace and override any fixed parameters
             assert parameterizations[i]["test_movable2"] == 4
+            assert parameterizations[i]["test_movable3"] == "B"
 
 
 def test_agent_ingest(mock_evaluation_function):
@@ -227,12 +237,14 @@ def test_ingest_baseline(mock_evaluation_function):
 def test_reconfigure_search_space(mock_evaluation_function):
     movable1 = MovableSignal(name="test_movable1")
     movable2 = MovableSignal(name="test_movable2")
+    movable3 = MovableSignal(name="test_movable3")
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
+    dof3 = ChoiceDOF(actuator=movable3, values=["A", "B", "C", "D", "E"], parameter_type="str")
     objective = Objective(name="test_objective", minimize=False)
     agent = Agent(
         sensors=[],
-        dofs=[dof1, dof2],
+        dofs=[dof1, dof2, dof3],
         objectives=[objective],
         evaluation_function=mock_evaluation_function,
     )
@@ -241,10 +253,11 @@ def test_reconfigure_search_space(mock_evaluation_function):
         agent.reconfigure_search_space({"test_movable1": (3, 6)})
 
     # Valid update should restrict the search space
-    agent.reconfigure_search_space({dof1: (3, 6)})
+    agent.reconfigure_search_space({dof1: (3, 6), dof3: ["A", "B"]})
     parameterizations = agent.suggest(10)
     for i in range(10):
         assert 3 <= parameterizations[i]["test_movable1"] <= 6
+        assert parameterizations[i]["test_movable3"] in {"A", "B"}
 
 
 def test_agent_init_actuator_string_raises(mock_evaluation_function):
@@ -254,6 +267,20 @@ def test_agent_init_actuator_string_raises(mock_evaluation_function):
 
     with pytest.raises(ValueError, match="not strings"):
         Agent(sensors=[], dofs=[dof1, dof2], objectives=[objective], evaluation_function=mock_evaluation_function)
+
+
+def test_agent_init_duplicate_dof_names(mock_evaluation_function):
+    dof1 = RangeDOF(name="test_same_name", bounds=(0, 10), parameter_type="float")
+    dof2 = ChoiceDOF(name="test_same_name", values=["A, B"], parameter_type="str")
+    objective = Objective(name="test_objective", minimize=True)
+
+    # Ax raises ValueError when two or more parameters have the same name
+    with pytest.raises(ValueError, match="names must be unique"):
+        Agent(sensors=[], dofs=[dof1, dof2], objectives=[objective], evaluation_function=mock_evaluation_function)
+
+    # Same setup, unique name for dof3, no error
+    dof3 = ChoiceDOF(name="test_different_name", values=["A, B"], parameter_type="str")
+    Agent(sensors=[], dofs=[dof1, dof3], objectives=[objective], evaluation_function=mock_evaluation_function)
 
 
 def test_agent_scalarized_objective(mock_evaluation_function):
@@ -288,12 +315,12 @@ def test_agent_scalarized_objective(mock_evaluation_function):
     )
 
 
-def test_queueserver_agent_init(mock_re_manager_api, mock_evaluation_function):
+def test_queueserver_agent_init(mock_re_manager_api, mock_document_dispatcher, mock_evaluation_function):
     dof1 = RangeDOF(actuator="test_motor1", bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator="test_motor2", bounds=(0, 10), parameter_type="float")
     agent = QueueserverAgent(
         mock_re_manager_api,
-        "inproc://test",
+        mock_document_dispatcher,
         ["det"],
         [dof1, dof2],
         [Objective(name="obj1", minimize=False)],
@@ -303,7 +330,6 @@ def test_queueserver_agent_init(mock_re_manager_api, mock_evaluation_function):
     assert agent.actuators == [dof1.actuator, dof2.actuator]
     assert agent.evaluation_function == mock_evaluation_function
     assert agent.acquisition_plan is None
-    assert not agent.is_running
     assert agent.current_iteration == 0
     assert isinstance(agent.ax_client, Client)
 
@@ -314,13 +340,31 @@ def test_queueserver_agent_init(mock_re_manager_api, mock_evaluation_function):
     assert problem.evaluation_function == mock_evaluation_function
 
 
-def test_queueserver_agent_init_actuator_instance(mock_re_manager_api, mock_evaluation_function):
+def test_queueserver_agent_init_acquisition_plan_kwargs(
+    mock_re_manager_api, mock_document_dispatcher, mock_evaluation_function
+):
+    dof1 = RangeDOF(actuator="test_motor1", bounds=(0, 10), parameter_type="float")
+    agent = QueueserverAgent(
+        mock_re_manager_api,
+        mock_document_dispatcher,
+        ["det"],
+        [dof1],
+        [Objective(name="obj1", minimize=False)],
+        mock_evaluation_function,
+        acquisition_plan_kwargs={"exposure_time": 0.5, "num_frames": 10},
+    )
+
+    problem = agent.to_optimization_problem()
+    assert problem.acquisition_plan_kwargs == {"exposure_time": 0.5, "num_frames": 10}
+
+
+def test_queueserver_agent_init_actuator_instance(mock_re_manager_api, mock_document_dispatcher, mock_evaluation_function):
     movable1 = MovableSignal(name="test_movable1")
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator="test_movable2", bounds=(0, 10), parameter_type="float")
     agent = QueueserverAgent(
         mock_re_manager_api,
-        "inproc://test",
+        mock_document_dispatcher,
         ["det"],
         [dof1, dof2],
         [Objective(name="obj1", minimize=False)],
@@ -330,44 +374,52 @@ def test_queueserver_agent_init_actuator_instance(mock_re_manager_api, mock_eval
     assert agent.actuators == [movable1.name, dof2.parameter_name]
 
 
-@patch("blop.ax.agent.QueueserverClient")
-@patch("blop.ax.agent.QueueserverOptimizationRunner")
+@patch("blop.ax.queueserver_agent.QueueserverClient")
+@patch("blop.ax.queueserver_agent.QueueserverOptimizationRunner")
 def test_queueserver_agent_run(
-    mock_queueserver_runner_cls, mock_queueserver_client_cls, mock_re_manager_api, mock_evaluation_function
+    mock_queueserver_runner_cls,
+    mock_queueserver_client_cls,
+    mock_re_manager_api,
+    mock_document_dispatcher,
+    mock_evaluation_function,
 ):
     dof1 = RangeDOF(actuator="test_motor1", bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator="test_motor2", bounds=(0, 10), parameter_type="float")
     agent = QueueserverAgent(
         mock_re_manager_api,
-        "inproc://test",
+        mock_document_dispatcher,
         ["det"],
         [dof1, dof2],
         [Objective(name="obj1", minimize=False)],
         mock_evaluation_function,
     )
-    mock_queueserver_client_cls.assert_called_once()
+    mock_queueserver_client_cls.assert_called_once_with(mock_re_manager_api, mock_document_dispatcher)
     mock_queueserver_runner_cls.assert_called_once()
 
     agent.run()
     mock_queueserver_runner_cls.return_value.run.assert_called_once_with(1, 1)
 
 
-@patch("blop.ax.agent.QueueserverClient")
-@patch("blop.ax.agent.QueueserverOptimizationRunner")
+@patch("blop.ax.queueserver_agent.QueueserverClient")
+@patch("blop.ax.queueserver_agent.QueueserverOptimizationRunner")
 def test_queueserver_agent_submit_suggestions(
-    mock_queueserver_runner_cls, mock_queueserver_client_cls, mock_re_manager_api, mock_evaluation_function
+    mock_queueserver_runner_cls,
+    mock_queueserver_client_cls,
+    mock_re_manager_api,
+    mock_document_dispatcher,
+    mock_evaluation_function,
 ):
     dof1 = RangeDOF(actuator="test_motor1", bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator="test_motor2", bounds=(0, 10), parameter_type="float")
     agent = QueueserverAgent(
         mock_re_manager_api,
-        "inproc://test",
+        mock_document_dispatcher,
         ["det"],
         [dof1, dof2],
         [Objective(name="obj1", minimize=False)],
         mock_evaluation_function,
     )
-    mock_queueserver_client_cls.assert_called_once()
+    mock_queueserver_client_cls.assert_called_once_with(mock_re_manager_api, mock_document_dispatcher)
     mock_queueserver_runner_cls.assert_called_once()
 
     suggestions = [{"test_motor1": 5, "test_motor2": 9}]
@@ -375,22 +427,26 @@ def test_queueserver_agent_submit_suggestions(
     mock_queueserver_runner_cls.return_value.submit_suggestions.assert_called_once_with(suggestions)
 
 
-@patch("blop.ax.agent.QueueserverClient")
-@patch("blop.ax.agent.QueueserverOptimizationRunner")
+@patch("blop.ax.queueserver_agent.QueueserverClient")
+@patch("blop.ax.queueserver_agent.QueueserverOptimizationRunner")
 def test_queueserver_agent_stop(
-    mock_queueserver_runner_cls, mock_queueserver_client_cls, mock_re_manager_api, mock_evaluation_function
+    mock_queueserver_runner_cls,
+    mock_queueserver_client_cls,
+    mock_re_manager_api,
+    mock_document_dispatcher,
+    mock_evaluation_function,
 ):
     dof1 = RangeDOF(actuator="test_motor1", bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator="test_motor2", bounds=(0, 10), parameter_type="float")
     agent = QueueserverAgent(
         mock_re_manager_api,
-        "inproc://test",
+        mock_document_dispatcher,
         ["det"],
         [dof1, dof2],
         [Objective(name="obj1", minimize=False)],
         mock_evaluation_function,
     )
-    mock_queueserver_client_cls.assert_called_once()
+    mock_queueserver_client_cls.assert_called_once_with(mock_re_manager_api, mock_document_dispatcher)
     mock_queueserver_runner_cls.assert_called_once()
 
     agent.stop()

@@ -13,6 +13,12 @@ kernelspec:
 
 # Asynchronous Optimization with Bluesky Queueserver
 
+```{warning}
+The queueserver integration is **experimental**. The API is not yet stable and
+may change in future releases without a deprecation period. It is not
+recommended for production use.
+```
+
 In this tutorial, you will learn how to run Blop optimization against a remote [Bluesky Queueserver](https://blueskyproject.io/bluesky-queueserver/). This architecture is used when:
 
 - The experiment hardware is controlled by a shared instrument server
@@ -92,6 +98,7 @@ Once the containers are up, proceed with the tutorial below.
 ```{code-cell} ipython3
 import time
 
+from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky_queueserver_api.zmq import REManagerAPI
 
 RM = REManagerAPI(zmq_control_addr="tcp://localhost:60615")
@@ -178,7 +185,8 @@ tiled_client = from_uri("http://localhost:8000", api_key="tutorialkey")
 Just as in the simple experiment tutorial, we define **DOFs** and **objectives**. The key difference: since devices exist only in the remote queueserver environment, DOFs reference device names as strings (no `actuator` objects).
 
 ```{code-cell} ipython3
-from blop.ax import QueueserverAgent, RangeDOF, Objective
+from blop.ax import RangeDOF, Objective
+from blop.ax.queueserver_agent import QueueserverAgent
 
 dofs = [
     RangeDOF(actuator="motor1", bounds=(-5.0, 5.0), parameter_type="float"),
@@ -264,13 +272,15 @@ class HimmelblauEvaluation:
 Now we bring everything together. The `QueueserverAgent` needs:
 
 - `re_manager_api`: how to communicate with the queueserver (submit plans, check status)
-- `zmq_consumer_addr`: where to listen for document completion events
+- `document_dispatcher`: a `RemoteDispatcher` that subscribes to the Bluesky document stream
 - The DOFs, objectives, sensors, and evaluation function
 
 ```{code-cell} ipython3
+document_dispatcher = RemoteDispatcher(("localhost", 5578))
+
 agent = QueueserverAgent(
     re_manager_api=RM,
-    zmq_consumer_addr=("localhost", 5578),
+    document_dispatcher=document_dispatcher,
     sensors=sensors,
     dofs=dofs,
     objectives=objectives,
@@ -282,8 +292,9 @@ agent = QueueserverAgent(
 ```{note}
 The `re_manager_api` argument also accepts an HTTP-based client
 (`bluesky_queueserver_api.http.REManagerAPI`) for deployments that expose the
-queueserver over HTTP rather than ZMQ. The `zmq_consumer_addr` points to the
-ZMQ proxy output port (5578) where Bluesky documents are published.
+queueserver over HTTP rather than ZMQ. Construct the `RemoteDispatcher` with
+whatever arguments your document stream requires, such as a ZMQ address or
+message prefix.
 ```
 
 ## Running the Optimization
@@ -291,17 +302,21 @@ ZMQ proxy output port (5578) where Bluesky documents are published.
 The `run()` method is **non-blocking** — it submits the first plan and returns immediately. The agent reacts asynchronously to plan completions via ZMQ callbacks.
 
 ```{code-cell} ipython3
-agent.run(iterations=10, n_points=1)
+future = agent.run(iterations=10, n_points=1)
 ```
 
-Wait for the optimization to complete:
+Wait for the optimization to complete and inspect the result:
 
 ```{code-cell} ipython3
-while agent.is_running:
-    print(f"  Iteration {agent.current_iteration} in progress...")
-    time.sleep(5)
+result = future.result()
 
-print(f"Optimization complete after {agent.current_iteration} iterations")
+print(f"Iterations completed : {result.iterations_completed}")
+print(f"Points per iteration : {result.num_points}")
+print(f"Total acquisitions   : {len(result.uids)}")
+print()
+print("Run UIDs:")
+for uid in result.uids:
+    print(f"  {uid}")
 ```
 
 ## Viewing Results

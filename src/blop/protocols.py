@@ -290,6 +290,7 @@ class BaseOptimizationProblem(Generic[TActuator, TSensor, TPlan]):
     acquisition_plan: TPlan | None = None
 
 
+@dataclass(frozen=True)
 class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionPlan]):
     """
     An optimization problem to solve. Immutable once initialized.
@@ -321,12 +322,14 @@ class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionP
     ...
 
 
+@dataclass(frozen=True)
 class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
     """
     An optimization problem to solve. Immutable once initialized.
 
     This dataclass encapsulates all components needed for optimization into a single
-    immutable structure. It is typically created via :meth:`blop.ax.QueueserverAgent.to_optimization_problem`
+    immutable structure. It is typically created via
+    :meth:`blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem`
     and used with bluesky-queueserver-api. Actuators, sensors, and the acquisition plan are referenced
     by their names, since their instances live on a remote server.
 
@@ -342,13 +345,16 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
     evaluation_function: EvaluationFunction
         A callable to evaluate data from a Bluesky run and produce outcomes.
     acquisition_plan: str, optional
-        The name of a Bluesky plan to acquire data from the beamline. If not provided, a default plan name will be used.
+        The name of a Bluesky plan to acquire data. If not provided, a default plan name will be used.
         The plan must match the arguments of :ref:`AcquisitionPlan`.
+    acquisition_plan_kwargs: Mapping[str, Any], optional
+        Additional plan arguments to pass to the Bluesky plan.
 
     See Also
     --------
-    blop.ax.QueueserverAgent.to_optimization_problem : Creates a QueueserverOptimizationProblem from an agent.
+    blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem :
+        Creates a QueueserverOptimizationProblem from an agent.
     blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.
     """
 
-    ...
+    acquisition_plan_kwargs: Mapping[str, Any] | None = None
