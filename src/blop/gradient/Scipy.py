@@ -421,9 +421,7 @@ class ScipyOptimizer(Optimizer):
             A list of dictionaries, each containing the outcomes of each suggested parameterization.
         """
         for res in points:
-            if self._objective is None:
-                self._objective = [param for param in res if param not in (*self._params, ID_KEY)][0]
-            y = res[self._objective]
+            y = res[self._objective.name]
             if res[ID_KEY] not in self._active:
                 if not self.force_resiliance:
                     raise ValueError("optimizer did not expect to receive an update")
