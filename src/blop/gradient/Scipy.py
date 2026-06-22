@@ -117,7 +117,7 @@ class Scipy:
 
         if optimizer not in SCP:
             raise ValueError(f"optimizer {optimizer} not in supported optimizers:{list(SCP)}")
-        if len(objectives) > 0:
+        if len(objectives) > 1:
             raise ValueError("Multiple Objectives are not supported for gradient optimizers")
         config = ScipyCFG(
             dofs=dofs,

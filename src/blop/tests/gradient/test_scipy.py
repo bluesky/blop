@@ -2,9 +2,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-import blop.gradient.Scipy as scp
 from blop.ax.dof import RangeDOF
 from blop.ax.objective import Objective
+from blop.gradient.Scipy import SCP, Scipy, ScipyCFG, ScipyOptimizer
 from blop.protocols import AcquisitionPlan, EvaluationFunction
 
 from ..conftest import MovableSignal, ReadableSignal
@@ -28,11 +28,11 @@ def agent_prep():
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    config = scp.ScipyCFG(
+    config = ScipyCFG(
         dofs=[dof1, dof2],
         objective=objective,
     )
-    agent = scp.Scipy(
+    agent = Scipy(
         sensors=[readable],
         config=config,
         evaluation_function=mock_evaluation_function,
@@ -50,11 +50,11 @@ def test_general_init(mock_evaluation_function, mock_acquisition_plan):
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    config = scp.ScipyCFG(
+    config = ScipyCFG(
         dofs=[dof1, dof2],
         objective=objective,
     )
-    agent = scp.Scipy(
+    agent = Scipy(
         sensors=[readable],
         config=config,
         evaluation_function=mock_evaluation_function,
@@ -75,7 +75,7 @@ def test_agent_init(mock_evaluation_function, mock_acquisition_plan):
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    agent = scp.Scipy.Agent(
+    agent = Scipy.Agent(
         sensors=[readable],
         dofs=[dof1, dof2],
         objectives=[objective],
@@ -96,7 +96,7 @@ def test_agent_to_optimization_problem(mock_evaluation_function):
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    agent = scp.Scipy.Agent(
+    agent = Scipy.Agent(
         sensors=[],
         dofs=[dof1, dof2],
         objectives=[objective],
@@ -106,7 +106,7 @@ def test_agent_to_optimization_problem(mock_evaluation_function):
     assert optimization_problem.evaluation_function == mock_evaluation_function
     assert optimization_problem.actuators == [movable1, movable2]
     assert optimization_problem.sensors == []
-    assert isinstance(optimization_problem.optimizer, scp.ScipyOptimizer)
+    assert isinstance(optimization_problem.optimizer, ScipyOptimizer)
     assert optimization_problem.acquisition_plan is None
 
 
@@ -126,7 +126,7 @@ def test_agent_ingest(mock_evaluation_function):
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    agent = scp.Scipy.Agent(
+    agent = Scipy.Agent(
         sensors=[], dofs=[dof1, dof2], objectives=[objective], evaluation_function=mock_evaluation_function
     )
 
