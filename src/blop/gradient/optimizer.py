@@ -84,12 +84,10 @@ class ScipyOptimizer(Optimizer):
             """
             simple cooperative thread that defers evaluation of cost call by scipy to the run engine
             """
-            print("pushing to request queue")
             req = self.Request(args=x, future=Future())
             self._active[self._increment] = req
             self._increment += 1
             res = req.future.result(timeout=self.SUGGESTION_TIMEOUT)
-            print(f"recovered result {res}")
             if res is None:
                 raise ValueError("return value is not present")
             return res
@@ -137,7 +135,6 @@ class ScipyOptimizer(Optimizer):
                 if config.threads:
                     with ThreadPoolExecutor(max_workers=config.threads) as pool:
                         kw["workers"] = pool.map
-                        print(f"creating {config.threads} workers with:{kw}")
                         call(kws=kw)
                 else:
                     call(kws=kw)
@@ -192,7 +189,6 @@ class ScipyOptimizer(Optimizer):
             suggestion = dict(zip(self._params, vector, strict=True))
             suggestion[ID_KEY] = id
             suggestions.append(suggestion)
-        print(f"returning {len(suggestions)} suggestions of {len(self._active.keys())} available")
         return suggestions
 
     def ingest(self, points: list[dict]) -> None:
