@@ -41,7 +41,8 @@ class Scipy:
         self._actuators = [cast(Actuator, dof.actuator) for dof in config.dofs if dof.actuator is not None]
         self._evaluation_function = evaluation_function
         self._acquisition_plan = acquisition_plan
-        self._optimizer = ScipyOptimizer(self.config)
+        self.timeout = kwargs.pop("timeout", 200)
+        self._optimizer = ScipyOptimizer(self.config, timeout=self.timeout)
         self._readable_cache: dict[str, InferredReadable] = {}
         self._callbacks: list[CallbackBase] = [OptimizationLogger()]
         self._callback_router = OptimizationCallbackRouter(self._callbacks)
@@ -102,7 +103,7 @@ class Scipy:
             eps=kwargs.get("eps", None),
             rescale=kwargs.get("scale", None),
         )
-        return cls(sensors, config, evaluation_function, acquisition_plan)
+        return cls(sensors, config, evaluation_function, acquisition_plan, **kwargs)
 
     @property
     def sensors(self) -> Sequence[Sensor]:
@@ -243,7 +244,7 @@ class Scipy:
     def optimize(self, iterations=10):
         if self._optimizer.final is not None:
             self.config.initial = self._optimizer.final.x
-            self._optimizer = ScipyOptimizer(self.config)
+            self._optimizer = ScipyOptimizer(self.config, timeout=self.timeout)
         optimize_plan = optimize(
             self.to_optimization_problem(),
             iterations=iterations,
