@@ -2,9 +2,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from blop.ax.dof import RangeDOF
-from blop.ax.objective import Objective
-from blop.gradient.Scipy import Scipy, ScipyCFG, ScipyOptimizer
+from blop.ax import Objective, RangeDOF
+from blop.gradient import SCP, Scipy, ScipyCFG, ScipyOptimizer
 from blop.protocols import ID_KEY, AcquisitionPlan, EvaluationFunction
 
 from ..conftest import MovableSignal, ReadableSignal
@@ -120,12 +119,31 @@ def test_agent_suggest(agent_prep):
     assert isinstance(parameterizations[0]["test_movable2"], (int, float))
 
 
-def test_agent_ingest(mock_evaluation_function):
+def test_agent_multithread(agent_prep):
     movable1 = MovableSignal(name="test_movable1")
     movable2 = MovableSignal(name="test_movable2")
+    readable = ReadableSignal(name="test_readable")
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    agent = Scipy.Agent(sensors=[], dofs=[dof1, dof2], objectives=[objective], evaluation_function=mock_evaluation_function)
+    config = ScipyCFG(
+        dofs=[dof1, dof2],
+        objective=objective,
+        optimizer=SCP.BFGS,
+        threads=4,
+    )
+    agent = Scipy(
+        sensors=[readable],
+        config=config,
+        evaluation_function=mock_evaluation_function,
+        acquisition_plan=mock_acquisition_plan,
+        name="test_experiment",
+    )
+    parameterizations = agent.suggest(4)
+    print([param.args for param in agent._optimizer._active.values()])
+    assert len(parameterizations) == 4
 
-    agent.ingest([{"test_movable1": 0.1, "test_movable2": 0.2, "test_objective": 0.3, ID_KEY: 0}])
+
+def test_agent_ingest(agent_prep):
+    suggestions = agent_prep.suggest()
+    agent_prep.ingest([{"test_movable1": 0.1, "test_movable2": 0.2, "test_objective": 0.3, ID_KEY: 0}])
