@@ -241,13 +241,14 @@ class Scipy:
         """
         self._optimizer.ingest(points)
 
-    def optimize(self, iterations=10):
+    def optimize(self, iterations=10, n_points=1):
         if self._optimizer.final is not None:
             self.config.initial = self._optimizer.final.x
             self._optimizer = ScipyOptimizer(self.config, timeout=self.timeout)
         optimize_plan = optimize(
             self.to_optimization_problem(),
             iterations=iterations,
+            n_points=n_points,
             readable_cache=self._readable_cache,
         )
 
