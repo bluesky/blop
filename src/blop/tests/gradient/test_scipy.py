@@ -649,7 +649,6 @@ def test_scipy_optimizer_session_reinit(mock_evaluation_function, mock_acquisiti
 
     opt = ScipyOptimizer(config, timeout=5)
     opt.suggest(1)
-    initial_increment = opt._increment
 
     # Call session to reinitialize
     opt.session(config, timeout=5)
