@@ -16,7 +16,7 @@ from blop.protocols import ID_KEY, Optimizer
 
 class SCP(StrEnum):
     Default = "Default"
-    BFGS = "BFGS"
+    BFGS = "L-BFGS-B"
     Dual_Annealing = "dual annealing"
 
 
@@ -51,8 +51,8 @@ class ScipyOptimizer(Optimizer):
         nit: int
         status: int = 2
 
-    def __init__(self, config: ScipyCFG):
-        self.session(config=config, timeout=200)
+    def __init__(self, config: ScipyCFG, timeout: int | None = 200):
+        self.session(config=config, timeout=timeout)
 
     def session(self, config: ScipyCFG, timeout: int | None = None):
         self._params: list[str] = []
@@ -134,10 +134,10 @@ class ScipyOptimizer(Optimizer):
 
         def mini_worker():
             try:
-                if config.threads and config.optimizer in (SCP.Default):
+                if config.threads:
                     with ThreadPoolExecutor(max_workers=config.threads) as pool:
                         kw["workers"] = pool.map
-                        print(f"creating {config.threads} workers")
+                        print(f"creating {config.threads} workers with:{kw}")
                         call(kws=kw)
                 else:
                     call(kws=kw)
