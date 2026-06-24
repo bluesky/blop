@@ -1,50 +1,24 @@
-from collections import OrderedDict
-from collections.abc import Mapping, Sequence
-from concurrent.futures import Future
-from dataclasses import dataclass
-from enum import StrEnum
-from threading import Thread
+from collections.abc import Sequence
 from typing import Any, cast
 
 import bluesky.preprocessors as bpp
-import numpy as np
 from bluesky.callbacks import CallbackBase
-from scipy.optimize import OptimizeResult, dual_annealing, minimize
 
 from blop.ax.dof import RangeDOF
 from blop.ax.objective import Objective
 from blop.callbacks.logger import OptimizationLogger
 from blop.callbacks.router import OptimizationCallbackRouter
 from blop.plans import optimize
-from blop.utils import InferredReadable
-
-from ..protocols import (
-    ID_KEY,
+from blop.protocols import (
     AcquisitionPlan,
     Actuator,
     EvaluationFunction,
     OptimizationProblem,
-    Optimizer,
     Sensor,
 )
+from blop.utils import InferredReadable
 
-
-class SCP(StrEnum):
-    Default = "Default"
-    Dual_Annealing = "dual annealing"
-
-
-@dataclass
-class ScipyCFG:
-    dofs: Sequence[RangeDOF]
-    objective: Objective
-    # dof_constraints: Sequence[DOFConstraint] | None = None
-    # outcome_constraints: Sequence[OutcomeConstraint] | None = None
-    optimizer: SCP = SCP.Default
-    initial: Sequence[float] | None = None
-    rescale: Sequence[float] | float | None = None
-    max_iter: int | None = 100
-    eps: float | None = None
+from .optimizer import SCP, ScipyCFG, ScipyOptimizer
 
 
 class Scipy:
@@ -62,15 +36,16 @@ class Scipy:
         **kwargs: Any,
     ):
 
-        self._config = config
+        self.config = config
         self._sensors = sensors
         self._actuators = [cast(Actuator, dof.actuator) for dof in config.dofs if dof.actuator is not None]
         self._evaluation_function = evaluation_function
         self._acquisition_plan = acquisition_plan
-        self._optimizer = ScipyOptimizer(self._config)
+        self._optimizer = ScipyOptimizer(self.config)
         self._readable_cache: dict[str, InferredReadable] = {}
         self._callbacks: list[CallbackBase] = [OptimizationLogger()]
         self._callback_router = OptimizationCallbackRouter(self._callbacks)
+        self.sessioning = kwargs.pop("sessioning", True)
 
     @classmethod
     def Agent(
@@ -267,7 +242,8 @@ class Scipy:
 
     def optimize(self, iterations=10):
         if self._optimizer.final is not None:
-            self._optimizer = ScipyOptimizer(self._config)
+            self.config.initial = self._optimizer.final.x
+            self._optimizer = ScipyOptimizer(self.config)
         optimize_plan = optimize(
             self.to_optimization_problem(),
             iterations=iterations,
@@ -279,181 +255,8 @@ class Scipy:
                 optimize_plan,
                 self._callback_router,
             )
-
-        yield from optimize_plan
-
-
-class ScipyOptimizer(Optimizer):
-    """
-    An optimizer object to supply an interactive interface for the scipy optimizers, with some caveats.
-    """
-
-    @dataclass
-    class Request:
-        args: tuple
-        future: Future
-
-    @dataclass
-    class Result:
-        x: list
-        fun: float
-        nit: int
-        status: int = 2
-
-    def __init__(self, config: ScipyCFG):
-        self._params: list[str] = []
-        self._bounds: list[tuple[Any, Any]] = []
-        self._increment: int = 0
-        self._objective: Objective = config.objective
-        self.force_resiliance = False  # kinda hidden for now
-        self._scale = np.ones(len(config.dofs))
-        self._active: dict[int, ScipyOptimizer.Request] = OrderedDict()
-        self.intermediate: OptimizeResult | ScipyOptimizer.Result | None = None
-        self.final: OptimizeResult | ScipyOptimizer.Result | None = None
-
-        if config.rescale is not None:
-            if isinstance(config.rescale, list):
-                self._scale = config.rescale
-            else:
-                self._scale *= config.rescale
-
-        for ind, dof in enumerate(config.dofs):
-            self._params.append(dof.parameter_name)
-            self._bounds.append(tuple(np.array(dof.bounds) / self._scale[ind]))
-
-        _x = np.mean(self._bounds, axis=1)
-        if config.initial is not None:
-            _x = np.array(config.initial) / self._scale
-
-        def cost(x):
-            """
-            simple cooperative thread that defers evaluation of cost call by scipy to the run engine
-            """
-            req = self.Request(args=x, future=Future())
-            self._active[self._increment] = req
-            self._increment += 1
-            res = req.future.result()
-            if res is None:
-                raise ValueError("return value is not present")
-            return res
-
-        kw = {}
-
-        if config.optimizer in (SCP.Default):
-            if config.max_iter is not None:
-                kw["max_iter"] = config.max_iter
-            if config.eps is not None:
-                kw["eps"] = config.eps
-
-            def default_callback(intermediate_result: OptimizeResult):
-                self.intermediate = intermediate_result
-
-            def mini_worker():
-                self.final = minimize(
-                    fun=cost,
-                    x0=_x,
-                    bounds=self._bounds,
-                    callback=default_callback,
-                    options=kw,
-                )
-        elif config.optimizer in (SCP.Dual_Annealing):
-
-            def dual_callback(x, f, context):
-                self.intermediate = self.Result(x, f, self._increment, context)
-
-            def mini_worker():
-                self.final = dual_annealing(
-                    func=cost,
-                    x0=_x,
-                    bounds=self._bounds,
-                    callback=dual_callback,
-                    minimizer_kwargs=kw,
-                )
+        if self.sessioning:
+            with self._optimizer:
+                yield from optimize_plan
         else:
-            raise NotImplementedError("")
-
-        self._t = Thread(target=mini_worker, name="optimizer")
-        self._t.start()
-
-    def suggest(self, num_points: int | None = None) -> list[dict]:
-        """
-        Returns a set of points in the input space, to be evaulated next.
-
-        The "_id" key is optional and can be used to identify suggested trials for later evaluation
-        and ingestion.
-
-        Parameters
-        ----------
-        num_points : int | None, optional
-            The number of points to suggest. If not provided, will default to 1.
-
-        Returns
-        -------
-        list[dict]
-            A list of dictionaries, each containing a parameterization of a point to evaluate next.
-            Each dictionary must contain a unique "_id" key to identify each parameterization.
-        """
-        if self.final is not None:
-            vector = [x_n * s for s, x_n in zip(self._scale, self.final.x, strict=True)]
-            suggestion = dict(zip(self._params, vector, strict=True))
-            suggestion[ID_KEY] = self.final.nit
-            return [suggestion]
-
-        suggestions = []
-        for id in list(self._active.keys())[: num_points if num_points is not None else 1]:
-            x = self._active[id].args
-            vector = [x_n * s for s, x_n in zip(self._scale, x, strict=True)]
-
-            suggestion = dict(zip(self._params, vector, strict=True))
-            suggestion[ID_KEY] = id
-            suggestions.append(suggestion)
-        return suggestions
-
-    def ingest(self, points: list[dict]) -> None:
-        """
-        Ingest a set of points into the experiment. Either from previously suggested points or from an external source.
-
-        The "_id" key is optional.
-
-        Parameters
-        ----------
-        points : list[dict]
-            A list of dictionaries, each containing the outcomes of each suggested parameterization.
-        """
-        for res in points:
-            y = res[self._objective.name]
-            if res[ID_KEY] not in self._active:
-                if not self.force_resiliance:
-                    raise ValueError("optimizer did not expect to receive an update")
-                continue
-            self._active.pop(res[ID_KEY]).future.set_result(y)
-
-    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
-        """
-        Get a list of the optimal point found during optimization.
-
-        Returns
-        -------
-        list[tuple[int, TParameterization, TOutcome]]
-            Each element in the list is a tuple of:
-              - trial index (int)
-              - parameter values (dict)
-              - metric values (dict, where values may be (value, sem) tuples)
-
-        See Also
-        --------
-        navigate_to_best : Plan stub to move actuators to a best point.
-        """
-        result = self.intermediate
-        if self.final is not None:
-            result = self.final
-        if (result is None) or (self._objective is None):
-            raise ValueError("no optimization epoch has been recorded")
-
-        vector = [x_n * s for s, x_n in zip(self._scale, result.x, strict=True)]
-        cart = [
-            result.nit - 1,
-            cast(Mapping, dict(zip(self._params, vector, strict=True))),
-            cast(Mapping, {self._objective: result.fun}),
-        ]
-        return cart
+            yield from optimize_plan
