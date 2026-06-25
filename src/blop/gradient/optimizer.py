@@ -244,10 +244,10 @@ class ScipyOptimizer(Optimizer):
         cart = [
             result.nit - 1,
             cast(Mapping, dict(zip(self._params, vector, strict=True))),
-            cast(Mapping, {self._objective: result.fun}),
+            cast(Mapping, {self._objective.name: result.fun}),
         ]
         return cart
 
     def close(self):
-        for fut in self._active.values():
-            fut.future.set_exception(KeyboardInterrupt("Execution has been suspended"))
+        for ind in list(self._active.keys()):
+            self._active.pop(ind).future.set_exception(KeyboardInterrupt("Execution has been suspended"))
