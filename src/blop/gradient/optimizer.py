@@ -2,7 +2,7 @@ from collections import OrderedDict
 from collections.abc import Mapping, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from threading import Thread
 from typing import Any, cast
 
@@ -14,7 +14,7 @@ from blop.ax.objective import Objective
 from blop.protocols import ID_KEY, Optimizer
 
 
-class SCP(str, Enum):  # noqa: UP042
+class SCP(StrEnum):
     Default = "Default"
     BFGS = "BFGS"
     LBFGS = "L-BFGS-B"
