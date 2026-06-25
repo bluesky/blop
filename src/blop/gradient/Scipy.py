@@ -1,4 +1,4 @@
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any, cast
 
 import bluesky.preprocessors as bpp
@@ -262,3 +262,24 @@ class Scipy:
                 yield from optimize_plan
         else:
             yield from optimize_plan
+
+    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
+        """
+        Get a list of the optimal points found during optimization.
+
+        For single-objective optimization, returns a single best point.
+        For multi-objective optimization, returns the Pareto-optimal set.
+
+        Returns
+        -------
+        list[tuple[int, TParameterization, TOutcome]]
+            Each element in the list is a tuple of:
+              - trial index (int)
+              - parameter values (dict)
+              - metric values (dict, where values may be (value, sem) tuples)
+
+        See Also
+        --------
+        navigate_to_best : Plan stub to move actuators to a best point.
+        """
+        return self._optimizer.get_best_points()
