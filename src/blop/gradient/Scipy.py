@@ -90,9 +90,11 @@ class Scipy:
         blop.ax.Agent
 
         """
-
-        if optimizer not in SCP:
-            raise ValueError(f"optimizer {optimizer} not in supported optimizers:{list(SCP)}")
+        try:
+            if optimizer not in SCP:
+                raise ValueError(f"optimizer {optimizer} not in supported optimizers:{list(SCP)}")
+        except TypeError:
+            ...
         if len(objectives) > 1:
             raise ValueError("Multiple Objectives are not supported for gradient optimizers")
         config = ScipyCFG(
