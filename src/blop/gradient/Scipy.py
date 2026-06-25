@@ -43,6 +43,7 @@ class Scipy:
         self._acquisition_plan = acquisition_plan
         self.timeout = kwargs.pop("timeout", 200)
         self._optimizer = ScipyOptimizer(self.config, timeout=self.timeout)
+        self._optimizer.force_resiliance = self.resiliance = kwargs.pop("resiliance", True)
         self._readable_cache: dict[str, InferredReadable] = {}
         self._callbacks: list[CallbackBase] = [OptimizationLogger()]
         self._callback_router = OptimizationCallbackRouter(self._callbacks)
@@ -247,6 +248,7 @@ class Scipy:
         if self._optimizer.final is not None:
             self.config.initial = self._optimizer.final.x
             self._optimizer = ScipyOptimizer(self.config, timeout=self.timeout)
+            self._optimizer.force_resiliance = self.resiliance
         optimize_plan = optimize(
             self.to_optimization_problem(),
             iterations=iterations,
