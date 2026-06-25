@@ -95,14 +95,18 @@ class ScipyOptimizer(Optimizer):
 
         kw = {}
         self._thread_pool = None
-        if config.optimizer in (SCP.Default, SCP.BFGS, SCP.LBFGS):
-            if config.max_iter is not None:
-                kw["max_iter"] = config.max_iter
-            if config.eps is not None:
-                kw["eps"] = config.eps
+        if config.max_iter is not None:
+            kw["max_iter"] = config.max_iter
+        if config.eps is not None:
+            kw["eps"] = config.eps
 
-            def default_callback(intermediate_result: OptimizeResult):
-                self.intermediate = intermediate_result
+        def default_callback(intermediate_result: OptimizeResult):
+            if self.intermediate and self.intermediate.fun < intermediate_result.fun:
+                return
+            self.intermediate = intermediate_result
+            self.intermediate.nit = self._increment
+
+        if config.optimizer in (SCP.Default, SCP.BFGS, SCP.LBFGS):
 
             def call(kws=None):
                 self.final = minimize(
@@ -117,6 +121,9 @@ class ScipyOptimizer(Optimizer):
         elif config.optimizer in (SCP.Dual_Annealing):
 
             def dual_callback(x, f, context):
+                print(f"callback on opt val {f} with current best of {self.intermediate}")
+                if self.intermediate and self.intermediate.fun < f:
+                    return
                 self.intermediate = self.Result(x, f, self._increment, context)
 
             def call(kws=None):
@@ -125,7 +132,7 @@ class ScipyOptimizer(Optimizer):
                     x0=_x,
                     bounds=self._bounds,
                     callback=dual_callback,
-                    minimizer_kwargs=kws,
+                    minimizer_kwargs={"callback": default_callback, "bounds": self._bounds, "options": kws},
                 )
 
         else:

@@ -180,7 +180,7 @@ RE(agent.optimize(10))
 Sometimes a default **Agent** optimization may not do all that you'd like. We expose a configuration object called ScipyCFG and a pure scipy interface so that the classic parameters of scipy minimize can be tweaked (and some multipoint sampling can be used).
 
 ```python
-config = ScipyCFG(dofs=dofs, objective=objectives[0], optimizer=SCP.Default, threads=4, eps=0.1)
+config = ScipyCFG(dofs=dofs, objective=objectives[0], optimizer=SCP.Dual_Annealing, threads=4, max_iter=2, eps=0.1)
 agent = Scipy(
     sensors=sensors,
     config=config,
@@ -197,10 +197,12 @@ Scipy is a local optimizer so it doesn't have internal point tracking, but we ca
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 res_client = tiled_client[res_uid[0]]
 data = res_client["primary/internal"].read()
-vec = data[["suggestion_ids", "x1", "x2", "himmelblau_2d"]]
+cols = ["suggestion_ids", "x1", "x2", "himmelblau_2d"]
+vec = data[cols]
 res = []
 for _, row in vec.iterrows():
     vic = [row.suggestion_ids, row.x1, row.x2, row.himmelblau_2d]
@@ -219,6 +221,16 @@ i, x, y, z = res.T
 ps = ax.scatter(x, y, c=range(len(x)), cmap="plasma", s=50)
 plt.colorbar(ps).set_label("sample index")
 plt.title("Visualizing Scipy's traversal of Himmelblau")
+```
+
+Seeing the sample history
+
+```python
+pd.DataFrame(data=res, columns=cols)
+```
+
+```python
+print(agent.get_best_points())
 ```
 
 The Himmelblau function has four global minima (all with value 0). The `summarize` output shows which one(s) the optimizer found.
