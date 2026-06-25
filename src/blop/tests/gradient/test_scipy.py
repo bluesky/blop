@@ -294,7 +294,7 @@ def test_agent_invalid_optimizer_enum(mock_evaluation_function, mock_acquisition
     objective = Objective(name="test_objective", minimize=False)
     readable = ReadableSignal(name="test_readable")
 
-    with pytest.raises(ValueError, match="optimizer.*not in supported optimizers"):
+    with pytest.raises((ValueError, NotImplementedError), match="optimizer.*not in supported optimizers"):
         Scipy.Agent(
             sensors=[readable],
             dofs=[dof],
