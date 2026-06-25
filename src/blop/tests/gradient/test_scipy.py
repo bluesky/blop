@@ -326,7 +326,7 @@ def test_agent_multiple_objectives_not_supported(mock_evaluation_function, mock_
 # ============================================================================
 
 
-@pytest.mark.parametrize("optimizer", [SCP.Default, SCP.BFGS, SCP.Dual_Annealing])
+@pytest.mark.parametrize("optimizer", [SCP.Default, SCP.BFGS, SCP.LBFGS, SCP.Dual_Annealing])
 def test_scipy_optimizer_algorithms(mock_evaluation_function, mock_acquisition_plan, optimizer):
     """Test ScipyOptimizer with different SCP algorithms."""
     movable1 = MovableSignal(name="test_movable1")
