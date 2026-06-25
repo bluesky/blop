@@ -19,7 +19,7 @@ In this tutorial, you will learn the three core concepts of Blop: **DOFs** (the 
 
 First, let's import what we need and start the data infrastructure:
 
-```python
+```{code-cell} ipython3
 import logging
 import time
 import warnings
@@ -39,7 +39,7 @@ from blop.gradient import SCP, Scipy, ScipyCFG
 logging.getLogger("httpx").setLevel(logging.WARNING)
 ```
 
-```python
+```{code-cell} ipython3
 # Start a local Tiled server for data storage
 tiled_server = SimpleTiledServer()
 
@@ -54,7 +54,7 @@ RE.subscribe(tiled_writer)
 
 Bluesky controls devices through protocols. For this tutorial, we create simple simulated "movable" devices. In real experiments, you would use [Ophyd](https://blueskyproject.io/ophyd-async) devices or similar—the code below is just boilerplate to simulate hardware:
 
-```python
+```{code-cell} ipython3
 class AlwaysSuccessfulStatus(Status):
     def add_callback(self, callback) -> None:
         callback(self)
@@ -109,7 +109,7 @@ class MovableSignal(ReadableSignal, NamedMovable):
 
 **DOFs** (degrees of freedom) are the parameters the optimizer can adjust. **Objectives** are what you want to optimize. Here we define two DOFs (`x1` and `x2`) that can range from -5 to 5, and one objective (the Himmelblau function) that we want to minimize:
 
-```python
+```{code-cell} ipython3
 x1 = MovableSignal("x1", initial_value=0.1)
 x2 = MovableSignal("x2", initial_value=0.23)
 
@@ -127,7 +127,7 @@ sensors = []
 
 The **evaluation function** computes objective values from experimental data. After each run, Blop calls this function with the run's unique ID and the suggestions that were tried. It returns the computed objective values:
 
-```python
+```{code-cell} ipython3
 class Himmelblau2DEvaluation:
     def __init__(self, tiled_client: Container):
         self.tiled_client = tiled_client
@@ -160,7 +160,7 @@ class Himmelblau2DEvaluation:
 
 The **Agent** brings everything together. Create one with your DOFs, objectives, and evaluation function, then run the optimization:
 
-```python
+```{code-cell} ipython3
 agent = Scipy.Agent(
     sensors=sensors,
     dofs=dofs,
@@ -177,7 +177,7 @@ RE(agent.optimize(10))
 
 Sometimes a default **Agent** optimization may not do all that you'd like. We expose a configuration object called ScipyCFG and a pure scipy interface so that the classic parameters of scipy minimize can be tweaked (and some multipoint sampling can be used).
 
-```python
+```{code-cell} ipython3
 config = ScipyCFG(dofs=dofs, objective=objectives[0], optimizer=SCP.Dual_Annealing, threads=4, max_iter=2, eps=0.1)
 agent = Scipy(
     sensors=sensors,
@@ -192,7 +192,7 @@ res_uid = RE(agent.optimize(20, n_points=2))
 
 Scipy is a local optimizer so it doesn't have internal point tracking, but we can to grab it from our datastore.
 
-```python
+```{code-cell} ipython3
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -223,11 +223,11 @@ plt.title("Visualizing Scipy's traversal of Himmelblau")
 
 Seeing the sample history
 
-```python
+```{code-cell} ipython3
 pd.DataFrame(data=res, columns=cols)
 ```
 
-```python
+```{code-cell} ipython3
 print(agent.get_best_points())
 ```
 
