@@ -652,7 +652,7 @@ def test_scipy_optimizer_session_reinit(mock_evaluation_function, mock_acquisiti
 
     # Call session to reinitialize
     opt.session(config, timeout=5)
-    time.sleep(.1)
+    time.sleep(0.1)
     # State should be reset
     assert opt._increment == 1
     assert len(opt._active) == 1
