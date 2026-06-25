@@ -37,7 +37,7 @@ from tiled.server import SimpleTiledServer
 from blop.ax import Objective, RangeDOF
 from blop.gradient import SCP, Scipy, ScipyCFG
 
-# Suppress noisy logs from httpx 
+# Suppress noisy logs from httpx
 logging.getLogger("httpx").setLevel(logging.WARNING)
 ```
 
@@ -60,37 +60,48 @@ Bluesky controls devices through protocols. For this tutorial, we create simple 
 class AlwaysSuccessfulStatus(Status):
     def add_callback(self, callback) -> None:
         callback(self)
-    def exception(self, timeout = 0.0):
+
+    def exception(self, timeout=0.0):
         return None
+
     @property
     def done(self) -> bool:
         return True
+
     @property
     def success(self) -> bool:
         return True
+
 
 class ReadableSignal(Readable, HasHints, HasParent):
     def __init__(self, name: str) -> None:
         self._name = name
         self._value = 0.0
+
     @property
     def name(self) -> str:
         return self._name
+
     @property
     def hints(self) -> Hints:
         return {"fields": [self._name], "dimensions": [], "gridding": "rectilinear"}
+
     @property
     def parent(self) -> Any | None:
         return None
+
     def read(self):
         return {self._name: {"value": self._value, "timestamp": time.time()}}
+
     def describe(self):
         return {self._name: {"source": self._name, "dtype": "number", "shape": []}}
+
 
 class MovableSignal(ReadableSignal, NamedMovable):
     def __init__(self, name: str, initial_value: float = 0.0) -> None:
         super().__init__(name)
         self._value: float = initial_value
+
     def set(self, value: float) -> Status:
         self._value = value
         return AlwaysSuccessfulStatus()
@@ -119,7 +130,7 @@ sensors = []
 The **evaluation function** computes objective values from experimental data. After each run, Blop calls this function with the run's unique ID and the suggestions that were tried. It returns the computed objective values:
 
 ```python
-class Himmelblau2DEvaluation():
+class Himmelblau2DEvaluation:
     def __init__(self, tiled_client: Container):
         self.tiled_client = tiled_client
 
@@ -130,18 +141,20 @@ class Himmelblau2DEvaluation():
         x1_data = run["primary/x1"].read()
         x2_data = run["primary/x2"].read()
 
-        print("[Himmelblau] evaluating suggestions: ", [s["_id"] for s in suggestions], " reordered to: ", [s["_id"] for s in reordered_suggestions])
+        print(
+            "[Himmelblau] evaluating suggestions: ",
+            [s["_id"] for s in suggestions],
+            " reordered to: ",
+            [s["_id"] for s in reordered_suggestions],
+        )
         for index, suggestion in enumerate(reordered_suggestions):
             # Special key to identify a suggestion
             suggestion_id = suggestion["_id"]
             x1 = x1_data[index]
             x2 = x2_data[index]
             # Himmelblau function: has four global minima where value = 0
-            outcomes.append({
-                "himmelblau_2d": (x1 ** 2 + x2 - 11) ** 2 + (x1 + x2 ** 2 - 7) ** 2,
-                "_id": suggestion_id
-            })
-        
+            outcomes.append({"himmelblau_2d": (x1**2 + x2 - 11) ** 2 + (x1 + x2**2 - 7) ** 2, "_id": suggestion_id})
+
         return outcomes
 ```
 
@@ -167,13 +180,7 @@ RE(agent.optimize(10))
 Sometimes a default **Agent** optimization may not do all that you'd like. We expose a configuration object called ScipyCFG and a pure scipy interface so that the classic parameters of scipy minimize can be tweaked (and some multipoint sampling can be used).
 
 ```python
-config = ScipyCFG(
-    dofs=dofs,
-    objective=objectives[0],
-    optimizer=SCP.Default,
-    threads=4,
-    eps=.1
-)
+config = ScipyCFG(dofs=dofs, objective=objectives[0], optimizer=SCP.Default, threads=4, eps=0.1)
 agent = Scipy(
     sensors=sensors,
     config=config,
@@ -198,7 +205,7 @@ res = []
 for _, row in vec.iterrows():
     vic = [row.suggestion_ids, row.x1, row.x2, row.himmelblau_2d]
     vic = [x.strip("[]").split() for x in vic]
-    for id, x, y, obj in zip(*vic,strict=True):
+    for id, x, y, obj in zip(*vic, strict=True):
         if id != "''":
             res.append([int(id.strip("'")), float(x), float(y), float(obj)])
 res = np.array(res)
@@ -206,11 +213,11 @@ res = np.array(res)
 fig, ax = plt.subplots(figsize=(12, 8))
 
 xb, yb = np.random.uniform(-5, 5, (2, 1000))
-ax.tripcolor(xb, yb, (xb**2 + yb - 11)**2 + (xb + yb**2 - 7)**2, shading="gouraud")
+ax.tripcolor(xb, yb, (xb**2 + yb - 11) ** 2 + (xb + yb**2 - 7) ** 2, shading="gouraud")
 
 i, x, y, z = res.T
-ps = ax.scatter(x, y, c=range(len(x)), cmap='plasma', s=50)
-plt.colorbar(ps).set_label('sample index')
+ps = ax.scatter(x, y, c=range(len(x)), cmap="plasma", s=50)
+plt.colorbar(ps).set_label("sample index")
 plt.title("Visualizing Scipy's traversal of Himmelblau")
 ```
 

@@ -16,7 +16,8 @@ from blop.protocols import ID_KEY, Optimizer
 
 class SCP(str, Enum):  # noqa: UP042
     Default = "Default"
-    BFGS = "L-BFGS-B"
+    BFGS = "BFGS"
+    LBFGS = "L-BFGS-B"
     Dual_Annealing = "dual annealing"
 
 
@@ -94,7 +95,7 @@ class ScipyOptimizer(Optimizer):
 
         kw = {}
         self._thread_pool = None
-        if config.optimizer in (SCP.Default, SCP.BFGS):
+        if config.optimizer in (SCP.Default, SCP.BFGS, SCP.LBFGS):
             if config.max_iter is not None:
                 kw["max_iter"] = config.max_iter
             if config.eps is not None:
