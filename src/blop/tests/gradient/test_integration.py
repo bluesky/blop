@@ -3,7 +3,7 @@ import time
 from bluesky import RunEngine
 
 from blop.ax import Objective, RangeDOF
-from blop.gradient import Scipy, ScipyCFG
+from blop.gradient import SCP, Scipy, ScipyCFG
 from blop.protocols import EvaluationFunction
 
 from ..conftest import MovableSignal, ReadableSignal
@@ -14,7 +14,7 @@ def test_integrated_iteration():
     readable = ReadableSignal(name="test_readable")
     dof = RangeDOF(actuator=movable, bounds=(0, 1e-4), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    config = ScipyCFG(dofs=[dof], objective=objective)
+    config = ScipyCFG(dofs=[dof], objective=objective, optimizer=SCP.Dual_Annealing)
 
     class deflating_evaluation(EvaluationFunction):
         def __init__(self):
