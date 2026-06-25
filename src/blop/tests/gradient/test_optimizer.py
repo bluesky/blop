@@ -177,6 +177,7 @@ def test_get_best_points_scaling(optimizer_prep):
     assert "test_movable2" in best[1]
     optimizer_prep.close()
 
+
 # ============================================================================
 # PHASE 4: Error Handling & Validation Tests
 # ============================================================================
