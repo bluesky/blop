@@ -136,7 +136,7 @@ class ScipyOptimizer(Optimizer):
                 )
 
         else:
-            raise NotImplementedError("")
+            raise NotImplementedError(f"optimizer {config.optimizer} not in supported optimizers:{list(SCP)}")
 
         def mini_worker():
             try:
