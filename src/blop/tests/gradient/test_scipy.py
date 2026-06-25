@@ -294,6 +294,7 @@ def test_agent_multiple_objectives_not_supported(mock_evaluation_function, mock_
             evaluation_function=mock_evaluation_function,
         )
 
+
 # ============================================================================
 # PHASE 5: Callback Management Tests
 # ============================================================================
