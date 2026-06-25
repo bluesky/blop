@@ -14,7 +14,7 @@ from blop.ax.objective import Objective
 from blop.protocols import ID_KEY, Optimizer
 
 
-class SCP(str, Enum):
+class SCP(str, Enum):  # noqa: UP042
     Default = "Default"
     BFGS = "L-BFGS-B"
     Dual_Annealing = "dual annealing"
