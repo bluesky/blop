@@ -59,11 +59,11 @@ DETECTOR_STORAGE = "/tmp/blop/sim"
 from pathlib import Path
 print([p.name for p in Path.cwd().iterdir()])
 fileName = r"toroid_focus.xml"
-beam = XRTBackend(file=fileName, n_iters=4, n_workers=4)
-dets = infer_detectors(beam)
-motors = infer_variables(beam, filter_for=None)
+#beam = XRTBackend(file=fileName, n_iters=4, n_workers=4)
+#dets = infer_detectors(beam)
+#motors = infer_variables(beam, filter_for=None)
 ```
-
+<!-- 
 ### A small view of the inferred motors
 
 ```{code-cell} ipython3
@@ -268,5 +268,5 @@ image = tiled_client[uid[0]][f"primary/{screen.name}"].read().squeeze()
 plt.imshow(image)
 plt.colorbar()
 plt.title("Optimized toroid Mirror Beam")
-plt.show()
+plt.show() -->
 ```
