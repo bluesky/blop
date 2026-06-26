@@ -39,8 +39,7 @@ from tiled.client import from_uri  # type: ignore[import-untyped]
 from tiled.client.container import Container
 from tiled.server import SimpleTiledServer
 
-from blop import RangeDOF
-from blop.ax import Agent, Objective
+from blop.ax import Agent, Objective, RangeDOF
 from blop.protocols import EvaluationFunction
 from blop_sim.backends import XRTBackend
 from blop_sim.devices.xrt import infer_detectors, infer_variables
@@ -56,15 +55,12 @@ DETECTOR_STORAGE = "/tmp/blop/sim"
 ```
 
 ```{code-cell} ipython3
-from pathlib import Path
-print([p.name for p in Path.cwd().iterdir()])
 fileName = r"toroid_focus.xml"
-#beam = XRTBackend(file=fileName, n_iters=4, n_workers=4)
-#dets = infer_detectors(beam)
-#motors = infer_variables(beam, filter_for=None)
+beam = XRTBackend(file=fileName, n_iters=4, n_workers=4)
+dets = infer_detectors(beam)
+motors = infer_variables(beam, filter_for=None)
 ```
 
-<!-- 
 ### A small view of the inferred motors
 
 ```{code-cell} ipython3
@@ -233,8 +229,8 @@ RE(agent.optimize(1, n_points=5))
 ```
 
 ```{code-cell} ipython3
-# Run remaining 10 iterations
-RE(agent.optimize(10))
+# Run more iterations
+RE(agent.optimize(15))
 ```
 
 ```{code-cell} ipython3
@@ -271,4 +267,3 @@ plt.colorbar()
 plt.title("Optimized toroid Mirror Beam")
 plt.show()
 ```
- -->

@@ -14,7 +14,7 @@ from bluesky.protocols import Readable
 from .core import SimBackend
 
 limits = [[-0.6, 0.6], [-0.45, 0.45]]
-cache_dir = Path.cwd() / "tmp" / "render"
+cache_dir = Path("/tmp/blop/sim/render")
 cache_dir.mkdir(parents=True, exist_ok=True)
 
 
@@ -44,7 +44,7 @@ def build_histRGB(lb, gb, limits=None, isScreen=False, shape=None) -> tuple[np.a
 def _run_cached_process_from_file(beamLine, start_index) -> dict[str, raycing.sources.beams.Beam]:
     outDict = {}
     sequence = list(beamLine.flowU.items())[start_index:]
-    print(f"starting from: {start_index}")
+    # print(f"starting from: {start_index}")
     for oeid, meth in sequence:
         oe = beamLine.oesDict[oeid][0]
         for func, fkwargs in meth.items():
@@ -56,11 +56,11 @@ def _run_cached_process_from_file(beamLine, start_index) -> dict[str, raycing.so
 
 
 def _run_shelved_process_from_file(beamLine, start_index, shelf) -> str:
-    filepath = f"tmp/render/iterbuf_{shelf}"
+    filepath = f"/tmp/blop/sim/render/iterbuf_{shelf}"
     with shelve.open(filepath, flag="c") as outDict:
         sequence = list(beamLine.flowU.items())[start_index:]
         touched = OrderedDict(sequence).keys()
-        print(f"starting {shelf} from: {start_index}:")
+        # print(f"starting {shelf} from: {start_index}:")
         for oeid, meth in sequence:
             oe = beamLine.oesDict[oeid][0]
             for func, fkwargs in meth.items():
@@ -106,7 +106,7 @@ class XRTBackend(SimBackend, Readable):
         """primary run function for each dispatched process.
         main responsibility to manage the data transfer contracts to and from main"""
         beamLine, seed, minvalid_index = stuple
-        print(f"worker {seed} executing")
+        # print(f"worker {seed} executing")
         np.random.seed(seed=seed)
         beam = pickle.loads(beamLine.buf[: beamLine.size])
         beamLine.close()
@@ -223,7 +223,7 @@ class XRTBackend(SimBackend, Readable):
         if type(id) is int and id in range(len(self._cache_invalidator)):
             self._cache_invalidator[id] = 1
 
-        print(f"invalidating cache element {id} ->", end="")
+        # print(f"invalidating cache element {id} ->", end="")
         if id in self.elements.keys():
             print("success")
             index = list(self._beamline.flowU.keys()).index(self._beamline.oenamesToUUIDs[id])
