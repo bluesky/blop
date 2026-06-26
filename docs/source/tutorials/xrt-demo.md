@@ -1,18 +1,17 @@
 ---
-jupyter:
-  jupytext:
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.19.3
-  kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.17.3
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
 ---
 
-```python
+```{code-cell} ipython3
 import logging
 import warnings
 from pprint import pprint
@@ -45,7 +44,9 @@ plt.ion()
 DETECTOR_STORAGE = "/tmp/blop/sim"
 ```
 
-```python
+```{code-cell} ipython3
+from pathlib import Path
+print([p.name for p in Path.cwd().iterdir()])
 fileName = r"toroid_focus.xml"
 beam = XRTBackend(file=fileName, n_iters=4, n_workers=4)
 dets = infer_detectors(beam)
@@ -54,19 +55,19 @@ motors = infer_variables(beam, filter_for=None)
 
 ### A small view of the inferred motors
 
-```python
+```{code-cell} ipython3
 pprint(motors)
 ```
 
 ### Another glimpse into the inferred detectors
 
-```python
+```{code-cell} ipython3
 pprint(dets)
 ```
 
 # Setting up an optimization
 
-```python
+```{code-cell} ipython3
 toro_R = motors["toroidMirror01"]["R"]
 toro_R.alias = "big_r"
 toro_r = motors["toroidMirror01"]["r"]
@@ -84,7 +85,7 @@ dofs = [
 ]
 ```
 
-```python
+```{code-cell} ipython3
 tiled_server = SimpleTiledServer()
 tiled_client = from_uri(tiled_server.uri)
 tiled_writer = TiledWriter(tiled_client)
@@ -101,14 +102,14 @@ tiled_writer = TiledWriter(tiled_client)
 RE.subscribe(tiled_writer)
 ```
 
-```python
+```{code-cell} ipython3
 # Single objective: minimize the geometric-mean FWHM
 objectives = [
     Objective(name="fwhm", minimize=True),
 ]
 ```
 
-```python
+```{code-cell} ipython3
 class DetectorEvaluation(EvaluationFunction):
     def __init__(self, tiled_client: Container):
         self.tiled_client = tiled_client
@@ -202,7 +203,7 @@ class DetectorEvaluation(EvaluationFunction):
         return outcomes
 ```
 
-```python
+```{code-cell} ipython3
 agent = Agent(
     sensors=[screen],
     dofs=dofs,
@@ -214,30 +215,30 @@ agent = Agent(
 )
 ```
 
-```python
+```{code-cell} ipython3
 # Run 1 iteration with a batch of 10 points for initial exploration
 RE(agent.optimize(1, n_points=5))
 ```
 
-```python
+```{code-cell} ipython3
 # Run remaining 10 iterations
 RE(agent.optimize(10))
 ```
 
-```python
+```{code-cell} ipython3
 _ = agent.ax_client.compute_analyses()
 ```
 
-```python
+```{code-cell} ipython3
 agent.ax_client.summarize()
 ```
 
-```python
+```{code-cell} ipython3
 optimal_parameters, metrics, _, _ = agent.ax_client.get_best_parameterization(use_model_predictions=False)
 optimal_parameters
 ```
 
-```python
+```{code-cell} ipython3
 from bluesky.plans import list_scan
 
 uid = RE(
@@ -251,14 +252,10 @@ uid = RE(
 )
 ```
 
-```python
+```{code-cell} ipython3
 image = tiled_client[uid[0]][f"primary/{screen.name}"].read().squeeze()
 plt.imshow(image)
 plt.colorbar()
 plt.title("Optimized toroid Mirror Beam")
 plt.show()
-```
-
-```python
-
 ```
