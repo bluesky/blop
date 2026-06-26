@@ -63,6 +63,7 @@ fileName = r"toroid_focus.xml"
 #dets = infer_detectors(beam)
 #motors = infer_variables(beam, filter_for=None)
 ```
+
 <!-- 
 ### A small view of the inferred motors
 
@@ -268,5 +269,6 @@ image = tiled_client[uid[0]][f"primary/{screen.name}"].read().squeeze()
 plt.imshow(image)
 plt.colorbar()
 plt.title("Optimized toroid Mirror Beam")
-plt.show() -->
+plt.show()
 ```
+ -->
