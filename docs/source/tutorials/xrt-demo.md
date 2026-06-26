@@ -11,6 +11,17 @@ kernelspec:
   name: python3
 ---
 
+# Demonstrating a "bring your own beamline" methodology with XRT
+
+In this tutorial we'll show a simulation optimization workflow by loading arbitrary XRT setups using xml/json.
+By the end, you should be able to go to XRT qook/glow and build your beamline from there to export and drop in
+to blop. Or if you are lucky enough for an XRT model to be already built for you, export to xml and load in
+blop.
+
+## Some Environment Setup
+
+note, like all other demos you need the blop_sim subpackage to run
+
 ```{code-cell} ipython3
 import logging
 import warnings
