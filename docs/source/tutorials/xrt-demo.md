@@ -11,7 +11,7 @@ kernelspec:
   name: python3
 ---
 
-# Demonstrating a "bring your own beamline" methodology with XRT
+# Demonstrating "Bring Your Own Beamline" simulation with XRT
 
 In this tutorial we'll show a simulation optimization workflow by loading arbitrary XRT setups using xml/json.
 By the end, you should be able to go to XRT qook/glow and build your beamline from there to export and drop in
@@ -25,7 +25,6 @@ note, like all other demos you need the blop_sim subpackage to run
 ```{code-cell} ipython3
 import logging
 import warnings
-from pprint import pprint
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -64,13 +63,17 @@ motors = infer_variables(beam, filter_for=None)
 ### A small view of the inferred motors
 
 ```{code-cell} ipython3
-pprint(motors)
+for name, element in motors.items():
+    print(name)
+    for nm, motor in element.items():
+        print(f"{nm} : {motor}")
 ```
 
 ### Another glimpse into the inferred detectors
 
 ```{code-cell} ipython3
-pprint(dets)
+for name, det in dets.items():
+    print(f"{name} : {det}")
 ```
 
 # Setting up an optimization
@@ -84,7 +87,7 @@ screen = dets["screen01"]
 screen.set_primary()
 
 
-VERTICAL_BOUNDS = (toro_R.val - 10000, toro_R.val + 10000)
+VERTICAL_BOUNDS = (toro_R.val - 15000, toro_R.val + 15000)
 HORIZONTAL_BOUNDS = (toro_r.val - 500, toro_r.val + 500)
 # Define DOFs using mirror radius signals
 dofs = [
@@ -225,12 +228,12 @@ agent = Agent(
 
 ```{code-cell} ipython3
 # Run 1 iteration with a batch of 10 points for initial exploration
-RE(agent.optimize(1, n_points=5))
+RE(agent.optimize(1, n_points=10))
 ```
 
 ```{code-cell} ipython3
 # Run more iterations
-RE(agent.optimize(15))
+RE(agent.optimize(5, n_points=5))
 ```
 
 ```{code-cell} ipython3

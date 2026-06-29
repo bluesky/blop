@@ -225,6 +225,6 @@ class XRTBackend(SimBackend, Readable):
 
         # print(f"invalidating cache element {id} ->", end="")
         if id in self.elements.keys():
-            print("success")
+            # print("success")
             index = list(self._beamline.flowU.keys()).index(self._beamline.oenamesToUUIDs[id])
             self._cache_invalidator[index] = 1
