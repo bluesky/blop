@@ -10,7 +10,7 @@ reimplement processing logic specifically for optimization.
 
 .. note::
     It is of current interest for **blop** to provide a higher-level per-suggestion processing interface to further reduce the boilerplate required in user-defined evaluation
-    functions (see `<https://github.com/NSLS-II/blop/issues/300>`).
+    functions (see `Issue #300 <https://github.com/NSLS-II/blop/issues/300>`_).
 
 Anatomy of an Evaluation Function
 ---------------------------------
