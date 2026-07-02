@@ -3,10 +3,14 @@ from collections.abc import Callable
 import numpy as np
 import pandas as pd
 import pytest
+from bluesky.run_engine import RunEngine
 from xopt.generators.bayesian import ExpectedImprovementGenerator
 from xopt.generators.random import RandomGenerator
 from xopt.vocs import VOCS
 
+from blop.plans import optimize
+from blop.protocols import OptimizationProblem
+from blop.tests.conftest import MovableSignal, ReadableSignal
 from blop.xopt import optimizer as xopt_optimizer_module
 from blop.xopt.optimizer import XoptOptimizer
 
@@ -83,6 +87,22 @@ def test_xopt_optimizer_suggest_defaults_to_single_point():
     suggestions = optimizer.suggest()
     assert len(suggestions) == 1
     assert suggestions[0]["_id"] == 0
+
+
+def test_xopt_optimizer_first_suggest_uses_vocs_random_inputs(monkeypatch: pytest.MonkeyPatch):
+    vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
+    optimizer = _bo_optimizer(vocs)
+
+    def _random_inputs(_vocs: VOCS, n: int | None = None, **_kwargs) -> list[dict]:
+        assert set(_vocs.variable_names) == {"x"}
+        assert n == 1
+        return [{"x": 0.42}]
+
+    monkeypatch.setattr(xopt_optimizer_module, "random_inputs", _random_inputs)
+
+    suggestions = optimizer.suggest()
+
+    assert suggestions == [{"_id": 0, "x": 0.42}]
 
 
 def test_xopt_optimizer_ingest_multiple_columns(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
@@ -380,3 +400,44 @@ def test_xopt_expected_improvement_runs_simple_minimization():
     assert len(best_points) == 1
     _, _, outcomes = best_points[0]
     assert outcomes["y"] <= 0.0625
+
+
+def test_xopt_inside_run_engine():
+    vocs = VOCS(variables={"x": [0.0, 1.0]}, objectives={"y": "MINIMIZE"})
+    optimizer = XoptOptimizer(generator=ExpectedImprovementGenerator(vocs=vocs))
+
+    actuator = MovableSignal("x", initial_value=0.5)
+    sensor = ReadableSignal("y")
+
+    def evaluation_function(_uid: str, suggestions: list[dict]) -> list[dict]:
+        return [
+            {
+                "_id": suggestion["_id"],
+                "y": (float(suggestion["x"]) - 0.25) ** 2,
+            }
+            for suggestion in suggestions
+        ]
+
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[actuator],
+        sensors=[sensor],
+        evaluation_function=evaluation_function,
+    )
+
+    RE = RunEngine({})
+    RE(optimize(optimization_problem, iterations=4, n_points=1))
+
+    data = optimizer.generator.data
+    assert data is not None
+    assert len(data) == 4
+    assert "x" in data.columns
+    assert "y" in data.columns
+
+    best_points = optimizer.get_best_points()
+    assert len(best_points) == 1
+    _, params, outcomes = best_points[0]
+    assert 0.0 <= float(params["x"]) <= 1.0
+    assert float(outcomes["y"]) >= 0.0
+
+    

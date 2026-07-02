@@ -6,7 +6,7 @@ from typing import Any
 import pandas as pd
 from xopt import VOCS
 from xopt.generator import Generator
-from xopt.vocs import get_feasibility_data, select_best
+from xopt.vocs import get_feasibility_data, random_inputs, select_best
 
 from ..protocols import ID_KEY, CanRegisterSuggestions, Checkpointable, Optimizer, TrialFaultAware
 
@@ -110,8 +110,16 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         if num_points is None:
             num_points = 1
 
-        # Delegate candidate generation to Xopt and optionally enforce fixed variables.
-        suggestions = self._generator.generate(num_points)
+        # Bootstrap first call with random VOCS inputs to avoid model-based generators requiring prior data.
+        data = self._generator.data
+        first_suggest_call = self._next_id == 0 and len(self._params_by_id) == 0
+        has_data = isinstance(data, pd.DataFrame) and not data.empty
+
+        if first_suggest_call and not has_data:
+            suggestions = random_inputs(self.vocs, n=num_points)
+        else:
+            suggestions = self._generator.generate(num_points)
+
         if self._fixed_parameters:
             suggestions = [{**suggestion, **self._fixed_parameters} for suggestion in suggestions]
         return self.register_suggestions(suggestions)
