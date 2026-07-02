@@ -315,21 +315,6 @@ def test_xopt_optimizer_get_best_points_empty_without_data():
     assert optimizer.get_best_points() == []
 
 
-def test_xopt_optimizer_feasible_mask_defaults_true_when_missing_feasible(monkeypatch: pytest.MonkeyPatch):
-    vocs = VOCS(
-        variables={"x": [0.0, 1.0]},
-        objectives={"y": "MINIMIZE"},
-        constraints={"c": ["LESS_THAN", 1.0]},
-    )
-    optimizer = _random_optimizer(vocs)
-    data = pd.DataFrame([{"x": 0.1, "y": 1.0, "c": 0.1}, {"x": 0.2, "y": 2.0, "c": 0.2}])
-
-    monkeypatch.setattr(xopt_optimizer_module, "get_feasibility_data", lambda _vocs, _data: {"c": [True, False]})
-
-    mask = optimizer._feasible_mask(data)
-    assert mask.tolist() == [True, True]
-
-
 def test_xopt_optimizer_get_best_points_includes_observables():
     vocs = VOCS(
         variables={"x": [0.0, 1.0]},

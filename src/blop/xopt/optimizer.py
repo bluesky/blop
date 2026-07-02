@@ -1,3 +1,4 @@
+import json
 import pickle
 from collections.abc import Mapping
 from pathlib import Path
@@ -6,7 +7,7 @@ from typing import Any
 import pandas as pd
 from xopt import VOCS
 from xopt.generator import Generator
-from xopt.vocs import get_feasibility_data, random_inputs, select_best
+from xopt.vocs import FeasibilityError, get_feasibility_data, random_inputs, select_best
 
 from ..protocols import ID_KEY, CanRegisterSuggestions, Checkpointable, Optimizer, TrialFaultAware
 
@@ -43,13 +44,25 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
     @classmethod
     def from_checkpoint(cls, checkpoint_path: str) -> "XoptOptimizer":
-        # Restore all persistent adapter state from pickle payload.
+        # Restore all persistent adapter state from JSON payload.
         path = Path(checkpoint_path)
         with path.open("rb") as stream:
-            payload = pickle.load(stream)
+            payload = json.load(stream)
 
         instance = object.__new__(cls)
-        instance._generator = payload["generator"]
+
+        generator_class_name = payload["generator"]["class"]
+        generator_module_name = payload["generator"]["module"]
+        generator_state = payload["generator"]["state"]
+        generator_data = payload["generator"].get("data", None)
+
+        # Dynamically import the generator class from its module.
+        generator_module = __import__(generator_module_name, fromlist=[generator_class_name])
+        generator_class = getattr(generator_module, generator_class_name)
+        instance._generator = generator_class.model_validate(generator_state)
+        if generator_data is not None:
+            instance._generator.ingest(generator_data)
+
         instance._checkpoint_path = str(path)
         instance._next_id = payload.get("next_id", 0)
         instance._params_by_id = payload.get("params_by_id", {})
@@ -114,11 +127,18 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             self._params_by_id[trial_id] = params
             registered.append({ID_KEY: trial_id, **suggestion})
 
+        # add the registered suggestions to the generator's data
+        self._generator.ingest(registered)
+
         return registered
 
     def ingest(self, points: list[dict]) -> None:
-        # Convert outcome payloads to DataFrame rows expected by Xopt generator.add_data().
-        rows: list[dict[str, Any]] = []
+        if not points:
+            return
+
+        # Convert outcomes into trial rows, keeping only the latest entry per trial ID.
+        variable_names = set(self.vocs.variable_names)
+        rows_by_id: dict[int | str, dict[str, Any]] = {}
 
         for point in points:
             # Preserve provided IDs when available, else allocate a new one.
@@ -131,18 +151,42 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
             # Merge known suggested parameters with any explicit parameters in incoming point.
             point_parameters = {name: point[name] for name in self.vocs.variable_names if name in point}
-            if trial_id in self._params_by_id:
-                parameters = {**self._params_by_id[trial_id], **point_parameters}
-            else:
-                parameters = point_parameters
+            parameters = {**self._params_by_id.get(trial_id, {}), **point_parameters}
 
             self._params_by_id[trial_id] = parameters
             # Everything not in variables and not _id is treated as measured output.
-            outcomes = {k: v for k, v in point.items() if k not in set(self.vocs.variable_names) | {ID_KEY}}
-            rows.append({ID_KEY: trial_id, **parameters, **outcomes})
+            outcomes = {k: v for k, v in point.items() if k not in variable_names | {ID_KEY}}
+            rows_by_id[trial_id] = {ID_KEY: trial_id, **parameters, **outcomes}
 
-        # Persist all new observations into the underlying generator state.
-        self._generator.ingest(rows)
+        rows = list(rows_by_id.values())
+
+        # Update existing trial rows in-place by ID; only append truly new IDs.
+        data = self._generator.data
+        if not (isinstance(data, pd.DataFrame) and not data.empty and ID_KEY in data.columns):
+            # Persist all observations when no existing data is present.
+            self._generator.ingest(rows)
+            return
+
+        # Build a mapping from trial ID to row indices in the existing generator data.
+        index_by_id: dict[int | str, list] = {}
+        for index, raw_trial_id in data[ID_KEY].items():
+            trial_id = _normalize_trial_id(raw_trial_id)
+            index_by_id.setdefault(trial_id, []).append(index)
+
+        # Update existing rows in-place and collect new rows to append.
+        rows_to_append: list[dict[str, Any]] = []
+        for trial_id, row in rows_by_id.items():
+            indices = index_by_id.get(trial_id)
+            if indices is None:
+                rows_to_append.append(row)
+                continue
+
+            for key, value in row.items():
+                data.loc[indices, key] = value
+
+        # Append any new rows to the generator's data after in-place updates.
+        if rows_to_append:
+            self._generator.ingest(rows_to_append)
 
     def register_failures(self, suggestions: list[dict]) -> None:
         # Remove failed suggestions from pending parameter cache.
@@ -151,48 +195,27 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             if trial_id in self._params_by_id:
                 self._params_by_id.pop(trial_id)
 
-    def _feasible_mask(self, data: pd.DataFrame) -> pd.Series:
-        # Delegate feasibility computation to Xopt's native VOCS helper.
-        constraints = self.vocs.constraints
-        if not isinstance(constraints, Mapping) or len(constraints) == 0:
-            return pd.Series([True] * len(data), index=data.index)
-
-        feasibility = get_feasibility_data(self.vocs, data)
-        if "feasible" not in feasibility:
-            return pd.Series([True] * len(data), index=data.index)
-        return pd.Series(feasibility["feasible"], index=data.index, dtype=bool)
-
-    def _output_names(self) -> list[str]:
-        # Outputs include objectives, constraints, and optional observables.
-        names = list(self.vocs.objective_names)
-        if self.vocs.constraints:
-            names.extend(self.vocs.constraint_names)
-        if getattr(self.vocs, "observables", None):
-            names.extend(self.vocs.observables)
-        return names
-
     def get_best_points(self) -> list[tuple[int | str, Mapping, Mapping]]:
         # Return no points when no data has been ingested.
         data = self._generator.data
         if not isinstance(data, pd.DataFrame) or data.empty:
             return []
 
-        # Best points are only defined over feasible observations.
-        candidates: pd.DataFrame = data.loc[self._feasible_mask(data)]
-        if len(candidates) == 0:
-            return []
-
         objective_names = list(self.vocs.objective_names)
         # For single-objective problems, return the single extremum according to direction.
-        if len(objective_names) == 1 and objective_names[0] in candidates:
-            best_indices, _, _ = select_best(self.vocs, candidates, n=1)
-            best_index = best_indices[0]
-            selected = candidates.loc[[best_index]]
+        if len(objective_names) == 1 and objective_names[0] in data:
+            try:
+                best_indices, _, _ = select_best(self.vocs, data, n=1)
+                best_index = best_indices[0]
+                selected = data.loc[[best_index]]
+            except FeasibilityError:
+                # If no feasible points exist, return an empty list.
+                return []
         else:
             # For multi-objective and objective-less modes, return the available candidate set.
-            selected = candidates
+            selected = data
 
-        output_names = self._output_names()
+        output_names = self._generator.vocs.output_names
         results: list[tuple[int | str, Mapping, Mapping]] = []
         for _, row in selected.iterrows():
             # Normalize IDs and split into parameter and outcome mappings.
@@ -205,16 +228,26 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         return results
 
     def checkpoint(self) -> None:
+        """ dump serialized state to json file at self._checkpoint_path """
         # Enforce explicit checkpoint path configuration before writing state.
         if not self._checkpoint_path:
             raise ValueError("Checkpoint path is not set. Please set a checkpoint path when initializing the optimizer.")
 
         # Persist generator and adapter bookkeeping to a single pickle artifact.
         payload = {
-            "generator": self._generator,
+            "generator": {
+                "class": self._generator.__class__.__name__,
+                "module": self._generator.__class__.__module__,
+                "state": self._generator.model_dump(),
+                "data": self._generator.data.to_dict(orient="records") if isinstance(self._generator.data, pd.DataFrame) else self._generator.data
+            },
             "next_id": self._next_id,
             "params_by_id": self._params_by_id,
         }
+
+        # Write the payload to the configured checkpoint path.
         path = Path(self._checkpoint_path)
         with path.open("wb") as stream:
-            pickle.dump(payload, stream)
+            stream.write(json.dumps(payload, default=str).encode("utf-8"))
+
+
