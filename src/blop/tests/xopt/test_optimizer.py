@@ -401,5 +401,3 @@ def test_xopt_inside_run_engine():
     _, params, outcomes = best_points[0]
     assert 0.0 <= float(params["x"]) <= 1.0
     assert float(outcomes["y"]) >= 0.0
-
-    

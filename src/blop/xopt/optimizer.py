@@ -1,6 +1,6 @@
 import json
-from importlib import import_module
 from collections.abc import Mapping
+from importlib import import_module
 from pathlib import Path
 from typing import Any
 
@@ -258,5 +258,3 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         path = Path(self._checkpoint_path)
         with path.open("w", encoding="utf-8") as stream:
             json.dump(payload, stream, default=str)
-
-
