@@ -100,15 +100,18 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             if isinstance(trial_id, int):
                 self._next_id = max(self._next_id, trial_id + 1)
 
+    def _generator_has_data(self) -> bool:
+        data = self._generator.data
+        return isinstance(data, pd.DataFrame) and not data.empty
+
     def suggest(self, num_points: int | None = None) -> list[dict]:
         # Default to single-point suggestion when caller does not specify cardinality.
         if num_points is None:
             num_points = 1
 
         # Bootstrap first call with random VOCS inputs to avoid model-based generators requiring prior data.
-        data = self._generator.data
         first_suggest_call = self._next_id == 0 and not self._params_by_id
-        has_data = isinstance(data, pd.DataFrame) and not data.empty
+        has_data = self._generator_has_data()
 
         if first_suggest_call and not has_data:
             suggestions = random_inputs(self.vocs, n=num_points)
@@ -137,7 +140,8 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             return
 
         # Convert outcomes into trial rows, keeping only the latest entry per trial ID.
-        variable_names = set(self.vocs.variable_names)
+        variable_names = list(self.vocs.variable_names)
+        variable_name_set = set(variable_names)
         rows_by_id: dict[int | str, dict[str, Any]] = {}
 
         for point in points:
@@ -150,21 +154,19 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
                 trial_id = _normalize_trial_id(raw_trial_id)
 
             # Merge known suggested parameters with any explicit parameters in incoming point.
-            point_parameters = {name: point[name] for name in self.vocs.variable_names if name in point}
+            point_parameters = {name: point[name] for name in variable_names if name in point}
             parameters = {**self._params_by_id.get(trial_id, {}), **point_parameters}
 
             self._params_by_id[trial_id] = parameters
             # Everything not in variables and not _id is treated as measured output.
-            outcomes = {k: v for k, v in point.items() if k not in variable_names | {ID_KEY}}
+            outcomes = {k: v for k, v in point.items() if k not in variable_name_set | {ID_KEY}}
             rows_by_id[trial_id] = {ID_KEY: trial_id, **parameters, **outcomes}
-
-        rows = list(rows_by_id.values())
 
         # Update existing trial rows in-place by ID; only append truly new IDs.
         data = self._generator.data
         if not (isinstance(data, pd.DataFrame) and not data.empty and ID_KEY in data.columns):
             # Persist all observations when no existing data is present.
-            self._generator.ingest(rows)
+            self._generator.ingest(list(rows_by_id.values()))
             return
 
         # Build a mapping from trial ID to row indices in the existing generator data.
@@ -197,8 +199,11 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
     def get_best_points(self) -> list[tuple[int | str, Mapping, Mapping]]:
         # Return no points when no data has been ingested.
+        if not self._generator_has_data():
+            return []
+
         data = self._generator.data
-        if not isinstance(data, pd.DataFrame) or data.empty:
+        if not isinstance(data, pd.DataFrame):
             return []
 
         objective_names = list(self.vocs.objective_names)
