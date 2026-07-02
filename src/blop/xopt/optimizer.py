@@ -1,5 +1,5 @@
 import json
-import pickle
+from importlib import import_module
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
@@ -7,7 +7,7 @@ from typing import Any
 import pandas as pd
 from xopt import VOCS
 from xopt.generator import Generator
-from xopt.vocs import FeasibilityError, get_feasibility_data, random_inputs, select_best
+from xopt.vocs import FeasibilityError, random_inputs, select_best
 
 from ..protocols import ID_KEY, CanRegisterSuggestions, Checkpointable, Optimizer, TrialFaultAware
 
@@ -46,7 +46,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
     def from_checkpoint(cls, checkpoint_path: str) -> "XoptOptimizer":
         # Restore all persistent adapter state from JSON payload.
         path = Path(checkpoint_path)
-        with path.open("rb") as stream:
+        with path.open("r", encoding="utf-8") as stream:
             payload = json.load(stream)
 
         instance = object.__new__(cls)
@@ -54,10 +54,10 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         generator_class_name = payload["generator"]["class"]
         generator_module_name = payload["generator"]["module"]
         generator_state = payload["generator"]["state"]
-        generator_data = payload["generator"].get("data", None)
+        generator_data = payload["generator"].get("data")
 
         # Dynamically import the generator class from its module.
-        generator_module = __import__(generator_module_name, fromlist=[generator_class_name])
+        generator_module = import_module(generator_module_name)
         generator_class = getattr(generator_module, generator_class_name)
         instance._generator = generator_class.model_validate(generator_state)
         if generator_data is not None:
@@ -107,7 +107,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
         # Bootstrap first call with random VOCS inputs to avoid model-based generators requiring prior data.
         data = self._generator.data
-        first_suggest_call = self._next_id == 0 and len(self._params_by_id) == 0
+        first_suggest_call = self._next_id == 0 and not self._params_by_id
         has_data = isinstance(data, pd.DataFrame) and not data.empty
 
         if first_suggest_call and not has_data:
@@ -192,8 +192,8 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         # Remove failed suggestions from pending parameter cache.
         for suggestion in suggestions:
             trial_id = suggestion.get(ID_KEY)
-            if trial_id in self._params_by_id:
-                self._params_by_id.pop(trial_id)
+            if trial_id is not None:
+                self._params_by_id.pop(trial_id, None)
 
     def get_best_points(self) -> list[tuple[int | str, Mapping, Mapping]]:
         # Return no points when no data has been ingested.
@@ -215,7 +215,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             # For multi-objective and objective-less modes, return the available candidate set.
             selected = data
 
-        output_names = self._generator.vocs.output_names
+        output_names = self.vocs.output_names
         results: list[tuple[int | str, Mapping, Mapping]] = []
         for _, row in selected.iterrows():
             # Normalize IDs and split into parameter and outcome mappings.
@@ -228,18 +228,22 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         return results
 
     def checkpoint(self) -> None:
-        """ dump serialized state to json file at self._checkpoint_path """
+        """Dump serialized optimizer state to the configured checkpoint JSON file."""
         # Enforce explicit checkpoint path configuration before writing state.
         if not self._checkpoint_path:
             raise ValueError("Checkpoint path is not set. Please set a checkpoint path when initializing the optimizer.")
 
-        # Persist generator and adapter bookkeeping to a single pickle artifact.
+        # Persist generator and adapter bookkeeping to a single JSON artifact.
         payload = {
             "generator": {
                 "class": self._generator.__class__.__name__,
                 "module": self._generator.__class__.__module__,
                 "state": self._generator.model_dump(),
-                "data": self._generator.data.to_dict(orient="records") if isinstance(self._generator.data, pd.DataFrame) else self._generator.data
+                "data": (
+                    self._generator.data.to_dict(orient="records")
+                    if isinstance(self._generator.data, pd.DataFrame)
+                    else self._generator.data
+                ),
             },
             "next_id": self._next_id,
             "params_by_id": self._params_by_id,
@@ -247,7 +251,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
         # Write the payload to the configured checkpoint path.
         path = Path(self._checkpoint_path)
-        with path.open("wb") as stream:
-            stream.write(json.dumps(payload, default=str).encode("utf-8"))
+        with path.open("w", encoding="utf-8") as stream:
+            json.dump(payload, stream, default=str)
 
 
