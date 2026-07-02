@@ -350,6 +350,77 @@ plt.title("Optimized KB Mirror Beam")
 plt.show()
 ```
 
+## Solving the Same Problem with XoptOptimizer
+
+Blop also supports Xopt through `XoptOptimizer`, which plugs directly into the
+same `optimize` plan used throughout the package. This gives you a lower-level
+optimization interface while reusing the same devices, acquisition flow, and
+evaluation function from above.
+
+For this section, we keep the exact same objective and constraint:
+
+- Minimize `fwhm`
+- Require `intensity >= 10000`
+
+```{code-cell} ipython3
+from xopt.generators.bayesian import ExpectedImprovementGenerator
+from xopt.vocs import VOCS
+
+from blop.plans import optimize
+from blop.protocols import OptimizationProblem
+from blop.xopt.optimizer import XoptOptimizer
+```
+
+Define the Xopt search space (`VOCS`) from the same mirror bounds and outcome names used earlier:
+
+```{code-cell} ipython3
+xopt_vocs = VOCS(
+    variables={
+        kbv.radius.name: list(VERTICAL_BOUNDS),
+        kbh.radius.name: list(HORIZONTAL_BOUNDS),
+    },
+    objectives={"fwhm": "MINIMIZE"},
+    constraints={"intensity": ["GREATER_THAN", 10000.0]},
+)
+
+xopt_optimizer = XoptOptimizer(generator=ExpectedImprovementGenerator(vocs=xopt_vocs))
+
+xopt_problem = OptimizationProblem(
+    optimizer=xopt_optimizer,
+    actuators=[kbv.radius, kbh.radius],
+    sensors=[det],
+    evaluation_function=DetectorEvaluation(tiled_client),
+)
+```
+
+Run an optimization loop. As with the Ax-based flow, this is executed via the Bluesky `RunEngine`.
+
+```{code-cell} ipython3
+RE(optimize(xopt_problem, iterations=10, n_points=1))
+```
+
+Visualize the GP model learned by the Xopt generator:
+
+```{code-cell} ipython3
+fig, _ = xopt_optimizer.generator.visualize_model(
+    output_names=["fwhm"],
+    variable_names=[kbv.radius.name, kbh.radius.name],
+    show_feasibility=True,
+)
+plt.show()
+```
+
+Inspect the best point found by Xopt and the collected trial data:
+
+```{code-cell} ipython3
+xopt_best_points = xopt_optimizer.get_best_points()
+xopt_best_points
+```
+
+```{code-cell} ipython3
+xopt_optimizer.generator.data.tail()
+```
+
 ```{code-cell} ipython3
 tiled_server.close()
 ```
