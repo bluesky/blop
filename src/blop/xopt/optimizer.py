@@ -37,7 +37,6 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
         # Internal state tracks IDs, pending/known parameterizations, and checkpoint metadata.
         self._checkpoint_path = checkpoint_path
-        self._fixed_parameters: dict[str, Any] | None = None
         self._next_id = 0
         self._params_by_id: dict[int | str, dict[str, Any]] = {}
         self._seed_state_from_existing_data()
@@ -52,7 +51,6 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         instance = object.__new__(cls)
         instance._generator = payload["generator"]
         instance._checkpoint_path = str(path)
-        instance._fixed_parameters = payload.get("fixed_parameters")
         instance._next_id = payload.get("next_id", 0)
         instance._params_by_id = payload.get("params_by_id", {})
         instance._seed_state_from_existing_data()
@@ -70,22 +68,6 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
     @property
     def vocs(self) -> VOCS:
         return self._generator.vocs
-
-    @property
-    def fixed_parameters(self) -> dict[str, Any] | None:
-        return self._fixed_parameters
-
-    @fixed_parameters.setter
-    def fixed_parameters(self, fixed_parameters: dict[str, Any] | None) -> None:
-        if not fixed_parameters:
-            self._fixed_parameters = None
-            return
-
-        unknown_names = set(fixed_parameters) - set(self.vocs.variable_names)
-        if unknown_names:
-            raise KeyError(f"Unknown fixed parameter(s): {sorted(unknown_names)}")
-
-        self._fixed_parameters = dict(fixed_parameters)
 
     def _seed_state_from_existing_data(self) -> None:
         # Recover known trial IDs/parameters from existing generator data when available.
@@ -118,10 +100,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         if first_suggest_call and not has_data:
             suggestions = random_inputs(self.vocs, n=num_points)
         else:
-            suggestions = self._generator.generate(num_points)
-
-        if self._fixed_parameters:
-            suggestions = [{**suggestion, **self._fixed_parameters} for suggestion in suggestions]
+            suggestions = self._generator.suggest(num_points)
         return self.register_suggestions(suggestions)
 
     def register_suggestions(self, suggestions: list[dict]) -> list[dict]:
@@ -163,8 +142,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             rows.append({ID_KEY: trial_id, **parameters, **outcomes})
 
         # Persist all new observations into the underlying generator state.
-        new_data = pd.DataFrame(rows)
-        self._generator.add_data(new_data)
+        self._generator.ingest(rows)
 
     def register_failures(self, suggestions: list[dict]) -> None:
         # Remove failed suggestions from pending parameter cache.
@@ -234,7 +212,6 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         # Persist generator and adapter bookkeeping to a single pickle artifact.
         payload = {
             "generator": self._generator,
-            "fixed_parameters": self._fixed_parameters,
             "next_id": self._next_id,
             "params_by_id": self._params_by_id,
         }

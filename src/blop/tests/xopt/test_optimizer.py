@@ -53,20 +53,6 @@ def test_xopt_optimizer_init(optimizer_factory: Callable[[VOCS], XoptOptimizer])
     assert set(optimizer.vocs.variable_names) == {"x1", "x2", "x3"}
 
 
-def test_xopt_fixed_parameters(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
-    vocs = VOCS(variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]}, objectives={"y1": "MINIMIZE"})
-    optimizer = optimizer_factory(vocs)
-
-    with pytest.raises(KeyError):
-        optimizer.fixed_parameters = {"x4": 3}
-
-    optimizer.fixed_parameters = {"x3": 3}
-    assert optimizer.fixed_parameters == {"x3": 3}
-
-    optimizer.fixed_parameters = {}
-    assert optimizer.fixed_parameters is None
-
-
 def test_xopt_optimizer_suggest_ids_and_keys():
     vocs = VOCS(variables={"x1": [-5.0, 5.0], "x2": [-5.0, 5.0], "x3": [0.0, 5.0]}, objectives={"y1": "MINIMIZE"})
     optimizer = _random_optimizer(vocs)
@@ -217,15 +203,6 @@ def test_xopt_optimizer_checkpoint_no_path():
 
     with pytest.raises(ValueError):
         optimizer.checkpoint()
-
-
-def test_xopt_optimizer_applies_fixed_parameters():
-    vocs = VOCS(variables={"x": [0.0, 1.0], "z": [0.0, 2.0]}, objectives={"y": "MINIMIZE"})
-    optimizer = _random_optimizer(vocs)
-    optimizer.fixed_parameters = {"z": 1.25}
-
-    suggestions = optimizer.suggest(3)
-    assert all(suggestion["z"] == 1.25 for suggestion in suggestions)
 
 
 def test_xopt_optimizer_get_best_points_single_objective_minimize(optimizer_factory: Callable[[VOCS], XoptOptimizer]):
