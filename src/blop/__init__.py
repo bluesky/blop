@@ -1,5 +1,4 @@
 from .plans import acquire_baseline, default_acquire, optimize, optimize_step, sample_suggestions
-from .xopt import XoptOptimizer
 
 try:
     from ._version import __version__
