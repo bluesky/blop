@@ -12,5 +12,4 @@ __all__ = [
     "optimize",
     "optimize_step",
     "sample_suggestions",
-    "XoptOptimizer",
 ]
