@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Asynchronous Optimization with Bluesky Queueserver &#8212; blop 1.0.0b2.dev33 documentation</title>
+    <title>Asynchronous Optimization with Bluesky Queueserver &#8212; blop 1.0.0b2.dev34 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=a95f357e85573c9b56d5" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -38,12 +38,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/styles.css?v=a24eef6b" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=c04e0514"></script>
+    <script src="../_static/documentation_options.js?v=0bc795d9"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -268,6 +268,25 @@ let darkTheme = isDarkTheme();
 let modal = null;
 let modalContent = null;
 let previousScrollOffset = [window.scrollX, window.scrollY];
+let _lazyObserver = null;
+let _renderQueue = Promise.resolve();
+
+// Apply d3 zoom to each SVG. Idempotent: an SVG already wrapped is skipped,
+// so this is safe to call both for the initial batch and for diagrams that
+// render lazily once they become visible.
+const addZoomToSvgs = (svgs) => {
+    svgs.each(function() {
+        if (this.getAttribute('data-zoom-applied') === 'true') return;
+        var svg = d3.select(this);
+        svg.html("<g class='wrapper'>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function(event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+        this.setAttribute('data-zoom-applied', 'true');
+    });
+};
 
 const runMermaid = async (rerun) => {
     console.log("Running mermaid diagrams, rerun =", rerun);
@@ -275,7 +294,15 @@ const runMermaid = async (rerun) => {
     let all_mermaids = document.querySelectorAll(".mermaid");
 
     if (rerun) {
+        // Disconnect any previous lazy rendering observer
+        if (_lazyObserver) {
+            _lazyObserver.disconnect();
+            _lazyObserver = null;
+        }
+
         all_mermaids.forEach((el) => {
+            el.removeAttribute('data-mermaid-deferred');
+            el.removeAttribute('data-mermaid-render-failed');
             if(!el.hasAttribute("data-original-code")) {
                 // store original code
                 // console.log(`Storing original code for first run: `, el.innerHTML);
@@ -292,35 +319,89 @@ const runMermaid = async (rerun) => {
                 el.setAttribute('data-original-code', el.innerHTML);
             }
         });
-        await mermaid.run();
+
+        // Separate visible and hidden elements. Mermaid's layout engine measures
+        // text dimensions via the DOM, which fails for elements hidden by a parent
+        // (e.g., Reveal.js non-active slides, sphinx-design unopened tabs),
+        // producing broken SVGs. Render visible elements now, defer hidden ones.
+        const visible = [];
+        const hidden = [];
+        all_mermaids.forEach((el) => {
+            // offsetParent is null for display:none ancestors.
+            // getClientRects().length > 0 catches position:fixed elements
+            // (which also have null offsetParent but are still visible).
+            if (el.offsetParent !== null || el.getClientRects().length > 0) {
+                visible.push(el);
+            } else {
+                hidden.push(el);
+                el.setAttribute('data-mermaid-deferred', 'true');
+            }
+        });
+
+        if (visible.length > 0) {
+            try {
+                await mermaid.run({ nodes: visible });
+            } catch (e) {
+                console.error("Mermaid rendering failed:", e);
+            }
+        }
+
+        // Lazily render hidden elements when they become visible.
+        // Uses a promise chain (_renderQueue) to serialize rendering,
+        // since IntersectionObserver may report multiple entries at once
+        // and mermaid.run() is not safe to call concurrently.
+        if (hidden.length > 0) {
+            if (typeof IntersectionObserver === 'undefined') {
+                console.warn("IntersectionObserver not available; hidden mermaid diagrams will not render.");
+            } else {
+                _renderQueue = Promise.resolve();
+                _lazyObserver = new IntersectionObserver((entries) => {
+                    for (const entry of entries) {
+                        if (entry.isIntersecting && entry.target.getAttribute("data-processed") !== "true") {
+                            _lazyObserver.unobserve(entry.target);
+                            const el = entry.target;
+                            _renderQueue = _renderQueue.then(async () => {
+                                try {
+                                    await mermaid.run({ nodes: [el] });
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    // Apply zoom to the now-rendered diagram, matching
+                                    // the decoration visible diagrams receive.
+                                    if ("False" === "True") {
+                                        addZoomToSvgs(d3.selectAll(""));
+                                    }
+                                } catch (e) {
+                                    console.error("Mermaid deferred rendering failed:", e);
+                                    el.removeAttribute('data-mermaid-deferred');
+                                    el.setAttribute('data-mermaid-render-failed', 'true');
+                                }
+                            });
+                        }
+                    }
+                });
+                hidden.forEach((el) => _lazyObserver.observe(el));
+            }
+        }
     }
 
     all_mermaids = document.querySelectorAll(".mermaid");
-    const mermaids_processed = document.querySelectorAll(".mermaid[data-processed='true']");
+    // Exclude deferred (hidden) and render-failed elements from completion checks
+    const mermaids_active = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])");
+    const mermaids_processed = document.querySelectorAll(".mermaid:not([data-mermaid-deferred]):not([data-mermaid-render-failed])[data-processed='true']");
 
     if ("False" === "True") {
-        const mermaids_to_add_zoom = -1 === -1 ? all_mermaids.length : -1;
+        const mermaids_to_add_zoom = -1 === -1 ? mermaids_active.length : -1;
         if(mermaids_to_add_zoom > 0) {
             var svgs = d3.selectAll("");
-            if(all_mermaids.length !== mermaids_processed.length) {
+            // Wait until every active (visible) diagram has rendered. Deferred
+            // diagrams are excluded, so a fixed d3_node_count that counts a
+            // hidden diagram no longer loops forever waiting for its SVG.
+            if(mermaids_active.length !== mermaids_processed.length) {
                 setTimeout(() => runMermaid(false), 200);
                 return;
-            } else if(svgs.size() !== mermaids_to_add_zoom) {
-                setTimeout(() => runMermaid(false), 200);
-                return;
-            } else {
-                svgs.each(function() {
-                    var svg = d3.select(this);
-                    svg.html("<g class='wrapper'>" + svg.html() + "</g>");
-                    var inner = svg.select("g");
-                    var zoom = d3.zoom().on("zoom", function(event) {
-                        inner.attr("transform", event.transform);
-                    });
-                    svg.call(zoom);
-                });
             }
+            addZoomToSvgs(svgs);
         }
-    } else if(all_mermaids.length !== mermaids_processed.length) {
+    } else if(mermaids_active.length !== mermaids_processed.length) {
         // Wait for mermaid to process all diagrams
         setTimeout(() => runMermaid(false), 200);
         return;
@@ -486,7 +567,7 @@ window.addEventListener("load", load);
 window.runMermaid = runMermaid;</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/queueserver';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.19.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://blueskyproject.io/blop/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -501,7 +582,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="prev" title="Your first Bayesian optimization with Blop" href="simple-experiment.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev33" />
+  <meta name="docsearch:version" content="1.0.0b2.dev34" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -847,7 +928,8 @@ window.runMermaid = runMermaid;</script>
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+  <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
   </svg>
   <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
@@ -1140,7 +1222,7 @@ Worker environment exists: True
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-06 15:14:52] ax.storage.sqa_store.with_db_settings_base: Ax SQL storage initialized with SQLAlchemy 2.0.51
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-09 18:40:48] ax.storage.sqa_store.with_db_settings_base: Ax SQL storage initialized with SQLAlchemy 2.0.51
 </pre></div>
 </div>
 </div>
@@ -1258,8 +1340,8 @@ message prefix.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-06 15:14:52] ax.api.client: GenerationStrategy(name=&#39;Center+Sobol+MBM:fast&#39;, nodes=[CenterGenerationNode(next_node_name=&#39;Sobol&#39;, use_existing_trials_for_initialization=True), GenerationNode(name=&#39;Sobol&#39;, generator_specs=[GeneratorSpec(generator_enum=Sobol, generator_key_override=None)], transition_criteria=[MinTrials(transition_to=&#39;MBM&#39;), MinTrials(transition_to=&#39;MBM&#39;)], suggested_experiment_status=ExperimentStatus.INITIALIZATION, pausing_criteria=[MaxTrialsAwaitingData(threshold=5)]), GenerationNode(name=&#39;MBM&#39;, generator_specs=[GeneratorSpec(generator_enum=BoTorch, generator_key_override=None)], transition_criteria=None, suggested_experiment_status=ExperimentStatus.OPTIMIZATION, pausing_criteria=None)]) chosen based on user input and problem structure.
-[INFO 07-06 15:14:52] ax.api.client: Generated new trial 0 with parameters {&#39;motor1&#39;: 0.0, &#39;motor2&#39;: 0.0} using GenerationNode CenterOfSearchSpace.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-09 18:40:48] ax.api.client: GenerationStrategy(name=&#39;Center+Sobol+MBM:fast&#39;, nodes=[CenterGenerationNode(next_node_name=&#39;Sobol&#39;, use_existing_trials_for_initialization=True), GenerationNode(name=&#39;Sobol&#39;, generator_specs=[GeneratorSpec(generator_enum=Sobol, generator_key_override=None)], transition_criteria=[MinTrials(transition_to=&#39;MBM&#39;), MinTrials(transition_to=&#39;MBM&#39;)], suggested_experiment_status=ExperimentStatus.INITIALIZATION, pausing_criteria=[MaxTrialsAwaitingData(threshold=5)]), GenerationNode(name=&#39;MBM&#39;, generator_specs=[GeneratorSpec(generator_enum=BoTorch, generator_key_override=None)], transition_criteria=None, suggested_experiment_status=ExperimentStatus.OPTIMIZATION, pausing_criteria=None)]) chosen based on user input and problem structure.
+[INFO 07-09 18:40:48] ax.api.client: Generated new trial 0 with parameters {&#39;motor1&#39;: 0.0, &#39;motor2&#39;: 0.0} using GenerationNode CenterOfSearchSpace.
 </pre></div>
 </div>
 </div>
@@ -1284,37 +1366,37 @@ message prefix.</p>
 Points per iteration : 1
 Total acquisitions   : 10
 Run UIDs:
-  a222eb02-ad98-43c9-916f-958f7dfdfec0
-  62e17b1c-1ccf-4762-9aa2-04a9ffca045e
-  a92bc190-504b-4a34-8ddd-332f162b5e36
-  531a7182-7a8f-4643-9df1-efad8e882c5a
-  10b3b1a0-1570-4ce2-806b-d504ca2ff460
-  a3658bdc-be31-4e70-a430-1a29f0ea09c9
-  f0679417-acb4-4abd-b4de-fa6bee39940a
-  b851051d-164e-4085-86a9-2de2df9c8546
-  a14eaddb-fa39-4633-a730-8b6b426f10d6
-  26b44b49-8ca5-4a19-a3c0-53d8534ad88a
+  cf95e676-cd1e-404c-be46-07b2f9613f05
+  4f3ef8a2-b6e1-4d23-b8b7-7a938813acc9
+  42d3d42c-1a95-47ea-8d95-b6454a4de538
+  7f0c386e-c03e-4e68-8056-73e551a78031
+  fb1a4ac9-e23f-4c38-b0f8-9371ccff27a8
+  d98f6512-4d1d-4347-8eca-9557b65eddbe
+  74aee9f0-da3b-44fd-bd02-584aa7371187
+  fbbc18bf-f1b4-4797-b3f7-38d5994de1dd
+  aefc43f1-d673-4f3c-9a19-7c50158a1783
+  e7310620-3764-4190-92cf-ef540220bc4e
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-06 15:14:53] ax.api.client: Trial 0 marked COMPLETED.
-[INFO 07-06 15:14:53] ax.api.client: Generated new trial 1 with parameters {&#39;motor1&#39;: 3.99247, &#39;motor2&#39;: 4.339917} using GenerationNode Sobol.
-[INFO 07-06 15:14:54] ax.api.client: Trial 1 marked COMPLETED.
-[INFO 07-06 15:14:54] ax.api.client: Generated new trial 2 with parameters {&#39;motor1&#39;: -0.199622, &#39;motor2&#39;: -3.541095} using GenerationNode Sobol.
-[INFO 07-06 15:14:55] ax.api.client: Trial 2 marked COMPLETED.
-[INFO 07-06 15:14:55] ax.api.client: Generated new trial 3 with parameters {&#39;motor1&#39;: -2.732084, &#39;motor2&#39;: 1.852082} using GenerationNode Sobol.
-[INFO 07-06 15:14:56] ax.api.client: Trial 3 marked COMPLETED.
-[INFO 07-06 15:14:56] ax.api.client: Generated new trial 4 with parameters {&#39;motor1&#39;: 1.517608, &#39;motor2&#39;: -1.048157} using GenerationNode Sobol.
-[INFO 07-06 15:14:57] ax.api.client: Trial 4 marked COMPLETED.
-[INFO 07-06 15:14:58] ax.api.client: Generated new trial 5 with parameters {&#39;motor1&#39;: -2.494164, &#39;motor2&#39;: 5.0} using GenerationNode MBM.
-[INFO 07-06 15:14:59] ax.api.client: Trial 5 marked COMPLETED.
-[INFO 07-06 15:15:00] ax.api.client: Generated new trial 6 with parameters {&#39;motor1&#39;: -5.0, &#39;motor2&#39;: 2.259297} using GenerationNode MBM.
-[INFO 07-06 15:15:01] ax.api.client: Trial 6 marked COMPLETED.
-[INFO 07-06 15:15:03] ax.api.client: Generated new trial 7 with parameters {&#39;motor1&#39;: -2.250548, &#39;motor2&#39;: 1.309792} using GenerationNode MBM.
-[INFO 07-06 15:15:04] ax.api.client: Trial 7 marked COMPLETED.
-[INFO 07-06 15:15:05] ax.api.client: Generated new trial 8 with parameters {&#39;motor1&#39;: -3.055006, &#39;motor2&#39;: 1.027427} using GenerationNode MBM.
-[INFO 07-06 15:15:06] ax.api.client: Trial 8 marked COMPLETED.
-[INFO 07-06 15:15:07] ax.api.client: Generated new trial 9 with parameters {&#39;motor1&#39;: 1.679005, &#39;motor2&#39;: 1.015723} using GenerationNode MBM.
-[INFO 07-06 15:15:08] ax.api.client: Trial 9 marked COMPLETED.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-09 18:40:50] ax.api.client: Trial 0 marked COMPLETED.
+[INFO 07-09 18:40:50] ax.api.client: Generated new trial 1 with parameters {&#39;motor1&#39;: 4.495488, &#39;motor2&#39;: -0.454494} using GenerationNode Sobol.
+[INFO 07-09 18:40:51] ax.api.client: Trial 1 marked COMPLETED.
+[INFO 07-09 18:40:51] ax.api.client: Generated new trial 2 with parameters {&#39;motor1&#39;: -0.433604, &#39;motor2&#39;: 2.003216} using GenerationNode Sobol.
+[INFO 07-09 18:40:52] ax.api.client: Trial 2 marked COMPLETED.
+[INFO 07-09 18:40:52] ax.api.client: Generated new trial 3 with parameters {&#39;motor1&#39;: -2.858689, &#39;motor2&#39;: -4.588645} using GenerationNode Sobol.
+[INFO 07-09 18:40:53] ax.api.client: Trial 3 marked COMPLETED.
+[INFO 07-09 18:40:53] ax.api.client: Generated new trial 4 with parameters {&#39;motor1&#39;: 1.919363, &#39;motor2&#39;: 3.030234} using GenerationNode Sobol.
+[INFO 07-09 18:40:54] ax.api.client: Trial 4 marked COMPLETED.
+[INFO 07-09 18:40:55] ax.api.client: Generated new trial 5 with parameters {&#39;motor1&#39;: 0.772297, &#39;motor2&#39;: 4.500912} using GenerationNode MBM.
+[INFO 07-09 18:40:56] ax.api.client: Trial 5 marked COMPLETED.
+[INFO 07-09 18:40:57] ax.api.client: Generated new trial 6 with parameters {&#39;motor1&#39;: 2.274977, &#39;motor2&#39;: 2.591737} using GenerationNode MBM.
+[INFO 07-09 18:40:58] ax.api.client: Trial 6 marked COMPLETED.
+[INFO 07-09 18:40:59] ax.api.client: Generated new trial 7 with parameters {&#39;motor1&#39;: 4.451826, &#39;motor2&#39;: 2.740303} using GenerationNode MBM.
+[INFO 07-09 18:41:00] ax.api.client: Trial 7 marked COMPLETED.
+[INFO 07-09 18:41:01] ax.api.client: Generated new trial 8 with parameters {&#39;motor1&#39;: 1.570353, &#39;motor2&#39;: 2.277243} using GenerationNode MBM.
+[INFO 07-09 18:41:02] ax.api.client: Trial 8 marked COMPLETED.
+[INFO 07-09 18:41:03] ax.api.client: Generated new trial 9 with parameters {&#39;motor1&#39;: 3.067387, &#39;motor2&#39;: 1.116594} using GenerationNode MBM.
+[INFO 07-09 18:41:04] ax.api.client: Trial 9 marked COMPLETED.
 </pre></div>
 </div>
 </div>
@@ -1374,9 +1456,9 @@ Run UIDs:
       <td>1_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>336.618524</td>
-      <td>3.992470</td>
-      <td>4.339917</td>
+      <td>81.929224</td>
+      <td>4.495488</td>
+      <td>-0.454494</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1384,9 +1466,9 @@ Run UIDs:
       <td>2_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>238.798861</td>
-      <td>-0.199622</td>
-      <td>-3.541095</td>
+      <td>89.295866</td>
+      <td>-0.433604</td>
+      <td>2.003216</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1394,9 +1476,9 @@ Run UIDs:
       <td>3_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>42.548294</td>
-      <td>-2.732084</td>
-      <td>1.852082</td>
+      <td>180.377216</td>
+      <td>-2.858689</td>
+      <td>-4.588645</td>
     </tr>
     <tr>
       <th>4</th>
@@ -1404,9 +1486,9 @@ Run UIDs:
       <td>4_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>114.182791</td>
-      <td>1.517608</td>
-      <td>-1.048157</td>
+      <td>35.191947</td>
+      <td>1.919363</td>
+      <td>3.030234</td>
     </tr>
     <tr>
       <th>5</th>
@@ -1414,9 +1496,9 @@ Run UIDs:
       <td>5_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>240.479734</td>
-      <td>-2.494164</td>
-      <td>5.000000</td>
+      <td>231.696402</td>
+      <td>0.772297</td>
+      <td>4.500912</td>
     </tr>
     <tr>
       <th>6</th>
@@ -1424,9 +1506,9 @@ Run UIDs:
       <td>6_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>311.913724</td>
-      <td>-5.000000</td>
-      <td>2.259297</td>
+      <td>14.418997</td>
+      <td>2.274977</td>
+      <td>2.591737</td>
     </tr>
     <tr>
       <th>7</th>
@@ -1434,9 +1516,9 @@ Run UIDs:
       <td>7_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>78.168980</td>
-      <td>-2.250548</td>
-      <td>1.309792</td>
+      <td>158.224168</td>
+      <td>4.451826</td>
+      <td>2.740303</td>
     </tr>
     <tr>
       <th>8</th>
@@ -1444,9 +1526,9 @@ Run UIDs:
       <td>8_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>81.398177</td>
-      <td>-3.055006</td>
-      <td>1.027427</td>
+      <td>39.206359</td>
+      <td>1.570353</td>
+      <td>2.277243</td>
     </tr>
     <tr>
       <th>9</th>
@@ -1454,9 +1536,9 @@ Run UIDs:
       <td>9_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>69.738461</td>
-      <td>1.679005</td>
-      <td>1.015723</td>
+      <td>7.438872</td>
+      <td>3.067387</td>
+      <td>1.116594</td>
     </tr>
   </tbody>
 </table>
@@ -1599,8 +1681,8 @@ docker<span class="w"> </span>compose<span class="w"> </span>down
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=a95f357e85573c9b56d5"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=a95f357e85573c9b56d5"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1634,7 +1716,7 @@ docker<span class="w"> </span>compose<span class="w"> </span>down
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.19.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
 </p></div>
       
     </div>
