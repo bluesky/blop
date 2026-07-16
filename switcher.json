@@ -6,5 +6,9 @@
   {
     "version": "v1.0.0b1",
     "url": "https://bluesky.github.io/blop/v1.0.0b1/"
+  },
+  {
+    "version": "v1.0.0",
+    "url": "https://bluesky.github.io/blop/v1.0.0/"
   }
 ]
