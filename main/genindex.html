@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>Index &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="_static/documentation_options.js?v=8d563738"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -579,7 +579,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -689,6 +689,13 @@ window.runMermaid = runMermaid;</script>
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="how-to-guides.html">
     How-to Guides
   </a>
@@ -708,20 +715,30 @@ window.runMermaid = runMermaid;</script>
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -829,6 +846,13 @@ window.runMermaid = runMermaid;</script>
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="installation.html">
     Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="deployments.html">
+    Deployments
   </a>
 </li>
 
@@ -973,6 +997,7 @@ window.runMermaid = runMermaid;</script>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  | <a href="#V"><strong>V</strong></a>
+ | <a href="#X"><strong>X</strong></a>
  
 </div>
 <h2 id="_">_</h2>
@@ -990,69 +1015,87 @@ window.runMermaid = runMermaid;</script>
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.acquire_baseline">acquire_baseline() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.acquire_baseline">acquire_baseline() (blop.ax.Agent method)</a>
 
       <ul>
         <li><a href="reference/plans.html#blop.plans.acquire_baseline">(in module blop.plans)</a>
 </li>
       </ul></li>
-      <li><a href="reference/agent.html#blop.ax.Agent.acquisition_plan">acquisition_plan (blop.ax.Agent property)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.acquisition_plan">acquisition_plan (blop.ax.Agent property)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.acquisition_plan">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.acquisition_plan">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+</li>
+        <li><a href="reference/protocols.html#blop.protocols.BaseOptimizationProblem.acquisition_plan">(blop.protocols.BaseOptimizationProblem attribute)</a>
 </li>
         <li><a href="reference/protocols.html#blop.protocols.OptimizationProblem.acquisition_plan">(blop.protocols.OptimizationProblem attribute)</a>
 </li>
+        <li><a href="reference/protocols.html#blop.protocols.QueueserverOptimizationProblem.acquisition_plan">(blop.protocols.QueueserverOptimizationProblem attribute)</a>
+</li>
       </ul></li>
+      <li><a href="reference/protocols.html#blop.protocols.QueueserverOptimizationProblem.acquisition_plan_kwargs">acquisition_plan_kwargs (blop.protocols.QueueserverOptimizationProblem attribute)</a>
+</li>
       <li><a href="reference/protocols.html#blop.protocols.AcquisitionPlan">AcquisitionPlan (class in blop.protocols)</a>
 </li>
-      <li><a href="reference/dof.html#blop.ax.dof.ChoiceDOF.actuator">actuator (blop.ax.dof.ChoiceDOF attribute)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.ChoiceDOF.actuator">actuator (blop.ax.dof.ChoiceDOF attribute)</a>
 
       <ul>
-        <li><a href="reference/dof.html#blop.ax.dof.DOF.actuator">(blop.ax.dof.DOF attribute)</a>
+        <li><a href="reference/ax/dof.html#blop.ax.dof.DOF.actuator">(blop.ax.dof.DOF attribute)</a>
 </li>
-        <li><a href="reference/dof.html#blop.ax.dof.RangeDOF.actuator">(blop.ax.dof.RangeDOF attribute)</a>
+        <li><a href="reference/ax/dof.html#blop.ax.dof.RangeDOF.actuator">(blop.ax.dof.RangeDOF attribute)</a>
 </li>
       </ul></li>
       <li><a href="reference/protocols.html#blop.protocols.Actuator">Actuator (in module blop.protocols)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.actuators">actuators (blop.ax.Agent property)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.actuators">actuators (blop.ax.Agent property)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.actuators">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.actuators">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+</li>
+        <li><a href="reference/protocols.html#blop.protocols.BaseOptimizationProblem.actuators">(blop.protocols.BaseOptimizationProblem attribute)</a>
 </li>
         <li><a href="reference/protocols.html#blop.protocols.OptimizationProblem.actuators">(blop.protocols.OptimizationProblem attribute)</a>
 </li>
-      </ul></li>
-      <li><a href="reference/agent.html#blop.ax.Agent">Agent (class in blop.ax)</a>
+        <li><a href="reference/protocols.html#blop.protocols.QueueserverOptimizationProblem.actuators">(blop.protocols.QueueserverOptimizationProblem attribute)</a>
 </li>
-      <li><a href="reference/agent.html#blop.ax.Agent.ax_client">ax_client (blop.ax.Agent property)</a>
+      </ul></li>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent">Agent (class in blop.ax)</a>
+</li>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.ax_client">ax_client (blop.ax.Agent property)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.ax_client">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+        <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.ax_client">(blop.ax.optimizer.AxOptimizer property)</a>
+</li>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.ax_client">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
 </li>
       </ul></li>
-      <li><a href="reference/dof-constraint.html#blop.ax.dof.DOFConstraint.ax_constraint">ax_constraint (blop.ax.dof.DOFConstraint property)</a>
+      <li><a href="reference/ax/dof-constraint.html#blop.ax.dof.DOFConstraint.ax_constraint">ax_constraint (blop.ax.dof.DOFConstraint property)</a>
 
       <ul>
-        <li><a href="reference/outcome-constraint.html#blop.ax.objective.OutcomeConstraint.ax_constraint">(blop.ax.objective.OutcomeConstraint property)</a>
+        <li><a href="reference/ax/outcome-constraint.html#blop.ax.objective.OutcomeConstraint.ax_constraint">(blop.ax.objective.OutcomeConstraint property)</a>
 </li>
       </ul></li>
-      <li><a href="reference/objective.html#blop.ax.objective.Objective.ax_expression">ax_expression (blop.ax.objective.Objective property)</a>
+      <li><a href="reference/ax/objective.html#blop.ax.objective.Objective.ax_expression">ax_expression (blop.ax.objective.Objective property)</a>
 
       <ul>
-        <li><a href="reference/objective.html#blop.ax.objective.ScalarizedObjective.ax_expression">(blop.ax.objective.ScalarizedObjective property)</a>
+        <li><a href="reference/ax/objective.html#blop.ax.objective.ScalarizedObjective.ax_expression">(blop.ax.objective.ScalarizedObjective property)</a>
 </li>
       </ul></li>
+      <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer">AxOptimizer (class in blop.ax.optimizer)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/dof.html#blop.ax.dof.RangeDOF.bounds">bounds (blop.ax.dof.RangeDOF attribute)</a>
+      <li><a href="reference/protocols.html#blop.protocols.BaseOptimizationProblem">BaseOptimizationProblem (class in blop.protocols)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.RangeDOF.bounds">bounds (blop.ax.dof.RangeDOF attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1060,7 +1103,9 @@ window.runMermaid = runMermaid;</script>
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.callbacks">callbacks (blop.ax.Agent property)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.callbacks">callbacks (blop.ax.Agent property)</a>
+</li>
+      <li><a href="reference/protocols.html#blop.protocols.CanRegisterSuggestions">CanRegisterSuggestions (class in blop.protocols)</a>
 </li>
       <li><a href="reference/queueserver.html#blop.queueserver.QueueserverClient.check_devices_available">check_devices_available() (blop.queueserver.QueueserverClient method)</a>
 </li>
@@ -1068,23 +1113,35 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="reference/queueserver.html#blop.queueserver.QueueserverClient.check_plan_available">check_plan_available() (blop.queueserver.QueueserverClient method)</a>
 </li>
-      <li><a href="reference/agent.html#blop.ax.Agent.checkpoint">checkpoint() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.checkpoint">checkpoint() (blop.ax.Agent method)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.checkpoint">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
+        <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.checkpoint">(blop.ax.optimizer.AxOptimizer method)</a>
+</li>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.checkpoint">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
+</li>
+        <li><a href="reference/protocols.html#blop.protocols.Checkpointable.checkpoint">(blop.protocols.Checkpointable method)</a>
+</li>
+        <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.checkpoint">(blop.xopt.optimizer.XoptOptimizer method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.checkpoint_path">checkpoint_path (blop.ax.Agent property)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.checkpoint_path">checkpoint_path (blop.ax.Agent property)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.checkpoint_path">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+        <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.checkpoint_path">(blop.ax.optimizer.AxOptimizer property)</a>
+</li>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.checkpoint_path">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+</li>
+        <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.checkpoint_path">(blop.xopt.optimizer.XoptOptimizer property)</a>
 </li>
       </ul></li>
-      <li><a href="reference/dof.html#blop.ax.dof.ChoiceDOF">ChoiceDOF (class in blop.ax.dof)</a>
+      <li><a href="reference/protocols.html#blop.protocols.Checkpointable">Checkpointable (class in blop.protocols)</a>
 </li>
-      <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.current_iteration">current_iteration (blop.ax.queueserver_agent.QueueserverAgent property)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.ChoiceDOF">ChoiceDOF (class in blop.ax.dof)</a>
+</li>
+      <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.current_iteration">current_iteration (blop.ax.queueserver_agent.QueueserverAgent property)</a>
 
       <ul>
         <li><a href="reference/queueserver.html#blop.queueserver.QueueserverOptimizationRunner.current_iteration">(blop.queueserver.QueueserverOptimizationRunner property)</a>
@@ -1098,13 +1155,15 @@ window.runMermaid = runMermaid;</script>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/plans.html#blop.plans.default_acquire">default_acquire() (in module blop.plans)</a>
 </li>
-      <li><a href="reference/dof.html#blop.ax.dof.ChoiceDOF.dependent_parameters">dependent_parameters (blop.ax.dof.ChoiceDOF attribute)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.ChoiceDOF.dependent_parameters">dependent_parameters (blop.ax.dof.ChoiceDOF attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/dof.html#blop.ax.dof.DOF">DOF (class in blop.ax.dof)</a>
+      <li><a href="reference/callbacks.html#blop.callbacks.logger.OptimizationLogger.descriptor">descriptor() (blop.callbacks.logger.OptimizationLogger method)</a>
 </li>
-      <li><a href="reference/dof-constraint.html#blop.ax.dof.DOFConstraint">DOFConstraint (class in blop.ax.dof)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.DOF">DOF (class in blop.ax.dof)</a>
+</li>
+      <li><a href="reference/ax/dof-constraint.html#blop.ax.dof.DOFConstraint">DOFConstraint (class in blop.ax.dof)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1112,17 +1171,23 @@ window.runMermaid = runMermaid;</script>
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.evaluation_function">evaluation_function (blop.ax.Agent property)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.evaluation_function">evaluation_function (blop.ax.Agent property)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.evaluation_function">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.evaluation_function">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+</li>
+        <li><a href="reference/protocols.html#blop.protocols.BaseOptimizationProblem.evaluation_function">(blop.protocols.BaseOptimizationProblem attribute)</a>
 </li>
         <li><a href="reference/protocols.html#blop.protocols.OptimizationProblem.evaluation_function">(blop.protocols.OptimizationProblem attribute)</a>
+</li>
+        <li><a href="reference/protocols.html#blop.protocols.QueueserverOptimizationProblem.evaluation_function">(blop.protocols.QueueserverOptimizationProblem attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/protocols.html#blop.protocols.EvaluationFunction">EvaluationFunction (class in blop.protocols)</a>
+</li>
+      <li><a href="reference/callbacks.html#blop.callbacks.logger.OptimizationLogger.event">event() (blop.callbacks.logger.OptimizationLogger method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1130,28 +1195,42 @@ window.runMermaid = runMermaid;</script>
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.fixed_dofs">fixed_dofs (blop.ax.Agent property)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.fixed_dofs">fixed_dofs (blop.ax.Agent property)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.fixed_dofs">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.fixed_dofs">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
 </li>
       </ul></li>
+      <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.fixed_parameters">fixed_parameters (blop.ax.optimizer.AxOptimizer property)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.from_checkpoint">from_checkpoint() (blop.ax.Agent class method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.from_checkpoint">from_checkpoint() (blop.ax.Agent class method)</a>
+
+      <ul>
+        <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.from_checkpoint">(blop.ax.optimizer.AxOptimizer class method)</a>
 </li>
+        <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.from_checkpoint">(blop.xopt.optimizer.XoptOptimizer class method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.get_best_points">get_best_points() (blop.ax.Agent method)</a>
+      <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.generator">generator (blop.xopt.optimizer.XoptOptimizer property)</a>
+</li>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.get_best_points">get_best_points() (blop.ax.Agent method)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.get_best_points">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
+        <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.get_best_points">(blop.ax.optimizer.AxOptimizer method)</a>
+</li>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.get_best_points">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
 </li>
         <li><a href="reference/protocols.html#blop.protocols.Optimizer.get_best_points">(blop.protocols.Optimizer method)</a>
+</li>
+        <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.get_best_points">(blop.xopt.optimizer.XoptOptimizer method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1160,17 +1239,21 @@ window.runMermaid = runMermaid;</script>
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.ingest">ingest() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.ingest">ingest() (blop.ax.Agent method)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.ingest">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
+        <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.ingest">(blop.ax.optimizer.AxOptimizer method)</a>
+</li>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.ingest">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
 </li>
         <li><a href="reference/protocols.html#blop.protocols.Optimizer.ingest">(blop.protocols.Optimizer method)</a>
+</li>
+        <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.ingest">(blop.xopt.optimizer.XoptOptimizer method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/dof.html#blop.ax.dof.ChoiceDOF.is_ordered">is_ordered (blop.ax.dof.ChoiceDOF attribute)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.ChoiceDOF.is_ordered">is_ordered (blop.ax.dof.ChoiceDOF attribute)</a>
 </li>
       <li><a href="reference/queueserver.html#blop.queueserver.OptimizationResult.iterations_completed">iterations_completed (blop.queueserver.OptimizationResult attribute)</a>
 </li>
@@ -1180,7 +1263,11 @@ window.runMermaid = runMermaid;</script>
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/objective.html#blop.ax.objective.Objective.minimize">minimize (blop.ax.objective.Objective attribute)</a>
+      <li><a href="reference/ax/objective.html#blop.ax.objective.Objective.minimize">minimize (blop.ax.objective.Objective attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/protocols.html#blop.protocols.MovableHasName">MovableHasName (class in blop.protocols)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1188,20 +1275,24 @@ window.runMermaid = runMermaid;</script>
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/dof.html#blop.ax.dof.ChoiceDOF.name">name (blop.ax.dof.ChoiceDOF attribute)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.ChoiceDOF.name">name (blop.ax.dof.ChoiceDOF attribute)</a>
 
       <ul>
-        <li><a href="reference/dof.html#blop.ax.dof.DOF.name">(blop.ax.dof.DOF attribute)</a>
+        <li><a href="reference/ax/dof.html#blop.ax.dof.DOF.name">(blop.ax.dof.DOF attribute)</a>
 </li>
-        <li><a href="reference/dof.html#blop.ax.dof.RangeDOF.name">(blop.ax.dof.RangeDOF attribute)</a>
+        <li><a href="reference/ax/dof.html#blop.ax.dof.RangeDOF.name">(blop.ax.dof.RangeDOF attribute)</a>
 </li>
-        <li><a href="reference/objective.html#blop.ax.objective.Objective.name">(blop.ax.objective.Objective attribute)</a>
+        <li><a href="reference/ax/objective.html#blop.ax.objective.Objective.name">(blop.ax.objective.Objective attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.navigate_to_best">navigate_to_best() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.navigate_to_best">navigate_to_best() (blop.ax.Agent method)</a>
+
+      <ul>
+        <li><a href="reference/plan_stubs.html#blop.plan_stubs.navigate_to_best">(in module blop.plan_stubs)</a>
 </li>
+      </ul></li>
       <li><a href="reference/queueserver.html#blop.queueserver.OptimizationResult.num_points">num_points (blop.queueserver.OptimizationResult attribute)</a>
 </li>
   </ul></td>
@@ -1210,15 +1301,19 @@ window.runMermaid = runMermaid;</script>
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/objective.html#blop.ax.objective.Objective">Objective (class in blop.ax.objective)</a>
+      <li><a href="reference/ax/objective.html#blop.ax.objective.Objective">Objective (class in blop.ax.objective)</a>
 </li>
       <li><a href="reference/queueserver.html#blop.queueserver.QueueserverOptimizationRunner.optimization_problem">optimization_problem (blop.queueserver.QueueserverOptimizationRunner property)</a>
+</li>
+      <li><a href="reference/callbacks.html#blop.callbacks.OptimizationCallbackRouter">OptimizationCallbackRouter (class in blop.callbacks)</a>
+</li>
+      <li><a href="reference/callbacks.html#blop.callbacks.logger.OptimizationLogger">OptimizationLogger (class in blop.callbacks.logger)</a>
 </li>
       <li><a href="reference/protocols.html#blop.protocols.OptimizationProblem">OptimizationProblem (class in blop.protocols)</a>
 </li>
       <li><a href="reference/queueserver.html#blop.queueserver.OptimizationResult">OptimizationResult (class in blop.queueserver)</a>
 </li>
-      <li><a href="reference/agent.html#blop.ax.Agent.optimize">optimize() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.optimize">optimize() (blop.ax.Agent method)</a>
 
       <ul>
         <li><a href="reference/plans.html#blop.plans.optimize">(in module blop.plans)</a>
@@ -1228,11 +1323,17 @@ window.runMermaid = runMermaid;</script>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="reference/plans.html#blop.plans.optimize_step">optimize_step() (in module blop.plans)</a>
 </li>
-      <li><a href="reference/protocols.html#blop.protocols.OptimizationProblem.optimizer">optimizer (blop.protocols.OptimizationProblem attribute)</a>
+      <li><a href="reference/protocols.html#blop.protocols.BaseOptimizationProblem.optimizer">optimizer (blop.protocols.BaseOptimizationProblem attribute)</a>
+
+      <ul>
+        <li><a href="reference/protocols.html#blop.protocols.OptimizationProblem.optimizer">(blop.protocols.OptimizationProblem attribute)</a>
 </li>
+        <li><a href="reference/protocols.html#blop.protocols.QueueserverOptimizationProblem.optimizer">(blop.protocols.QueueserverOptimizationProblem attribute)</a>
+</li>
+      </ul></li>
       <li><a href="reference/protocols.html#blop.protocols.Optimizer">Optimizer (class in blop.protocols)</a>
 </li>
-      <li><a href="reference/outcome-constraint.html#blop.ax.objective.OutcomeConstraint">OutcomeConstraint (class in blop.ax.objective)</a>
+      <li><a href="reference/ax/outcome-constraint.html#blop.ax.objective.OutcomeConstraint">OutcomeConstraint (class in blop.ax.objective)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1240,26 +1341,26 @@ window.runMermaid = runMermaid;</script>
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/dof.html#blop.ax.dof.ChoiceDOF.parameter_name">parameter_name (blop.ax.dof.ChoiceDOF property)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.ChoiceDOF.parameter_name">parameter_name (blop.ax.dof.ChoiceDOF property)</a>
 
       <ul>
-        <li><a href="reference/dof.html#blop.ax.dof.DOF.parameter_name">(blop.ax.dof.DOF property)</a>
+        <li><a href="reference/ax/dof.html#blop.ax.dof.DOF.parameter_name">(blop.ax.dof.DOF property)</a>
 </li>
-        <li><a href="reference/dof.html#blop.ax.dof.RangeDOF.parameter_name">(blop.ax.dof.RangeDOF property)</a>
+        <li><a href="reference/ax/dof.html#blop.ax.dof.RangeDOF.parameter_name">(blop.ax.dof.RangeDOF property)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/dof.html#blop.ax.dof.ChoiceDOF.parameter_type">parameter_type (blop.ax.dof.ChoiceDOF attribute)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.ChoiceDOF.parameter_type">parameter_type (blop.ax.dof.ChoiceDOF attribute)</a>
 
       <ul>
-        <li><a href="reference/dof.html#blop.ax.dof.RangeDOF.parameter_type">(blop.ax.dof.RangeDOF attribute)</a>
+        <li><a href="reference/ax/dof.html#blop.ax.dof.RangeDOF.parameter_type">(blop.ax.dof.RangeDOF attribute)</a>
 </li>
       </ul></li>
-      <li><a href="reference/agent.html#blop.ax.Agent.plot_objective">plot_objective() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.plot_objective">plot_objective() (blop.ax.Agent method)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.plot_objective">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.plot_objective">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1268,11 +1369,13 @@ window.runMermaid = runMermaid;</script>
 <h2 id="Q">Q</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent">QueueserverAgent (class in blop.ax.queueserver_agent)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent">QueueserverAgent (class in blop.ax.queueserver_agent)</a>
+</li>
+      <li><a href="reference/queueserver.html#blop.queueserver.QueueserverClient">QueueserverClient (class in blop.queueserver)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/queueserver.html#blop.queueserver.QueueserverClient">QueueserverClient (class in blop.queueserver)</a>
+      <li><a href="reference/protocols.html#blop.protocols.QueueserverOptimizationProblem">QueueserverOptimizationProblem (class in blop.protocols)</a>
 </li>
       <li><a href="reference/queueserver.html#blop.queueserver.QueueserverOptimizationRunner">QueueserverOptimizationRunner (class in blop.queueserver)</a>
 </li>
@@ -1282,17 +1385,37 @@ window.runMermaid = runMermaid;</script>
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/dof.html#blop.ax.dof.RangeDOF">RangeDOF (class in blop.ax.dof)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.RangeDOF">RangeDOF (class in blop.ax.dof)</a>
 </li>
-      <li><a href="reference/agent.html#blop.ax.Agent.reconfigure_search_space">reconfigure_search_space() (blop.ax.Agent method)</a>
+      <li><a href="reference/plan_stubs.html#blop.plan_stubs.read_step">read_step() (in module blop.plan_stubs)</a>
+</li>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.reconfigure_search_space">reconfigure_search_space() (blop.ax.Agent method)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.reconfigure_search_space">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
+        <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.reconfigure_search_space">(blop.ax.optimizer.AxOptimizer method)</a>
+</li>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.reconfigure_search_space">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.register_failures">register_failures() (blop.ax.optimizer.AxOptimizer method)</a>
+
+      <ul>
+        <li><a href="reference/protocols.html#blop.protocols.TrialFaultAware.register_failures">(blop.protocols.TrialFaultAware method)</a>
+</li>
+        <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.register_failures">(blop.xopt.optimizer.XoptOptimizer method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.run">run() (blop.ax.queueserver_agent.QueueserverAgent method)</a>
+      <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.register_suggestions">register_suggestions() (blop.ax.optimizer.AxOptimizer method)</a>
+
+      <ul>
+        <li><a href="reference/protocols.html#blop.protocols.CanRegisterSuggestions.register_suggestions">(blop.protocols.CanRegisterSuggestions method)</a>
+</li>
+        <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.register_suggestions">(blop.xopt.optimizer.XoptOptimizer method)</a>
+</li>
+      </ul></li>
+      <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.run">run() (blop.ax.queueserver_agent.QueueserverAgent method)</a>
 
       <ul>
         <li><a href="reference/queueserver.html#blop.queueserver.QueueserverOptimizationRunner.run">(blop.queueserver.QueueserverOptimizationRunner method)</a>
@@ -1304,35 +1427,43 @@ window.runMermaid = runMermaid;</script>
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.sample_suggestions">sample_suggestions() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.sample_suggestions">sample_suggestions() (blop.ax.Agent method)</a>
 
       <ul>
         <li><a href="reference/plans.html#blop.plans.sample_suggestions">(in module blop.plans)</a>
 </li>
       </ul></li>
-      <li><a href="reference/objective.html#blop.ax.objective.ScalarizedObjective">ScalarizedObjective (class in blop.ax.objective)</a>
+      <li><a href="reference/ax/objective.html#blop.ax.objective.ScalarizedObjective">ScalarizedObjective (class in blop.ax.objective)</a>
 </li>
-      <li><a href="reference/dof.html#blop.ax.dof.RangeDOF.scaling">scaling (blop.ax.dof.RangeDOF attribute)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.RangeDOF.scaling">scaling (blop.ax.dof.RangeDOF attribute)</a>
 </li>
       <li><a href="reference/protocols.html#blop.protocols.Sensor">Sensor (in module blop.protocols)</a>
 </li>
-      <li><a href="reference/agent.html#blop.ax.Agent.sensors">sensors (blop.ax.Agent property)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.sensors">sensors (blop.ax.Agent property)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.sensors">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.sensors">(blop.ax.queueserver_agent.QueueserverAgent property)</a>
+</li>
+        <li><a href="reference/protocols.html#blop.protocols.BaseOptimizationProblem.sensors">(blop.protocols.BaseOptimizationProblem attribute)</a>
 </li>
         <li><a href="reference/protocols.html#blop.protocols.OptimizationProblem.sensors">(blop.protocols.OptimizationProblem attribute)</a>
 </li>
+        <li><a href="reference/protocols.html#blop.protocols.QueueserverOptimizationProblem.sensors">(blop.protocols.QueueserverOptimizationProblem attribute)</a>
+</li>
       </ul></li>
+      <li><a href="reference/callbacks.html#blop.callbacks.logger.OptimizationLogger.start">start() (blop.callbacks.logger.OptimizationLogger method)</a>
+</li>
       <li><a href="reference/queueserver.html#blop.queueserver.QueueserverClient.start_listener">start_listener() (blop.queueserver.QueueserverClient method)</a>
 </li>
-      <li><a href="reference/dof.html#blop.ax.dof.RangeDOF.step_size">step_size (blop.ax.dof.RangeDOF attribute)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.RangeDOF.step_size">step_size (blop.ax.dof.RangeDOF attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.stop">stop() (blop.ax.queueserver_agent.QueueserverAgent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.stop">stop() (blop.ax.queueserver_agent.QueueserverAgent method)</a>
 
       <ul>
+        <li><a href="reference/callbacks.html#blop.callbacks.logger.OptimizationLogger.stop">(blop.callbacks.logger.OptimizationLogger method)</a>
+</li>
         <li><a href="reference/queueserver.html#blop.queueserver.QueueserverOptimizationRunner.stop">(blop.queueserver.QueueserverOptimizationRunner method)</a>
 </li>
       </ul></li>
@@ -1340,20 +1471,24 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="reference/queueserver.html#blop.queueserver.QueueserverClient.submit_plan">submit_plan() (blop.queueserver.QueueserverClient method)</a>
 </li>
-      <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.submit_suggestions">submit_suggestions() (blop.ax.queueserver_agent.QueueserverAgent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.submit_suggestions">submit_suggestions() (blop.ax.queueserver_agent.QueueserverAgent method)</a>
 
       <ul>
         <li><a href="reference/queueserver.html#blop.queueserver.QueueserverOptimizationRunner.submit_suggestions">(blop.queueserver.QueueserverOptimizationRunner method)</a>
 </li>
       </ul></li>
-      <li><a href="reference/agent.html#blop.ax.Agent.subscribe">subscribe() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.subscribe">subscribe() (blop.ax.Agent method)</a>
 </li>
-      <li><a href="reference/agent.html#blop.ax.Agent.suggest">suggest() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.suggest">suggest() (blop.ax.Agent method)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.suggest">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
+        <li><a href="reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.suggest">(blop.ax.optimizer.AxOptimizer method)</a>
+</li>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.suggest">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
 </li>
         <li><a href="reference/protocols.html#blop.protocols.Optimizer.suggest">(blop.protocols.Optimizer method)</a>
+</li>
+        <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.suggest">(blop.xopt.optimizer.XoptOptimizer method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -1362,22 +1497,24 @@ window.runMermaid = runMermaid;</script>
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/dof.html#blop.ax.dof.ChoiceDOF.to_ax_parameter_config">to_ax_parameter_config() (blop.ax.dof.ChoiceDOF method)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.ChoiceDOF.to_ax_parameter_config">to_ax_parameter_config() (blop.ax.dof.ChoiceDOF method)</a>
 
       <ul>
-        <li><a href="reference/dof.html#blop.ax.dof.DOF.to_ax_parameter_config">(blop.ax.dof.DOF method)</a>
+        <li><a href="reference/ax/dof.html#blop.ax.dof.DOF.to_ax_parameter_config">(blop.ax.dof.DOF method)</a>
 </li>
-        <li><a href="reference/dof.html#blop.ax.dof.RangeDOF.to_ax_parameter_config">(blop.ax.dof.RangeDOF method)</a>
+        <li><a href="reference/ax/dof.html#blop.ax.dof.RangeDOF.to_ax_parameter_config">(blop.ax.dof.RangeDOF method)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.to_optimization_problem">to_optimization_problem() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.to_optimization_problem">to_optimization_problem() (blop.ax.Agent method)</a>
 
       <ul>
-        <li><a href="reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
+        <li><a href="reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem">(blop.ax.queueserver_agent.QueueserverAgent method)</a>
 </li>
       </ul></li>
+      <li><a href="reference/protocols.html#blop.protocols.TrialFaultAware">TrialFaultAware (class in blop.protocols)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -1388,7 +1525,7 @@ window.runMermaid = runMermaid;</script>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/agent.html#blop.ax.Agent.unsubscribe">unsubscribe() (blop.ax.Agent method)</a>
+      <li><a href="reference/ax/agent.html#blop.ax.Agent.unsubscribe">unsubscribe() (blop.ax.Agent method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1396,7 +1533,19 @@ window.runMermaid = runMermaid;</script>
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="reference/dof.html#blop.ax.dof.ChoiceDOF.values">values (blop.ax.dof.ChoiceDOF attribute)</a>
+      <li><a href="reference/ax/dof.html#blop.ax.dof.ChoiceDOF.values">values (blop.ax.dof.ChoiceDOF attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.vocs">vocs (blop.xopt.optimizer.XoptOptimizer property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="X">X</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer">XoptOptimizer (class in blop.xopt.optimizer)</a>
 </li>
   </ul></td>
 </tr></table>

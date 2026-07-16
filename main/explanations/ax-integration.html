@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Ax Integration &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>Ax Integration &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="The Evaluation Function" href="evaluation-function.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -175,6 +175,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../how-to-guides.html">
     How-to Guides
   </a>
@@ -194,20 +201,30 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -322,6 +339,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../how-to-guides.html">
     How-to Guides
   </a>
@@ -428,6 +452,7 @@
 <li class="toctree-l1"><a class="reference internal" href="evaluation-function.html">The Evaluation Function</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Ax Integration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acquisition-plan.html">Acquisition Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="callbacks.html">Optimization Callbacks</a></li>
 </ul>
 </div>
 </nav></div>
@@ -495,16 +520,16 @@ focus on delivering a great user experience for optimization using Bluesky.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>The use of Ax is optional. You can implement your own optimizer using the <a class="reference internal" href="../reference/protocols.html#blop.protocols.Optimizer" title="blop.protocols.Optimizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.protocols.Optimizer</span></code></a> protocol. However,
-the <a class="reference internal" href="../reference/agent.html#blop.ax.Agent" title="blop.ax.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.Agent</span></code></a> class is designed to be a nicer interface for using Ax only.</p>
+the <a class="reference internal" href="../reference/ax/agent.html#blop.ax.Agent" title="blop.ax.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.Agent</span></code></a> class is designed to be a nicer interface for using Ax only.</p>
 </div>
 <section id="wrapping-ax">
 <h2>Wrapping Ax<a class="headerlink" href="#wrapping-ax" title="Link to this heading">#</a></h2>
 <p>Generally, we want to avoid wrapping the Ax API and allow users to use the full power of Ax themselves. However, there are some cases where
 an API wrapper is useful:</p>
 <ul class="simple">
-<li><p><strong>DOFs</strong>: We wrap Ax parameters to link them with Bluesky <a class="reference internal" href="../reference/protocols.html#blop.protocols.Actuator" title="blop.protocols.Actuator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Actuator</span></code></a>s, enabling automatic movement during acquisition (see <a class="reference internal" href="../reference/dof.html#blop.ax.dof.DOF" title="blop.ax.dof.DOF"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.dof.DOF</span></code></a>).</p></li>
-<li><p><strong>Constraints</strong>: We provide <a class="reference internal" href="../reference/dof-constraint.html#blop.ax.dof.DOFConstraint" title="blop.ax.dof.DOFConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.dof.DOFConstraint</span></code></a> and <a class="reference internal" href="../reference/outcome-constraint.html#blop.ax.objective.OutcomeConstraint" title="blop.ax.objective.OutcomeConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.objective.OutcomeConstraint</span></code></a> with a readable syntax that maps to Ax constraints.</p></li>
-<li><p><strong>Agent</strong>: The <a class="reference internal" href="../reference/agent.html#blop.ax.Agent" title="blop.ax.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.Agent</span></code></a> class provides a higher-level interface for common optimization workflows.</p></li>
+<li><p><strong>DOFs</strong>: We wrap Ax parameters to link them with Bluesky <a class="reference internal" href="../reference/protocols.html#blop.protocols.Actuator" title="blop.protocols.Actuator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Actuator</span></code></a>s, enabling automatic movement during acquisition (see <a class="reference internal" href="../reference/ax/dof.html#blop.ax.dof.DOF" title="blop.ax.dof.DOF"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.dof.DOF</span></code></a>).</p></li>
+<li><p><strong>Constraints</strong>: We provide <a class="reference internal" href="../reference/ax/dof-constraint.html#blop.ax.dof.DOFConstraint" title="blop.ax.dof.DOFConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.dof.DOFConstraint</span></code></a> and <a class="reference internal" href="../reference/ax/outcome-constraint.html#blop.ax.objective.OutcomeConstraint" title="blop.ax.objective.OutcomeConstraint"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.objective.OutcomeConstraint</span></code></a> with a readable syntax that maps to Ax constraints.</p></li>
+<li><p><strong>Agent</strong>: The <a class="reference internal" href="../reference/ax/agent.html#blop.ax.Agent" title="blop.ax.Agent"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.ax.Agent</span></code></a> class provides a higher-level interface for common optimization workflows.</p></li>
 </ul>
 <p>Blop handles the following aspects of the Ax API for you:</p>
 <ul class="simple">
@@ -516,7 +541,7 @@ an API wrapper is useful:</p>
 </section>
 <section id="using-the-ax-api-directly">
 <h2>Using the Ax API directly<a class="headerlink" href="#using-the-ax-api-directly" title="Link to this heading">#</a></h2>
-<p>You can access the underlying <code class="xref py py-class docutils literal notranslate"><span class="pre">ax.Client</span></code> instance via <a class="reference internal" href="../reference/agent.html#blop.ax.Agent.ax_client" title="blop.ax.Agent.ax_client"><code class="xref py py-attr docutils literal notranslate"><span class="pre">blop.ax.Agent.ax_client</span></code></a>, and interact with the <a class="reference external" href="https://ax.readthedocs.io/en/stable/api.html#ax.api.client.Client">Client API</a></p>
+<p>You can access the underlying <code class="xref py py-class docutils literal notranslate"><span class="pre">ax.Client</span></code> instance via <a class="reference internal" href="../reference/ax/agent.html#blop.ax.Agent.ax_client" title="blop.ax.Agent.ax_client"><code class="xref py py-attr docutils literal notranslate"><span class="pre">blop.ax.Agent.ax_client</span></code></a>, and interact with the <a class="reference external" href="https://ax.readthedocs.io/en/stable/api.html#ax.api.client.Client">Client API</a></p>
 <p>You can learn all about the various Ax features in the <a class="reference external" href="https://ax.dev/docs/tutorials/quickstart">Ax documentation</a>. Some notable features that are not used by Blop by default are:</p>
 <ul class="simple">
 <li><p>Generation strategy configuration</p>
@@ -526,8 +551,8 @@ an API wrapper is useful:</p>
 <li><p>Using external generators: <a class="reference external" href="https://ax.dev/docs/tutorials/external_generation_node/">https://ax.dev/docs/tutorials/external_generation_node/</a></p></li>
 </ul>
 </li>
-<li><p>Configuring early stopping: <a class="reference external" href="https://ax.dev/docs/tutorials/early_stopping/">https://ax.dev/docs/tutorials/early_stopping/</a> (first-class support for early stopping is coming soon, see <a class="github reference external" href="https://github.com/NSLS-II/blop/issues/129">NSLS-II/blop#129</a>)</p></li>
-<li><p>Analyzing/Summarizing the optimization results and model fit: <a class="reference external" href="https://ax.dev/docs/tutorials/analyses/">https://ax.dev/docs/tutorials/analyses/</a> (see <a class="reference internal" href="../reference/agent.html#blop.ax.Agent.plot_objective" title="blop.ax.Agent.plot_objective"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.ax.Agent.plot_objective()</span></code></a> for an example in Blop)</p></li>
+<li><p>Configuring early stopping: <a class="reference external" href="https://ax.dev/docs/tutorials/early_stopping/">https://ax.dev/docs/tutorials/early_stopping/</a></p></li>
+<li><p>Analyzing/Summarizing the optimization results and model fit: <a class="reference external" href="https://ax.dev/docs/tutorials/analyses/">https://ax.dev/docs/tutorials/analyses/</a> (see <a class="reference internal" href="../reference/ax/agent.html#blop.ax.Agent.plot_objective" title="blop.ax.Agent.plot_objective"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.ax.Agent.plot_objective()</span></code></a> for an example in Blop)</p></li>
 <li><p>Configuring tracking metrics: <a class="reference external" href="https://ax.dev/docs/recipes/tracking-metrics/">https://ax.dev/docs/recipes/tracking-metrics/</a></p></li>
 <li><p>Saving and loading experiments</p>
 <ul>

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.queueserver_agent &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>blop.ax.queueserver_agent &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="../../../_static/documentation_options.js?v=8d563738"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -579,7 +579,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -689,6 +689,13 @@ window.runMermaid = runMermaid;</script>
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../how-to-guides.html">
     How-to Guides
   </a>
@@ -708,20 +715,30 @@ window.runMermaid = runMermaid;</script>
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -829,6 +846,13 @@ window.runMermaid = runMermaid;</script>
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../installation.html">
     Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../deployments.html">
+    Deployments
   </a>
 </li>
 
@@ -978,12 +1002,20 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.ax.queueserver_agent</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span></span><span class="sd">&quot;&quot;&quot;Agent interface for asynchronous optimization using Bluesky Queueserver and Ax.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">Future</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
 
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">bluesky_queueserver_api.http</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">bluesky_queueserver_api.zmq</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
+        <span class="s2">&quot;The queueserver integration requires additional dependencies. Install them with: pip install blop[queueserver]&quot;</span>
+    <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.callbacks.zmq</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteDispatcher</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">bluesky_queueserver_api.zmq</span><span class="w"> </span><span class="kn">import</span> <span class="n">REManagerAPI</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">..protocols</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">Actuator</span><span class="p">,</span>
@@ -998,11 +1030,12 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="QueueserverAgent">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">QueueserverAgent</span><span class="p">(</span><span class="n">_AxAgentMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    An asynchronous interface that uses Ax as the backend for optimization and experiment tracking</span>
-<span class="sd">    and the bluesky-queueserver-api for scheduling plan execution.</span>
+<span class="sd">    An asynchronous interface that uses Ax as the backend for optimization and experiment tracking.</span>
+
+<span class="sd">    Uses the bluesky-queueserver-api for scheduling plan execution.</span>
 
 <span class="sd">    .. warning::</span>
 
@@ -1012,7 +1045,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    re_manager_api : REManagerAPI</span>
+<span class="sd">    re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI | bluesky_queueserver_api.http.REManagerAPI</span>
 <span class="sd">        The manager API for interaction with Bluesky queueserver.</span>
 <span class="sd">    document_dispatcher : RemoteDispatcher</span>
 <span class="sd">        Dispatcher for consuming Bluesky documents from the remote server.</span>
@@ -1044,12 +1077,12 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    blop.ax.dof.ChoiceDOF : For discrete parameters.</span>
 <span class="sd">    blop.ax.objective.Objective : For defining objectives.</span>
 <span class="sd">    blop.ax.optimizer.AxOptimizer : The optimizer used internally.</span>
-<span class="sd">    blop.queueserver.QueueserverOptimizatonRunner : Runner that handles interaction with bluesky-queueserver.</span>
+<span class="sd">    blop.queueserver.QueueserverOptimizationRunner : Runner that handles interaction with bluesky-queueserver.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">re_manager_api</span><span class="p">:</span> <span class="n">REManagerAPI</span><span class="p">,</span>
+        <span class="n">re_manager_api</span><span class="p">:</span> <span class="n">bluesky_queueserver_api</span><span class="o">.</span><span class="n">zmq</span><span class="o">.</span><span class="n">REManagerAPI</span> <span class="o">|</span> <span class="n">bluesky_queueserver_api</span><span class="o">.</span><span class="n">http</span><span class="o">.</span><span class="n">REManagerAPI</span><span class="p">,</span>
         <span class="n">document_dispatcher</span><span class="p">:</span> <span class="n">RemoteDispatcher</span><span class="p">,</span>
         <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">dofs</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DOF</span><span class="p">],</span>
@@ -1090,33 +1123,40 @@ window.runMermaid = runMermaid;</script>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationFunction</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluation function mapping acquired data to outcomes.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">actuators</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set of actuator names used during acquisition.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set of sensor names used during acquisition.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">acquisition_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Acquisition plan name used during acquisition.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span>
 
 <div class="viewcode-block" id="QueueserverAgent.stop">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.stop">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.stop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the queueserver runner.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runner</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">current_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The current iteration of the optimization.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runner</span><span class="o">.</span><span class="n">current_iteration</span>
 
 <div class="viewcode-block" id="QueueserverAgent.to_optimization_problem">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_optimization_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueueserverOptimizationProblem</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the agent state to an optimization problem.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">QueueserverOptimizationProblem</span><span class="p">(</span>
             <span class="n">optimizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="p">,</span>
             <span class="n">actuators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="p">,</span>
@@ -1128,7 +1168,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="QueueserverAgent.run">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.run">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.run">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Future</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Start the optimization loop.</span>
@@ -1163,7 +1203,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="QueueserverAgent.submit_suggestions">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.queueserver_agent.QueueserverAgent.submit_suggestions">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.submit_suggestions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">submit_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Future</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate specific parameter combinations.</span>

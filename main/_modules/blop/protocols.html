@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.protocols &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>blop.protocols &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -579,7 +579,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -689,6 +689,13 @@ window.runMermaid = runMermaid;</script>
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../how-to-guides.html">
     How-to Guides
   </a>
@@ -708,20 +715,30 @@ window.runMermaid = runMermaid;</script>
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -829,6 +846,13 @@ window.runMermaid = runMermaid;</script>
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../installation.html">
     Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../deployments.html">
+    Deployments
   </a>
 </li>
 
@@ -978,7 +1002,9 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.protocols</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span></span><span class="sd">&quot;&quot;&quot;Protocols that bridge between optimizer backends and Bluesky.&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">runtime_checkable</span>
 
@@ -986,6 +1012,8 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span><span class="p">,</span> <span class="n">plan</span>
 
 
+<div class="viewcode-block" id="MovableHasName">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.MovableHasName">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">MovableHasName</span><span class="p">(</span><span class="n">Movable</span><span class="p">,</span> <span class="n">HasName</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -997,7 +1025,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    A `Movable` and `HasName` is sufficient. `HasHints` should be optional.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="o">...</span>
+    <span class="o">...</span></div>
+
 
 
 <span class="n">ID_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_id&quot;</span>
@@ -1012,14 +1041,19 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">&quot;&quot;&quot;Plan generic type&quot;&quot;&quot;</span>
 
 
+<div class="viewcode-block" id="CanRegisterSuggestions">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.CanRegisterSuggestions">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CanRegisterSuggestions</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A protocol for optimizers that can register suggestions. This</span>
-<span class="sd">    allows them to add an &quot;_id&quot; key to the suggestions dynamically and ensure</span>
+<span class="sd">    A protocol for optimizers that can register suggestions.</span>
+
+<span class="sd">    This allows them to add an &quot;_id&quot; key to the suggestions dynamically and ensure</span>
 <span class="sd">    that the suggestions are unique.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="CanRegisterSuggestions.register_suggestions">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.CanRegisterSuggestions.register_suggestions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">register_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Register the suggestions with the optimizer.</span>
@@ -1034,19 +1068,24 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        list[dict]</span>
 <span class="sd">            The original suggestions with an &quot;_id&quot; key added.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="o">...</span>
+        <span class="o">...</span></div>
+</div>
 
 
+
+<div class="viewcode-block" id="TrialFaultAware">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.TrialFaultAware">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TrialFaultAware</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A protocol to accept information about trial failures of the optimization loop.</span>
 
-
 <span class="sd">    Used to invalidate or register early stop on data for the optimizer, or do necesary</span>
 <span class="sd">    cleanup of processes not directly tied to the run engine</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="TrialFaultAware.register_failures">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.TrialFaultAware.register_failures">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">register_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Register the failed suggestions with the optimizer.</span>
@@ -1055,14 +1094,14 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ----------</span>
 <span class="sd">        suggestions: list[dict]</span>
 <span class="sd">            The suggestions to fail. Ids must be present.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        Nothing :)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="o">...</span>
+        <span class="o">...</span></div>
+</div>
 
 
+
+<div class="viewcode-block" id="Checkpointable">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Checkpointable">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Checkpointable</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1072,11 +1111,13 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    The checkpoint method then saves or updates to that pre-configured location.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="Checkpointable.checkpoint">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Checkpointable.checkpoint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Write the object&#39;s state to persistent storage.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="o">...</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the object&#39;s state to persistent storage.&quot;&quot;&quot;</span>
+        <span class="o">...</span></div>
+</div>
+
 
 
 <div class="viewcode-block" id="Optimizer">
@@ -1100,7 +1141,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer.suggest">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns a set of points in the input space, to be evaulated next.</span>
+<span class="sd">        Suggest a set of points in the input space, to be evaulated next.</span>
 
 <span class="sd">        The &quot;_id&quot; key is optional and can be used to identify suggested trials for later evaluation</span>
 <span class="sd">        and ingestion.</span>
@@ -1169,6 +1210,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    acquired data. Custom implementations are needed to define how your beamline</span>
 <span class="sd">    data translates into the outcomes you want to optimize.</span>
 
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.ax.Agent : Accepts an evaluation function during initialization.</span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    The evaluation function is called after data acquisition to compute outcomes</span>
@@ -1179,10 +1224,6 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    --------</span>
 <span class="sd">    See the tutorial documentation for complete examples of evaluation functions:</span>
 <span class="sd">    :doc:`/tutorials/simple-experiment`</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    blop.ax.Agent : Accepts an evaluation function during initialization.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="EvaluationFunction.__call__">
@@ -1222,16 +1263,16 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    over the suggested points. Custom implementations are only needed for specialized</span>
 <span class="sd">    acquisition strategies (e.g., fly scans, complex detector configurations).</span>
 
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    blop.plans.default_acquire : Default acquisition plan implementation.</span>
+<span class="sd">    blop.ax.Agent : Accepts an optional acquisition plan during initialization.</span>
+
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    The acquisition plan is a Bluesky plan that should move the actuators to each</span>
 <span class="sd">    suggested position and acquire data from the sensors. It must return the UID</span>
 <span class="sd">    of the Bluesky run so that the evaluation function can retrieve the data.</span>
-
-<span class="sd">    See Also</span>
-<span class="sd">    --------</span>
-<span class="sd">    blop.plans.default_acquire : Default acquisition plan implementation.</span>
-<span class="sd">    blop.ax.Agent : Accepts an optional acquisition plan during initialization.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="AcquisitionPlan.__call__">
@@ -1273,6 +1314,8 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="BaseOptimizationProblem">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.BaseOptimizationProblem">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BaseOptimizationProblem</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">TActuator</span><span class="p">,</span> <span class="n">TSensor</span><span class="p">,</span> <span class="n">TPlan</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for optimization problem definitions.</span>
@@ -1291,7 +1334,8 @@ window.runMermaid = runMermaid;</script>
     <span class="n">actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">TActuator</span><span class="p">]</span>
     <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">TSensor</span><span class="p">]</span>
     <span class="n">evaluation_function</span><span class="p">:</span> <span class="n">EvaluationFunction</span>
-    <span class="n">acquisition_plan</span><span class="p">:</span> <span class="n">TPlan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">acquisition_plan</span><span class="p">:</span> <span class="n">TPlan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 
 
 <div class="viewcode-block" id="OptimizationProblem">
@@ -1329,6 +1373,8 @@ window.runMermaid = runMermaid;</script>
 
 
 
+<div class="viewcode-block" id="QueueserverOptimizationProblem">
+<a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.QueueserverOptimizationProblem">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">QueueserverOptimizationProblem</span><span class="p">(</span><span class="n">BaseOptimizationProblem</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1353,7 +1399,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        A callable to evaluate data from a Bluesky run and produce outcomes.</span>
 <span class="sd">    acquisition_plan: str, optional</span>
 <span class="sd">        The name of a Bluesky plan to acquire data. If not provided, a default plan name will be used.</span>
-<span class="sd">        The plan must match the arguments of :ref:`AcquisitionPlan`.</span>
+<span class="sd">        The plan must match the arguments of :class:`AcquisitionPlan`.</span>
 <span class="sd">    acquisition_plan_kwargs: Mapping[str, Any], optional</span>
 <span class="sd">        Additional plan arguments to pass to the Bluesky plan.</span>
 
@@ -1364,7 +1410,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">acquisition_plan_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">acquisition_plan_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 </pre></div>
 
                 </article>

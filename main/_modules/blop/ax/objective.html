@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.objective &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>blop.ax.objective &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="../../../_static/documentation_options.js?v=8d563738"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -579,7 +579,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -689,6 +689,13 @@ window.runMermaid = runMermaid;</script>
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../how-to-guides.html">
     How-to Guides
   </a>
@@ -708,20 +715,30 @@ window.runMermaid = runMermaid;</script>
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -829,6 +846,13 @@ window.runMermaid = runMermaid;</script>
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../installation.html">
     Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../deployments.html">
+    Deployments
   </a>
 </li>
 
@@ -978,7 +1002,9 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.ax.objective</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span></span><span class="sd">&quot;&quot;&quot;Wrapper for specifying objectives in Ax.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
@@ -986,7 +1012,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="Objective">
-<a class="viewcode-back" href="../../../reference/objective.html#blop.ax.objective.Objective">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/objective.html#blop.ax.objective.Objective">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Objective</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1035,7 +1061,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="ScalarizedObjective">
-<a class="viewcode-back" href="../../../reference/objective.html#blop.ax.objective.ScalarizedObjective">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/objective.html#blop.ax.objective.ScalarizedObjective">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScalarizedObjective</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A scalarized objective is a weighted sum of other objectives.</span>
@@ -1053,6 +1079,12 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    **objective_names : str</span>
 <span class="sd">        Keyword arguments mapping variables in the expression to objective names.</span>
 
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The variable names used in the expression (e.g., &quot;intensity&quot;, &quot;width&quot;) are</span>
+<span class="sd">    arbitrary and do not need to match the objective names. They are mapped to</span>
+<span class="sd">    objectives via the keyword arguments for readability.</span>
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Create a scalarized objective for minimizing a weighted sum:</span>
@@ -1066,12 +1098,6 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; print(scalarized_obj)</span>
 <span class="sd">    -(objective1 + 2 * objective2)</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    The variable names used in the expression (e.g., &quot;intensity&quot;, &quot;width&quot;) are</span>
-<span class="sd">    arbitrary and do not need to match the objective names. They are mapped to</span>
-<span class="sd">    objectives via the keyword arguments for readability.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">**</span><span class="n">objective_names</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -1104,18 +1130,20 @@ window.runMermaid = runMermaid;</script>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-(</span><span class="si">{</span><span class="n">objective_str</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimize</span> <span class="k">else</span> <span class="n">objective_str</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax scalarized objective representation.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;ScalarizedObjective(&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="si">}</span><span class="s2">&#39;, minimize=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimize</span><span class="si">}</span><span class="s2">, &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">_objective_names</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span><span class="si">}</span><span class="s2">)&quot;</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax scalarized form of an objective as a string.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_expression</span></div>
 
 
 
 <div class="viewcode-block" id="OutcomeConstraint">
-<a class="viewcode-back" href="../../../reference/outcome-constraint.html#blop.ax.objective.OutcomeConstraint">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/outcome-constraint.html#blop.ax.objective.OutcomeConstraint">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OutcomeConstraint</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A constraint on an outcome of a suggestion.</span>
@@ -1134,6 +1162,15 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    **outcomes : Objective | IMetric</span>
 <span class="sd">        Keyword arguments mapping variables in the expression to objectives or metrics.</span>
 
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The variable names used in the constraint expression (e.g., &quot;temp&quot;, &quot;i&quot;, &quot;w&quot;)</span>
+<span class="sd">    are arbitrary and do not need to match the objective names. They are mapped</span>
+<span class="sd">    to objectives via the keyword arguments for readability.</span>
+
+<span class="sd">    Outcome constraints differ from DOF constraints in that they constrain the</span>
+<span class="sd">    measured outcomes rather than the input parameters.</span>
+
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Constrain an objective to be below a threshold:</span>
@@ -1145,15 +1182,6 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    temperature &lt;= 100</span>
 
 <span class="sd">    For complete examples with multiple constraints, see :doc:`/how-to-guides/set-outcome-constraints`.</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    The variable names used in the constraint expression (e.g., &quot;temp&quot;, &quot;i&quot;, &quot;w&quot;)</span>
-<span class="sd">    are arbitrary and do not need to match the objective names. They are mapped</span>
-<span class="sd">    to objectives via the keyword arguments for readability.</span>
-
-<span class="sd">    Outcome constraints differ from DOF constraints in that they constrain the</span>
-<span class="sd">    measured outcomes rather than the input parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">outcomes</span><span class="p">:</span> <span class="n">Objective</span> <span class="o">|</span> <span class="n">IMetric</span><span class="p">):</span>
@@ -1186,10 +1214,12 @@ window.runMermaid = runMermaid;</script>
         <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">outcome</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcomes</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax outcome constraint representation.&quot;&quot;&quot;</span>
         <span class="n">outcomes_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcomes</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;OutcomeConstraint(&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">outcomes_str</span><span class="si">}</span><span class="s2">)&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax outcome constraint as a string.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_constraint</span></div>
 
 

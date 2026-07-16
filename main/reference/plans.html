@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Plans &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>Plans &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,11 +61,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Protocols" href="protocols.html" />
-    <link rel="prev" title="Outcome Constraint" href="outcome-constraint.html" />
+    <link rel="next" title="Plan Stubs" href="plan_stubs.html" />
+    <link rel="prev" title="Xopt Optimizer" href="xopt/optimizer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -175,6 +175,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../how-to-guides.html">
     How-to Guides
   </a>
@@ -194,20 +201,30 @@
   </a>
 </li>
 
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -322,6 +339,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../how-to-guides.html">
     How-to Guides
   </a>
@@ -424,13 +448,17 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="agent.html">Agent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dof.html">Degree of Freedom (DOF)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dof-constraint.html">DOF Constraint</a></li>
-<li class="toctree-l1"><a class="reference internal" href="objective.html">Objectives</a></li>
-<li class="toctree-l1"><a class="reference internal" href="outcome-constraint.html">Outcome Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/agent.html">Ax Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/dof.html">Ax Degree of Freedom (DOF)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/dof-constraint.html">Ax DOF Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/objective.html">Ax Objectives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/optimizer.html">Ax Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/outcome-constraint.html">Ax Outcome Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xopt/optimizer.html">Xopt Optimizer</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plan_stubs.html">Plan Stubs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="callbacks.html">Callbacks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="queueserver.html">Queueserver</a></li>
 </ul>
 </div>
@@ -497,7 +525,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="blop.plans.optimize">
 <span class="sig-prename descclassname"><span class="pre">blop.plans.</span></span><span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimization_problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readable_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/plans.html#optimize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.plans.optimize" title="Link to this definition">#</a></dt>
-<dd><p>A plan to solve the optimization problem.</p>
+<dd><p>Solve the optimization problem.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -509,7 +537,7 @@
 </dd>
 <dt><strong>checkpoint_interval</strong><span class="classifier">int | None, optional</span></dt><dd><p>The number of iterations between optimizer checkpoints. If None, checkpoints
 will not be saved. Optimizer must implement the
-<code class="xref py py-class docutils literal notranslate"><span class="pre">blop.protocols.Checkpointable</span></code> protocol.</p>
+<a class="reference internal" href="protocols.html#blop.protocols.Checkpointable" title="blop.protocols.Checkpointable"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.protocols.Checkpointable</span></code></a> protocol.</p>
 </dd>
 <dt><strong>readable_cache: dict[str, InferredReadable] | None = None</strong></dt><dd><p>Cache of readable objects to store the suggestions and outcomes as events.
 If None, a new cache will be created.</p>
@@ -524,7 +552,7 @@ If None, a new cache will be created.</p>
 <dl class="simple">
 <dt><a class="reference internal" href="protocols.html#blop.protocols.OptimizationProblem" title="blop.protocols.OptimizationProblem"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blop.protocols.OptimizationProblem</span></code></a></dt><dd><p>The problem to solve.</p>
 </dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">blop.protocols.Checkpointable</span></code></dt><dd><p>The protocol for checkpointable objects.</p>
+<dt><a class="reference internal" href="protocols.html#blop.protocols.Checkpointable" title="blop.protocols.Checkpointable"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blop.protocols.Checkpointable</span></code></a></dt><dd><p>The protocol for checkpointable objects.</p>
 </dd>
 <dt><a class="reference internal" href="#blop.plans.optimize_step" title="blop.plans.optimize_step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize_step</span></code></a></dt><dd><p>The plan to execute a single step of the optimization.</p>
 </dd>
@@ -535,7 +563,7 @@ If None, a new cache will be created.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="blop.plans.optimize_step">
 <span class="sig-prename descclassname"><span class="pre">blop.plans.</span></span><span class="sig-name descname"><span class="pre">optimize_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimization_problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/plans.html#optimize_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.plans.optimize_step" title="Link to this definition">#</a></dt>
-<dd><p>A single step of the optimization loop.</p>
+<dd><p>Single step of the optimization loop.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -547,7 +575,7 @@ If None, a new cache will be created.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>tuple[list[dict], list[dict]]</dt><dd><p>A tuple containing the suggestions and outcomes of the step.</p>
+<dt>tuple[str, list[dict], list[dict]]</dt><dd><p>A tuple containing the uid, suggestions, and outcomes of the step.</p>
 </dd>
 </dl>
 </dd>
@@ -557,7 +585,7 @@ If None, a new cache will be created.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="blop.plans.default_acquire">
 <span class="sig-prename descclassname"><span class="pre">blop.plans.</span></span><span class="sig-name descname"><span class="pre">default_acquire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suggestions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actuators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/plans.html#default_acquire"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.plans.default_acquire" title="Link to this definition">#</a></dt>
-<dd><p>A default plan to acquire data for optimization. Simply a list scan.</p>
+<dd><p>Acquire data for optimization. Simply a list scan.</p>
 <p>Includes a default metadata key “blop_suggestion_ids” which can be used to identify
 the suggestions that were acquired for each step of the scan.</p>
 <dl class="field-list simple">
@@ -587,7 +615,7 @@ to add “_id” values to the run metadata for later identification of the acqu
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference external" href="https://blueskyproject.io/bluesky/main/generated/bluesky.plans.list_scan.html#bluesky.plans.list_scan" title="(in bluesky v1.15.2.dev24+g8b8b6dc8f)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bluesky.plans.list_scan</span></code></a></dt><dd><p>The Bluesky plan to acquire data.</p>
+<dt><a class="reference external" href="https://blueskyproject.io/bluesky/main/generated/bluesky.plans.list_scan.html#bluesky.plans.list_scan" title="(in bluesky v1.15.2.dev58+gedb01a9bc)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">bluesky.plans.list_scan</span></code></a></dt><dd><p>The Bluesky plan to acquire data.</p>
 </dd>
 </dl>
 </div>
@@ -662,7 +690,7 @@ Supports both optimizer-generated suggestions (with “_id”) and manual points
 <dl class="simple">
 <dt><a class="reference internal" href="#blop.plans.optimize_step" title="blop.plans.optimize_step"><code class="xref py py-obj docutils literal notranslate"><span class="pre">optimize_step</span></code></a></dt><dd><p>Standard optimizer-driven step.</p>
 </dd>
-<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">blop.protocols.CanRegisterSuggestions</span></code></dt><dd><p>Protocol for manual suggestions.</p>
+<dt><a class="reference internal" href="protocols.html#blop.protocols.CanRegisterSuggestions" title="blop.protocols.CanRegisterSuggestions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blop.protocols.CanRegisterSuggestions</span></code></a></dt><dd><p>Protocol for manual suggestions.</p>
 </dd>
 </dl>
 </div>
@@ -681,20 +709,20 @@ Supports both optimizer-generated suggestions (with “_id”) and manual points
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="outcome-constraint.html"
+       href="xopt/optimizer.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Outcome Constraint</p>
+        <p class="prev-next-title">Xopt Optimizer</p>
       </div>
     </a>
     <a class="right-next"
-       href="protocols.html"
+       href="plan_stubs.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Protocols</p>
+        <p class="prev-next-title">Plan Stubs</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

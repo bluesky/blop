@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.queueserver &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>blop.queueserver &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="../../_static/documentation_options.js?v=8d563738"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -579,7 +579,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -689,6 +689,13 @@ window.runMermaid = runMermaid;</script>
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../how-to-guides.html">
     How-to Guides
   </a>
@@ -708,20 +715,30 @@ window.runMermaid = runMermaid;</script>
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -829,6 +846,13 @@ window.runMermaid = runMermaid;</script>
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../installation.html">
     Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../deployments.html">
+    Deployments
   </a>
 </li>
 
@@ -1003,11 +1027,12 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.callbacks.zmq</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteDispatcher</span>
 
 <span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">bluesky_queueserver_api.http</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">bluesky_queueserver_api.zmq</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky_queueserver_api</span><span class="w"> </span><span class="kn">import</span> <span class="n">BPlan</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky_queueserver_api.zmq</span><span class="w"> </span><span class="kn">import</span> <span class="n">REManagerAPI</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-        <span class="s2">&quot;The queueserver integration requires additional dependencies. Install them with: pip install blop[qs]&quot;</span>
+        <span class="s2">&quot;The queueserver integration requires additional dependencies. Install them with: pip install blop[queueserver]&quot;</span>
     <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">event_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunStart</span><span class="p">,</span> <span class="n">RunStop</span>
 
@@ -1070,12 +1095,20 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span> <span class="o">=</span> <span class="n">callback</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">RunStart</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Caches the start document if it came from Blop&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the start document.</span>
+
+<span class="sd">        Caches the start document if it has the Blop injected correlation UID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">CORRELATION_UID_KEY</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_start_doc_cache</span><span class="p">[</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;uid&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">doc</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">RunStop</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Executes the callback if the cached start and stop document match&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process the stop document.</span>
+
+<span class="sd">        Calls the callback with the cached start document and stop document pair.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">start_doc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_start_doc_cache</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">doc</span><span class="p">[</span><span class="s2">&quot;run_start&quot;</span><span class="p">],</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">start_doc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_callback</span><span class="p">(</span><span class="n">start_doc</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span>
@@ -1097,7 +1130,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI</span>
+<span class="sd">    re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI | bluesky_queueserver_api.http.REManagerAPI</span>
 <span class="sd">        Manager instance for communication with Bluesky Queueserver</span>
 <span class="sd">    document_dispatcher : bluesky.callbacks.zmq.RemoteDispatcher</span>
 <span class="sd">        Dispatcher for the Bluesky document stream.</span>
@@ -1105,7 +1138,7 @@ window.runMermaid = runMermaid;</script>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">re_manager_api</span><span class="p">:</span> <span class="n">REManagerAPI</span><span class="p">,</span>
+        <span class="n">re_manager_api</span><span class="p">:</span> <span class="n">bluesky_queueserver_api</span><span class="o">.</span><span class="n">zmq</span><span class="o">.</span><span class="n">REManagerAPI</span> <span class="o">|</span> <span class="n">bluesky_queueserver_api</span><span class="o">.</span><span class="n">http</span><span class="o">.</span><span class="n">REManagerAPI</span><span class="p">,</span>
         <span class="n">document_dispatcher</span><span class="p">:</span> <span class="n">RemoteDispatcher</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rm</span> <span class="o">=</span> <span class="n">re_manager_api</span>
@@ -1374,8 +1407,9 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/queueserver.html#blop.queueserver.QueueserverOptimizationRunner.submit_suggestions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">submit_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Future</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Manually submit suggestions to the queue. This method returns immediately; the</span>
-<span class="sd">        optimization runs asynchronously via callbacks on the Bluesky document stream.</span>
+<span class="sd">        Manually submit suggestions to the queue.</span>
+
+<span class="sd">        This method returns immediately; the optimization runs asynchronously via callbacks on the Bluesky document stream.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1499,8 +1533,7 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_on_acquisition_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_doc</span><span class="p">:</span> <span class="n">RunStart</span><span class="p">,</span> <span class="n">stop_doc</span><span class="p">:</span> <span class="n">RunStop</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Callback when acquisition finishes. Ingest results and maybe continue.&quot;&quot;&quot;</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;When acquisition finishes, ingest results, and maybe continue.&quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_acquisition</span><span class="p">(</span><span class="n">start_doc</span><span class="p">,</span> <span class="n">stop_doc</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
@@ -1515,7 +1548,6 @@ window.runMermaid = runMermaid;</script>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_process_acquisition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_doc</span><span class="p">:</span> <span class="n">RunStart</span><span class="p">,</span> <span class="n">stop_doc</span><span class="p">:</span> <span class="n">RunStop</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Core acquisition-complete logic (called from _on_acquisition_complete).&quot;&quot;&quot;</span>
-
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;_on_acquisition_complete called before run()&quot;</span><span class="p">)</span>

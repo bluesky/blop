@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Queueserver &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>Queueserver &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="../_static/documentation_options.js?v=8d563738"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -62,10 +62,10 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Release History" href="../release-history.html" />
-    <link rel="prev" title="Protocols" href="protocols.html" />
+    <link rel="prev" title="Callbacks" href="callbacks.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -175,6 +175,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../how-to-guides.html">
     How-to Guides
   </a>
@@ -194,20 +201,30 @@
   </a>
 </li>
 
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="../reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="../reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -322,6 +339,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../how-to-guides.html">
     How-to Guides
   </a>
@@ -424,13 +448,17 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="agent.html">Agent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dof.html">Degree of Freedom (DOF)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dof-constraint.html">DOF Constraint</a></li>
-<li class="toctree-l1"><a class="reference internal" href="objective.html">Objectives</a></li>
-<li class="toctree-l1"><a class="reference internal" href="outcome-constraint.html">Outcome Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/agent.html">Ax Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/dof.html">Ax Degree of Freedom (DOF)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/dof-constraint.html">Ax DOF Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/objective.html">Ax Objectives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/optimizer.html">Ax Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ax/outcome-constraint.html">Ax Outcome Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="xopt/optimizer.html">Xopt Optimizer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plans.html">Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plan_stubs.html">Plan Stubs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="protocols.html">Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="callbacks.html">Callbacks</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Queueserver</a></li>
 </ul>
 </div>
@@ -565,7 +593,7 @@ The API may change in future releases without a deprecation period.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>re_manager_api</strong><span class="classifier">bluesky_queueserver_api.zmq.REManagerAPI</span></dt><dd><p>Manager instance for communication with Bluesky Queueserver</p>
+<dt><strong>re_manager_api</strong><span class="classifier">bluesky_queueserver_api.zmq.REManagerAPI | bluesky_queueserver_api.http.REManagerAPI</span></dt><dd><p>Manager instance for communication with Bluesky Queueserver</p>
 </dd>
 <dt><strong>document_dispatcher</strong><span class="classifier">bluesky.callbacks.zmq.RemoteDispatcher</span></dt><dd><p>Dispatcher for the Bluesky document stream.</p>
 </dd>
@@ -700,7 +728,7 @@ is ready before any submitted plan can emit documents.</p>
 </dl>
 <dl class="py property">
 <dt class="sig sig-object py" id="blop.queueserver.QueueserverOptimizationRunner.optimization_problem">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">optimization_problem</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">QueueserverOptimizationProblem</span></span><a class="headerlink" href="#blop.queueserver.QueueserverOptimizationRunner.optimization_problem" title="Link to this definition">#</a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">optimization_problem</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="protocols.html#blop.protocols.QueueserverOptimizationProblem" title="blop.protocols.QueueserverOptimizationProblem"><span class="pre">QueueserverOptimizationProblem</span></a></span><a class="headerlink" href="#blop.queueserver.QueueserverOptimizationRunner.optimization_problem" title="Link to this definition">#</a></dt>
 <dd><p>The optimization problem being solved.</p>
 </dd></dl>
 
@@ -749,8 +777,8 @@ hold that exception and re-raise it on <code class="docutils literal notranslate
 <dl class="py method">
 <dt class="sig sig-object py" id="blop.queueserver.QueueserverOptimizationRunner.submit_suggestions">
 <span class="sig-name descname"><span class="pre">submit_suggestions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suggestions</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/queueserver.html#QueueserverOptimizationRunner.submit_suggestions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.queueserver.QueueserverOptimizationRunner.submit_suggestions" title="Link to this definition">#</a></dt>
-<dd><p>Manually submit suggestions to the queue. This method returns immediately; the
-optimization runs asynchronously via callbacks on the Bluesky document stream.</p>
+<dd><p>Manually submit suggestions to the queue.</p>
+<p>This method returns immediately; the optimization runs asynchronously via callbacks on the Bluesky document stream.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -800,12 +828,12 @@ many iterations completed before the stop.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="protocols.html"
+       href="callbacks.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Protocols</p>
+        <p class="prev-next-title">Callbacks</p>
       </div>
     </a>
     <a class="right-next"

@@ -361,4 +361,4 @@ docker compose down
 - Add multiple objectives for multi-objective optimization (see [KB Mirrors tutorial](./xrt-kb-mirrors.md))
 - Use `agent.submit_suggestions()` to manually evaluate specific parameter combinations (see [](../how-to-guides/manual-suggestions.rst))
 - Implement `outcome_constraints` to constrain the optimization (see [](../how-to-guides/set-outcome-constraints.rst))
-- Add a `checkpoint_path` to persist optimizer state across restarts (see [](../reference/agent.rst))
+- Add a `checkpoint_path` to persist optimizer state across restarts (see [](../reference/ax/agent.rst))

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Installation &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>Installation &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="_static/documentation_options.js?v=8d563738"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,11 +61,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="How-to Guides" href="how-to-guides.html" />
+    <link rel="next" title="Deployments" href="deployments.html" />
     <link rel="prev" title="Blop" href="index.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -175,6 +175,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="how-to-guides.html">
     How-to Guides
   </a>
@@ -194,20 +201,30 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -317,6 +334,13 @@
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
     Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="deployments.html">
+    Deployments
   </a>
 </li>
 
@@ -485,7 +509,7 @@
 <h2>For users<a class="headerlink" href="#for-users" title="Link to this heading">#</a></h2>
 <section id="id1">
 <h3>Installation<a class="headerlink" href="#id1" title="Link to this heading">#</a></h3>
-<p>The package works with Python 3.10+ and can be installed from both PyPI and/or conda-forge.</p>
+<p>The package works with Python 3.11+ and can be installed from both PyPI and/or conda-forge.</p>
 <p>To install the package using the <code class="docutils literal notranslate"><span class="pre">pip</span></code> package manager, run the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>blop
 </pre></div>
@@ -510,19 +534,23 @@
 <td><p><code class="docutils literal notranslate"><span class="pre">ax-platform</span></code>, <code class="docutils literal notranslate"><span class="pre">botorch</span></code>, <code class="docutils literal notranslate"><span class="pre">gpytorch</span></code>, <code class="docutils literal notranslate"><span class="pre">torch</span></code></p></td>
 <td><p>GPU torch by default; pair with <code class="docutils literal notranslate"><span class="pre">[cpu]</span></code> for CPU-only</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">blop[queueserver]</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">blop[xopt]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">xopt</span></code>, <code class="docutils literal notranslate"><span class="pre">botorch</span></code>, <code class="docutils literal notranslate"><span class="pre">gpytorch</span></code>, <code class="docutils literal notranslate"><span class="pre">torch</span></code></p></td>
+<td><p>GPU torch by default; pair with <code class="docutils literal notranslate"><span class="pre">[cpu]</span></code> for CPU-only</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">blop[queueserver]</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bluesky-queueserver-api</span></code></p></td>
 <td><p>Transport layer only; pair with <code class="docutils literal notranslate"><span class="pre">[ax]</span></code> for <code class="docutils literal notranslate"><span class="pre">QueueserverAgent</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">blop[cpu]</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">blop[cpu]</span></code></p></td>
 <td><p><em>(uv index routing)</em></p></td>
 <td><p>Routes <code class="docutils literal notranslate"><span class="pre">torch</span></code> to the CPU-only PyTorch index; requires <code class="docutils literal notranslate"><span class="pre">uv</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">blop[all]</span></code></p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">blop[all]</span></code></p></td>
 <td><p>All backends + <code class="docutils literal notranslate"><span class="pre">[queueserver]</span></code></p></td>
 <td><p>No dev tooling; will grow as new backends are added</p></td>
 </tr>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">blop[dev]</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">blop[dev]</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">blop[all]</span></code> + dev tooling</p></td>
 <td><p>For contributors</p></td>
 </tr>
@@ -555,46 +583,6 @@ If you prefer to use standard <code class="docutils literal notranslate"><span c
 </pre></div>
 </div>
 </section>
-<section id="running-the-tutorials">
-<h3>Running the tutorials<a class="headerlink" href="#running-the-tutorials" title="Link to this heading">#</a></h3>
-<p>You have the option of running the tutorials in <a class="reference external" href="https://jupyter.org/">Jupyter Lab</a> locally or in a browser using <a class="reference external" href="https://mybinder.org/">Binder</a>.</p>
-<p><a class="reference external" href="https://mybinder.org/v2/gh/NSLS-II/blop/HEAD">Binder Blop Tutorials</a></p>
-<p>If you are using Pixi (see <a class="reference internal" href="#for-developers"><span class="std std-ref">For developers</span></a> below), you can do the following for a local Jupyter Lab instance:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span>start-jupyter
-</pre></div>
-</div>
-<p>Your third option is to simply convert the tutorials to ipynb format and use whatever you prefer to run them.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>jupytext<span class="w"> </span>--to<span class="w"> </span>ipynb<span class="w"> </span>docs/source/tutorials/*.md
-</pre></div>
-</div>
-</section>
-</section>
-<section id="for-developers">
-<span id="id2"></span><h2>For developers<a class="headerlink" href="#for-developers" title="Link to this heading">#</a></h2>
-<p>We recommend using Pixi to manage your development environments. Go to <a class="reference external" href="https://pixi.sh/latest/installation/">https://pixi.sh/latest/installation/</a> to install it.</p>
-<p>If you don’t want to use Pixi, you can view the configuration in the <code class="docutils literal notranslate"><span class="pre">pixi.toml</span></code> file and create your own based on it.</p>
-<section id="static-checks">
-<h3>Static checks<a class="headerlink" href="#static-checks" title="Link to this heading">#</a></h3>
-<p>For linting, formatting, and static code analysis.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span>check
-</pre></div>
-</div>
-</section>
-<section id="run-tests">
-<h3>Run tests<a class="headerlink" href="#run-tests" title="Link to this heading">#</a></h3>
-<p>For running the tests.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span>unit-tests
-$<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span>test-docs
-</pre></div>
-</div>
-</section>
-<section id="build-documentation">
-<h3>Build documentation<a class="headerlink" href="#build-documentation" title="Link to this heading">#</a></h3>
-<p>For building this documentation.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span>build-docs
-</pre></div>
-</div>
-</section>
 </section>
 </section>
 
@@ -618,11 +606,11 @@ $<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span>
       </div>
     </a>
     <a class="right-next"
-       href="how-to-guides.html"
+       href="deployments.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">How-to Guides</p>
+        <p class="prev-next-title">Deployments</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -649,13 +637,6 @@ $<span class="w"> </span>pixi<span class="w"> </span>run<span class="w"> </span>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Installation</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optional-extras">Optional Extras</a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pytorch-acceleration-options">PyTorch Acceleration Options</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#running-the-tutorials">Running the tutorials</a></li>
-</ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#for-developers">For developers</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#static-checks">Static checks</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-tests">Run tests</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-documentation">Build documentation</a></li>
 </ul>
 </li>
 </ul>

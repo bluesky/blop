@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>API Reference &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>API Reference &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="_static/documentation_options.js?v=8d563738"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,11 +61,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Agent" href="reference/agent.html" />
+    <link rel="next" title="Ax Agent" href="reference/ax/agent.html" />
     <link rel="prev" title="Optimizing KB Mirrors with Bayesian Optimization" href="tutorials/xrt-kb-mirrors.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -175,6 +175,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="how-to-guides.html">
     How-to Guides
   </a>
@@ -194,20 +201,30 @@
   </a>
 </li>
 
-
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="#">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" current active">
+  <a class="nav-link dropdown-item nav-internal" href="#">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -322,6 +339,13 @@
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="how-to-guides.html">
     How-to Guides
   </a>
@@ -424,13 +448,17 @@
      aria-label="Section Navigation">
   <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
   <div class="bd-toc-item navbar-nav"><ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="reference/agent.html">Agent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/dof.html">Degree of Freedom (DOF)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/dof-constraint.html">DOF Constraint</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/objective.html">Objectives</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/outcome-constraint.html">Outcome Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/agent.html">Ax Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/dof.html">Ax Degree of Freedom (DOF)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/dof-constraint.html">Ax DOF Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/objective.html">Ax Objectives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/optimizer.html">Ax Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/outcome-constraint.html">Ax Outcome Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/xopt/optimizer.html">Xopt Optimizer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/plans.html">Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/plan_stubs.html">Plan Stubs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/protocols.html">Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/callbacks.html">Callbacks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/queueserver.html">Queueserver</a></li>
 </ul>
 </div>
@@ -493,13 +521,17 @@
 <h1>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading">#</a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="reference/agent.html">Agent</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/dof.html">Degree of Freedom (DOF)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/dof-constraint.html">DOF Constraint</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/objective.html">Objectives</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference/outcome-constraint.html">Outcome Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/agent.html">Ax Agent</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/dof.html">Ax Degree of Freedom (DOF)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/dof-constraint.html">Ax DOF Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/objective.html">Ax Objectives</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/optimizer.html">Ax Optimizer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/ax/outcome-constraint.html">Ax Outcome Constraint</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/xopt/optimizer.html">Xopt Optimizer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/plans.html">Plans</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/plan_stubs.html">Plan Stubs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/protocols.html">Protocols</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/callbacks.html">Callbacks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/queueserver.html">Queueserver</a></li>
 </ul>
 </div>
@@ -525,11 +557,11 @@
       </div>
     </a>
     <a class="right-next"
-       href="reference/agent.html"
+       href="reference/ax/agent.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Agent</p>
+        <p class="prev-next-title">Ax Agent</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

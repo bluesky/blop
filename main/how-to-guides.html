@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>How-to Guides &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>How-to Guides &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="_static/documentation_options.js?v=8d563738"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -62,10 +62,10 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="How to optimize with ophyd and ophyd-async devices" href="how-to-guides/use-ophyd-devices.html" />
-    <link rel="prev" title="Installation" href="installation.html" />
+    <link rel="prev" title="Deployments" href="deployments.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="_static/searchtools.js"></script>
@@ -174,6 +174,13 @@
 </li>
 
 
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="deployments.html">
+    Deployments
+  </a>
+</li>
+
+
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
     How-to Guides
@@ -194,20 +201,30 @@
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -321,6 +338,13 @@
 </li>
 
 
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="deployments.html">
+    Deployments
+  </a>
+</li>
+
+
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
     How-to Guides
@@ -428,6 +452,7 @@
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/attach-data-to-experiments.html">Attach external data to experiments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/custom-generation-strategies.html">Using custom generation strategies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/manual-suggestions.html">Manual Point Injection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-guides/custom-callbacks.html">Write a Custom Optimization Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/set-dof-constraints.html">Set DOF constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/set-outcome-constraints.html">Set outcome constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/acquire-baseline.html">Acquire a baseline reading (for relative outcome constraints)</a></li>
@@ -497,6 +522,7 @@
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/attach-data-to-experiments.html">Attach external data to experiments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/custom-generation-strategies.html">Using custom generation strategies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/manual-suggestions.html">Manual Point Injection</a></li>
+<li class="toctree-l1"><a class="reference internal" href="how-to-guides/custom-callbacks.html">Write a Custom Optimization Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/set-dof-constraints.html">Set DOF constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/set-outcome-constraints.html">Set outcome constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-guides/acquire-baseline.html">Acquire a baseline reading (for relative outcome constraints)</a></li>
@@ -516,12 +542,12 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="installation.html"
+       href="deployments.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Installation</p>
+        <p class="prev-next-title">Deployments</p>
       </div>
     </a>
     <a class="right-next"

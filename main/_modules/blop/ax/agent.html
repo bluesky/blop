@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.agent &#8212; blop 1.0.0b2.dev34 documentation</title>
+    <title>blop.ax.agent &#8212; blop 1.0.0 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=0bc795d9"></script>
+    <script src="../../../_static/documentation_options.js?v=8d563738"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -579,7 +579,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.0b2.dev34" />
+  <meta name="docsearch:version" content="1.0.0" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -689,6 +689,13 @@ window.runMermaid = runMermaid;</script>
 
 
 <li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../deployments.html">
+    Deployments
+  </a>
+</li>
+
+
+<li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../how-to-guides.html">
     How-to Guides
   </a>
@@ -708,20 +715,30 @@ window.runMermaid = runMermaid;</script>
   </a>
 </li>
 
-
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../reference.html">
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button"
+                data-bs-toggle="dropdown" aria-expanded="false"
+                aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../reference.html">
     API Reference
   </a>
 </li>
 
 
-<li class="nav-item ">
-  <a class="nav-link nav-internal" href="../../../release-history.html">
+<li class=" ">
+  <a class="nav-link dropdown-item nav-internal" href="../../../release-history.html">
     Release History
   </a>
 </li>
 
+                </ul>
+            </li>
+            
   </ul>
 </nav></div>
       
@@ -829,6 +846,13 @@ window.runMermaid = runMermaid;</script>
 <li class="nav-item ">
   <a class="nav-link nav-internal" href="../../../installation.html">
     Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../deployments.html">
+    Deployments
   </a>
 </li>
 
@@ -978,7 +1002,9 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.ax.agent</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span></span><span class="sd">&quot;&quot;&quot;Agent interface for optimization with Ax as the backend.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">cast</span>
 
@@ -1012,6 +1038,7 @@ window.runMermaid = runMermaid;</script>
 <span class="k">class</span><span class="w"> </span><span class="nc">_AxAgentMixin</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Mixin providing Ax-related functionality shared by agents.</span>
+
 <span class="sd">    Expects subclasses to define `self._optimizer` as an `AxOptimizer`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -1157,9 +1184,7 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Save the agent&#39;s state to a JSON file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save the agent&#39;s state to a JSON file.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">reconfigure_search_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dof_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">DOF</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">TParamValue</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -1171,12 +1196,11 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        dof_mappings : dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]</span>
 <span class="sd">            Mapping of DOFs to their new search space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">reconfigure_search_space</span><span class="p">({</span><span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">:</span> <span class="n">update</span> <span class="k">for</span> <span class="n">dof</span><span class="p">,</span> <span class="n">update</span> <span class="ow">in</span> <span class="n">dof_mappings</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
 
 
 <div class="viewcode-block" id="Agent">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Agent</span><span class="p">(</span><span class="n">_AxAgentMixin</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    An interface that uses Ax as the backend for optimization and experiment tracking.</span>
@@ -1208,13 +1232,6 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    **kwargs : Any</span>
 <span class="sd">        Additional keyword arguments to configure the Ax experiment.</span>
 
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    For more complex setups, you can configure the Ax client directly via ``self.ax_client``.</span>
-
-<span class="sd">    For complete working examples of creating and using an Agent, see the tutorial</span>
-<span class="sd">    documentation, particularly :doc:`/tutorials/simple-experiment`.</span>
-
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    blop.protocols.Sensor : The protocol for sensors.</span>
@@ -1223,6 +1240,13 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    blop.ax.objective.Objective : For defining objectives.</span>
 <span class="sd">    blop.ax.optimizer.AxOptimizer : The optimizer used internally.</span>
 <span class="sd">    blop.plans.optimize : Bluesky plan for running optimization.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    For more complex setups, you can configure the Ax client directly via ``self.ax_client``.</span>
+
+<span class="sd">    For complete working examples of creating and using an Agent, see the tutorial</span>
+<span class="sd">    documentation, particularly :doc:`/tutorials/simple-experiment`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1261,7 +1285,7 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_callback_router</span> <span class="o">=</span> <span class="n">OptimizationCallbackRouter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Agent.from_checkpoint">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.from_checkpoint">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.from_checkpoint">[docs]</a>
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_checkpoint</span><span class="p">(</span>
         <span class="bp">cls</span><span class="p">,</span>
@@ -1320,7 +1344,7 @@ window.runMermaid = runMermaid;</script>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span>
 
 <div class="viewcode-block" id="Agent.subscribe">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.subscribe">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.subscribe">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">CallbackBase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Subscribe a callback to receive optimization run documents.</span>
 
@@ -1340,7 +1364,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="Agent.unsubscribe">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.unsubscribe">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.unsubscribe">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">unsubscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">CallbackBase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Unsubscribe a previously subscribed callback.</span>
 
@@ -1378,7 +1402,7 @@ window.runMermaid = runMermaid;</script>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span>
 
 <div class="viewcode-block" id="Agent.to_optimization_problem">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.to_optimization_problem">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.to_optimization_problem">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_optimization_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationProblem</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct an optimization problem from the agent.</span>
@@ -1407,7 +1431,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="Agent.acquire_baseline">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.acquire_baseline">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.acquire_baseline">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">acquire_baseline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameterization</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Acquire a baseline reading for reference.</span>
@@ -1434,7 +1458,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="Agent.optimize">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.optimize">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.optimize">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run Bayesian optimization.</span>
@@ -1457,18 +1481,18 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Msg</span>
 <span class="sd">            Bluesky messages for the run engine.</span>
 
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        blop.plans.optimize : The underlying Bluesky optimization plan.</span>
+<span class="sd">        suggest : Get point suggestions without running acquisition.</span>
+<span class="sd">        ingest : Manually ingest evaluation results.</span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        This is the primary method for running optimization. It handles the full loop</span>
 <span class="sd">        of suggesting points, acquiring data, evaluating outcomes, and updating the model.</span>
 
 <span class="sd">        For complete examples, see :doc:`/tutorials/simple-experiment`.</span>
-
-<span class="sd">        See Also</span>
-<span class="sd">        --------</span>
-<span class="sd">        blop.plans.optimize : The underlying Bluesky optimization plan.</span>
-<span class="sd">        suggest : Get point suggestions without running acquisition.</span>
-<span class="sd">        ingest : Manually ingest evaluation results.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">optimize_plan</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">(),</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span> <span class="n">readable_cache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_readable_cache</span>
@@ -1483,7 +1507,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="Agent.sample_suggestions">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.sample_suggestions">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.sample_suggestions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Evaluate specific parameter combinations.</span>
@@ -1519,7 +1543,7 @@ window.runMermaid = runMermaid;</script>
 
 
 <div class="viewcode-block" id="Agent.navigate_to_best">
-<a class="viewcode-back" href="../../../reference/agent.html#blop.ax.Agent.navigate_to_best">[docs]</a>
+<a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.navigate_to_best">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">navigate_to_best</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameterization</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Move actuators to the best point found during optimization.</span>
