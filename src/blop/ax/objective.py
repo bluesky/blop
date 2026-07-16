@@ -1,3 +1,5 @@
+"""Wrapper for specifying objectives in Ax."""
+
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -68,6 +70,12 @@ class ScalarizedObjective:
     **objective_names : str
         Keyword arguments mapping variables in the expression to objective names.
 
+    Notes
+    -----
+    The variable names used in the expression (e.g., "intensity", "width") are
+    arbitrary and do not need to match the objective names. They are mapped to
+    objectives via the keyword arguments for readability.
+
     Examples
     --------
     Create a scalarized objective for minimizing a weighted sum:
@@ -81,12 +89,6 @@ class ScalarizedObjective:
     ... )
     >>> print(scalarized_obj)
     -(objective1 + 2 * objective2)
-
-    Notes
-    -----
-    The variable names used in the expression (e.g., "intensity", "width") are
-    arbitrary and do not need to match the objective names. They are mapped to
-    objectives via the keyword arguments for readability.
     """
 
     def __init__(self, expression: str, *, minimize: bool, **objective_names: str):
@@ -119,12 +121,14 @@ class ScalarizedObjective:
         return f"-({objective_str})" if self._minimize else objective_str
 
     def __repr__(self) -> str:
+        """Ax scalarized objective representation."""
         return (
             f"ScalarizedObjective('{self._expression}', minimize={self._minimize}, "
             f"{', '.join([f'{k}={v}' for k, v in self._objective_names.items()])})"
         )
 
     def __str__(self) -> str:
+        """Ax scalarized form of an objective as a string."""
         return self.ax_expression
 
 
@@ -146,6 +150,15 @@ class OutcomeConstraint:
     **outcomes : Objective | IMetric
         Keyword arguments mapping variables in the expression to objectives or metrics.
 
+    Notes
+    -----
+    The variable names used in the constraint expression (e.g., "temp", "i", "w")
+    are arbitrary and do not need to match the objective names. They are mapped
+    to objectives via the keyword arguments for readability.
+
+    Outcome constraints differ from DOF constraints in that they constrain the
+    measured outcomes rather than the input parameters.
+
     Examples
     --------
     Constrain an objective to be below a threshold:
@@ -157,15 +170,6 @@ class OutcomeConstraint:
     temperature <= 100
 
     For complete examples with multiple constraints, see :doc:`/how-to-guides/set-outcome-constraints`.
-
-    Notes
-    -----
-    The variable names used in the constraint expression (e.g., "temp", "i", "w")
-    are arbitrary and do not need to match the objective names. They are mapped
-    to objectives via the keyword arguments for readability.
-
-    Outcome constraints differ from DOF constraints in that they constrain the
-    measured outcomes rather than the input parameters.
     """
 
     def __init__(self, constraint: str, **outcomes: Objective | IMetric):
@@ -198,10 +202,12 @@ class OutcomeConstraint:
         return template.format(**{key: outcome.name for key, outcome in self._outcomes.items()})
 
     def __repr__(self) -> str:
+        """Ax outcome constraint representation."""
         outcomes_str = ", ".join(f"{k}={v.name}" for k, v in self._outcomes.items())
         return f"OutcomeConstraint('{self._constraint}', {outcomes_str})"
 
     def __str__(self) -> str:
+        """Ax outcome constraint as a string."""
         return self.ax_constraint
 
 

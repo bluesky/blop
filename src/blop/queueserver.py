@@ -23,11 +23,12 @@ from bluesky.callbacks import CallbackBase
 from bluesky.callbacks.zmq import RemoteDispatcher
 
 try:
+    import bluesky_queueserver_api.http
+    import bluesky_queueserver_api.zmq
     from bluesky_queueserver_api import BPlan
-    from bluesky_queueserver_api.zmq import REManagerAPI
 except ImportError as e:
     raise ImportError(
-        "The queueserver integration requires additional dependencies. Install them with: pip install blop[qs]"
+        "The queueserver integration requires additional dependencies. Install them with: pip install blop[queueserver]"
     ) from e
 from event_model import RunStart, RunStop
 
@@ -87,12 +88,20 @@ class ConsumerCallback(CallbackBase):
         self._callback = callback
 
     def start(self, doc: RunStart) -> None:
-        """Caches the start document if it came from Blop"""
+        """
+        Process the start document.
+
+        Caches the start document if it has the Blop injected correlation UID.
+        """
         if doc.get(CORRELATION_UID_KEY):
             self._start_doc_cache[doc["uid"]] = doc
 
     def stop(self, doc: RunStop) -> None:
-        """Executes the callback if the cached start and stop document match"""
+        """
+        Process the stop document.
+
+        Calls the callback with the cached start document and stop document pair.
+        """
         start_doc = self._start_doc_cache.pop(doc["run_start"], None)
         if self._callback is not None and start_doc is not None:
             self._callback(start_doc, doc)
@@ -112,7 +121,7 @@ class QueueserverClient:
 
     Parameters
     ----------
-    re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI
+    re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI | bluesky_queueserver_api.http.REManagerAPI
         Manager instance for communication with Bluesky Queueserver
     document_dispatcher : bluesky.callbacks.zmq.RemoteDispatcher
         Dispatcher for the Bluesky document stream.
@@ -120,7 +129,7 @@ class QueueserverClient:
 
     def __init__(
         self,
-        re_manager_api: REManagerAPI,
+        re_manager_api: bluesky_queueserver_api.zmq.REManagerAPI | bluesky_queueserver_api.http.REManagerAPI,
         document_dispatcher: RemoteDispatcher,
     ):
         self._rm = re_manager_api
@@ -363,8 +372,9 @@ class QueueserverOptimizationRunner:
 
     def submit_suggestions(self, suggestions: list[dict]) -> Future[OptimizationResult]:
         """
-        Manually submit suggestions to the queue. This method returns immediately; the
-        optimization runs asynchronously via callbacks on the Bluesky document stream.
+        Manually submit suggestions to the queue.
+
+        This method returns immediately; the optimization runs asynchronously via callbacks on the Bluesky document stream.
 
         Parameters
         ----------
@@ -484,8 +494,7 @@ class QueueserverOptimizationRunner:
         )
 
     def _on_acquisition_complete(self, start_doc: RunStart, stop_doc: RunStop) -> None:
-        """Callback when acquisition finishes. Ingest results and maybe continue."""
-
+        """When acquisition finishes, ingest results, and maybe continue."""
         try:
             self._process_acquisition(start_doc, stop_doc)
         except Exception as exc:
@@ -500,7 +509,6 @@ class QueueserverOptimizationRunner:
 
     def _process_acquisition(self, start_doc: RunStart, stop_doc: RunStop) -> None:
         """Core acquisition-complete logic (called from _on_acquisition_complete)."""
-
         with self._state_lock:
             if self._state is None:
                 raise RuntimeError("_on_acquisition_complete called before run()")

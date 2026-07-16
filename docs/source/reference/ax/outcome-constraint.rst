@@ -1,5 +1,5 @@
-Outcome Constraint
-==================
+Ax Outcome Constraint
+=====================
 
 .. autoclass:: blop.ax.objective.OutcomeConstraint
    :members:

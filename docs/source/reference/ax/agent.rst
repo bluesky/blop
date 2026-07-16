@@ -1,5 +1,5 @@
-Agent
-=====
+Ax Agent
+========
 
 .. autoclass:: blop.ax.Agent
    :members:

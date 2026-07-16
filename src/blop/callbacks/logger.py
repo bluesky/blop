@@ -1,3 +1,5 @@
+"""Logging callback for Bluesky optimization runs."""
+
 import math
 from collections import defaultdict
 from typing import Any, cast
@@ -88,6 +90,11 @@ class OptimizationLogger(CallbackBase):
         self._stats: dict[str, RunningStats] = {}
 
     def start(self, doc: RunStart) -> None:
+        """
+        Process the start document from the Bluesky run.
+
+        Logs the optimization setup observed from metadata.
+        """
         iterations = doc.get("iterations", None)
         n_points = doc.get("n_points", 1)
         optimizer = doc.get("optimizer", "Unknown")
@@ -153,6 +160,11 @@ class OptimizationLogger(CallbackBase):
                     self._stats[key].update(float(values[idx]))
 
     def event(self, doc: Event) -> Event:
+        """
+        Process an event document from a Bluesky run.
+
+        Logs what occurred in this event along with running stats.
+        """
         data = doc.get("data", {})
         if not data:
             return doc
@@ -266,6 +278,11 @@ class OptimizationLogger(CallbackBase):
         return doc
 
     def stop(self, doc: RunStop) -> None:
+        """
+        Handle the stop document of a Bluesky run.
+
+        Prints summary statistics of what has been observed so far.
+        """
         exit_status = doc.get("exit_status", "success")
         reason = doc.get("reason", "")
 

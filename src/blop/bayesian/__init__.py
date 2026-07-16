@@ -1,3 +1,5 @@
+"""Custom models and kernels for Bayesian optimization."""
+
 try:
     from .kernels import LatentKernel
     from .models import LatentGP

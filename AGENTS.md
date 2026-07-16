@@ -8,7 +8,7 @@ type checking, and `pytest` for tests.
 
 - All commands run inside a pixi environment. Prefix commands with
   `pixi run -e <env>`. Common envs: `dev` (GPU torch), `dev-cpu` (CPU torch),
-  `docs`, and per-Python `py310-cpu`..`py313-cpu`.
+  `docs`, and per-Python `py311-cpu`..`py313-cpu`.
 - Editable installs are configured in `pixi.toml`; do not `pip install`
   manually. Re-sync with `pixi install -e dev-cpu` if dependencies change.
 - `pyproject.toml` is the single source of truth for runtime/dev
@@ -51,7 +51,7 @@ type checking, and `pytest` for tests.
 
 Enforced by `ruff` (config in `pyproject.toml [tool.ruff]`) and `pyright`.
 
-- Target Python: `>=3.10`. Use modern syntax (`X | Y` unions, `list[T]`,
+- Target Python: `>=3.11`. Use modern syntax (`X | Y` unions, `list[T]`,
   `dict[K, V]`, `match`/`case`) — `pyupgrade` (`UP`) is enabled.
 - Line length: **125** chars. Indent with 4 spaces. Use double quotes
   (ruff format default).

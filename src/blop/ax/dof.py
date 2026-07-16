@@ -1,3 +1,5 @@
+"""Wrapper dataclasses for parameter specification in Ax."""
+
 import re
 from abc import ABC, abstractmethod
 from collections.abc import Mapping, Sequence
@@ -27,29 +29,31 @@ class DOF(ABC):
     actuator : Actuator | str | None
         The actuator or its name to use for the DOF. Provide an actuator if the DOF is controllable by Bluesky.
 
+    See Also
+    --------
+    blop.protocols.Actuator : The protocol for actuators.
+    RangeDOF : For continuous parameters with bounds.
+    ChoiceDOF : For discrete parameters with specific values.
+
     Notes
     -----
     Either ``name`` or ``actuator`` must be provided, but not both. If ``actuator`` is
     provided, the DOF will be associated with a Bluesky-controllable device and will
     automatically move during acquisition. If only ``name`` is provided, the DOF
     represents a parameter that is controlled externally.
-
-    See Also
-    --------
-    blop.protocols.Actuator : The protocol for actuators.
-    RangeDOF : For continuous parameters with bounds.
-    ChoiceDOF : For discrete parameters with specific values.
     """
 
     name: str | None = None
     actuator: Actuator | str | None = None
 
     def __post_init__(self) -> None:
+        """Ensure name and actuator are not both specified."""
         if not (bool(self.name) ^ bool(self.actuator)):
             raise ValueError("Either name or actuator must be provided, but not both or neither.")
 
     @property
     def parameter_name(self) -> str:
+        """The parameter name used internally by Ax."""
         if isinstance(self.actuator, Actuator):
             param_name = self.actuator.name
         elif isinstance(self.actuator, str):
@@ -59,7 +63,9 @@ class DOF(ABC):
         return param_name
 
     @abstractmethod
-    def to_ax_parameter_config(self) -> RangeParameterConfig | ChoiceParameterConfig: ...
+    def to_ax_parameter_config(self) -> RangeParameterConfig | ChoiceParameterConfig:
+        """Convert the data class to Ax configuration."""
+        ...
 
 
 @dataclass(frozen=True, kw_only=True, eq=False)
@@ -192,6 +198,12 @@ class DOFConstraint:
     **dofs : DOF
         Keyword arguments mapping variables in the constraint to DOFs.
 
+    Notes
+    -----
+    The variable names used in the constraint expression (e.g., "x", "y") are
+    arbitrary and do not need to match the DOF parameter names. They are mapped
+    to DOFs via the keyword arguments for readability.
+
     Examples
     --------
     Define a constraint that ensures the sum of two DOFs is less than a value:
@@ -200,12 +212,6 @@ class DOFConstraint:
     >>> x_dof = RangeDOF(name="x", bounds=(0, 10), parameter_type="float")
     >>> y_dof = RangeDOF(name="y", bounds=(0, 10), parameter_type="float")
     >>> constraint = DOFConstraint("x + y <= 12", x=x_dof, y=y_dof)
-
-    Notes
-    -----
-    The variable names used in the constraint expression (e.g., "x", "y") are
-    arbitrary and do not need to match the DOF parameter names. They are mapped
-    to DOFs via the keyword arguments for readability.
     """
 
     def __init__(self, constraint: str, **dofs: DOF) -> None:
@@ -249,8 +255,10 @@ class DOFConstraint:
         return template.format(**{key: dof.parameter_name for key, dof in self._dofs.items()})
 
     def __str__(self) -> str:
+        """Ax parameter constraint as a string."""
         return self.ax_constraint
 
     def __repr__(self) -> str:
+        """Ax parameter constraint representation."""
         dofs_str = ", ".join(f"{name}={dof.parameter_name}" for name, dof in self._dofs.items())
         return f"DOFConstraint('{self._constraint}', {dofs_str})"
