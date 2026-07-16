@@ -36,5 +36,5 @@ not intended to be a complete deployment registry.
    * - NSLS-II
      - `CHX <https://www.bnl.gov/nsls2/beamlines/beamline.php?r=11-ID>`_
      - Bragg-peak optimization and detector-centering workflows using sample
-       and detector-stage positions as optimization variables with Timepix3
-       intensity and centroid metrics as feedback.
+       and detector-stage positions as optimization variables with Timepix3 ROI
+       intensity rocking curves and beam image centroid metrics as feedback.
