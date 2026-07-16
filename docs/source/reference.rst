@@ -14,4 +14,5 @@ API Reference
     reference/plans.rst
     reference/plan_stubs.rst
     reference/protocols.rst
+    reference/callbacks.rst
     reference/queueserver.rst

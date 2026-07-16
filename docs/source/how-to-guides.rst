@@ -8,6 +8,7 @@ How-to Guides
    how-to-guides/attach-data-to-experiments.rst
    how-to-guides/custom-generation-strategies.rst
    how-to-guides/manual-suggestions.rst
+   how-to-guides/custom-callbacks.rst
    how-to-guides/set-dof-constraints.rst
    how-to-guides/set-outcome-constraints.rst
    how-to-guides/acquire-baseline.rst
