@@ -6,6 +6,7 @@ Blop
     :hidden:
 
     installation
+    deployments
     how-to-guides
     explanation
     tutorials
