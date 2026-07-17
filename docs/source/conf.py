@@ -93,6 +93,12 @@ nb_execution_mode = "auto"
 if "doctest" in sys.argv or os.environ.get("BLOP_DOCS_NO_EXEC"):
     nb_execution_mode = "off"
 
+# The TES tutorial needs the trained emulator weights, which are derived from
+# measured beamline data and not yet publicly downloadable. Skip executing it
+# (the page still renders) until a weights URL is configured in
+# blop_sim.backends.models.tes_model.WEIGHTS_URL — then remove this exclusion.
+nb_execution_excludepatterns = ["tutorials/tes-kb-jacks*"]
+
 # Enable ELLIPSIS option for doctest to match any substring including empty
 doctest_default_flags = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
 
