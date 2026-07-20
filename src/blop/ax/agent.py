@@ -48,6 +48,10 @@ class _AxAgentMixin:
     def checkpoint_path(self) -> str | None:
         return self._optimizer.checkpoint_path
 
+    @checkpoint_path.setter
+    def checkpoint_path(self, value: str) -> None:
+        self._optimizer.checkpoint_path = value
+
     @property
     def fixed_dofs(self) -> dict[str, Any] | None:
         return self._optimizer.fixed_parameters

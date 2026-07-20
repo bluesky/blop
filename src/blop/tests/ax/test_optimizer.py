@@ -172,6 +172,41 @@ def test_ax_optimizer_checkpoint(tmp_path):
     assert optimizer.checkpoint_path == str(checkpoint_path)
 
 
+def test_ax_optimizer_set_checkpoint_after_init(tmp_path):
+    checkpoint_path = tmp_path / "checkpoint.json"
+
+    # Save to checkpoint
+    optimizer = AxOptimizer(
+        parameters=[
+            RangeParameterConfig(name="x1", bounds=(-5.0, 5.0), parameter_type="float"),
+        ],
+        objective="y1",
+    )
+    assert optimizer.checkpoint_path is None
+    suggestions = optimizer.suggest(num_points=2)
+    outcomes = [
+        {"_id": suggestions[0]["_id"], "y1": 1.0},
+        {"_id": suggestions[1]["_id"], "y1": 3.0},
+    ]
+    optimizer.ingest(outcomes)
+
+    with pytest.raises(ValueError, match="path is not set"):
+        optimizer.checkpoint()
+
+    optimizer.checkpoint_path = str(checkpoint_path)
+    assert not checkpoint_path.exists()
+    optimizer.checkpoint()
+    assert checkpoint_path.exists()
+
+    # Load from checkpoint
+    optimizer = AxOptimizer.from_checkpoint(str(checkpoint_path))
+    summary_df = optimizer.ax_client.summarize()
+    assert "x1" in summary_df.columns
+    assert "y1" in summary_df.columns
+    assert len(summary_df) == 2
+    assert optimizer.checkpoint_path == str(checkpoint_path)
+
+
 def test_ax_optimizer_register_failures():
     optimizer = AxOptimizer(
         parameters=[

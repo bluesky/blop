@@ -92,6 +92,35 @@ def test_agent_checkpoint(mock_evaluation_function, mock_acquisition_plan, tmp_p
     assert len(agent.ax_client.summarize()) == 1
 
 
+def test_agent_set_checkpoint_after_init(mock_evaluation_function, mock_acquisition_plan, tmp_path):
+    checkpoint_path = tmp_path / "checkpoint.json"
+    readable = ReadableSignal(name="test_readable")
+    agent = Agent(
+        sensors=[ReadableSignal(name="test_readable")],
+        dofs=[RangeDOF(name="x1", bounds=(0, 10), parameter_type="float")],
+        objectives=[Objective(name="test_objective", minimize=False)],
+        evaluation_function=mock_evaluation_function,
+        acquisition_plan=mock_acquisition_plan,
+    )
+
+    assert agent.checkpoint_path is None
+    agent.ingest([{"x1": 0.1, "test_objective": 0.2}])
+    agent.ax_client.configure_generation_strategy()
+    agent.checkpoint_path = str(checkpoint_path)
+    assert not checkpoint_path.exists()
+    agent.checkpoint()
+    assert checkpoint_path.exists()
+
+    agent = Agent.from_checkpoint(
+        str(checkpoint_path),
+        sensors=[readable],
+        actuators=[],
+        evaluation_function=mock_evaluation_function,
+        acquisition_plan=mock_acquisition_plan,
+    )
+    assert len(agent.ax_client.summarize()) == 1
+
+
 def test_agent_to_optimization_problem(mock_evaluation_function):
     """Test that the agent can be converted to an optimization problem."""
     movable1 = MovableSignal(name="test_movable1")
