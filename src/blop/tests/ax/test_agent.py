@@ -397,7 +397,35 @@ def test_queueserver_agent_run(
     mock_queueserver_runner_cls.assert_called_once()
 
     agent.run()
-    mock_queueserver_runner_cls.return_value.run.assert_called_once_with(1, 1)
+    mock_queueserver_runner_cls.return_value.run.assert_called_once_with(
+        iterations=1, num_points=1, checkpoint_interval=None
+    )
+
+
+@patch("blop.ax.queueserver_agent.QueueserverClient")
+@patch("blop.ax.queueserver_agent.QueueserverOptimizationRunner")
+def test_queueserver_agent_run_with_checkpoint_interval(
+    mock_queueserver_runner_cls,
+    mock_queueserver_client_cls,
+    mock_re_manager_api,
+    mock_document_dispatcher,
+    mock_evaluation_function,
+):
+    dof1 = RangeDOF(actuator="test_motor1", bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator="test_motor2", bounds=(0, 10), parameter_type="float")
+    agent = QueueserverAgent(
+        mock_re_manager_api,
+        mock_document_dispatcher,
+        ["det"],
+        [dof1, dof2],
+        [Objective(name="obj1", minimize=False)],
+        mock_evaluation_function,
+    )
+    mock_queueserver_client_cls.assert_called_once_with(mock_re_manager_api, mock_document_dispatcher)
+    mock_queueserver_runner_cls.assert_called_once()
+
+    agent.run(checkpoint_interval=1)
+    mock_queueserver_runner_cls.return_value.run.assert_called_once_with(iterations=1, num_points=1, checkpoint_interval=1)
 
 
 @patch("blop.ax.queueserver_agent.QueueserverClient")

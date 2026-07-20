@@ -321,7 +321,9 @@ class QueueserverOptimizationRunner:
         with self._state_lock:
             return self._state.current_iteration if self._state else 0
 
-    def run(self, iterations: int = 1, num_points: int = 1, checkpoint_interval: int = 0) -> Future[OptimizationResult]:
+    def run(
+        self, iterations: int = 1, num_points: int = 1, checkpoint_interval: int | None = None
+    ) -> Future[OptimizationResult]:
         """
         Run the optimization loop.
 
@@ -335,6 +337,10 @@ class QueueserverOptimizationRunner:
             Number of optimization iterations to run.
         num_points : int
             Number of points to suggest per iteration.
+        checkpoint_interval : int | None
+            The number of iterations between optimizer checkpoints. If None, checkpoints
+            will not be saved. Optimizer must implement the
+            :class:`blop.protocols.Checkpointable` protocol.
 
         Returns
         -------
