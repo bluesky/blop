@@ -1,5 +1,5 @@
-DOF Constraint
-==============
+Ax DOF Constraint
+=================
 
 .. autoclass:: blop.ax.dof.DOFConstraint
    :members:

@@ -2,6 +2,7 @@ import threading
 from unittest.mock import MagicMock, patch
 
 import pytest
+from bluesky.callbacks.zmq import RemoteDispatcher
 
 from blop.protocols import CanRegisterSuggestions, Optimizer, QueueserverOptimizationProblem, TrialFaultAware
 from blop.queueserver import (
@@ -11,6 +12,12 @@ from blop.queueserver import (
     QueueserverClient,
     QueueserverOptimizationRunner,
 )
+
+
+@pytest.fixture(scope="function")
+def mock_document_dispatcher():
+    """Create a mock document dispatcher."""
+    return MagicMock(spec=RemoteDispatcher)
 
 
 @pytest.fixture(scope="function")
@@ -63,40 +70,69 @@ def test_consumer_callback_clears_cache_after_stop():
     assert mock_callback.call_count == 1
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_check_environment_raises_when_not_ready(mock_re_manager):
+def test_consumer_callback_ignores_start_without_correlation_uid():
+    """Test ConsumerCallback ignores non-Blop start documents."""
+    mock_callback = MagicMock()
+    callback = ConsumerCallback(callback=mock_callback)
+    run_uid = "test-uid"
+    start_doc = {"uid": run_uid}
+    stop_doc = {"uid": "test-uid2", "run_start": run_uid}
+
+    callback.start(start_doc)
+    callback.stop(stop_doc)
+
+    mock_callback.assert_not_called()
+
+
+def test_consumer_callback_matches_stop_to_cached_start_by_run_uid():
+    """Test ConsumerCallback matches stops to the correct cached Blop start."""
+    mock_callback = MagicMock()
+    callback = ConsumerCallback(callback=mock_callback)
+    start_doc_1 = {"uid": "run-1", CORRELATION_UID_KEY: "one"}
+    start_doc_2 = {"uid": "run-2", CORRELATION_UID_KEY: "two"}
+    stop_doc = {"uid": "stop-2", "run_start": "run-2"}
+
+    callback.start(start_doc_1)
+    callback.start(start_doc_2)
+    callback.stop(stop_doc)
+
+    mock_callback.assert_called_once_with(start_doc_2, stop_doc)
+
+
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
+def test_queueserver_client_check_environment_raises_when_not_ready(mock_re_manager, mock_document_dispatcher):
     """Test check_environment raises RuntimeError when environment not open."""
     mock_re_manager.status.return_value = {"worker_environment_exists": False}
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
 
     with pytest.raises(RuntimeError, match="queueserver environment is not open"):
         client.check_environment()
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_check_devices_raises_for_missing_device(mock_re_manager):
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
+def test_queueserver_client_check_devices_raises_for_missing_device(mock_re_manager, mock_document_dispatcher):
     """Test check_devices_available raises ValueError for missing devices."""
     mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}}}
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
 
     with pytest.raises(ValueError, match="Device 'motor2' is not available"):
         client.check_devices_available(["motor1", "motor2"])
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_check_plan_raises_for_missing_plan(mock_re_manager):
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
+def test_queueserver_client_check_plan_raises_for_missing_plan(mock_re_manager, mock_document_dispatcher):
     """Test check_plan_available raises ValueError for missing plan."""
     mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"other_plan": {}}}
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
 
     with pytest.raises(ValueError, match="Plan 'my_plan' is not available"):
         client.check_plan_available("my_plan")
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_submit_plan_with_autostart(mock_re_manager):
-    """Test submit_plan adds item to queue; autostart is configured at construction."""
-    client = QueueserverClient(mock_re_manager, "inproc://test", autostart=True)
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
+def test_queueserver_client_submit_plan_with_autostart(mock_re_manager, mock_document_dispatcher):
+    """Test submit_plan adds item and starts queue when autostart=True."""
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher, autostart=True)
     mock_plan = MagicMock()
 
     client.submit_plan(mock_plan)
@@ -105,10 +141,10 @@ def test_queueserver_client_submit_plan_with_autostart(mock_re_manager):
     mock_re_manager.item_add.assert_called_once_with(mock_plan)
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_submit_plan_without_autostart(mock_re_manager):
-    """Test submit_plan only adds item when autostart=False at construction."""
-    client = QueueserverClient(mock_re_manager, "inproc://test", autostart=False)
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
+def test_queueserver_client_submit_plan_without_autostart(mock_re_manager, mock_document_dispatcher):
+    """Test submit_plan only adds item when autostart=False."""
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher, autostart=False)
     mock_plan = MagicMock()
 
     client.submit_plan(mock_plan)
@@ -118,80 +154,76 @@ def test_queueserver_client_submit_plan_without_autostart(mock_re_manager):
 
 
 @patch("blop.queueserver.threading.Thread")
-@patch("blop.queueserver.RemoteDispatcher")
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_start_listener(mock_re_manager, mock_dispatcher_cls, mock_thread_cls):
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
+def test_queueserver_client_start_listener(mock_re_manager, mock_thread_cls, mock_document_dispatcher):
     """Test start_listener creates dispatcher, subscribes callback, and starts thread."""
     mock_re_manager.status.return_value = {"worker_environment_exists": True}
     mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}, "detector": {}}}
     mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"default_acquire": {}}}
 
-    client = QueueserverClient(mock_re_manager, "tcp://localhost:5578")
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
     mock_callback = MagicMock()
 
     client.start_listener(on_stop=mock_callback)
 
-    mock_dispatcher_cls.assert_called_once_with("tcp://localhost:5578")
-    mock_dispatcher = mock_dispatcher_cls.return_value
-    mock_dispatcher.subscribe.assert_called_once()
-    subscribed_callback = mock_dispatcher.subscribe.call_args[0][0]
+    mock_document_dispatcher.subscribe.assert_called_once()
+    subscribed_callback = mock_document_dispatcher.subscribe.call_args[0][0]
     assert isinstance(subscribed_callback, ConsumerCallback)
     assert subscribed_callback._callback is mock_callback
 
     mock_thread_cls.assert_called_once()
     call_kwargs = mock_thread_cls.call_args[1]
-    assert call_kwargs["target"] == mock_dispatcher.start
+    assert call_kwargs["target"] == mock_document_dispatcher.start
     mock_thread_cls.return_value.start.assert_called_once()
 
 
 @patch("blop.queueserver.threading.Thread")
-@patch("blop.queueserver.RemoteDispatcher")
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_start_listener_already_running_returns_early(
-    mock_re_manager, mock_dispatcher_cls, mock_thread_cls
+    mock_re_manager, mock_thread_cls, mock_document_dispatcher
 ):
     """Test start_listener returns early when listener is already running."""
     mock_re_manager.status.return_value = {"worker_environment_exists": True}
     mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}, "detector": {}}}
     mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"default_acquire": {}}}
 
-    client = QueueserverClient(mock_re_manager, "tcp://localhost:5578")
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
     client._listener_thread = MagicMock()  # Simulate already running
 
     client.start_listener(on_stop=MagicMock())
 
-    mock_dispatcher_cls.assert_not_called()
+    mock_document_dispatcher.subscribe.assert_not_called()
     mock_thread_cls.assert_not_called()
 
 
 @patch("blop.queueserver.threading.Thread")
-@patch("blop.queueserver.RemoteDispatcher")
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_stop_listener(mock_re_manager, mock_dispatcher_cls, mock_thread_cls):
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
+def test_queueserver_client_stop_listener(mock_re_manager, mock_thread_cls, mock_document_dispatcher):
     """Test stop_listener stops dispatcher and clears state."""
     mock_re_manager.status.return_value = {"worker_environment_exists": True}
     mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}, "detector": {}}}
     mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"default_acquire": {}}}
 
-    client = QueueserverClient(mock_re_manager, "tcp://localhost:5578")
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
     client.start_listener(on_stop=MagicMock())
 
     client.stop_listener()
 
-    mock_dispatcher_cls.return_value.stop.assert_called_once()
-    assert client._dispatcher is None
+    mock_document_dispatcher.stop.assert_called_once()
+    assert client._dispatcher is mock_document_dispatcher
     assert client._consumer_callback is None
     assert client._listener_thread is None
 
 
-@patch("blop.queueserver.REManagerAPI")
-def test_queueserver_client_stop_listener_when_not_started(mock_re_manager):
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
+def test_queueserver_client_stop_listener_when_not_started(mock_re_manager, mock_document_dispatcher):
     """Test stop_listener is safe to call when listener was never started."""
-    client = QueueserverClient(mock_re_manager, "inproc://test")
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
 
     client.stop_listener()  # Should not raise
 
-    assert client._dispatcher is None
+    mock_document_dispatcher.stop.assert_not_called()
+    assert client._dispatcher is mock_document_dispatcher
     assert client._listener_thread is None
 
 
@@ -228,6 +260,9 @@ def test_runner_run_submits_suggestions_to_queueserver():
     assert runner.optimization_problem == mock_optimization_problem
 
     future = runner.run(iterations=1, num_points=1)
+
+    # Verify listener is started once during runner construction, not per run
+    mock_client.start_listener.assert_called_once_with(on_stop=runner._on_acquisition_complete)
 
     # Verify optimizer.suggest was called
     mock_optimization_problem.optimizer.suggest.assert_called_once_with(1)
@@ -343,6 +378,9 @@ def test_runner_submit_suggestions_to_queueserver():
 
     suggestions = [{"motor1": 5}]
     future = runner.submit_suggestions(suggestions)
+
+    # Verify listener is started once during runner construction, not per submission
+    mock_client.start_listener.assert_called_once_with(on_stop=runner._on_acquisition_complete)
 
     # Verify optimizer.suggest was NOT called
     mock_optimization_problem.optimizer.suggest.assert_not_called()
@@ -467,6 +505,8 @@ def test_runner_run_full_cycle(mock_optimization_problem):
         queueserver_client=mock_client,
     )
 
+    mock_client.start_listener.assert_called_once()
+
     future = runner.run(iterations=3, num_points=2)
 
     # Simulate 3 acquisition completions by invoking the captured callback
@@ -480,6 +520,7 @@ def test_runner_run_full_cycle(mock_optimization_problem):
         mock_client._on_stop(start_doc, stop_doc)
 
     assert mock_client.submit_plan.call_count == 3
+    mock_client.start_listener.assert_called_once()
     assert mock_optimization_problem.optimizer.suggest.call_count == 3
     assert mock_optimization_problem.optimizer.ingest.call_count == 3
     assert mock_optimization_problem.evaluation_function.call_count == 3
@@ -493,14 +534,13 @@ def test_runner_run_full_cycle(mock_optimization_problem):
     assert result.uids == tuple(uids)
 
 
-def test_runner_on_acquisition_complete_uid_mismatch_sets_future_exception(mock_optimization_problem):
-    """Test _on_acquisition_complete stores error in future on UID mismatch."""
+def test_runner_on_acquisition_complete_ignores_other_blop_runs(mock_optimization_problem):
+    """Test _on_acquisition_complete ignores Blop documents for other correlation UIDs."""
     runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem)
 
     start_doc = {"uid": "fake-uid", CORRELATION_UID_KEY: "wrong-uid"}
     stop_doc = {"uid": "other-fake-uid", "run_start": "fake-uid"}
 
-    # Should NOT raise — exception is captured in the future
     mock_client._on_stop(start_doc, stop_doc)
 
     assert future.done()
@@ -683,12 +723,24 @@ def test_runner_stop_races_final_callback_does_not_raise(mock_optimization_probl
     runner.stop()  # Must not raise
 
 
-@pytest.mark.parametrize("failing_method", ["start_listener", "submit_plan"])
-def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_problem, failing_method):
-    """An exception from start_listener or submit_plan in run() fails the future and re-raises."""
+def test_runner_init_listener_error_reraises(mock_optimization_problem):
+    """An exception from start_listener in __init__ is re-raised."""
     error = RuntimeError("connection refused")
     mock_client = MagicMock(spec=QueueserverClient)
-    getattr(mock_client, failing_method).side_effect = error
+    mock_client.start_listener.side_effect = error
+
+    with pytest.raises(RuntimeError, match="connection refused"):
+        QueueserverOptimizationRunner(
+            optimization_problem=mock_optimization_problem,
+            queueserver_client=mock_client,
+        )
+
+
+def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_problem):
+    """An exception from submit_plan in run() fails the future and re-raises."""
+    error = RuntimeError("connection refused")
+    mock_client = MagicMock(spec=QueueserverClient)
+    mock_client.submit_plan.side_effect = error
 
     runner = QueueserverOptimizationRunner(
         optimization_problem=mock_optimization_problem,
@@ -704,12 +756,11 @@ def test_runner_run_submit_error_fails_future_and_reraises(mock_optimization_pro
     assert future.exception() is error
 
 
-@pytest.mark.parametrize("failing_method", ["start_listener", "submit_plan"])
-def test_runner_submit_suggestions_submit_error_fails_future_and_reraises(mock_optimization_problem, failing_method):
-    """An exception from start_listener or submit_plan in submit_suggestions() fails the future and re-raises."""
+def test_runner_submit_suggestions_submit_error_fails_future_and_reraises(mock_optimization_problem):
+    """An exception from submit_plan in submit_suggestions() fails the future and re-raises."""
     error = RuntimeError("connection refused")
     mock_client = MagicMock(spec=QueueserverClient)
-    getattr(mock_client, failing_method).side_effect = error
+    mock_client.submit_plan.side_effect = error
 
     runner = QueueserverOptimizationRunner(
         optimization_problem=mock_optimization_problem,

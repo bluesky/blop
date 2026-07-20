@@ -2,6 +2,12 @@ name: Build Documentation
 
 on:
   workflow_call:
+    inputs:
+      publish:
+        description: "Whether to publish docs to gh-pages"
+        required: false
+        default: true
+        type: boolean
 
 jobs:
   build_docs:
@@ -47,7 +53,7 @@ jobs:
         run: python .github/pages/make_switcher.py --add $DOCS_VERSION ${{ github.repository }} .github/pages/switcher.json
 
       - name: Publish Docs to gh-pages
-        if: github.ref_type == 'tag' || github.ref_name == 'main'
+        if: inputs.publish && (github.ref_type == 'tag' || github.ref_name == 'main')
         # We pin to the SHA, not the tag, for security reasons.
         # https://docs.github.com/en/actions/learn-github-actions/security-hardening-for-github-actions#using-third-party-actions
         uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0

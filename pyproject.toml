@@ -20,32 +20,24 @@ maintainers = [
   { name = "Jennefer Maldonado", email = "jmaldonad@bnl.gov" },
   { name = "Roman Chernikov", email = "rcherniko@bnl.gov" },
 ]
-requires-python = ">=3.10"
-dependencies = [
-  "ax-platform>=1.1.0,<1.3",
-  "bluesky>=1.14.2",
-  "bluesky-queueserver-api>=0.0.12",
-  "torch",
-  "botorch>=0.16.0",
-  "gpytorch",
-  "scipy",
-  "networkx>=3",
-  "numpy",
-  "rich>=13",
-]
+requires-python = ">=3.11"
+dependencies = ["bluesky>=1.14.2", "networkx>=3", "numpy", "rich>=13"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "License :: OSI Approved :: BSD License",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering :: Physics",
 ]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-qs = ["bluesky-queueserver-api"]
+ax = ["ax-platform>=1.3.0,<1.4", "botorch>=0.18.0,<0.19.0", "gpytorch", "torch"]
+queueserver = ["bluesky-queueserver-api"]
+xopt = ["xopt>3.0.0"]
+all = ["blop[ax,queueserver,xopt]"]
 dev = [
   "pytest",
   "pytest-cov",
@@ -53,10 +45,9 @@ dev = [
   "ruff",
   "nbstripout",
   "pre-commit",
-  "pandas-stubs",
   "coverage",
   "pyright",
-  "blop[qs]",
+  "blop[all]",
 ]
 cpu = [
   # Empty extra - the source configuration below routes to CPU-only index
@@ -64,7 +55,7 @@ cpu = [
 
 [project.urls]
 Homepage = "https://github.com/bluesky/blop"
-Documentation = "https://nsls-ii.github.io/blop"
+Documentation = "https://blueskyproject.io/blop"
 "Bug Reports" = "https://github.com/bluesky/blop/issues"
 
 [tool.hatch]
@@ -100,8 +91,7 @@ lint.select = [
   "D",       # docstring - https://docs.astral.sh/ruff/rules/#pydocstyle-d
 ]
 lint.ignore = [
-  "D",      # TODO: Add docstrings, then enforce these errors
-  "SLF001", # TODO: Fix private member access, https://github.com/NSLS-II/blop/issues/94
+  "SLF001", # private member access
   "B901",   # return-in-generator - https://docs.astral.sh/ruff/rules/return-in-generator/
 ]
 lint.preview = true # so that preview mode PLC2701, and LOG015 is enabled
@@ -111,9 +101,10 @@ convention = "numpy"
 
 [tool.ruff.lint.per-file-ignores]
 "src/blop/tests/**/*" = ["S101", "SLF001", "D"]
+"sim/**/*" = ["D"]
 # Ignore F821: undefined name '...' since the ipython profiles are dynamically loaded into the namespace
-"docs/**/*" = ["F821"]
-"examples/**/*" = ["F821"]
+"docs/**/*" = ["F821", "D"]
+"examples/**/*" = ["F821", "D"]
 
 [tool.pyright]
 ignore = [

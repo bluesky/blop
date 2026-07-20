@@ -8,17 +8,17 @@ version = "0.0.0"
 description = "Example simulations and benchmarks for blop (not published to PyPI)"
 readme = "README.md"
 authors = [{ name = "Thomas Hopkins", email = "thopkins1@bnl.gov" }]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
   "blop",
-  "ophyd-async",
+  "ophyd-async<0.17",
   "h5py",
   "area-detector-handlers",
   "bluesky-tiled-plugins",
   "numpy",
   "scipy",
   "matplotlib",
-  "xrt>=1.6.1,<2",
+  "xrt>=2.0.0b1",
 ]
 
 [tool.hatch.build.targets.wheel]

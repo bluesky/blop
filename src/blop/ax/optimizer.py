@@ -1,8 +1,10 @@
+"""An optimizer protocol implementation for Ax."""
+
 from collections.abc import Sequence
 from typing import Any
 
 from ax import ChoiceParameterConfig, Client, RangeParameterConfig, TOutcome, TParameterization
-from ax.core.objective import MultiObjective
+from ax.core import MultiObjectiveOptimizationConfig
 from ax.core.parameter import ChoiceParameter, RangeParameter
 from ax.core.types import TParamValue
 
@@ -137,7 +139,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
         next_trials = self._client.get_next_trials(max_trials=num_points, fixed_parameters=self._fixed_parameters)
         return [
             {
-                "_id": trial_index,
+                ID_KEY: trial_index,
                 **parameterization,
             }
             for trial_index, parameterization in next_trials.items()
@@ -163,11 +165,10 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
         ValueError
             If the Ax client's optimization has not been configured yet.
         """
-
         opt_config = self._client._experiment.optimization_config
         if opt_config is None:
             raise ValueError("Somehow your optimization has not been configured yet...check `ax_client`.")
-        is_multi_objective = isinstance(opt_config.objective, MultiObjective)
+        is_multi_objective = isinstance(opt_config, MultiObjectiveOptimizationConfig)
 
         if is_multi_objective:
             frontier = self._client.get_pareto_frontier(use_model_predictions=False)
@@ -177,7 +178,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
             return [(trial_index, params, metrics)]
 
     def _split_point(self, point: dict) -> tuple[dict, dict]:
-        """Helper function to split a point into parameters and outcomes."""
+        """Split a point into parameters and outcomes."""
         parameters = {}
         outcomes = {}
         for k, v in point.items():
@@ -250,7 +251,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
     def register_failures(self, suggestions) -> None:
         """
-        Register suggestions as failures
+        Register suggestions as failures.
 
         Inherited from the trialfaultaware class to make sure either the Ax optimizer knows to
         either retry the trial or end the optimization context
@@ -264,9 +265,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
             self._client.mark_trial_failed(s[ID_KEY])
 
     def checkpoint(self) -> None:
-        """
-        Save the optimizer's state to JSON file.
-        """
+        """Save the optimizer's state to JSON file."""
         if not self.checkpoint_path:
             raise ValueError("Checkpoint path is not set. Please set a checkpoint path when initializing the optimizer.")
         self._client.save_to_json_file(self.checkpoint_path)
@@ -305,9 +304,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
         original_range_values: dict[str, tuple[float, float]],
         original_choice_values: dict[str, list[TParamValue]],
     ) -> None:
-        """
-        Rollback original parameter state after a failed update
-        """
+        """Rollback original parameter state after a failed update."""
         for parameter_name, value in original_range_values.items():
             parameter = self._client._experiment.parameters[parameter_name]
             if isinstance(parameter, RangeParameter):
@@ -319,13 +316,12 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
     def reconfigure_search_space(self, parameter_mappings: dict[str, tuple[float, float] | list[TParamValue]]) -> None:
         """
-        Update the bounds or values of existing parameters in the underlying experiment
+        Update the bounds or values of existing parameters in the underlying experiment.
 
         Parameters
         ----------
         parameter_mappings : dict[str, tuple[float, float] | list[TParamValue]]
             Mapping of parameter names to (lower, upper) bounds or a list of values depending on the parameter type.
-
         """
         original_range_values = {}
         original_choice_values = {}

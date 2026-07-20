@@ -1,4 +1,5 @@
-from .ax import DOF, Agent, ChoiceDOF, DOFConstraint, Objective, OutcomeConstraint, RangeDOF, ScalarizedObjective
+"""A bridge between optimization algorithms and Bluesky."""
+
 from .plans import acquire_baseline, default_acquire, optimize, optimize_step, sample_suggestions
 
 try:
@@ -8,14 +9,6 @@ except ImportError:
 
 __all__ = [
     "__version__",
-    "Agent",
-    "ChoiceDOF",
-    "DOF",
-    "DOFConstraint",
-    "Objective",
-    "OutcomeConstraint",
-    "RangeDOF",
-    "ScalarizedObjective",
     "acquire_baseline",
     "default_acquire",
     "optimize",
