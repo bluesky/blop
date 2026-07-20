@@ -13,7 +13,6 @@ a queueserver, rather than directly through a RunEngine.
 
 import logging
 import threading
-import time
 import uuid
 from collections.abc import Callable, Sequence
 from concurrent.futures import Future
@@ -359,7 +358,7 @@ class QueueserverOptimizationRunner:
             future: Future[OptimizationResult] = Future()
             self._current_future = future
         try:
-            self._client.submit_plan(plan, autostart=self._autostart)
+            self._client.submit_plan(plan)
         except Exception as exc:
             with self._state_lock:
                 self._fail_future(exc)
