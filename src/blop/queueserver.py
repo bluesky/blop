@@ -34,6 +34,7 @@ from event_model import RunStart, RunStop
 
 from .plans import default_acquire
 from .protocols import ID_KEY, CanRegisterSuggestions, QueueserverOptimizationProblem, TrialFaultAware
+from .utils import _maybe_checkpoint
 
 logger = logging.getLogger("blop")
 
@@ -253,6 +254,7 @@ class _OptimizationState:
 
     max_iterations: int = 1
     num_points: int = 1
+    checkpoint_interval: int | None = None
     current_iteration: int = 0
     current_suggestions: list[dict] = field(default_factory=list)
     current_uid: str | None = None
@@ -319,7 +321,7 @@ class QueueserverOptimizationRunner:
         with self._state_lock:
             return self._state.current_iteration if self._state else 0
 
-    def run(self, iterations: int = 1, num_points: int = 1) -> Future[OptimizationResult]:
+    def run(self, iterations: int = 1, num_points: int = 1, checkpoint_interval: int = 0) -> Future[OptimizationResult]:
         """
         Run the optimization loop.
 
@@ -351,7 +353,9 @@ class QueueserverOptimizationRunner:
         """
         with self._state_lock:
             self._validate()
-            self._state = _OptimizationState(max_iterations=iterations, num_points=num_points)
+            self._state = _OptimizationState(
+                max_iterations=iterations, num_points=num_points, checkpoint_interval=checkpoint_interval
+            )
             self._continuous = True
         suggestions = self._problem.optimizer.suggest(num_points)
         with self._state_lock:
@@ -534,17 +538,21 @@ class QueueserverOptimizationRunner:
         # Ingest into optimizer
         self._problem.optimizer.ingest(outcomes)
 
-        # Check if done
         with self._state_lock:
+            # Checkpoint optimizer, if applicable
+            _maybe_checkpoint(
+                self._problem.optimizer, self._state.checkpoint_interval, iteration=self._state.current_iteration
+            )
+            # Check if done
             if not self._continuous or self._state.current_iteration >= self._state.max_iterations:
                 logger.info(f"Optimization complete after {self._state.current_iteration} iterations")
                 result = self._state.build_result()
                 self._resolve_future(result)
                 return
 
-        # Continue: get next suggestions and submit
-        with self._state_lock:
+            # Continue: get next suggestions and submit
             num_points = self._state.num_points
+
         suggestions = self._problem.optimizer.suggest(num_points)
         with self._state_lock:
             plan = self._build_plan(suggestions)
