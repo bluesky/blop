@@ -1,10 +1,7 @@
 """XRT ray-tracing beam simulation backend."""
 
-import pickle
-import shelve
 import time
 from collections import OrderedDict
-from multiprocessing import Pool, shared_memory
 from pathlib import Path
 
 import numpy as np
