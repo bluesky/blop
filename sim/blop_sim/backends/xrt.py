@@ -55,24 +55,6 @@ def _run_cached_process_from_file(beamLine, start_index) -> dict[str, raycing.so
     return outDict
 
 
-def _run_shelved_process_from_file(beamLine, start_index, shelf) -> str:
-    filepath = f"/tmp/blop/sim/render/iterbuf_{shelf}"
-    with shelve.open(filepath, flag="c") as outDict:
-        sequence = list(beamLine.flowU.items())[start_index:]
-        touched = OrderedDict(sequence).keys()
-        # print(f"starting {shelf} from: {start_index}:")
-        for oeid, meth in sequence:
-            oe = beamLine.oesDict[oeid][0]
-            for func, fkwargs in meth.items():
-                getattr(oe, func)(**fkwargs)
-        for beamName, beamTag in beamLine.beamNamesDict.items():
-            if beamTag[0] not in touched:
-                continue
-            outDict[beamName] = beamLine.beamsDictU[beamTag[0]][beamTag[1]]
-
-    return filepath
-
-
 class XRTBackend(SimBackend, Readable):
     """XRT ray-tracing simulation backend.
 
@@ -94,25 +76,12 @@ class XRTBackend(SimBackend, Readable):
         self.n_iters = n_iters
         self.n_workers = n_workers
         self._cache_invalidator = [0] * len(beamLine.flowU.items())
-        self.render = None
+        self._render = None
 
     def _ensure_beamline(self):
         """legacy check to make sure beamline exists"""
         if self._beamline is None:
             raise ValueError("beamline has not been initialized")
-
-    @staticmethod
-    def _render_worker(stuple: tuple[raycing.BeamLine, int, int]):
-        """primary run function for each dispatched process.
-        main responsibility to manage the data transfer contracts to and from main"""
-        beamLine, seed, minvalid_index = stuple
-        # print(f"worker {seed} executing")
-        np.random.seed(seed=seed)
-        beam = pickle.loads(beamLine.buf[: beamLine.size])
-        beamLine.close()
-        # outDict = _run_cached_process_from_file(beamLine=beam, start_index=minvalid_index)
-        outDict = _run_shelved_process_from_file(beamLine=beam, start_index=minvalid_index, shelf=seed)
-        return outDict
 
     def generate_beam(self) -> np.ndarray:
         """Generate beam using XRT ray-tracing.
@@ -121,26 +90,13 @@ class XRTBackend(SimBackend, Readable):
             2D numpy histogram array with shape of primary detector
         """
         self._ensure_beamline()
-        if self.render is None:
+        if self._render is None:
+            self._render = {}
             self._cache_invalidator = [0] * len(self._beamline.flowU.keys())
 
-        with Pool(processes=self.n_workers) as pool:
-            binary = pickle.dumps(self._beamline)
-            shm = shared_memory.SharedMemory(create=True, size=len(binary))
-            shm.buf[: len(binary)] = binary
-            n_disp = self.n_iters - 1
-            minvalid_index = [self._cache_invalidator.index(1) if 1 in self._cache_invalidator else 0] * n_disp
-            b_refs = [shm] * n_disp
-            result = pool.imap_unordered(self._render_worker, zip(b_refs, range(n_disp), minvalid_index, strict=True))
-            outDict = [_run_shelved_process_from_file(self._beamline, start_index=minvalid_index[0], shelf=n_disp)]
-            # outDict = _run_cached_process_from_file(self._beamline, start_index=minvalid_index[0])
-            for out in result:
-                # [outDict[k].concatenate(v) for k, v in out.items() if k in outDict.keys()]
-                # del out
-                outDict.append(out)
-            shm.close()
-            shm.unlink()
-        self.render = outDict
+        minvalid_index = self._cache_invalidator.index(1) if 1 in self._cache_invalidator else 0
+        outDict = _run_cached_process_from_file(self._beamline, start_index=minvalid_index)
+        self._render.update(outDict)
         self._cache_invalidator = [0] * len(self._cache_invalidator)
         self._cache_invalidator[-1] = 1
         if self.target is not None:
@@ -148,8 +104,7 @@ class XRTBackend(SimBackend, Readable):
             target = self.target.name
         else:
             print("warning: target is not set, please make sure you manage your triggering by setting a primary detector")
-            with shelve.open(self.render[0]) as db:
-                target = list(db.keys())[0]
+            target = list(self._render.keys())[0]
 
         lb = self[target][0]
         # Build histogram from ray data
@@ -175,10 +130,10 @@ class XRTBackend(SimBackend, Readable):
 
     # readable interface
     def read(self) -> OrderedDict[str, dict]:
-        if self.render is None:
+        if self._render is None:
             self.generate_beam()
         result = OrderedDict()
-        for name, beam in self.render.items():
+        for name, beam in self._render.items():
             hist2d, _, _ = build_histRGB(beam, beam, limits=self._limits, isScreen=True, shape=self._image_shape)
             result[name] = {"value": hist2d, "timestamp": time.time()}
         return result
@@ -191,25 +146,9 @@ class XRTBackend(SimBackend, Readable):
         return self._name
 
     def __getitem__(self, key):
-        if self.render is None:
+        if self._render is None:
             self.generate_beam()
-
-        outDict = {}
-        with shelve.open(self.render[0]) as db:
-            # if key in db.keys():
-            #     outDict = {self.render[key]}
-            for k in db.keys():
-                if key in k and "global" not in k:
-                    outDict[k] = db[k]
-
-        for shelf in self.render[1:]:
-            with shelve.open(shelf) as db:
-                index = set(outDict.keys())
-                for k in db.keys():
-                    if k in index:
-                        outDict[k].concatenate(db[k])
-        return list(outDict.values())
-        # return [v for k, v in self.render.items() if key in k and "global" not in k]
+        return [v for k, v in self._render.items() if key in k and "global" not in k]
 
     @property
     def variables(self):
