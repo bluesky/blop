@@ -1,3 +1,5 @@
+"""A set of useful helper utilities."""
+
 import time
 from collections.abc import Sequence
 from enum import StrEnum
@@ -72,14 +74,17 @@ class InferredReadable(Readable, HasHints, HasParent):
 
     @property
     def parent(self) -> Any | None:
+        """Parent of the readable, always ``None``."""
         return None
 
     @property
     def name(self) -> str:
+        """Name of the readable."""
         return self._name
 
     @property
     def hints(self) -> Hints:
+        """Hints for callbacks (such as plotting)."""
         return {
             "fields": [self.name],
             "dimensions": [],
@@ -87,6 +92,7 @@ class InferredReadable(Readable, HasHints, HasParent):
         }
 
     def describe(self) -> dict[str, DataKey]:
+        """Describe the properties of this readable."""
         if not self._data_key:
             # Use stored dtype if available, otherwise infer
             if self._dtype is not None:
@@ -97,6 +103,7 @@ class InferredReadable(Readable, HasHints, HasParent):
         return {self.name: self._data_key}
 
     def update(self, value: ArrayLike) -> None:
+        """Update the stored value of this readable."""
         if isinstance(value, np.ndarray):
             self._dtype = value.dtype
             value = value.tolist()
@@ -108,6 +115,7 @@ class InferredReadable(Readable, HasHints, HasParent):
         self._value = value
 
     def read(self) -> dict[str, Reading]:
+        """Emit a reading for this readable."""
         return {
             self.name: {
                 "value": self._value,
@@ -116,7 +124,7 @@ class InferredReadable(Readable, HasHints, HasParent):
         }
 
 
-def get_route_index(points: np.ndarray, starting_point: np.ndarray | None = None):
+def _get_route_index(points: np.ndarray, starting_point: np.ndarray | None = None):
     if starting_point is not None:
         points = np.concatenate([starting_point[None], points], axis=0)
 
@@ -139,6 +147,7 @@ def get_route_index(points: np.ndarray, starting_point: np.ndarray | None = None
 
 
 def route_suggestions(suggestions: list[dict], starting_position: dict | None = None):
+    """Route suggestions using networkx TSP solver."""
     if len(suggestions) == 1:
         return suggestions
 
@@ -146,13 +155,11 @@ def route_suggestions(suggestions: list[dict], starting_position: dict | None = 
     points = np.array([[s[dim] for dim in dims_to_route] for s in suggestions])
     starting_point = np.array([starting_position[dim] for dim in dims_to_route]) if starting_position else None
 
-    return [suggestions[i] for i in get_route_index(points=points, starting_point=starting_point)]
+    return [suggestions[i] for i in _get_route_index(points=points, starting_point=starting_point)]
 
 
 def collect_optimization_metadata(optimization_problem: OptimizationProblem) -> dict[str, Any]:
-    """
-    Collect the metadata for the optimization problem.
-    """
+    """Collect the metadata for the optimization problem."""
     if hasattr(optimization_problem.evaluation_function, "__name__"):
         evaluation_function_name = optimization_problem.evaluation_function.__name__  # type: ignore[attr-defined]
     else:

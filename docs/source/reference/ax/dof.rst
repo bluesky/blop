@@ -1,5 +1,5 @@
-Degree of Freedom (DOF)
-=======================
+Ax Degree of Freedom (DOF)
+==========================
 
 DOF
 ---

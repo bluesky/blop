@@ -1,3 +1,5 @@
+"""Protocols that bridge between optimizer backends and Bluesky."""
+
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
@@ -35,8 +37,9 @@ TPlan = TypeVar("TPlan")
 @runtime_checkable
 class CanRegisterSuggestions(Protocol):
     """
-    A protocol for optimizers that can register suggestions. This
-    allows them to add an "_id" key to the suggestions dynamically and ensure
+    A protocol for optimizers that can register suggestions.
+
+    This allows them to add an "_id" key to the suggestions dynamically and ensure
     that the suggestions are unique.
     """
 
@@ -62,7 +65,6 @@ class TrialFaultAware(Protocol):
     """
     A protocol to accept information about trial failures of the optimization loop.
 
-
     Used to invalidate or register early stop on data for the optimizer, or do necesary
     cleanup of processes not directly tied to the run engine
     """
@@ -75,10 +77,6 @@ class TrialFaultAware(Protocol):
         ----------
         suggestions: list[dict]
             The suggestions to fail. Ids must be present.
-
-        Returns
-        -------
-        Nothing :)
         """
         ...
 
@@ -93,9 +91,7 @@ class Checkpointable(Protocol):
     """
 
     def checkpoint(self) -> None:
-        """
-        Write the object's state to persistent storage.
-        """
+        """Write the object's state to persistent storage."""
         ...
 
 
@@ -116,7 +112,7 @@ class Optimizer(Protocol):
 
     def suggest(self, num_points: int | None = None) -> list[dict]:
         """
-        Returns a set of points in the input space, to be evaulated next.
+        Suggest a set of points in the input space, to be evaulated next.
 
         The "_id" key is optional and can be used to identify suggested trials for later evaluation
         and ingestion.
@@ -175,6 +171,10 @@ class EvaluationFunction(Protocol):
     acquired data. Custom implementations are needed to define how your beamline
     data translates into the outcomes you want to optimize.
 
+    See Also
+    --------
+    blop.ax.Agent : Accepts an evaluation function during initialization.
+
     Notes
     -----
     The evaluation function is called after data acquisition to compute outcomes
@@ -185,10 +185,6 @@ class EvaluationFunction(Protocol):
     --------
     See the tutorial documentation for complete examples of evaluation functions:
     :doc:`/tutorials/simple-experiment`
-
-    See Also
-    --------
-    blop.ax.Agent : Accepts an evaluation function during initialization.
     """
 
     def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
@@ -222,16 +218,16 @@ class AcquisitionPlan(Protocol):
     over the suggested points. Custom implementations are only needed for specialized
     acquisition strategies (e.g., fly scans, complex detector configurations).
 
+    See Also
+    --------
+    blop.plans.default_acquire : Default acquisition plan implementation.
+    blop.ax.Agent : Accepts an optional acquisition plan during initialization.
+
     Notes
     -----
     The acquisition plan is a Bluesky plan that should move the actuators to each
     suggested position and acquire data from the sensors. It must return the UID
     of the Bluesky run so that the evaluation function can retrieve the data.
-
-    See Also
-    --------
-    blop.plans.default_acquire : Default acquisition plan implementation.
-    blop.ax.Agent : Accepts an optional acquisition plan during initialization.
     """
 
     @plan
@@ -346,7 +342,7 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
         A callable to evaluate data from a Bluesky run and produce outcomes.
     acquisition_plan: str, optional
         The name of a Bluesky plan to acquire data. If not provided, a default plan name will be used.
-        The plan must match the arguments of :ref:`AcquisitionPlan`.
+        The plan must match the arguments of :class:`AcquisitionPlan`.
     acquisition_plan_kwargs: Mapping[str, Any], optional
         Additional plan arguments to pass to the Bluesky plan.
 

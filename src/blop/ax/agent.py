@@ -1,3 +1,5 @@
+"""Agent interface for optimization with Ax as the backend."""
+
 import logging
 from collections.abc import Mapping, Sequence
 from typing import Any, cast
@@ -32,6 +34,7 @@ logger = logging.getLogger(__name__)
 class _AxAgentMixin:
     """
     Mixin providing Ax-related functionality shared by agents.
+
     Expects subclasses to define `self._optimizer` as an `AxOptimizer`.
     """
 
@@ -177,9 +180,7 @@ class _AxAgentMixin:
         )
 
     def checkpoint(self) -> None:
-        """
-        Save the agent's state to a JSON file.
-        """
+        """Save the agent's state to a JSON file."""
         self._optimizer.checkpoint()
 
     def reconfigure_search_space(self, dof_mappings: dict[DOF, tuple[float, float] | list[TParamValue]]) -> None:
@@ -191,7 +192,6 @@ class _AxAgentMixin:
         dof_mappings : dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]
             Mapping of DOFs to their new search space.
         """
-
         self._optimizer.reconfigure_search_space({dof.parameter_name: update for dof, update in dof_mappings.items()})
 
 
@@ -226,13 +226,6 @@ class Agent(_AxAgentMixin):
     **kwargs : Any
         Additional keyword arguments to configure the Ax experiment.
 
-    Notes
-    -----
-    For more complex setups, you can configure the Ax client directly via ``self.ax_client``.
-
-    For complete working examples of creating and using an Agent, see the tutorial
-    documentation, particularly :doc:`/tutorials/simple-experiment`.
-
     See Also
     --------
     blop.protocols.Sensor : The protocol for sensors.
@@ -241,6 +234,13 @@ class Agent(_AxAgentMixin):
     blop.ax.objective.Objective : For defining objectives.
     blop.ax.optimizer.AxOptimizer : The optimizer used internally.
     blop.plans.optimize : Bluesky plan for running optimization.
+
+    Notes
+    -----
+    For more complex setups, you can configure the Ax client directly via ``self.ax_client``.
+
+    For complete working examples of creating and using an Agent, see the tutorial
+    documentation, particularly :doc:`/tutorials/simple-experiment`.
     """
 
     def __init__(
@@ -458,18 +458,18 @@ class Agent(_AxAgentMixin):
         Msg
             Bluesky messages for the run engine.
 
+        See Also
+        --------
+        blop.plans.optimize : The underlying Bluesky optimization plan.
+        suggest : Get point suggestions without running acquisition.
+        ingest : Manually ingest evaluation results.
+
         Notes
         -----
         This is the primary method for running optimization. It handles the full loop
         of suggesting points, acquiring data, evaluating outcomes, and updating the model.
 
         For complete examples, see :doc:`/tutorials/simple-experiment`.
-
-        See Also
-        --------
-        blop.plans.optimize : The underlying Bluesky optimization plan.
-        suggest : Get point suggestions without running acquisition.
-        ingest : Manually ingest evaluation results.
         """
         optimize_plan = optimize(
             self.to_optimization_problem(), iterations=iterations, n_points=n_points, readable_cache=self._readable_cache
