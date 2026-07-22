@@ -17,11 +17,31 @@ from blop.protocols import ID_KEY, Optimizer
 
 
 class SCP(StrEnum):
-    """Enumeration of all optimizers currently supported/tested."""
+    """Enumeration of all optimizers currently supported/tested.
+
+    #TODO all commented optimizers require jacobian and are currently suspended in impl until its clear that external
+    # gradient sampling is necesary and clearly cross implementable. likely necesary for noisy opts but this is clearly
+    # a usage defined addition.
+    """
 
     Default = "Default"
+
+    Nelder_Mead = "Nelder-Mead"
+    Powell = "Powell"
+    CG = "CG"
     BFGS = "BFGS"
+    # Newton_CG = "Newton-CG"
     LBFGS = "L-BFGS-B"
+    TNC = "TNC"
+    COBYLA = "COBYLA"
+    COBYQA = "COBYQA"
+    SLSQP = "SLSQP"
+    Trust_Constr = "trust-constr"
+    # Dogleg = "dogleg"
+    # Trust_NCG = "trust-ncg"
+    # Trust_Exact = "trust-exact"
+    # Trust_Krylov = "trust-krylov"
+
     Dual_Annealing = "dual annealing"
 
 
@@ -110,7 +130,10 @@ class ScipyOptimizer(Optimizer):
         kw = {}
         self._thread_pool = None
         if config.max_iter is not None:
-            kw["max_iter"] = config.max_iter
+            if config.optimizer is not SCP.Trust_Constr:
+                kw["max_iter"] = config.max_iter
+            else:
+                kw["maxiter"] = config.max_iter
         if config.eps is not None:
             kw["eps"] = config.eps
 
@@ -120,19 +143,7 @@ class ScipyOptimizer(Optimizer):
             self.intermediate = intermediate_result
             self.intermediate.nit = self._increment
 
-        if config.optimizer in (SCP.Default, SCP.BFGS, SCP.LBFGS):
-
-            def call(kws=None):
-                self.final = minimize(
-                    fun=cost,
-                    x0=_x,
-                    method=config.optimizer if config.optimizer != SCP.Default else None,
-                    bounds=self._bounds,
-                    callback=default_callback,
-                    options=kws,
-                )
-
-        elif config.optimizer in (SCP.Dual_Annealing):
+        if config.optimizer is SCP.Dual_Annealing:
 
             def dual_callback(x, f, context):
                 print(f"callback on opt val {f} with current best of {self.intermediate}")
@@ -148,7 +159,17 @@ class ScipyOptimizer(Optimizer):
                     callback=dual_callback,
                     minimizer_kwargs={"callback": default_callback, "bounds": self._bounds, "options": kws},
                 )
+        elif config.optimizer in SCP:
 
+            def call(kws=None):
+                self.final = minimize(
+                    fun=cost,
+                    x0=_x,
+                    method=config.optimizer if config.optimizer != SCP.Default else None,
+                    bounds=self._bounds,
+                    callback=default_callback,
+                    options=kws,
+                )
         else:
             raise NotImplementedError(f"optimizer {config.optimizer} not in supported optimizers:{list(SCP)}")
 
