@@ -1,3 +1,5 @@
+"""Core Scipy optimizer porting scipy algorithms."""
+
 from collections import OrderedDict
 from collections.abc import Mapping, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
@@ -15,6 +17,8 @@ from blop.protocols import ID_KEY, Optimizer
 
 
 class SCP(StrEnum):
+    """Enumeration of all optimizers currently supported/tested."""
+
     Default = "Default"
     BFGS = "BFGS"
     LBFGS = "L-BFGS-B"
@@ -23,6 +27,12 @@ class SCP(StrEnum):
 
 @dataclass
 class ScipyCFG:
+    """
+    Configuration dataclass that encompasses the core optimization problem and extra parameters within Scipy.
+
+    Used as the optimizer/generation function is not injectable like in Ax
+    """
+
     dofs: Sequence[RangeDOF]
     objective: Objective
     # dof_constraints: Sequence[DOFConstraint] | None = None
@@ -36,17 +46,17 @@ class ScipyCFG:
 
 
 class ScipyOptimizer(Optimizer):
-    """
-    An optimizer object to supply an interactive interface for the scipy optimizers, with some caveats.
-    """
+    """An optimizer object to supply an interactive interface for the scipy optimizers, with some caveats."""
 
     @dataclass
-    class Request:
+    class _Request:
         args: tuple
         future: Future
 
     @dataclass
     class Result:
+        """Class to unify Optimize Result and Scipy Result."""
+
         x: list[float | int]
         fun: float
         nit: int
@@ -56,13 +66,19 @@ class ScipyOptimizer(Optimizer):
         self.session(config=config, timeout=timeout)
 
     def session(self, config: ScipyCFG, timeout: int | None = None):
+        """
+        Through path for initialization and stateful reinitialization of optimization.
+
+        derived so that mutiple initializations and lifetimes can be used for optimization.
+        Such as the standard ScipyOptimizer(...) call or a following "with"
+        """
         self._params: list[str] = []
         self._bounds: list[tuple[Any, Any]] = []
         self._increment: int = 0
         self._objective: Objective = config.objective
         self.force_resiliance = False  # kinda hidden for now
         self._scale = np.ones(len(config.dofs))
-        self._active: dict[int, ScipyOptimizer.Request] = OrderedDict()
+        self._active: dict[int, ScipyOptimizer._Request] = OrderedDict()
         self.intermediate: OptimizeResult | ScipyOptimizer.Result | None = None
         self.final: OptimizeResult | ScipyOptimizer.Result | None = None
         self.SUGGESTION_TIMEOUT = timeout
@@ -82,10 +98,8 @@ class ScipyOptimizer(Optimizer):
             _x = np.array(config.initial) / self._scale
 
         def cost(x):  # thread safety needs timeout so there is not infinite hang on programs
-            """
-            simple cooperative thread that defers evaluation of cost call by scipy to the run engine
-            """
-            req = self.Request(args=x, future=Future())
+            """Cooperative thread that defers evaluation of cost call by scipy to the run engine."""
+            req = self._Request(args=x, future=Future())
             self._active[self._increment] = req
             self._increment += 1
             res = req.future.result(timeout=self.SUGGESTION_TIMEOUT)
@@ -160,14 +174,16 @@ class ScipyOptimizer(Optimizer):
         return self
 
     def __enter__(self):
+        """Magic convenience to use "with" to better control thread lifetime."""
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """Lifetime threads when using with."""
         self.close()
 
     def suggest(self, num_points: int | None = None) -> list[dict]:
         """
-        Returns a set of points in the input space, to be evaulated next.
+        Provide a set of points in the input space, to be evaulated next.
 
         The "_id" key is optional and can be used to identify suggested trials for later evaluation
         and ingestion.
@@ -249,5 +265,6 @@ class ScipyOptimizer(Optimizer):
         return cart
 
     def close(self):
+        """Clear out futures to allow cleanup of threads."""
         for ind in list(self._active.keys()):
             self._active.pop(ind).future.set_exception(KeyboardInterrupt("Execution has been suspended"))
