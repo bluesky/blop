@@ -1,3 +1,5 @@
+"""Utilities for Bluesky callbacks."""
+
 import math
 
 from bluesky.callbacks import CallbackBase
@@ -35,10 +37,12 @@ class RunningStats:
 
     @property
     def mean(self) -> float:
+        """Average of the observed values so far."""
         return self._mean if self.count > 0 else math.nan
 
     @property
     def std(self) -> float:
+        """Standard deviation of the observed values so far."""
         if self.count < 2:
             return math.nan
         return math.sqrt(self._m2 / (self.count - 1))

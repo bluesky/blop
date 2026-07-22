@@ -1,9 +1,17 @@
+"""Agent interface for asynchronous optimization using Bluesky Queueserver and Ax."""
+
 from collections.abc import Mapping, Sequence
 from concurrent.futures import Future
 from typing import Any
 
+try:
+    import bluesky_queueserver_api.http
+    import bluesky_queueserver_api.zmq
+except ImportError as e:
+    raise ImportError(
+        "The queueserver integration requires additional dependencies. Install them with: pip install blop[queueserver]"
+    ) from e
 from bluesky.callbacks.zmq import RemoteDispatcher
-from bluesky_queueserver_api.zmq import REManagerAPI
 
 from ..protocols import (
     Actuator,
@@ -19,8 +27,9 @@ from .optimizer import AxOptimizer
 
 class QueueserverAgent(_AxAgentMixin):
     """
-    An asynchronous interface that uses Ax as the backend for optimization and experiment tracking
-    and the bluesky-queueserver-api for scheduling plan execution.
+    An asynchronous interface that uses Ax as the backend for optimization and experiment tracking.
+
+    Uses the bluesky-queueserver-api for scheduling plan execution.
 
     .. warning::
 
@@ -30,7 +39,7 @@ class QueueserverAgent(_AxAgentMixin):
 
     Parameters
     ----------
-    re_manager_api : REManagerAPI
+    re_manager_api : bluesky_queueserver_api.zmq.REManagerAPI | bluesky_queueserver_api.http.REManagerAPI
         The manager API for interaction with Bluesky queueserver.
     document_dispatcher : RemoteDispatcher
         Dispatcher for consuming Bluesky documents from the remote server.
@@ -62,12 +71,12 @@ class QueueserverAgent(_AxAgentMixin):
     blop.ax.dof.ChoiceDOF : For discrete parameters.
     blop.ax.objective.Objective : For defining objectives.
     blop.ax.optimizer.AxOptimizer : The optimizer used internally.
-    blop.queueserver.QueueserverOptimizatonRunner : Runner that handles interaction with bluesky-queueserver.
+    blop.queueserver.QueueserverOptimizationRunner : Runner that handles interaction with bluesky-queueserver.
     """
 
     def __init__(
         self,
-        re_manager_api: REManagerAPI,
+        re_manager_api: bluesky_queueserver_api.zmq.REManagerAPI | bluesky_queueserver_api.http.REManagerAPI,
         document_dispatcher: RemoteDispatcher,
         sensors: Sequence[str],
         dofs: Sequence[DOF],
@@ -108,28 +117,35 @@ class QueueserverAgent(_AxAgentMixin):
 
     @property
     def evaluation_function(self) -> EvaluationFunction:
+        """Evaluation function mapping acquired data to outcomes."""
         return self._evaluation_function
 
     @property
     def actuators(self) -> Sequence[str]:
+        """Set of actuator names used during acquisition."""
         return self._actuators
 
     @property
     def sensors(self) -> Sequence[str]:
+        """Set of sensor names used during acquisition."""
         return self._sensors
 
     @property
     def acquisition_plan(self) -> str | None:
+        """Acquisition plan name used during acquisition."""
         return self._acquisition_plan
 
     def stop(self) -> None:
+        """Stop the queueserver runner."""
         self._runner.stop()
 
     @property
     def current_iteration(self) -> int:
+        """The current iteration of the optimization."""
         return self._runner.current_iteration
 
     def to_optimization_problem(self) -> QueueserverOptimizationProblem:
+        """Convert the agent state to an optimization problem."""
         return QueueserverOptimizationProblem(
             optimizer=self._optimizer,
             actuators=self._actuators,

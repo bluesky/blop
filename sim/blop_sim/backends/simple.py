@@ -21,7 +21,8 @@ class SimpleBackend(SimBackend):
         - Slit aperture (clips the beam)
         - Optional noise (white + pink noise)
 
-        Returns:
+        Returns
+        -------
             2D numpy array with shape (nx, ny)
         """
         nx, ny = self._image_shape

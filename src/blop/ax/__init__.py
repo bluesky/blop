@@ -1,3 +1,5 @@
+"""Ax backend for optimization."""
+
 try:
     from .agent import Agent as Agent
     from .dof import DOF, ChoiceDOF, DOFConstraint, RangeDOF

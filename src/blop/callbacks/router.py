@@ -1,3 +1,5 @@
+"""Router for filtering out non-optimization Bluesky runs."""
+
 from bluesky.callbacks import CallbackBase
 from event_model import RunRouter
 
@@ -32,4 +34,5 @@ class OptimizationCallbackRouter:
         return [], []
 
     def __call__(self, name, doc):
+        """Pass the document along to the run router."""
         self._run_router(name, doc)

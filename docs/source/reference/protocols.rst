@@ -1,6 +1,11 @@
 Protocols
 =========
 
+MovableHasName
+--------------
+
+.. autoclass:: blop.protocols.MovableHasName
+
 Actuator
 --------
 
@@ -39,10 +44,55 @@ Optimizer
    :show-inheritance:
    :inherited-members:
 
+BaseOptimizationProblem
+-----------------------
+
+.. autoclass:: blop.protocols.BaseOptimizationProblem
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
 OptimizationProblem
 -------------------
 
 .. autoclass:: blop.protocols.OptimizationProblem
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
+QueueserverOptimizationProblem
+------------------------------
+
+.. autoclass:: blop.protocols.QueueserverOptimizationProblem
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
+CanRegisterSuggestions
+----------------------
+
+.. autoclass:: blop.protocols.CanRegisterSuggestions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
+TrialFaultAware
+---------------
+
+.. autoclass:: blop.protocols.TrialFaultAware
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
+Checkpointable
+--------------
+
+.. autoclass:: blop.protocols.Checkpointable
    :members:
    :undoc-members:
    :show-inheritance:

@@ -2,6 +2,85 @@
 Release History
 ===============
 
+v1.0.0 (2026-07-16)
+-------------------
+
+Features
+........
+* **Xopt backend**: New optional ``blop.xopt.XoptOptimizer`` backend, installable via the
+  ``blop[xopt]`` extra, implementing the ``Optimizer``, ``Checkpointable``,
+  ``CanRegisterSuggestions``, and ``TrialFaultAware`` protocols on top of
+  `Xopt <https://xopt.xopt.org>`_ (`#318 <https://github.com/bluesky/blop/pull/318>`_).
+* **Scalarized objectives in `Agent`**: ``Agent`` can now be configured with
+  ``ScalarizedObjective`` for weighted multi-objective optimization
+  (`#284 <https://github.com/bluesky/blop/pull/284>`_).
+* **Best point(s) navigation**: New ``blop.plan_stubs.navigate_to_best`` plan stub that moves
+  actuators to the best point(s) found so far, backed by ``Optimizer.get_best_points()``
+  (`#293 <https://github.com/bluesky/blop/pull/293>`_).
+* **Queueserver plan keyword arguments**: ``QueueserverOptimizationProblem`` now accepts
+  additional keyword arguments to pass through to the acquisition plan
+  (`#306 <https://github.com/bluesky/blop/pull/306>`_).
+* **More reliable queueserver runner**: The queueserver runner now starts its listener
+  automatically on initialization (`#316 <https://github.com/bluesky/blop/pull/316>`_), tracks
+  its state with ``concurrent.futures.Future`` for more robust status reporting
+  (`#305 <https://github.com/bluesky/blop/pull/305>`_), and ``QueueserverAgent`` now exposes
+  additional runner properties (``actuators``, ``sensors``, ``acquisition_plan``,
+  ``current_iteration``) and a ``stop()`` method directly
+  (`#291 <https://github.com/bluesky/blop/pull/291>`_).
+
+Breaking Changes
+................
+* **`QueueserverClient` now takes a `RemoteDispatcher`**: Replaces the previous raw ZMQ address
+  argument, giving users full control over how documents are dispatched from the queueserver
+  (`#308 <https://github.com/bluesky/blop/pull/308>`_).
+* **`QueueserverAgent` moved to its own module**: ``QueueserverAgent`` now lives in
+  ``blop.ax.queueserver_agent`` instead of ``blop.ax.agent``. The ``queueserver`` optional
+  extra was also renamed from ``qs`` to ``queueserver``
+  (`#321 <https://github.com/bluesky/blop/pull/321>`_).
+
+Bug Fixes
+.........
+* Made ``ChoiceDOF`` hashable, fixing a bug when reconfiguring or fixing ``ChoiceDOF`` parameters
+  (`#301 <https://github.com/bluesky/blop/pull/301>`_).
+* Fixed stream filtering in the optimization logging callback
+  (`#302 <https://github.com/bluesky/blop/pull/302>`_).
+* Fixed the queueserver runner calling ``stop_listener`` from the wrong thread, and used the
+  correct ``run_start`` key on the stop document
+  (`#291 <https://github.com/bluesky/blop/pull/291>`_).
+* Queueserver runner now prevents concurrent/parallel runs
+  (`#296 <https://github.com/bluesky/blop/pull/296>`_).
+* Fixed the import path for ``ContourPlot`` (`#281 <https://github.com/bluesky/blop/pull/281>`_).
+
+Dependency Changes
+..................
+* Reworked and clarified the optional-dependency structure, adding an ``all`` extra and
+  renaming the ``qs`` extra to ``queueserver``
+  (`#321 <https://github.com/bluesky/blop/pull/321>`_).
+
+Documentation
+.............
+* **Queueserver integration marked experimental**: Clearly documented across module
+  docstrings, the tutorial, and the API reference that the queueserver integration is
+  experimental and subject to change (`#309 <https://github.com/bluesky/blop/pull/309>`_).
+* New tutorial for running Blop optimization against a remote Bluesky Queueserver
+  (`#292 <https://github.com/bluesky/blop/pull/292>`_).
+* Improvements to the XRT KB mirror tutorial (`#311 <https://github.com/bluesky/blop/pull/311>`_)
+  and the simple experiment tutorial (`#303 <https://github.com/bluesky/blop/pull/303>`_), plus a
+  general documentation maintenance pass
+  (`#294 <https://github.com/bluesky/blop/pull/294>`_).
+* New explanation content describing which components of an optimization workflow
+  (evaluation functions, acquisition plans) users are responsible for implementing
+  (`#323 <https://github.com/bluesky/blop/pull/323>`_).
+* Website redesign, including a version-switcher dropdown in the docs header
+  (`#269 <https://github.com/bluesky/blop/pull/269>`_,
+  `#277 <https://github.com/bluesky/blop/pull/277>`_,
+  `#279 <https://github.com/bluesky/blop/pull/279>`_,
+  `#287 <https://github.com/bluesky/blop/pull/287>`_,
+  `#288 <https://github.com/bluesky/blop/pull/288>`_).
+* Various consistency improvements to the documentation.
+
+`Full Changelog <https://github.com/bluesky/blop/compare/v1.0.0b1...v1.0.0>`__
+
 v1.0.0b1 (2026-04-17)
 ---------------------
 

@@ -40,7 +40,7 @@ You can learn all about the various Ax features in the `Ax documentation <https:
   - Using custom BoTorch models: `<https://ax.dev/docs/tutorials/modular_botorch/>`_ (see :doc:`/how-to-guides/custom-generation-strategies` for an example in Blop)
   - Using external generators: `<https://ax.dev/docs/tutorials/external_generation_node/>`_
 
-- Configuring early stopping: `<https://ax.dev/docs/tutorials/early_stopping/>`_ (first-class support for early stopping is coming soon, see `<https://github.com/NSLS-II/blop/issues/129>`_)
+- Configuring early stopping: `<https://ax.dev/docs/tutorials/early_stopping/>`_
 - Analyzing/Summarizing the optimization results and model fit: `<https://ax.dev/docs/tutorials/analyses/>`_ (see :func:`blop.ax.Agent.plot_objective` for an example in Blop)
 - Configuring tracking metrics: `<https://ax.dev/docs/recipes/tracking-metrics/>`_
 - Saving and loading experiments

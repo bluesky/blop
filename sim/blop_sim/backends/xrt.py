@@ -28,7 +28,8 @@ class XRTBackend(SimBackend):
     async def generate_beam(self) -> np.ndarray:
         """Generate beam using XRT ray-tracing.
 
-        Returns:
+        Returns
+        -------
             2D numpy array with shape (300, 400)
         """
         self._ensure_beamline()
@@ -57,7 +58,8 @@ class XRTBackend(SimBackend):
     async def _get_mirror_radii(self) -> list[float]:
         """Get KB mirror radii from registered devices.
 
-        Returns:
+        Returns
+        -------
             [R1, R2] where R1 is first mirror (vertical), R2 is second mirror (horizontal)
         """
         # Default radii from xrt_kb_model.py

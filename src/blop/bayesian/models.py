@@ -1,3 +1,5 @@
+"""Custom models for doing Bayesian optimization."""
+
 from typing import Any
 
 import gpytorch
@@ -9,6 +11,8 @@ from . import kernels
 
 
 class LatentGP(SingleTaskGP):
+    """Latent model GP."""
+
     def __init__(
         self,
         train_X: torch.Tensor,
@@ -35,6 +39,8 @@ class LatentGP(SingleTaskGP):
 
 
 class MultiTaskLatentGP(MultiTaskGP):
+    """Multi-task latent model GP."""
+
     def __init__(
         self,
         train_X: torch.Tensor,
@@ -60,6 +66,8 @@ class MultiTaskLatentGP(MultiTaskGP):
 
 
 class LatentConstraintModel(LatentGP):
+    """Constraint latent model GP."""
+
     def __init__(
         self,
         train_X: torch.Tensor,
@@ -73,15 +81,15 @@ class LatentConstraintModel(LatentGP):
         self.trained: bool = False
 
     def fitness(self, x: torch.Tensor, n_samples: int = 1024) -> torch.Tensor:
-        """
-        Takes in a (..., m) dimension tensor and returns a (..., n_classes) tensor
-        """
+        """Given a (..., m) dimension tensor and returns a (..., n_classes) tensor."""
         *input_shape, n_dim = x.shape
         samples = self.posterior(x.reshape(-1, n_dim)).sample(torch.Size((n_samples,))).exp()
         return (samples / samples.sum(-1, keepdim=True)).mean(0).reshape(*input_shape, -1)
 
 
 class LatentDirichletClassifier(LatentGP):
+    """Classifier latent model GP."""
+
     def __init__(
         self,
         train_X: torch.Tensor,
@@ -95,9 +103,7 @@ class LatentDirichletClassifier(LatentGP):
         self.trained: bool = False
 
     def probabilities(self, x: torch.Tensor, n_samples: int = 256) -> torch.Tensor:
-        """
-        Takes in a (..., m) dimension tensor and returns a (..., n_classes) tensor
-        """
+        """Given a (..., m) dimension tensor and returns a (..., n_classes) tensor."""
         *input_shape, n_dim = x.shape
         samples = self.posterior(x.reshape(-1, n_dim)).sample(torch.Size((n_samples,))).exp()
         return (samples / samples.sum(-1, keepdim=True)).mean(0).reshape(*input_shape, -1)

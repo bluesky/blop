@@ -1,3 +1,5 @@
+"""Bluesky plan stubs for optimization."""
+
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from typing import Any, Literal

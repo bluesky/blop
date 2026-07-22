@@ -58,7 +58,8 @@ class SimBackend(ABC):
         Args:
             device_name: Name of the device
 
-        Returns:
+        Returns
+        -------
             Device state dictionary
         """
         device = self._device_states[device_name]
@@ -69,7 +70,8 @@ class SimBackend(ABC):
     async def generate_beam(self) -> np.ndarray:
         """Generate beam image based on current device states.
 
-        Returns:
+        Returns
+        -------
             2D numpy array with shape self._image_shape
         """
         pass

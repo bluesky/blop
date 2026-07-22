@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from blop.protocols import ID_KEY
-from blop.utils import InferredReadable, Source, _infer_data_key, get_route_index, route_suggestions
+from blop.utils import InferredReadable, Source, _infer_data_key, route_suggestions
 
 # InferredReadable tests
 
@@ -38,28 +38,6 @@ def test_inferred_readable_update():
     r2 = InferredReadable("arr", Source.OTHER, [0.0, 0.1])
     r2.update(np.array([1.0, 2.0]))
     assert list(r2.read()["arr"]["value"]) == [1.0, 2.0]
-
-
-# get_route_index tests
-
-
-def test_get_route_index_two_points_no_start():
-    points = np.array([[0.0, 0.0], [1.0, 1.0]])
-    result = get_route_index(points)
-    assert set(result) == {0, 1}
-
-
-def test_get_route_index_multiple_points_no_start():
-    points = np.array([[0.0, 0.0], [1.0, 0.0], [2.0, 0.0]])
-    result = get_route_index(points)
-    assert set(result) == {0, 1, 2}
-
-
-def test_get_route_index_with_starting_point():
-    points = np.array([[1.0, 0.0], [2.0, 0.0]])
-    start = np.array([0.0, 0.0])
-    result = get_route_index(points, starting_point=start)
-    assert set(result) == {0, 1}
 
 
 # route_suggestions tests

@@ -1,3 +1,5 @@
+"""Custom kernels for Gaussian Processes."""
+
 from collections.abc import Iterable
 
 import gpytorch
@@ -7,8 +9,11 @@ import torch
 
 
 class LatentKernel(gpytorch.kernels.Kernel):
+    """Latent kernel."""
+
     @property
     def is_stationary(self) -> bool:
+        """Latent kernel is always stationary."""
         return True
 
     num_outputs: int = 1
@@ -109,6 +114,7 @@ class LatentKernel(gpytorch.kernels.Kernel):
 
     @property
     def lengthscales(self) -> torch.Tensor:
+        """Lengthscales of the kernel."""
         return self.raw_lengthscales_constraint.transform(self.raw_lengthscales)
 
     @lengthscales.setter
@@ -117,6 +123,7 @@ class LatentKernel(gpytorch.kernels.Kernel):
 
     @property
     def skew_entries(self) -> torch.Tensor:
+        """Skew entries of the kernel."""
         return self.raw_skew_entries_constraint.transform(self.raw_skew_entries)
 
     @skew_entries.setter
@@ -125,6 +132,7 @@ class LatentKernel(gpytorch.kernels.Kernel):
 
     @property
     def outputscale(self) -> torch.Tensor:
+        """Outputscale of the kernel."""
         return self.raw_outputscale_constraint.transform(self.raw_outputscale)
 
     @outputscale.setter
@@ -148,6 +156,7 @@ class LatentKernel(gpytorch.kernels.Kernel):
 
     @property
     def skew_matrix(self) -> torch.Tensor:
+        """Skew matrix of the kernel."""
         S = torch.zeros((self.num_outputs, self.num_inputs, self.num_inputs), dtype=torch.float64)
         if self.n_skew_entries > 0:
             # to construct an orthogonal matrix. fun fact: exp(skew(N)) is the generator of SO(N)
@@ -157,15 +166,18 @@ class LatentKernel(gpytorch.kernels.Kernel):
 
     @property
     def diag_matrix(self) -> torch.Tensor:
+        """Diagonal matrix of the kernel."""
         D = torch.zeros((self.num_outputs, self.num_inputs, self.num_inputs), dtype=torch.float64)
         D[self.diag_matrix_indices] = self.lengthscales.ravel() ** -1
         return D
 
     @property
     def latent_transform(self) -> torch.Tensor:
+        """The 'latent' transformation."""
         return torch.matmul(self.diag_matrix, self.skew_matrix)
 
     def forward(self, x1: torch.Tensor, x2: torch.Tensor, diag: bool = False, **params: dict) -> torch.Tensor:
+        """Compute the output of the kernel."""
         # adapted from the Matern kernel
         mean = x1.reshape(-1, x1.size(-1)).mean(0)[(None,) * (x1.dim() - 1)]
 

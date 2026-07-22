@@ -6,7 +6,7 @@ authors = [
 channels = ["conda-forge"]
 name = "blop"
 platforms = ["linux-64", "osx-arm64"]
-version = "1.0.0b1"
+version = "1.0.0"
 
 [dependencies]
 python = ">=3.11.0,<3.14"

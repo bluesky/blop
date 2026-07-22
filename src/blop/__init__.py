@@ -1,3 +1,5 @@
+"""A bridge between optimization algorithms and Bluesky."""
+
 from .plans import acquire_baseline, default_acquire, optimize, optimize_step, sample_suggestions
 
 try:

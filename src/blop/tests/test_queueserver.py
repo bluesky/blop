@@ -99,7 +99,7 @@ def test_consumer_callback_matches_stop_to_cached_start_by_run_uid():
     mock_callback.assert_called_once_with(start_doc_2, stop_doc)
 
 
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_check_environment_raises_when_not_ready(mock_re_manager, mock_document_dispatcher):
     """Test check_environment raises RuntimeError when environment not open."""
     mock_re_manager.status.return_value = {"worker_environment_exists": False}
@@ -109,7 +109,7 @@ def test_queueserver_client_check_environment_raises_when_not_ready(mock_re_mana
         client.check_environment()
 
 
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_check_devices_raises_for_missing_device(mock_re_manager, mock_document_dispatcher):
     """Test check_devices_available raises ValueError for missing devices."""
     mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}}}
@@ -119,7 +119,7 @@ def test_queueserver_client_check_devices_raises_for_missing_device(mock_re_mana
         client.check_devices_available(["motor1", "motor2"])
 
 
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_check_plan_raises_for_missing_plan(mock_re_manager, mock_document_dispatcher):
     """Test check_plan_available raises ValueError for missing plan."""
     mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"other_plan": {}}}
@@ -129,7 +129,7 @@ def test_queueserver_client_check_plan_raises_for_missing_plan(mock_re_manager, 
         client.check_plan_available("my_plan")
 
 
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_submit_plan_with_autostart(mock_re_manager, mock_document_dispatcher):
     """Test submit_plan adds item and starts queue when autostart=True."""
     client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
@@ -142,7 +142,7 @@ def test_queueserver_client_submit_plan_with_autostart(mock_re_manager, mock_doc
     mock_re_manager.queue_start.assert_called_once()
 
 
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_submit_plan_without_autostart(mock_re_manager, mock_document_dispatcher):
     """Test submit_plan only adds item when autostart=False."""
     client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
@@ -155,7 +155,7 @@ def test_queueserver_client_submit_plan_without_autostart(mock_re_manager, mock_
 
 
 @patch("blop.queueserver.threading.Thread")
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_start_listener(mock_re_manager, mock_thread_cls, mock_document_dispatcher):
     """Test start_listener creates dispatcher, subscribes callback, and starts thread."""
     mock_re_manager.status.return_value = {"worker_environment_exists": True}
@@ -179,7 +179,7 @@ def test_queueserver_client_start_listener(mock_re_manager, mock_thread_cls, moc
 
 
 @patch("blop.queueserver.threading.Thread")
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_start_listener_already_running_returns_early(
     mock_re_manager, mock_thread_cls, mock_document_dispatcher
 ):
@@ -198,7 +198,7 @@ def test_queueserver_client_start_listener_already_running_returns_early(
 
 
 @patch("blop.queueserver.threading.Thread")
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_stop_listener(mock_re_manager, mock_thread_cls, mock_document_dispatcher):
     """Test stop_listener stops dispatcher and clears state."""
     mock_re_manager.status.return_value = {"worker_environment_exists": True}
@@ -216,7 +216,7 @@ def test_queueserver_client_stop_listener(mock_re_manager, mock_thread_cls, mock
     assert client._listener_thread is None
 
 
-@patch("blop.queueserver.REManagerAPI")
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_stop_listener_when_not_started(mock_re_manager, mock_document_dispatcher):
     """Test stop_listener is safe to call when listener was never started."""
     client = QueueserverClient(mock_re_manager, mock_document_dispatcher)

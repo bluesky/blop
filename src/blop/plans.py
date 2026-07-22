@@ -1,3 +1,5 @@
+"""Bluesky plans for optimization."""
+
 import logging
 from collections.abc import Sequence
 from typing import Any, Literal, cast
@@ -49,7 +51,7 @@ def default_acquire(
     **kwargs: Any,
 ) -> MsgGenerator[str]:
     """
-    A default plan to acquire data for optimization. Simply a list scan.
+    Acquire data for optimization. Simply a list scan.
 
     Includes a default metadata key "blop_suggestion_ids" which can be used to identify
     the suggestions that were acquired for each step of the scan.
@@ -116,7 +118,7 @@ def optimize_step(
     **kwargs: Any,
 ) -> MsgGenerator[tuple[str, list[dict], list[dict]]]:
     """
-    A single step of the optimization loop.
+    Single step of the optimization loop.
 
     Parameters
     ----------
@@ -127,8 +129,8 @@ def optimize_step(
 
     Returns
     -------
-    tuple[list[dict], list[dict]]
-        A tuple containing the suggestions and outcomes of the step.
+    tuple[str, list[dict], list[dict]]
+        A tuple containing the uid, suggestions, and outcomes of the step.
     """
     if optimization_problem.acquisition_plan is None:
         acquisition_plan = default_acquire
@@ -161,7 +163,7 @@ def optimize_step(
 
 
 def _maybe_checkpoint(optimizer: Optimizer, checkpoint_interval: int | None, iteration: int) -> None:
-    """Helper function to maybe create a checkpoint of the optimizer state at a given interval and iteration."""
+    """Maybe create a checkpoint of the optimizer state at a given interval and iteration."""
     if checkpoint_interval and (iteration + 1) % checkpoint_interval == 0:
         if not isinstance(optimizer, Checkpointable):
             raise ValueError(
@@ -180,7 +182,7 @@ def optimize(
     **kwargs: Any,
 ) -> MsgGenerator[None]:
     """
-    A plan to solve the optimization problem.
+    Solve the optimization problem.
 
     Parameters
     ----------
@@ -206,7 +208,6 @@ def optimize(
     blop.protocols.Checkpointable : The protocol for checkpointable objects.
     optimize_step : The plan to execute a single step of the optimization.
     """
-
     # Cache to track readables created from suggestions and outcomes
     readable_cache = readable_cache or {}
 
@@ -287,7 +288,6 @@ def sample_suggestions(
     optimize_step : Standard optimizer-driven step.
     blop.protocols.CanRegisterSuggestions : Protocol for manual suggestions.
     """
-
     # Ensure the suggestions have an ID_KEY or register them with the optimizer
     if not isinstance(optimization_problem.optimizer, CanRegisterSuggestions) and any(
         ID_KEY not in suggestion for suggestion in suggestions
