@@ -1,3 +1,5 @@
+"""Scipy optimization power class for fast start QOL and Ax like agent behavior."""
+
 from collections.abc import Mapping, Sequence
 from typing import Any, cast
 
@@ -24,8 +26,10 @@ from .optimizer import SCP, ScipyCFG, ScipyOptimizer
 class Scipy:
     """
     A convenience interface associated with running optimizations with Scipy, providing similar syntax to the Ax Agent
-    (allowing drop in swapping as much as possible). Useful as a cover in for all the QOL provided by the Agent object.
-    """
+    (allowing drop in swapping as much as possible).
+
+    Useful as a cover in for all the QOL provided by the Agent object.
+    """  # noqa: D205
 
     def __init__(
         self,
@@ -63,7 +67,7 @@ class Scipy:
         **kwargs: Any,
     ):
         """
-        A nearly emcompassing interface to provide strong interoperability with Ax agent formalism.
+        An emcompassing interface to provide strong interoperability with Ax agent formalism.
 
         Parameters
         ----------
@@ -82,15 +86,16 @@ class Scipy:
         **kwargs : Any
             Additional keyword arguments to configure the Ax experiment.
 
-        Notes
-        -----
-        This is a nearly drop in replacement for Ax agent sans dof + outcome constraints and checkpointing
-
         See Also
         --------
         blop.ax.Agent
 
-        """
+        Notes
+        -----
+        This is a nearly drop in replacement for Ax agent sans dof + outcome constraints and checkpointing
+
+
+        """  # noqa: D401
         try:
             if optimizer not in SCP:
                 raise ValueError(f"optimizer {optimizer} not in supported optimizers:{list(SCP)}")
@@ -175,7 +180,7 @@ class Scipy:
 
     def to_optimization_problem(self) -> OptimizationProblem:
         """
-        Construct an optimization problem from the Scipy Base class
+        Construct an optimization problem from the Scipy Base class.
 
         Creates an immutable :class:`blop.protocols.OptimizationProblem` that
         encapsulates all components needed for optimization. This is typically
@@ -245,6 +250,7 @@ class Scipy:
         self._optimizer.ingest(points)
 
     def optimize(self, iterations=10, n_points=1):
+        """Optimization plan wrapper used by the agent interface."""
         if self._optimizer.final is not None:
             self.config.initial = self._optimizer.final.x
             self._optimizer = ScipyOptimizer(self.config, timeout=self.timeout)

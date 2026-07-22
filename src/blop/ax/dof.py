@@ -126,9 +126,7 @@ class RangeDOF(DOF):
         )
 
     def to_scipy_bounds(self) -> Bounds:
-        """
-        convert DOF to the Scipy equivalent Bounds
-        """
+        """Convert DOF to the Scipy equivalent Bounds."""
         return Bounds(lb=self.bounds[0], ub=self.bounds[1])
 
 
