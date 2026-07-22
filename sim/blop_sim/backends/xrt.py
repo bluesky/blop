@@ -59,7 +59,7 @@ class XRTBackend(SimBackend, Readable):
     Much slower than SimpleBackend but more physically accurate.
     """
 
-    def __init__(self, file, limits=None, noise: bool = False, n_iters=4, n_workers=4):
+    def __init__(self, file, limits=None, noise: bool = False):
         """Initialize XRT backend. requiring at least the beamline description file"""
         super().__init__()
         self._beamline = raycing.BeamLine(fileName=file)
@@ -70,8 +70,6 @@ class XRTBackend(SimBackend, Readable):
         beamLine = self._beamline
         self._elements = {k: beamLine.oesDict[v][0] for k, v in beamLine.oenamesToUUIDs.items()}
         self._ensure_beamline()
-        self.n_iters = n_iters
-        self.n_workers = n_workers
         self._cache_invalidator = [0] * len(beamLine.flowU.items())
         self._render = None
 
