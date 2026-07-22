@@ -41,7 +41,7 @@ def optimizer_prep():
 # ============================================================================
 
 
-@pytest.mark.parametrize("optimizer", [SCP.Default, SCP.BFGS, SCP.LBFGS, SCP.Dual_Annealing])
+@pytest.mark.parametrize("optimizer", list(SCP))
 def test_scipy_optimizer_algorithms(mock_evaluation_function, mock_acquisition_plan, optimizer):
     """Test ScipyOptimizer with different SCP algorithms."""
     movable1 = MovableSignal(name="test_movable1")
