@@ -178,7 +178,7 @@ class ScipyOptimizer(Optimizer):
                     minimizer_kwargs={"callback": default_callback, "options": kws},
                     workers=workers,
                 )
-        elif config.optimizer in SCP:
+        elif config.optimizer in list(SCP):
 
             def call(kws=None):
                 self.final = minimize(
