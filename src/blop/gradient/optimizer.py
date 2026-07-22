@@ -9,7 +9,7 @@ from threading import Thread
 from typing import Any, cast
 
 import numpy as np
-from scipy.optimize import OptimizeResult, dual_annealing, minimize
+from scipy.optimize import OptimizeResult, dual_annealing, minimize, shgo
 
 from blop.ax.dof import RangeDOF
 from blop.ax.objective import Objective
@@ -43,6 +43,7 @@ class SCP(StrEnum):
     # Trust_Krylov = "trust-krylov"
 
     Dual_Annealing = "dual annealing"
+    SHGO = "SHGO"
 
 
 @dataclass
@@ -159,6 +160,24 @@ class ScipyOptimizer(Optimizer):
                     callback=dual_callback,
                     minimizer_kwargs={"callback": default_callback, "bounds": self._bounds, "options": kws},
                 )
+        elif config.optimizer is SCP.SHGO:
+            # TODO the utility of SHGO is quite underepresented in this implementation, much more thought needs to go into
+            # how parameters are passed through this formalism
+            print("warning: as a global optimizer, SHGO does not use an X0 but its own Sobol sampling")
+
+            def shgo_callback(x):
+                print(f"callback point {x} with current best of {self.intermediate}")
+                # self.intermediate = self.Result(x, -1, self._increment, 1)
+
+            def call(kws=None):
+                workers = kws.pop("workers", 1) if kws else 1
+                self.final = shgo(
+                    func=cost,
+                    bounds=self._bounds,
+                    callback=shgo_callback,
+                    minimizer_kwargs={"callback": default_callback, "options": kws},
+                    workers=workers,
+                )
         elif config.optimizer in SCP:
 
             def call(kws=None):
@@ -181,6 +200,7 @@ class ScipyOptimizer(Optimizer):
                         call(kws=kw)
                 else:
                     call(kws=kw)
+
             except (KeyboardInterrupt, TimeoutError):
                 # have to have timeout, made it so that it can be restored to its state on agent auto reboot
                 if self.final:
