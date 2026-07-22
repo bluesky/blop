@@ -55,7 +55,7 @@ DETECTOR_STORAGE = "/tmp/blop/sim"
 
 ```{code-cell} ipython3
 fileName = r"toroid_focus.xml"
-beam = XRTBackend(file=fileName, n_iters=4, n_workers=4)
+beam = XRTBackend(file=fileName)
 dets = infer_detectors(beam)
 motors = infer_variables(beam, filter_for=None)
 ```
