@@ -13,6 +13,8 @@ from blop.queueserver import (
     QueueserverOptimizationRunner,
 )
 
+from .conftest import CheckpointableOptimizer
+
 
 @pytest.fixture(scope="function")
 def mock_document_dispatcher():
@@ -456,7 +458,7 @@ def test_runner_submit_suggestions_twice_fails():
         runner.run(iterations=1)
 
 
-def _make_runner_with_captured_callback(mock_optimization_problem, iterations=3):
+def _make_runner_with_captured_callback(mock_optimization_problem, iterations=3, checkpoint_interval=None):
     """Helper: build a runner and capture the on_stop callback via start_listener side-effect."""
     mock_client = MagicMock(spec=QueueserverClient)
 
@@ -469,7 +471,7 @@ def _make_runner_with_captured_callback(mock_optimization_problem, iterations=3)
         optimization_problem=mock_optimization_problem,
         queueserver_client=mock_client,
     )
-    future = runner.run(iterations=iterations, num_points=1)
+    future = runner.run(iterations=iterations, num_points=1, checkpoint_interval=checkpoint_interval)
     return runner, mock_client, future
 
 
@@ -776,3 +778,57 @@ def test_runner_submit_suggestions_submit_error_fails_future_and_reraises(mock_o
     assert future is not None
     assert future.done()
     assert future.exception() is error
+
+
+def test_runner_checkpoints(mock_optimization_problem):
+    """A checkpoint is taken for each iteration."""
+
+    mock_optimizer = MagicMock(spec=CheckpointableOptimizer)
+    mock_optimizer.suggest.return_value = [
+        {"_id": 0, "motor1": 5.0, "motor2": 3.0},
+    ]
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=mock_optimizer,
+        actuators=mock_optimization_problem.actuators,
+        sensors=mock_optimization_problem.sensors,
+        evaluation_function=mock_optimization_problem.evaluation_function,
+    )
+    runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem, checkpoint_interval=1)
+    mock_optimizer.checkpoint.assert_not_called()
+    _fire_callback(runner, mock_client, 0)
+    mock_optimizer.checkpoint.assert_called_once()
+    _fire_callback(runner, mock_client, 1)
+    assert mock_optimizer.checkpoint.call_count == 2
+    _fire_callback(runner, mock_client, 2)
+    assert mock_optimizer.checkpoint.call_count == 3
+
+
+def test_runner_skip_checkpoints(mock_optimization_problem):
+    """No checkpoint is taken for each iteration because no interval configured."""
+
+    mock_optimizer = MagicMock(spec=CheckpointableOptimizer)
+    mock_optimizer.suggest.return_value = [
+        {"_id": 0, "motor1": 5.0, "motor2": 3.0},
+    ]
+    mock_optimization_problem = QueueserverOptimizationProblem(
+        optimizer=mock_optimizer,
+        actuators=mock_optimization_problem.actuators,
+        sensors=mock_optimization_problem.sensors,
+        evaluation_function=mock_optimization_problem.evaluation_function,
+    )
+    runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem, checkpoint_interval=None)
+    mock_optimizer.checkpoint.assert_not_called()
+    _fire_callback(runner, mock_client, 0)
+    mock_optimizer.checkpoint.assert_not_called()
+    _fire_callback(runner, mock_client, 1)
+    mock_optimizer.checkpoint.assert_not_called()
+    _fire_callback(runner, mock_client, 2)
+    mock_optimizer.checkpoint.assert_not_called()
+
+
+def test_runner_raises_not_checkpointable(mock_optimization_problem):
+    """No checkpoint is taken for each iteration because optimize does not support it."""
+    runner, mock_client, future = _make_runner_with_captured_callback(mock_optimization_problem, checkpoint_interval=1)
+    _fire_callback(runner, mock_client, 0)
+    with pytest.raises(ValueError, match="optimizer is not checkpointable"):
+        raise future.exception()

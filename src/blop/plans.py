@@ -15,13 +15,11 @@ from .protocols import (
     ID_KEY,
     Actuator,
     CanRegisterSuggestions,
-    Checkpointable,
     OptimizationProblem,
-    Optimizer,
     Sensor,
     TrialFaultAware,
 )
-from .utils import InferredReadable, collect_optimization_metadata, route_suggestions
+from .utils import InferredReadable, _maybe_checkpoint, collect_optimization_metadata, route_suggestions
 
 logger = logging.getLogger(__name__)
 
@@ -160,16 +158,6 @@ def optimize_step(
     optimizer.ingest(outcomes)
 
     return uid, suggestions, outcomes
-
-
-def _maybe_checkpoint(optimizer: Optimizer, checkpoint_interval: int | None, iteration: int) -> None:
-    """Maybe create a checkpoint of the optimizer state at a given interval and iteration."""
-    if checkpoint_interval and (iteration + 1) % checkpoint_interval == 0:
-        if not isinstance(optimizer, Checkpointable):
-            raise ValueError(
-                "The optimizer is not checkpointable. Please review your optimizer configuration or implementation."
-            )
-        optimizer.checkpoint()
 
 
 @plan

@@ -155,7 +155,9 @@ class QueueserverAgent(_AxAgentMixin):
             acquisition_plan_kwargs=self._acquisition_plan_kwargs,
         )
 
-    def run(self, iterations: int = 1, n_points: int = 1) -> Future[OptimizationResult]:
+    def run(
+        self, iterations: int = 1, n_points: int = 1, checkpoint_interval: int | None = None
+    ) -> Future[OptimizationResult]:
         """
         Start the optimization loop.
 
@@ -169,6 +171,10 @@ class QueueserverAgent(_AxAgentMixin):
             Number of optimization iterations to run.
         n_points : int
             Number of points to suggest per iteration.
+        checkpoint_interval : int | None
+            The number of iterations between optimizer checkpoints. If None, checkpoints
+            will not be saved. Optimizer must implement the
+            :class:`blop.protocols.Checkpointable` protocol.
 
         Returns
         -------
@@ -185,7 +191,7 @@ class QueueserverAgent(_AxAgentMixin):
         ValueError
             If required devices or plans are not available.
         """
-        return self._runner.run(iterations, n_points)
+        return self._runner.run(iterations=iterations, num_points=n_points, checkpoint_interval=checkpoint_interval)
 
     def submit_suggestions(self, suggestions: list[dict]) -> Future[OptimizationResult]:
         """

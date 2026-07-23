@@ -93,6 +93,11 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
         """The file path for saving and restoring optimizer state, or ``None`` if disabled."""
         return self._checkpoint_path
 
+    @checkpoint_path.setter
+    def checkpoint_path(self, value: str) -> None:
+        """Set file path for saving and restoring optimizer state, or ``None`` if disabled."""
+        self._checkpoint_path = value
+
     @property
     def ax_client(self) -> Client:
         """The underlying Ax ``Client`` used for experiment management."""
