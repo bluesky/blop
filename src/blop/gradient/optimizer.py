@@ -1,0 +1,311 @@
+"""Core Scipy optimizer porting scipy algorithms."""
+
+from collections import OrderedDict
+from collections.abc import Mapping, Sequence
+from concurrent.futures import Future, ThreadPoolExecutor
+from dataclasses import dataclass
+from enum import StrEnum
+from threading import Thread
+from typing import Any, cast
+
+import numpy as np
+from scipy.optimize import OptimizeResult, dual_annealing, minimize, shgo
+
+from blop.ax.dof import RangeDOF
+from blop.ax.objective import Objective
+from blop.protocols import ID_KEY, Optimizer
+
+
+class SCP(StrEnum):
+    """Enumeration of all optimizers currently supported/tested.
+
+    #TODO all commented optimizers require jacobian and are currently suspended in impl until its clear that external
+    # gradient sampling is necesary and clearly cross implementable. likely necesary for noisy opts but this is clearly
+    # a usage defined addition.
+    """
+
+    Default = "Default"
+
+    Nelder_Mead = "Nelder-Mead"
+    Powell = "Powell"
+    CG = "CG"
+    BFGS = "BFGS"
+    # Newton_CG = "Newton-CG"
+    LBFGS = "L-BFGS-B"
+    TNC = "TNC"
+    COBYLA = "COBYLA"
+    COBYQA = "COBYQA"
+    SLSQP = "SLSQP"
+    Trust_Constr = "trust-constr"
+    # Dogleg = "dogleg"
+    # Trust_NCG = "trust-ncg"
+    # Trust_Exact = "trust-exact"
+    # Trust_Krylov = "trust-krylov"
+
+    Dual_Annealing = "dual annealing"
+    SHGO = "SHGO"
+
+
+@dataclass
+class ScipyCFG:
+    """
+    Configuration dataclass that encompasses the core optimization problem and extra parameters within Scipy.
+
+    Used as the optimizer/generation function is not injectable like in Ax
+    """
+
+    dofs: Sequence[RangeDOF]
+    objective: Objective
+    # dof_constraints: Sequence[DOFConstraint] | None = None
+    # outcome_constraints: Sequence[OutcomeConstraint] | None = None
+    optimizer: SCP = SCP.Default
+    initial: Sequence[float] | None = None
+    rescale: Sequence[float] | float | None = None
+    max_iter: int | None = 100
+    eps: float | None = None
+    threads: int | None = None
+
+
+class ScipyOptimizer(Optimizer):
+    """An optimizer object to supply an interactive interface for the scipy optimizers, with some caveats."""
+
+    @dataclass
+    class _Request:
+        args: tuple
+        future: Future
+
+    @dataclass
+    class Result:
+        """Class to unify Optimize Result and Scipy Result."""
+
+        x: list[float | int]
+        fun: float
+        nit: int
+        status: int = 2
+
+    def __init__(self, config: ScipyCFG, timeout: int | None = 200):
+        self.session(config=config, timeout=timeout)
+
+    def session(self, config: ScipyCFG, timeout: int | None = None):
+        """
+        Through path for initialization and stateful reinitialization of optimization.
+
+        derived so that mutiple initializations and lifetimes can be used for optimization.
+        Such as the standard ScipyOptimizer(...) call or a following "with"
+        """
+        self._params: list[str] = []
+        self._bounds: list[tuple[Any, Any]] = []
+        self._increment: int = 0
+        self._objective: Objective = config.objective
+        self.force_resiliance = False  # kinda hidden for now
+        self._scale = np.ones(len(config.dofs))
+        self._active: dict[int, ScipyOptimizer._Request] = OrderedDict()
+        self.intermediate: OptimizeResult | ScipyOptimizer.Result | None = None
+        self.final: OptimizeResult | ScipyOptimizer.Result | None = None
+        self.SUGGESTION_TIMEOUT = timeout
+
+        if config.rescale is not None:
+            if isinstance(config.rescale, list):
+                self._scale = config.rescale
+            else:
+                self._scale *= config.rescale
+
+        for ind, dof in enumerate(config.dofs):
+            self._params.append(dof.parameter_name)
+            self._bounds.append(tuple(np.array(dof.bounds) / self._scale[ind]))
+
+        _x = np.mean(self._bounds, axis=1)
+        if config.initial is not None:
+            _x = np.array(config.initial) / self._scale
+
+        def cost(x):  # thread safety needs timeout so there is not infinite hang on programs
+            """Cooperative thread that defers evaluation of cost call by scipy to the run engine."""
+            req = self._Request(args=x, future=Future())
+            self._active[self._increment] = req
+            self._increment += 1
+            res = req.future.result(timeout=self.SUGGESTION_TIMEOUT)
+            if res is None:
+                raise ValueError("return value is not present")
+            return res
+
+        kw = {}
+        self._thread_pool = None
+        if config.max_iter is not None:
+            if config.optimizer is not SCP.Trust_Constr:
+                kw["max_iter"] = config.max_iter
+            else:
+                kw["maxiter"] = config.max_iter
+        if config.eps is not None:
+            kw["eps"] = config.eps
+
+        def default_callback(intermediate_result: OptimizeResult):
+            if self.intermediate and self.intermediate.fun < intermediate_result.fun:
+                return
+            self.intermediate = intermediate_result
+            self.intermediate.nit = self._increment
+
+        if config.optimizer is SCP.Dual_Annealing:
+
+            def dual_callback(x, f, context):
+                print(f"callback on opt val {f} with current best of {self.intermediate}")
+                if self.intermediate and self.intermediate.fun < f:
+                    return
+                self.intermediate = self.Result(x, f, self._increment, context)
+
+            def call(kws=None):
+                self.final = dual_annealing(
+                    func=cost,
+                    x0=_x,
+                    bounds=self._bounds,
+                    callback=dual_callback,
+                    minimizer_kwargs={"callback": default_callback, "bounds": self._bounds, "options": kws},
+                )
+        elif config.optimizer is SCP.SHGO:
+            # TODO the utility of SHGO is quite underepresented in this implementation, much more thought needs to go into
+            # how parameters are passed through this formalism
+            print("warning: as a global optimizer, SHGO does not use an X0 but its own Sobol sampling")
+
+            def shgo_callback(x):
+                print(f"callback point {x} with current best of {self.intermediate}")
+                # self.intermediate = self.Result(x, -1, self._increment, 1)
+
+            def call(kws=None):
+                workers = kws.pop("workers", 1) if kws else 1
+                self.final = shgo(
+                    func=cost,
+                    bounds=self._bounds,
+                    callback=shgo_callback,
+                    minimizer_kwargs={"callback": default_callback, "options": kws},
+                    workers=workers,
+                )
+        elif config.optimizer in list(SCP):
+
+            def call(kws=None):
+                self.final = minimize(
+                    fun=cost,
+                    x0=_x,
+                    method=config.optimizer if config.optimizer != SCP.Default else None,
+                    bounds=self._bounds,
+                    callback=default_callback,
+                    options=kws,
+                )
+        else:
+            raise NotImplementedError(f"optimizer {config.optimizer} not in supported optimizers:{list(SCP)}")
+
+        def mini_worker():
+            try:
+                if config.threads:
+                    with ThreadPoolExecutor(max_workers=config.threads) as pool:
+                        kw["workers"] = pool.map
+                        call(kws=kw)
+                else:
+                    call(kws=kw)
+
+            except (KeyboardInterrupt, TimeoutError):
+                # have to have timeout, made it so that it can be restored to its state on agent auto reboot
+                if self.final:
+                    return
+                if self.intermediate:
+                    self.final = self.intermediate
+                else:
+                    self.final = self.Result(list(_x), np.nan, nit=self._increment)
+
+        self._t = Thread(target=mini_worker, name="optimizer")
+        self._t.start()
+        return self
+
+    def __enter__(self):
+        """Magic convenience to use "with" to better control thread lifetime."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Lifetime threads when using with."""
+        self.close()
+
+    def suggest(self, num_points: int | None = None) -> list[dict]:
+        """
+        Provide a set of points in the input space, to be evaulated next.
+
+        The "_id" key is optional and can be used to identify suggested trials for later evaluation
+        and ingestion.
+
+        Parameters
+        ----------
+        num_points : int | None, optional
+            The number of points to suggest. If not provided, will default to 1.
+
+        Returns
+        -------
+        list[dict]
+            A list of dictionaries, each containing a parameterization of a point to evaluate next.
+            Each dictionary must contain a unique "_id" key to identify each parameterization.
+        """
+        if self.final is not None:
+            vector = [x_n * s for s, x_n in zip(self._scale, self.final.x, strict=True)]
+            suggestion = dict(zip(self._params, vector, strict=True))
+            suggestion[ID_KEY] = self.final.nit
+            return [suggestion]
+
+        suggestions = []
+        for id in list(self._active.keys())[: num_points if num_points is not None else 1]:
+            x = self._active[id].args
+            vector = [x_n * s for s, x_n in zip(self._scale, x, strict=True)]
+
+            suggestion = dict(zip(self._params, vector, strict=True))
+            suggestion[ID_KEY] = id
+            suggestions.append(suggestion)
+        return suggestions
+
+    def ingest(self, points: list[dict]) -> None:
+        """
+        Ingest a set of points into the experiment. Either from previously suggested points or from an external source.
+
+        The "_id" key is optional.
+
+        Parameters
+        ----------
+        points : list[dict]
+            A list of dictionaries, each containing the outcomes of each suggested parameterization.
+        """
+        for res in points:
+            y = res[self._objective.name]
+            if res[ID_KEY] not in self._active:
+                if not self.force_resiliance:
+                    raise ValueError("optimizer did not expect to receive an update")
+                continue
+            self._active.pop(res[ID_KEY]).future.set_result(y)
+
+    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
+        """
+        Get a list of the optimal point found during optimization.
+
+        Returns
+        -------
+        list[tuple[int, TParameterization, TOutcome]]
+            Each element in the list is a tuple of:
+              - trial index (int)
+              - parameter values (dict)
+              - metric values (dict, where values may be (value, sem) tuples)
+
+        See Also
+        --------
+        navigate_to_best : Plan stub to move actuators to a best point.
+        """
+        result = self.intermediate
+        if self.final is not None:
+            result = self.final
+        if (result is None) or (self._objective is None):
+            raise ValueError("no optimization epoch has been recorded")
+
+        vector = [x_n * s for s, x_n in zip(self._scale, result.x, strict=True)]
+        cart = [
+            result.nit - 1,
+            cast(Mapping, dict(zip(self._params, vector, strict=True))),
+            cast(Mapping, {self._objective.name: result.fun}),
+        ]
+        return cart
+
+    def close(self):
+        """Clear out futures to allow cleanup of threads."""
+        for ind in list(self._active.keys()):
+            self._active.pop(ind).future.set_exception(KeyboardInterrupt("Execution has been suspended"))

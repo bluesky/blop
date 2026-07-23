@@ -8,6 +8,7 @@ from typing import Literal, cast
 
 from ax import ChoiceParameterConfig, RangeParameterConfig
 from ax.api.types import TParameterValue
+from scipy.optimize import Bounds
 
 from ..protocols import Actuator
 
@@ -123,6 +124,10 @@ class RangeDOF(DOF):
             step_size=self.step_size,
             scaling=self.scaling,
         )
+
+    def to_scipy_bounds(self) -> Bounds:
+        """Convert DOF to the Scipy equivalent Bounds."""
+        return Bounds(lb=self.bounds[0], ub=self.bounds[1])
 
 
 @dataclass(frozen=True, kw_only=True, eq=False)
