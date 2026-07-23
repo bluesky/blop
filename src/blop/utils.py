@@ -11,7 +11,7 @@ from bluesky.protocols import HasHints, HasParent, Hints, Readable, Reading
 from event_model import DataKey
 from numpy.typing import ArrayLike
 
-from .protocols import ID_KEY, OptimizationProblem
+from .protocols import ID_KEY, Checkpointable, OptimizationProblem, Optimizer
 
 
 class Source(StrEnum):
@@ -22,6 +22,16 @@ class Source(StrEnum):
     SUGGESTION_ID = "optimization-suggestion-id"
     ACQUISITION_UID = "optimization-acquisition-uid"
     OTHER = "optimization-other"
+
+
+def _maybe_checkpoint(optimizer: Optimizer, checkpoint_interval: int | None, iteration: int) -> None:
+    """Maybe create a checkpoint of the optimizer state at a given interval and iteration."""
+    if checkpoint_interval and (iteration + 1) % checkpoint_interval == 0:
+        if not isinstance(optimizer, Checkpointable):
+            raise ValueError(
+                "The optimizer is not checkpointable. Please review your optimizer configuration or implementation."
+            )
+        optimizer.checkpoint()
 
 
 def _infer_data_key(source: Source, value: ArrayLike) -> DataKey:

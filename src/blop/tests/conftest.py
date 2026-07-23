@@ -3,6 +3,11 @@ from typing import Any
 
 from bluesky.protocols import HasHints, HasParent, Hints, NamedMovable, Readable, Status
 
+from blop.protocols import Checkpointable, Optimizer
+
+
+class CheckpointableOptimizer(Optimizer, Checkpointable): ...
+
 
 class AlwaysSuccessfulStatus(Status):
     def add_callback(self, callback) -> None:

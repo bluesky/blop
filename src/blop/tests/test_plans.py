@@ -8,14 +8,13 @@ from bluesky.utils import plan
 from blop.plans import acquire_baseline, default_acquire, optimize, optimize_step
 from blop.protocols import (
     AcquisitionPlan,
-    Checkpointable,
     EvaluationFunction,
     OptimizationProblem,
     Optimizer,
     TrialFaultAware,
 )
 
-from .conftest import MovableSignal, ReadableSignal
+from .conftest import CheckpointableOptimizer, MovableSignal, ReadableSignal
 
 
 @plan
@@ -41,9 +40,6 @@ def _collect_optimize_events():
             events.append(doc)
 
     return callback, events
-
-
-class CheckpointableOptimizer(Optimizer, Checkpointable): ...
 
 
 @pytest.fixture(scope="function")
@@ -291,7 +287,7 @@ def test_optimize_with_non_checkpointable_optimizer(RE):
         sensors=[ReadableSignal("objective")],
         evaluation_function=evaluation_function,
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="optimizer is not checkpointable"):
         RE(optimize(optimization_problem, iterations=5, n_points=2, checkpoint_interval=1))
 
 
