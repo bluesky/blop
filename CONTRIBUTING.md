@@ -57,4 +57,3 @@ Before opening a pull request, please run:
 pixi run -e dev-cpu check
 pixi run -e dev-cpu tests
 ```
-
