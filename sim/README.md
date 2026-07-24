@@ -18,6 +18,13 @@ The package uses a component-based architecture with individual devices:
 
   - `SimpleBackend`: Mathematical Gaussian beam simulation
   - `XRTBackend`: Full ray-tracing simulation using XRT
+  - `TESBackend`: Replay of a data-trained emulator of the NSLS-II TES beamline
+    (28,561 measured KB-jack/detector frames at 3 keV). Reuses the
+    `blop_sim.devices.simple.KBMirror` jack devices. The trained weights (16 MB,
+    derived from measured data) are not in this repository: point the
+    `BLOP_SIM_TES_WEIGHTS` environment variable at the `emulator_weights.npz`
+    shipped with the [tes-emulator](https://github.com/FLlorente/tes-emulator)
+    package, or pass `TESBackend(weights_path=...)`.
 
 - **Devices**: Individual ophyd-async devices
 

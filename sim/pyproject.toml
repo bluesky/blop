@@ -18,6 +18,7 @@ dependencies = [
   "numpy",
   "scipy",
   "matplotlib",
+  "torch",
   "xrt>=2.0.0b1",
 ]
 

@@ -14,8 +14,12 @@ class SimBackend(ABC):
 
     _instances: dict[type, "SimBackend"] = {}
 
-    def __new__(cls):
-        """Singleton pattern: return existing instance or create new."""
+    def __new__(cls, *args, **kwargs):
+        """Singleton pattern: return existing instance or create new.
+
+        Constructor arguments are accepted (and consumed by ``__init__``) so
+        backends can take options, e.g. ``SimpleBackend(noise=True)``.
+        """
         if cls not in cls._instances:
             instance = super().__new__(cls)
             cls._instances[cls] = instance
