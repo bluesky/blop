@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.queueserver &#8212; blop 1.0.1.dev7 documentation</title>
+    <title>blop.queueserver &#8212; blop 1.0.1.dev8 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=3440b056"></script>
+    <script src="../../_static/documentation_options.js?v=dc5a1394"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev7" />
+  <meta name="docsearch:version" content="1.0.1.dev8" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -980,11 +980,16 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">re_manager_api</span><span class="p">:</span> <span class="n">bluesky_queueserver_api</span><span class="o">.</span><span class="n">zmq</span><span class="o">.</span><span class="n">REManagerAPI</span> <span class="o">|</span> <span class="n">bluesky_queueserver_api</span><span class="o">.</span><span class="n">http</span><span class="o">.</span><span class="n">REManagerAPI</span><span class="p">,</span>
         <span class="n">document_dispatcher</span><span class="p">:</span> <span class="n">RemoteDispatcher</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">autostart</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rm</span> <span class="o">=</span> <span class="n">re_manager_api</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dispatcher</span> <span class="o">=</span> <span class="n">document_dispatcher</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_consumer_callback</span><span class="p">:</span> <span class="n">ConsumerCallback</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_listener_thread</span><span class="p">:</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rm</span><span class="o">.</span><span class="n">queue_autostart</span><span class="p">(</span><span class="n">autostart</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Set queue autostart to </span><span class="si">{</span><span class="n">autostart</span><span class="si">}</span><span class="s2">. Response: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="QueueserverClient.check_environment">
 <a class="viewcode-back" href="../../reference/queueserver.html#blop.queueserver.QueueserverClient.check_environment">[docs]</a>
@@ -1048,7 +1053,7 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="QueueserverClient.submit_plan">
 <a class="viewcode-back" href="../../reference/queueserver.html#blop.queueserver.QueueserverClient.submit_plan">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">submit_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="n">BPlan</span><span class="p">,</span> <span class="n">autostart</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">submit_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plan</span><span class="p">:</span> <span class="n">BPlan</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Submit a plan to the queueserver queue.</span>
 
@@ -1056,19 +1061,9 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ----------</span>
 <span class="sd">        plan : BPlan</span>
 <span class="sd">            The plan to submit.</span>
-<span class="sd">        autostart : bool, optional</span>
-<span class="sd">            If True, start the queue after adding the plan.</span>
-<span class="sd">        timeout : float, optional</span>
-<span class="sd">            Timeout in seconds when waiting for queue to be idle.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rm</span><span class="o">.</span><span class="n">item_add</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted plan to queue. Response: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">autostart</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Waiting for queue to be idle or paused&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_rm</span><span class="o">.</span><span class="n">wait_for_idle_or_paused</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rm</span><span class="o">.</span><span class="n">queue_start</span><span class="p">()</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Started queue. Response: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted plan to queue. Response: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="QueueserverClient.start_listener">
@@ -1244,7 +1239,7 @@ window.runMermaid = runMermaid;</script>
             <span class="n">future</span><span class="p">:</span> <span class="n">Future</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]</span> <span class="o">=</span> <span class="n">Future</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_current_future</span> <span class="o">=</span> <span class="n">future</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">submit_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">autostart</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_autostart</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">submit_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_lock</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_fail_future</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
@@ -1297,7 +1292,7 @@ window.runMermaid = runMermaid;</script>
             <span class="n">future</span><span class="p">:</span> <span class="n">Future</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]</span> <span class="o">=</span> <span class="n">Future</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_current_future</span> <span class="o">=</span> <span class="n">future</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">submit_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">autostart</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_autostart</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">submit_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_lock</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_fail_future</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
@@ -1444,7 +1439,7 @@ window.runMermaid = runMermaid;</script>
                 <span class="sa">f</span><span class="s2">&quot;Submitting iteration </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">current_iteration</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">max_iterations</span><span class="si">}</span><span class="s2"> &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;with correlation uid: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_state</span><span class="o">.</span><span class="n">current_uid</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">submit_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">,</span> <span class="n">autostart</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_autostart</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">submit_plan</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span></div>
 
 </pre></div>
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Your first Bayesian optimization with Blop &#8212; blop 1.0.1.dev7 documentation</title>
+    <title>Your first Bayesian optimization with Blop &#8212; blop 1.0.1.dev8 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=3440b056"></script>
+    <script src="../_static/documentation_options.js?v=dc5a1394"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Tutorials" href="../tutorials.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev7" />
+  <meta name="docsearch:version" content="1.0.1.dev8" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -541,7 +541,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-23 16:42:29] ax.storage.sqa_store.with_db_settings_base: Ax SQL storage initialized with SQLAlchemy 2.0.51
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-28 17:14:56] ax.storage.sqa_store.with_db_settings_base: Ax SQL storage initialized with SQLAlchemy 2.0.51
 </pre></div>
 </div>
 </div>
@@ -697,235 +697,235 @@
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Actuators  </span>x1, x2                                                                                               <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Sensors    </span>N/A                                                                                                  <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Iterations </span>5  <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Points/iter </span>8                                                                                     <span style="color: #000080; text-decoration-color: #000080">│</span>
-<span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Run UID    </span>41dc1df1-347c-4cfd-acb8-4991044a25e6                                                                 <span style="color: #000080; text-decoration-color: #000080">│</span>
+<span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Run UID    </span>09655c17-ed5d-4afd-b00c-195134141738                                                                 <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
 </div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Himmelblau] evaluating suggestions:
 [0, 1, 2, 3, 4, 5, 6, 7]
  reordered to:
-[0, 7, 2, 4, 6, 3, 5, 1]
+[0, 1, 5, 3, 7, 2, 6, 4]
 [Himmelblau] evaluating suggestions:
 [8, 9, 10, 11, 12, 13, 14, 15]
  reordered to:
-[13, 15, 8, 14, 12, 10, 11, 9]
+[12, 10, 15, 8, 13, 11, 9, 14]
 [Himmelblau] evaluating suggestions:
 [16, 17, 18, 19, 20, 21, 22, 23]
  reordered to:
-[18, 21, 23, 17, 20, 16, 22, 19]
+[17, 20, 21, 16, 19, 22, 23, 18]
 [Himmelblau] evaluating suggestions:
 [24, 25, 26, 27, 28, 29, 30, 31]
  reordered to:
-[25, 29, 28, 24, 27, 31, 26, 30]
+[24, 28, 31, 26, 25, 30, 29, 27]
 [Himmelblau] evaluating suggestions:
 [32, 33, 34, 35, 36, 37, 38, 39]
  reordered to:
-[33, 37, 39, 36, 38, 32, 34, 35]
+[37, 32, 39, 38, 33, 35, 34, 36]
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-23 16:42:35] ax.api.client: GenerationStrategy(name=&#39;Center+Sobol+MBM:fast&#39;, nodes=[CenterGenerationNode(next_node_name=&#39;Sobol&#39;, use_existing_trials_for_initialization=True), GenerationNode(name=&#39;Sobol&#39;, generator_specs=[GeneratorSpec(generator_enum=Sobol, generator_key_override=None)], transition_criteria=[MinTrials(transition_to=&#39;MBM&#39;), MinTrials(transition_to=&#39;MBM&#39;)], suggested_experiment_status=ExperimentStatus.INITIALIZATION, pausing_criteria=[MaxTrialsAwaitingData(threshold=5)]), GenerationNode(name=&#39;MBM&#39;, generator_specs=[GeneratorSpec(generator_enum=BoTorch, generator_key_override=None)], transition_criteria=None, suggested_experiment_status=ExperimentStatus.OPTIMIZATION, pausing_criteria=None)]) chosen based on user input and problem structure.
-[INFO 07-23 16:42:35] ax.api.client: Generated new trial 0 with parameters {&#39;x1&#39;: 0.0, &#39;x2&#39;: 0.0} using GenerationNode CenterOfSearchSpace.
-[INFO 07-23 16:42:35] ax.api.client: Generated new trial 1 with parameters {&#39;x1&#39;: 2.683957, &#39;x2&#39;: -1.711903} using GenerationNode Sobol.
-[INFO 07-23 16:42:35] ax.api.client: Generated new trial 2 with parameters {&#39;x1&#39;: -1.304312, &#39;x2&#39;: 0.984524} using GenerationNode Sobol.
-[INFO 07-23 16:42:35] ax.api.client: Generated new trial 3 with parameters {&#39;x1&#39;: -3.768109, &#39;x2&#39;: -4.171121} using GenerationNode Sobol.
-[INFO 07-23 16:42:35] ax.api.client: Generated new trial 4 with parameters {&#39;x1&#39;: 0.219846, &#39;x2&#39;: 3.442507} using GenerationNode Sobol.
-[INFO 07-23 16:42:35] ax.api.client: Generated new trial 5 with parameters {&#39;x1&#39;: 2.444624, &#39;x2&#39;: -2.551763} using GenerationNode Sobol.
-[INFO 07-23 16:42:35] ax.api.client: Generated new trial 6 with parameters {&#39;x1&#39;: -3.56498, &#39;x2&#39;: 4.519687} using GenerationNode Sobol.
-[INFO 07-23 16:42:35] ax.api.client: Generated new trial 7 with parameters {&#39;x1&#39;: -1.028775, &#39;x2&#39;: -0.010953} using GenerationNode Sobol.
-[INFO 07-23 16:42:35] ax.api.client: Trial 0 marked COMPLETED.
-[INFO 07-23 16:42:35] ax.api.client: Trial 7 marked COMPLETED.
-[INFO 07-23 16:42:35] ax.api.client: Trial 2 marked COMPLETED.
-[INFO 07-23 16:42:35] ax.api.client: Trial 4 marked COMPLETED.
-[INFO 07-23 16:42:35] ax.api.client: Trial 6 marked COMPLETED.
-[INFO 07-23 16:42:35] ax.api.client: Trial 3 marked COMPLETED.
-[INFO 07-23 16:42:35] ax.api.client: Trial 5 marked COMPLETED.
-[INFO 07-23 16:42:35] ax.api.client: Trial 1 marked COMPLETED.
-[INFO 07-23 16:42:41] ax.api.client: Generated new trial 8 with parameters {&#39;x1&#39;: -3.616199, &#39;x2&#39;: -1.806308} using GenerationNode MBM.
-[INFO 07-23 16:42:41] ax.api.client: Generated new trial 9 with parameters {&#39;x1&#39;: 5.0, &#39;x2&#39;: -1.827273} using GenerationNode MBM.
-[INFO 07-23 16:42:41] ax.api.client: Generated new trial 10 with parameters {&#39;x1&#39;: -0.178866, &#39;x2&#39;: -5.0} using GenerationNode MBM.
-[INFO 07-23 16:42:41] ax.api.client: Generated new trial 11 with parameters {&#39;x1&#39;: 5.0, &#39;x2&#39;: -4.007794} using GenerationNode MBM.
-[INFO 07-23 16:42:41] ax.api.client: Generated new trial 12 with parameters {&#39;x1&#39;: -5.0, &#39;x2&#39;: -3.413569} using GenerationNode MBM.
-[INFO 07-23 16:42:41] ax.api.client: Generated new trial 13 with parameters {&#39;x1&#39;: 5.0, &#39;x2&#39;: 2.382146} using GenerationNode MBM.
-[INFO 07-23 16:42:41] ax.api.client: Generated new trial 14 with parameters {&#39;x1&#39;: -5.0, &#39;x2&#39;: -5.0} using GenerationNode MBM.
-[INFO 07-23 16:42:41] ax.api.client: Generated new trial 15 with parameters {&#39;x1&#39;: -5.0, &#39;x2&#39;: 2.397658} using GenerationNode MBM.
-[INFO 07-23 16:42:41] ax.api.client: Trial 13 marked COMPLETED.
-[INFO 07-23 16:42:41] ax.api.client: Trial 15 marked COMPLETED.
-[INFO 07-23 16:42:41] ax.api.client: Trial 8 marked COMPLETED.
-[INFO 07-23 16:42:41] ax.api.client: Trial 14 marked COMPLETED.
-[INFO 07-23 16:42:41] ax.api.client: Trial 12 marked COMPLETED.
-[INFO 07-23 16:42:41] ax.api.client: Trial 10 marked COMPLETED.
-[INFO 07-23 16:42:41] ax.api.client: Trial 11 marked COMPLETED.
-[INFO 07-23 16:42:41] ax.api.client: Trial 9 marked COMPLETED.
-[INFO 07-23 16:42:45] ax.api.client: Generated new trial 16 with parameters {&#39;x1&#39;: -3.724633, &#39;x2&#39;: -3.054416} using GenerationNode MBM.
-[INFO 07-23 16:42:45] ax.api.client: Generated new trial 17 with parameters {&#39;x1&#39;: -1.468638, &#39;x2&#39;: 4.473973} using GenerationNode MBM.
-[INFO 07-23 16:42:45] ax.api.client: Generated new trial 18 with parameters {&#39;x1&#39;: 1.865889, &#39;x2&#39;: 1.723526} using GenerationNode MBM.
-[INFO 07-23 16:42:45] ax.api.client: Generated new trial 19 with parameters {&#39;x1&#39;: 3.429642, &#39;x2&#39;: -1.850144} using GenerationNode MBM.
-[INFO 07-23 16:42:45] ax.api.client: Generated new trial 20 with parameters {&#39;x1&#39;: -3.111946, &#39;x2&#39;: -3.207496} using GenerationNode MBM.
-[INFO 07-23 16:42:45] ax.api.client: Generated new trial 21 with parameters {&#39;x1&#39;: 1.615743, &#39;x2&#39;: 5.0} using GenerationNode MBM.
-[INFO 07-23 16:42:45] ax.api.client: Generated new trial 22 with parameters {&#39;x1&#39;: 2.021828, &#39;x2&#39;: -0.860696} using GenerationNode MBM.
-[INFO 07-23 16:42:45] ax.api.client: Generated new trial 23 with parameters {&#39;x1&#39;: -0.515329, &#39;x2&#39;: 5.0} using GenerationNode MBM.
-[INFO 07-23 16:42:46] ax.api.client: Trial 18 marked COMPLETED.
-[INFO 07-23 16:42:46] ax.api.client: Trial 21 marked COMPLETED.
-[INFO 07-23 16:42:46] ax.api.client: Trial 23 marked COMPLETED.
-[INFO 07-23 16:42:46] ax.api.client: Trial 17 marked COMPLETED.
-[INFO 07-23 16:42:46] ax.api.client: Trial 20 marked COMPLETED.
-[INFO 07-23 16:42:46] ax.api.client: Trial 16 marked COMPLETED.
-[INFO 07-23 16:42:46] ax.api.client: Trial 22 marked COMPLETED.
-[INFO 07-23 16:42:46] ax.api.client: Trial 19 marked COMPLETED.
-[INFO 07-23 16:42:51] ax.api.client: Generated new trial 24 with parameters {&#39;x1&#39;: 0.159941, &#39;x2&#39;: 2.291858} using GenerationNode MBM.
-[INFO 07-23 16:42:51] ax.api.client: Generated new trial 25 with parameters {&#39;x1&#39;: -1.513557, &#39;x2&#39;: 2.897931} using GenerationNode MBM.
-[INFO 07-23 16:42:51] ax.api.client: Generated new trial 26 with parameters {&#39;x1&#39;: 3.54132, &#39;x2&#39;: -0.329239} using GenerationNode MBM.
-[INFO 07-23 16:42:51] ax.api.client: Generated new trial 27 with parameters {&#39;x1&#39;: 0.731711, &#39;x2&#39;: 2.23735} using GenerationNode MBM.
-[INFO 07-23 16:42:51] ax.api.client: Generated new trial 28 with parameters {&#39;x1&#39;: -0.64526, &#39;x2&#39;: 2.60236} using GenerationNode MBM.
-[INFO 07-23 16:42:51] ax.api.client: Generated new trial 29 with parameters {&#39;x1&#39;: -2.30014, &#39;x2&#39;: 3.009978} using GenerationNode MBM.
-[INFO 07-23 16:42:51] ax.api.client: Generated new trial 30 with parameters {&#39;x1&#39;: 3.396868, &#39;x2&#39;: -2.400577} using GenerationNode MBM.
-[INFO 07-23 16:42:51] ax.api.client: Generated new trial 31 with parameters {&#39;x1&#39;: 1.499852, &#39;x2&#39;: 2.586904} using GenerationNode MBM.
-[INFO 07-23 16:42:51] ax.api.client: Trial 25 marked COMPLETED.
-[INFO 07-23 16:42:51] ax.api.client: Trial 29 marked COMPLETED.
-[INFO 07-23 16:42:51] ax.api.client: Trial 28 marked COMPLETED.
-[INFO 07-23 16:42:51] ax.api.client: Trial 24 marked COMPLETED.
-[INFO 07-23 16:42:51] ax.api.client: Trial 27 marked COMPLETED.
-[INFO 07-23 16:42:51] ax.api.client: Trial 31 marked COMPLETED.
-[INFO 07-23 16:42:51] ax.api.client: Trial 26 marked COMPLETED.
-[INFO 07-23 16:42:51] ax.api.client: Trial 30 marked COMPLETED.
-[INFO 07-23 16:42:56] ax.api.client: Generated new trial 32 with parameters {&#39;x1&#39;: 2.973421, &#39;x2&#39;: 0.6046} using GenerationNode MBM.
-[INFO 07-23 16:42:56] ax.api.client: Generated new trial 33 with parameters {&#39;x1&#39;: 3.41157, &#39;x2&#39;: -1.27283} using GenerationNode MBM.
-[INFO 07-23 16:42:56] ax.api.client: Generated new trial 34 with parameters {&#39;x1&#39;: 3.168003, &#39;x2&#39;: 1.105968} using GenerationNode MBM.
-[INFO 07-23 16:42:56] ax.api.client: Generated new trial 35 with parameters {&#39;x1&#39;: 2.845814, &#39;x2&#39;: 0.15762} using GenerationNode MBM.
-[INFO 07-23 16:42:56] ax.api.client: Generated new trial 36 with parameters {&#39;x1&#39;: -2.79698, &#39;x2&#39;: 1.81469} using GenerationNode MBM.
-[INFO 07-23 16:42:56] ax.api.client: Generated new trial 37 with parameters {&#39;x1&#39;: -5.0, &#39;x2&#39;: -1.569823} using GenerationNode MBM.
-[INFO 07-23 16:42:56] ax.api.client: Generated new trial 38 with parameters {&#39;x1&#39;: -2.446433, &#39;x2&#39;: 3.435856} using GenerationNode MBM.
-[INFO 07-23 16:42:56] ax.api.client: Generated new trial 39 with parameters {&#39;x1&#39;: -3.240325, &#39;x2&#39;: 0.627758} using GenerationNode MBM.
-[INFO 07-23 16:42:56] ax.api.client: Trial 33 marked COMPLETED.
-[INFO 07-23 16:42:56] ax.api.client: Trial 37 marked COMPLETED.
-[INFO 07-23 16:42:56] ax.api.client: Trial 39 marked COMPLETED.
-[INFO 07-23 16:42:56] ax.api.client: Trial 36 marked COMPLETED.
-[INFO 07-23 16:42:56] ax.api.client: Trial 38 marked COMPLETED.
-[INFO 07-23 16:42:56] ax.api.client: Trial 32 marked COMPLETED.
-[INFO 07-23 16:42:56] ax.api.client: Trial 34 marked COMPLETED.
-[INFO 07-23 16:42:56] ax.api.client: Trial 35 marked COMPLETED.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 07-28 17:15:01] ax.api.client: GenerationStrategy(name=&#39;Center+Sobol+MBM:fast&#39;, nodes=[CenterGenerationNode(next_node_name=&#39;Sobol&#39;, use_existing_trials_for_initialization=True), GenerationNode(name=&#39;Sobol&#39;, generator_specs=[GeneratorSpec(generator_enum=Sobol, generator_key_override=None)], transition_criteria=[MinTrials(transition_to=&#39;MBM&#39;), MinTrials(transition_to=&#39;MBM&#39;)], suggested_experiment_status=ExperimentStatus.INITIALIZATION, pausing_criteria=[MaxTrialsAwaitingData(threshold=5)]), GenerationNode(name=&#39;MBM&#39;, generator_specs=[GeneratorSpec(generator_enum=BoTorch, generator_key_override=None)], transition_criteria=None, suggested_experiment_status=ExperimentStatus.OPTIMIZATION, pausing_criteria=None)]) chosen based on user input and problem structure.
+[INFO 07-28 17:15:01] ax.api.client: Generated new trial 0 with parameters {&#39;x1&#39;: 0.0, &#39;x2&#39;: 0.0} using GenerationNode CenterOfSearchSpace.
+[INFO 07-28 17:15:01] ax.api.client: Generated new trial 1 with parameters {&#39;x1&#39;: 2.312376, &#39;x2&#39;: 1.403097} using GenerationNode Sobol.
+[INFO 07-28 17:15:01] ax.api.client: Generated new trial 2 with parameters {&#39;x1&#39;: -2.543032, &#39;x2&#39;: -1.841968} using GenerationNode Sobol.
+[INFO 07-28 17:15:01] ax.api.client: Generated new trial 3 with parameters {&#39;x1&#39;: -1.103263, &#39;x2&#39;: 3.55764} using GenerationNode Sobol.
+[INFO 07-28 17:15:01] ax.api.client: Generated new trial 4 with parameters {&#39;x1&#39;: 3.987761, &#39;x2&#39;: -3.432546} using GenerationNode Sobol.
+[INFO 07-28 17:15:01] ax.api.client: Generated new trial 5 with parameters {&#39;x1&#39;: 3.153507, &#39;x2&#39;: 4.515819} using GenerationNode Sobol.
+[INFO 07-28 17:15:01] ax.api.client: Generated new trial 6 with parameters {&#39;x1&#39;: -1.66301, &#39;x2&#39;: -4.974069} using GenerationNode Sobol.
+[INFO 07-28 17:15:01] ax.api.client: Generated new trial 7 with parameters {&#39;x1&#39;: -4.676342, &#39;x2&#39;: 0.444767} using GenerationNode Sobol.
+[INFO 07-28 17:15:01] ax.api.client: Trial 0 marked COMPLETED.
+[INFO 07-28 17:15:01] ax.api.client: Trial 1 marked COMPLETED.
+[INFO 07-28 17:15:01] ax.api.client: Trial 5 marked COMPLETED.
+[INFO 07-28 17:15:01] ax.api.client: Trial 3 marked COMPLETED.
+[INFO 07-28 17:15:01] ax.api.client: Trial 7 marked COMPLETED.
+[INFO 07-28 17:15:01] ax.api.client: Trial 2 marked COMPLETED.
+[INFO 07-28 17:15:01] ax.api.client: Trial 6 marked COMPLETED.
+[INFO 07-28 17:15:02] ax.api.client: Trial 4 marked COMPLETED.
+[INFO 07-28 17:15:06] ax.api.client: Generated new trial 8 with parameters {&#39;x1&#39;: 0.801479, &#39;x2&#39;: 2.18315} using GenerationNode MBM.
+[INFO 07-28 17:15:06] ax.api.client: Generated new trial 9 with parameters {&#39;x1&#39;: 3.7266, &#39;x2&#39;: 0.995503} using GenerationNode MBM.
+[INFO 07-28 17:15:06] ax.api.client: Generated new trial 10 with parameters {&#39;x1&#39;: -2.916815, &#39;x2&#39;: 4.176441} using GenerationNode MBM.
+[INFO 07-28 17:15:06] ax.api.client: Generated new trial 11 with parameters {&#39;x1&#39;: 3.496945, &#39;x2&#39;: 2.106436} using GenerationNode MBM.
+[INFO 07-28 17:15:06] ax.api.client: Generated new trial 12 with parameters {&#39;x1&#39;: 1.936164, &#39;x2&#39;: -2.39897} using GenerationNode MBM.
+[INFO 07-28 17:15:06] ax.api.client: Generated new trial 13 with parameters {&#39;x1&#39;: 2.559864, &#39;x2&#39;: 0.459624} using GenerationNode MBM.
+[INFO 07-28 17:15:06] ax.api.client: Generated new trial 14 with parameters {&#39;x1&#39;: 5.0, &#39;x2&#39;: -4.751724} using GenerationNode MBM.
+[INFO 07-28 17:15:06] ax.api.client: Generated new trial 15 with parameters {&#39;x1&#39;: -2.859017, &#39;x2&#39;: 2.815493} using GenerationNode MBM.
+[INFO 07-28 17:15:07] ax.api.client: Trial 12 marked COMPLETED.
+[INFO 07-28 17:15:07] ax.api.client: Trial 10 marked COMPLETED.
+[INFO 07-28 17:15:07] ax.api.client: Trial 15 marked COMPLETED.
+[INFO 07-28 17:15:07] ax.api.client: Trial 8 marked COMPLETED.
+[INFO 07-28 17:15:07] ax.api.client: Trial 13 marked COMPLETED.
+[INFO 07-28 17:15:07] ax.api.client: Trial 11 marked COMPLETED.
+[INFO 07-28 17:15:07] ax.api.client: Trial 9 marked COMPLETED.
+[INFO 07-28 17:15:07] ax.api.client: Trial 14 marked COMPLETED.
+[INFO 07-28 17:15:12] ax.api.client: Generated new trial 16 with parameters {&#39;x1&#39;: -5.0, &#39;x2&#39;: 3.342113} using GenerationNode MBM.
+[INFO 07-28 17:15:12] ax.api.client: Generated new trial 17 with parameters {&#39;x1&#39;: -5.0, &#39;x2&#39;: -2.862722} using GenerationNode MBM.
+[INFO 07-28 17:15:12] ax.api.client: Generated new trial 18 with parameters {&#39;x1&#39;: 5.0, &#39;x2&#39;: -0.431252} using GenerationNode MBM.
+[INFO 07-28 17:15:12] ax.api.client: Generated new trial 19 with parameters {&#39;x1&#39;: -5.0, &#39;x2&#39;: 5.0} using GenerationNode MBM.
+[INFO 07-28 17:15:12] ax.api.client: Generated new trial 20 with parameters {&#39;x1&#39;: -1.66787, &#39;x2&#39;: -3.129206} using GenerationNode MBM.
+[INFO 07-28 17:15:12] ax.api.client: Generated new trial 21 with parameters {&#39;x1&#39;: -5.0, &#39;x2&#39;: 2.591093} using GenerationNode MBM.
+[INFO 07-28 17:15:12] ax.api.client: Generated new trial 22 with parameters {&#39;x1&#39;: 5.0, &#39;x2&#39;: 2.762132} using GenerationNode MBM.
+[INFO 07-28 17:15:12] ax.api.client: Generated new trial 23 with parameters {&#39;x1&#39;: 5.0, &#39;x2&#39;: 1.74056} using GenerationNode MBM.
+[INFO 07-28 17:15:12] ax.api.client: Trial 17 marked COMPLETED.
+[INFO 07-28 17:15:12] ax.api.client: Trial 20 marked COMPLETED.
+[INFO 07-28 17:15:12] ax.api.client: Trial 21 marked COMPLETED.
+[INFO 07-28 17:15:12] ax.api.client: Trial 16 marked COMPLETED.
+[INFO 07-28 17:15:12] ax.api.client: Trial 19 marked COMPLETED.
+[INFO 07-28 17:15:12] ax.api.client: Trial 22 marked COMPLETED.
+[INFO 07-28 17:15:12] ax.api.client: Trial 23 marked COMPLETED.
+[INFO 07-28 17:15:13] ax.api.client: Trial 18 marked COMPLETED.
+[INFO 07-28 17:15:20] ax.api.client: Generated new trial 24 with parameters {&#39;x1&#39;: 3.24338, &#39;x2&#39;: -2.0792} using GenerationNode MBM.
+[INFO 07-28 17:15:20] ax.api.client: Generated new trial 25 with parameters {&#39;x1&#39;: -2.056105, &#39;x2&#39;: 2.717109} using GenerationNode MBM.
+[INFO 07-28 17:15:20] ax.api.client: Generated new trial 26 with parameters {&#39;x1&#39;: -3.345577, &#39;x2&#39;: -0.625026} using GenerationNode MBM.
+[INFO 07-28 17:15:20] ax.api.client: Generated new trial 27 with parameters {&#39;x1&#39;: 1.568463, &#39;x2&#39;: 2.825131} using GenerationNode MBM.
+[INFO 07-28 17:15:20] ax.api.client: Generated new trial 28 with parameters {&#39;x1&#39;: 2.929909, &#39;x2&#39;: -5.0} using GenerationNode MBM.
+[INFO 07-28 17:15:20] ax.api.client: Generated new trial 29 with parameters {&#39;x1&#39;: 0.174046, &#39;x2&#39;: 5.0} using GenerationNode MBM.
+[INFO 07-28 17:15:20] ax.api.client: Generated new trial 30 with parameters {&#39;x1&#39;: -1.973495, &#39;x2&#39;: 5.0} using GenerationNode MBM.
+[INFO 07-28 17:15:20] ax.api.client: Generated new trial 31 with parameters {&#39;x1&#39;: -3.682406, &#39;x2&#39;: -5.0} using GenerationNode MBM.
+[INFO 07-28 17:15:20] ax.api.client: Trial 24 marked COMPLETED.
+[INFO 07-28 17:15:20] ax.api.client: Trial 28 marked COMPLETED.
+[INFO 07-28 17:15:20] ax.api.client: Trial 31 marked COMPLETED.
+[INFO 07-28 17:15:20] ax.api.client: Trial 26 marked COMPLETED.
+[INFO 07-28 17:15:20] ax.api.client: Trial 25 marked COMPLETED.
+[INFO 07-28 17:15:20] ax.api.client: Trial 30 marked COMPLETED.
+[INFO 07-28 17:15:20] ax.api.client: Trial 29 marked COMPLETED.
+[INFO 07-28 17:15:20] ax.api.client: Trial 27 marked COMPLETED.
+[INFO 07-28 17:15:25] ax.api.client: Generated new trial 32 with parameters {&#39;x1&#39;: -2.538289, &#39;x2&#39;: 3.361523} using GenerationNode MBM.
+[INFO 07-28 17:15:25] ax.api.client: Generated new trial 33 with parameters {&#39;x1&#39;: 4.375609, &#39;x2&#39;: -2.47241} using GenerationNode MBM.
+[INFO 07-28 17:15:25] ax.api.client: Generated new trial 34 with parameters {&#39;x1&#39;: 3.581053, &#39;x2&#39;: -2.61878} using GenerationNode MBM.
+[INFO 07-28 17:15:25] ax.api.client: Generated new trial 35 with parameters {&#39;x1&#39;: 5.0, &#39;x2&#39;: -2.504436} using GenerationNode MBM.
+[INFO 07-28 17:15:25] ax.api.client: Generated new trial 36 with parameters {&#39;x1&#39;: 2.792604, &#39;x2&#39;: 2.028837} using GenerationNode MBM.
+[INFO 07-28 17:15:25] ax.api.client: Generated new trial 37 with parameters {&#39;x1&#39;: -2.232998, &#39;x2&#39;: 0.847885} using GenerationNode MBM.
+[INFO 07-28 17:15:25] ax.api.client: Generated new trial 38 with parameters {&#39;x1&#39;: -0.663052, &#39;x2&#39;: -1.761468} using GenerationNode MBM.
+[INFO 07-28 17:15:25] ax.api.client: Generated new trial 39 with parameters {&#39;x1&#39;: -5.0, &#39;x2&#39;: -1.34801} using GenerationNode MBM.
+[INFO 07-28 17:15:25] ax.api.client: Trial 37 marked COMPLETED.
+[INFO 07-28 17:15:25] ax.api.client: Trial 32 marked COMPLETED.
+[INFO 07-28 17:15:25] ax.api.client: Trial 39 marked COMPLETED.
+[INFO 07-28 17:15:25] ax.api.client: Trial 38 marked COMPLETED.
+[INFO 07-28 17:15:25] ax.api.client: Trial 33 marked COMPLETED.
+[INFO 07-28 17:15:25] ax.api.client: Trial 35 marked COMPLETED.
+[INFO 07-28 17:15:25] ax.api.client: Trial 34 marked COMPLETED.
+[INFO 07-28 17:15:25] ax.api.client: Trial 36 marked COMPLETED.
 </pre></div>
 </div>
 <div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>7b9312d8-1237-405e-95eb-e706444e1d35
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">         x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             0 │</span><span style="color: #008080; text-decoration-color: #008080">        0 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">          0 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">           170 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │             1 │</span><span style="color: #008080; text-decoration-color: #008080">  2.68396 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">    -1.7119 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       32.2605 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │             2 │</span><span style="color: #008080; text-decoration-color: #008080"> -1.30431 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   0.984524 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       122.929 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │             3 │</span><span style="color: #008080; text-decoration-color: #008080"> -3.76811 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   -4.17112 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       44.9045 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │             4 │</span><span style="color: #008080; text-decoration-color: #008080"> 0.219846 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">    3.44251 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       82.0995 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │             5 │</span><span style="color: #008080; text-decoration-color: #008080">  2.44462 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   -2.55176 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       61.2157 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │             6 │</span><span style="color: #008080; text-decoration-color: #008080"> -3.56498 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">    4.51969 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       136.068 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │             7 │</span><span style="color: #008080; text-decoration-color: #008080"> -1.02877 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -0.0109527 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       163.513 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴────────────┴───────────────┘</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>32.2605<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>170<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>101.624
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (8 pts sampled)</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>6c97c61c-49bb-48b5-9fbc-821451f61ca7
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            10 │</span><span style="color: #008080; text-decoration-color: #008080"> -0.178866 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">       -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        572.57 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            11 │</span><span style="color: #008080; text-decoration-color: #008080">         5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -4.00779 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       297.596 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │            12 │</span><span style="color: #008080; text-decoration-color: #008080">        -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -3.41357 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       112.193 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │            13 │</span><span style="color: #008080; text-decoration-color: #008080">         5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  2.38215 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       281.878 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │            14 │</span><span style="color: #008080; text-decoration-color: #008080">        -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">       -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">           250 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │            15 │</span><span style="color: #008080; text-decoration-color: #008080">        -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  2.39766 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       307.961 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │             8 │</span><span style="color: #008080; text-decoration-color: #008080">   -3.6162 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -1.80631 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       54.1464 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │             9 │</span><span style="color: #008080; text-decoration-color: #008080">         5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -1.82727 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       149.968 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴───────────┴──────────┴───────────────┘</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>32.2605<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>572.57<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>177.456
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (16 pts sampled)</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>e071e206-df46-434d-bb59-7d83a7a05501
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            16 │</span><span style="color: #008080; text-decoration-color: #008080">  -3.72463 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  -3.05442 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       1.97948 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            17 │</span><span style="color: #008080; text-decoration-color: #008080">  -1.46864 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   4.47397 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       152.441 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │            18 │</span><span style="color: #008080; text-decoration-color: #008080">   1.86589 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   1.72353 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       38.2623 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │            19 │</span><span style="color: #008080; text-decoration-color: #008080">   3.42964 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  -1.85014 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        1.2048 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │            20 │</span><span style="color: #008080; text-decoration-color: #008080">  -3.11195 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   -3.2075 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       20.4911 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │            21 │</span><span style="color: #008080; text-decoration-color: #008080">   1.61574 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">         5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       396.265 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │            22 │</span><span style="color: #008080; text-decoration-color: #008080">   2.02183 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -0.860696 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       78.3734 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │            23 │</span><span style="color: #008080; text-decoration-color: #008080"> -0.515329 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">         5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       338.597 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴───────────┴───────────┴───────────────┘</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>1.2048<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>572.57<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>161.122
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (24 pts sampled)</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>a4f33586-1d88-4fcc-aff9-acda68c58cde
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            24 │</span><span style="color: #008080; text-decoration-color: #008080"> 0.159941 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   2.29186 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       77.9068 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            25 │</span><span style="color: #008080; text-decoration-color: #008080"> -1.51356 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   2.89793 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       33.7836 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │            26 │</span><span style="color: #008080; text-decoration-color: #008080">  3.54132 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -0.329239 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       12.6926 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │            27 │</span><span style="color: #008080; text-decoration-color: #008080"> 0.731711 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   2.23735 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       69.2817 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │            28 │</span><span style="color: #008080; text-decoration-color: #008080"> -0.64526 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   2.60236 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       64.4629 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │            29 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.30014 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   3.00998 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       7.34432 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │            30 │</span><span style="color: #008080; text-decoration-color: #008080">  3.39687 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  -2.40058 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       8.13059 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │            31 │</span><span style="color: #008080; text-decoration-color: #008080">  1.49985 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">    2.5869 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       39.4099 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴───────────┴───────────────┘</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>1.2048<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>572.57<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>130.623
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (32 pts sampled)</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>21ec66a8-47e4-4227-b992-6ebc8964d69f
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>98e06f24-4927-417b-afae-145d2e86d5ed
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            32 │</span><span style="color: #008080; text-decoration-color: #008080">  2.97342 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   0.6046 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       15.8186 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            33 │</span><span style="color: #008080; text-decoration-color: #008080">  3.41157 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -1.27283 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       4.27633 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │            34 │</span><span style="color: #008080; text-decoration-color: #008080">    3.168 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  1.10597 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       6.82623 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │            35 │</span><span style="color: #008080; text-decoration-color: #008080">  2.84581 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  0.15762 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       24.5795 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │            36 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.79698 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  1.81469 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       44.1561 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │            37 │</span><span style="color: #008080; text-decoration-color: #008080">       -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -1.56982 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       245.438 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │            38 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.44643 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  3.43586 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       8.05692 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │            39 │</span><span style="color: #008080; text-decoration-color: #008080"> -3.24033 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 0.627758 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       96.9648 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             0 │</span><span style="color: #008080; text-decoration-color: #008080">        0 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">        0 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">           170 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │             1 │</span><span style="color: #008080; text-decoration-color: #008080">  2.31238 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   1.4031 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       25.4536 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │             2 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.54303 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -1.84197 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       78.4649 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │             3 │</span><span style="color: #008080; text-decoration-color: #008080"> -1.10326 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  3.55764 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       59.4875 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │             4 │</span><span style="color: #008080; text-decoration-color: #008080">  3.98776 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -3.43255 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       79.0752 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │             5 │</span><span style="color: #008080; text-decoration-color: #008080">  3.15351 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  4.51582 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       285.749 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │             6 │</span><span style="color: #008080; text-decoration-color: #008080"> -1.66301 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -4.97407 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       432.977 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │             7 │</span><span style="color: #008080; text-decoration-color: #008080"> -4.67634 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 0.444767 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       259.739 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴──────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>1.2048<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>572.57<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>115.651
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>25.4536<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>432.977<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>173.868
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (8 pts sampled)</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>e24a1517-bfbc-43f0-98ec-f3bf12ae62ec
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            10 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.91682 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  4.17644 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        59.475 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            11 │</span><span style="color: #008080; text-decoration-color: #008080">  3.49695 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  2.10644 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        11.995 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │            12 │</span><span style="color: #008080; text-decoration-color: #008080">  1.93616 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -2.39897 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       93.6049 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │            13 │</span><span style="color: #008080; text-decoration-color: #008080">  2.55986 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 0.459624 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       33.7834 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │            14 │</span><span style="color: #008080; text-decoration-color: #008080">        5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -4.75172 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       509.021 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │            15 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.85902 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  2.81549 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        3.7328 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │             8 │</span><span style="color: #008080; text-decoration-color: #008080"> 0.801479 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  2.18315 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       68.8739 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │             9 │</span><span style="color: #008080; text-decoration-color: #008080">   3.7266 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 0.995503 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       20.2873 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴──────────┴───────────────┘</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>3.7328<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>509.021<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>136.982
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (16 pts sampled)</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>9a66a0dd-012c-4fa8-ab79-5399b178010a
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            16 │</span><span style="color: #008080; text-decoration-color: #008080">       -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   3.34211 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       301.438 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            17 │</span><span style="color: #008080; text-decoration-color: #008080">       -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  -2.86272 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       138.516 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │            18 │</span><span style="color: #008080; text-decoration-color: #008080">        5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -0.431252 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       187.402 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │            19 │</span><span style="color: #008080; text-decoration-color: #008080">       -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">         5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">           530 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │            20 │</span><span style="color: #008080; text-decoration-color: #008080"> -1.66787 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  -3.12921 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       130.027 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │            21 │</span><span style="color: #008080; text-decoration-color: #008080">       -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   2.59109 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       303.209 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │            22 │</span><span style="color: #008080; text-decoration-color: #008080">        5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   2.76213 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       312.659 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │            23 │</span><span style="color: #008080; text-decoration-color: #008080">        5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   1.74056 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       248.825 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴───────────┴───────────────┘</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>3.7328<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>530<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>180.991
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (24 pts sampled)</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>53339273-97fa-4360-9b85-e2312c764001
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            24 │</span><span style="color: #008080; text-decoration-color: #008080">  3.24338 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   -2.0792 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       6.87288 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            25 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.05611 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   2.71711 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        19.246 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │            26 │</span><span style="color: #008080; text-decoration-color: #008080"> -3.34558 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -0.625026 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       99.2872 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │            27 │</span><span style="color: #008080; text-decoration-color: #008080">  1.56846 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   2.82513 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       39.1605 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │            28 │</span><span style="color: #008080; text-decoration-color: #008080">  2.92991 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">        -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       493.053 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │            29 │</span><span style="color: #008080; text-decoration-color: #008080"> 0.174046 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">         5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       365.933 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │            30 │</span><span style="color: #008080; text-decoration-color: #008080">  -1.9735 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">         5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       261.281 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │            31 │</span><span style="color: #008080; text-decoration-color: #008080"> -3.68241 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">        -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       210.947 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴───────────┴───────────────┘</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>3.7328<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>530<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>182.487
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (32 pts sampled)</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">─────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>24b0b294-d11f-486a-915f-76ad3cb3b3ed
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            32 │</span><span style="color: #008080; text-decoration-color: #008080">  -2.53829 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  3.36152 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       4.53243 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            33 │</span><span style="color: #008080; text-decoration-color: #008080">   4.37561 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -2.47241 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       44.3582 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     2 │            34 │</span><span style="color: #008080; text-decoration-color: #008080">   3.58105 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -2.61878 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       12.4589 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     3 │            35 │</span><span style="color: #008080; text-decoration-color: #008080">         5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -2.50444 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">         150.4 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     4 │            36 │</span><span style="color: #008080; text-decoration-color: #008080">    2.7926 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  2.02884 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       1.38313 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     5 │            37 │</span><span style="color: #008080; text-decoration-color: #008080">    -2.233 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 0.847885 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       99.1755 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     6 │            38 │</span><span style="color: #008080; text-decoration-color: #008080"> -0.663052 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -1.76147 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       172.624 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     7 │            39 │</span><span style="color: #008080; text-decoration-color: #008080">        -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -1.34801 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       263.764 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴───────────┴──────────┴───────────────┘</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>1.38313<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>530<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>164.707
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (40 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">                            Summary Statistics                             </span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Name          </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Type    </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">    Min </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">    Max </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      Mean </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     Std </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Count </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008080; text-decoration-color: #008080">x1           </span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ param   │</span>     -5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>      5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> -0.105361 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 3.10621 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    40 │</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008080; text-decoration-color: #008080">x2           </span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ param   │</span>     -5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>      5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>  0.231275 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 2.85863 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    40 │</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ outcome │</span> 1.2048 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 572.57 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>   115.651 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>  129.35 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    40 │</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────────────┴─────────┴────────┴────────┴───────────┴─────────┴───────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">                           Summary Statistics                           </span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Name          </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Type    </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     Min </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Max </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     Mean </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     Std </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Count </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008080; text-decoration-color: #008080">x1           </span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ param   │</span>      -5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>   5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 0.167962 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 3.48996 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    40 │</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008080; text-decoration-color: #008080">x2           </span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ param   │</span>      -5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>   5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 0.316064 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 3.06902 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    40 │</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ outcome │</span> 1.38313 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 530 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>  164.707 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 152.328 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    40 │</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────────────┴─────────┴─────────┴─────┴──────────┴─────────┴───────┘</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #008000; text-decoration-color: #008000">────────────────────────────────────────────── </span><span style="font-weight: bold">Optimization Complete</span><span style="color: #008000; text-decoration-color: #008000"> ──────────────────────────────────────────────</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 </pre>
-</div><div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&#39;41dc1df1-347c-4cfd-acb8-4991044a25e6&#39;,
- &#39;7b9312d8-1237-405e-95eb-e706444e1d35&#39;,
- &#39;6c97c61c-49bb-48b5-9fbc-821451f61ca7&#39;,
- &#39;e071e206-df46-434d-bb59-7d83a7a05501&#39;,
- &#39;a4f33586-1d88-4fcc-aff9-acda68c58cde&#39;,
- &#39;21ec66a8-47e4-4227-b992-6ebc8964d69f&#39;)
+</div><div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>(&#39;09655c17-ed5d-4afd-b00c-195134141738&#39;,
+ &#39;98e06f24-4927-417b-afae-145d2e86d5ed&#39;,
+ &#39;e24a1517-bfbc-43f0-98ec-f3bf12ae62ec&#39;,
+ &#39;9a66a0dd-012c-4fa8-ab79-5399b178010a&#39;,
+ &#39;53339273-97fa-4360-9b85-e2312c764001&#39;,
+ &#39;24b0b294-d11f-486a-915f-76ad3cb3b3ed&#39;)
 </pre></div>
 </div>
 </div>
@@ -4857,7 +4857,7 @@ return Plotly;
 <div class="card">
     <div class="card-header">
         <b>himmelblau_2d (Mean) vs. x1, x2</b>
-        <div class="card-subtitle">The contour plot visualizes the predicted outcomes for himmelblau_2d across a two-dimensional parameter space, with other parameters held fixed at their best trial value (Arm 19_0). This plot helps in identifying regions of optimal performance and understanding how changes in the selected parameters influence the predicted outcomes. Contour lines represent levels of constant predicted values, providing insights into the gradient and potential optima within the parameter space.</div>
+        <div class="card-subtitle">The contour plot visualizes the predicted outcomes for himmelblau_2d across a two-dimensional parameter space, with other parameters held fixed at their best trial value (Arm 24_0). This plot helps in identifying regions of optimal performance and understanding how changes in the selected parameters influence the predicted outcomes. Contour lines represent levels of constant predicted values, providing insights into the gradient and potential optima within the parameter space.</div>
         <button class="card-subtitle-toggle">See more</button>
     </div>
     <div class="card-body">
@@ -4871,7 +4871,7 @@ return Plotly;
 }
 </style>
 <div class="content">
-    <div style="height:100%; width:100%;">                            <div id="22ee5b75-f168-4199-be0c-027e43a9fe58" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("22ee5b75-f168-4199-be0c-027e43a9fe58")) {                    Plotly.newPlot(                        "22ee5b75-f168-4199-be0c-027e43a9fe58",                        [{"colorbar":{"ticksuffix":""},"colorscale":[[0.0,"rgb(161, 105, 40)"],[0.16666666666666666,"rgb(189, 146, 90)"],[0.3333333333333333,"rgb(214, 189, 141)"],[0.5,"rgb(237, 234, 194)"],[0.6666666666666666,"rgb(181, 200, 184)"],[0.8333333333333334,"rgb(121, 167, 172)"],[1.0,"rgb(40, 135, 161)"]],"hoverinfo":"skip","showscale":true,"x":{"dtype":"f8","bdata":"AAAAAAAAFMDHcRzHcRwPwAAAgEQWJQ7AeVRNfwzMDcACkpCt+e0MwAAAgBUUhQzAGQAqji\u002fsCcDcLO7mQ+UIwPfYyC83YAbAjuM4juM4BsARwiKeS5IDwK3HsPavZgLAqqqqqqqq+r8jQRd4hzf4v4Lj3VqKf\u002fe\u002fAACAhHbe9L8AAIDC3HXwv+6jXgj4peS\u002fcBzHcRzH4b9dMhD3kn3gvxD61rsW5ca\u002fAAAAAAAAAACex6Yj8njEPwAAAPDoI8w\u002fcBzHcRzH4T8EkEzFLWrnPwPb3pFk\u002f\u002fc\u002f1qk\u002fLBXa+T+sqqqqqqr6P3h0M7uu2v0\u002fZb0QXrQsAEAAAAAml44DQAAAAJC+eAVAkOM4juM4BkA2kGJQOsQGQFfcusaQyQdArkWTAhJYCUDk++fpyCwLQCbW\u002fAblSgtAzFIY\u002fOdvC0CFTw24n1QMQMhxHMdxHA9AAAAAAAAAFEA="},"y":{"dtype":"f8","bdata":"AAAAAAAAFMAAAKBlOq8QwL3+2i37BxDAx3Ecx3EcD8D6rMcn\u002fU4LwLMqInHzqAnAHOo0aHFvCMCO4ziO4zgGwAAAgIsCagTA0C+Q0GE0A8A8cabzMJr9v097mFiCPP2\u002flPbXQ6Pm\u002fL8AAACg9GP7v6qqqqqqqvq\u002fGDvr0P4d+b\u002fD4KKpgl30v3k11FbSiuu\u002fcBzHcRzH4b\u002fAwC\u002fMQBLVvwAAAIBaboa\u002fAAAAAAAAAACDHO004CzEP3Acx3Ecx+E\u002fbA0yr+JY4z\u002f02XormBbkPwAAAJY3ge8\u002fT1EfUwuy8T+sqqqqqqr6P3eCyvmPk\u002fs\u002fOZgWX\u002fgI\u002fT+ehKP1F+YBQK1dHNi5VQJARICszqIOA0DSlWEUZy4DQIT1fcv6sQRAjuOCOqLRBECQ4ziO4zgGQD21vKz2LgdA5VV4Jm8UCEDk2iz4oXwLQAAAgDRBigtAyHEcx3EcD0AgjRweWeURQAAAYLooFBJAAAAAAAAAFEA="},"z":{"dtype":"f8","bdata":"hgD3XIUhb0ANnxjUHd5gQBluSHS4zl9AWXjHvfg1X0CpnvqC5fVdQCILCOUFfl1ArDjOOUdzXEA\u002fZgtCB\u002fpcQDJRZ6vTOWBAkY42yBNhYED0wXFArcRjQAzT0DoIpWVAdkvf2gsvb0D8hoJM88ZwQLI9VitIHnFAEqWUYrJTckAcFOp8+Cd0QDitqxeNHnZAaByHExF2dkDm8t82U5l2QFCur91mXHdAexlZfNV6d0BmNOi9EGx3QJDvp3u1XHdAzOs+yq+rdkBMAvqPdhh2QKZantxlk3JAslPcN0T\u002fcUBmrjdTCr9xQPPR04EVzXBA+4HGog0fcEBuz9uF7WFtQL2V7MVZdWxA30VVnehAbEAcSrw9nClsQEcI2oisH2xAgu9I0eVkbEBUU0RYRjNtQAjH9yHeRG1AMoAYWSxbbUCYNroFDfVtQO2ZpAhhNXBAQqIHE1jzdEAAuoxHZ1BlQHgic7zIOkpA\u002fL6WEQsmR0DGrBRZx0ZGQLqZ18g5q0RAuM1\u002fH3syREBobh7PzplFQKhhvNcKPEhAwdsX7wmqUUDPEhCapBlSQJ4y+fxWFltA5eQ8S2nFX0AqO3tr+RlrQKW7NqDYxW1AWDVxJ\u002feIbkC4qpT3MJtwQC2zMDcgmXJAcAVWQlWudEDoys+Vygh1QCoeNqbgLHVAeqFwolXrdUC21HIhC\u002f91QFVRxOrA4XVAdE5aJbrLdUCoW\u002f72ROh0QHKHQ3E\u002fMXRAkX3JXD+Hb0DP0DoZcwZuQKbrbeAZXm1A8LcTf0XaakBgdGMhpf9oQPztIfEG42RAJAFQ3LFlY0AaQppyxANjQGfSC6wn0GJAmkdv5r2cYkCpWiSG88JiQHOdUFego2NA\u002fK1FTIO4Y0DuPavhONNjQF4uzzkEkWRAaEoiTUvUZ0CWhMgdUDNzQHrqtFxFdmNABhtCcnLYQ0CEln+4CQJBQKReCPgXOkBAhDvPpY+0PUBM4UCvufw8QISvzEdIn0BAsFvoXEWJQ0BiurpiaUNPQOa9CffPFVBAgXIyztlVWUCNwzbiuBteQHBWlCW0XGpA7jIvyqAIbUDL+6fLbMttQCoPqDxEO3BA3tSku7U1ckCAXOkOSER0QANmKHkTnXRA9LSk8WnAdEBlSiYvq3h1QJPccCcfiXVAOLLod91odUBmWdEdsVF1QK+egWIEZ3RAiP\u002f4sVGrc0DZFH\u002fhfDhuQFcpypMtqWxANMgCZBn6a0B85F2zFlppQCK4hdK9Z2dAPvjkTEEIY0AxWeqCoWdhQMnjs9I7+WBA21ymRTm9YED3SmlmyHtgQHHTDo6+kWBABlGxd8poYUBgjJofcn1hQDYYnervl2FAUAplLwxWYkDlyBntJ61lQBYy\u002fT7tjXJAYPLn5powYkAs4qeQQoc\u002fQJiEO+beOjpASMOU0WXOOEDsH+UBBmg2QHDzwIGK2jVAJNFLnqciO0CAPAbRkatAQH5BBOOzzExAlIunT1a6TUCW0GLo2UJYQPE9bpyIE11AXxd7Lj3caUDfnm++B4VsQNTtAMCwRm1AE1cWTvXsb0D\u002fdKItC+xxQL7ljgVc83NAlKKomohKdEDW9n\u002fWKW10QAPeTCAKIHVAIuiMqAUudUBWh3Uvtwt1QEwprU\u002fL83RAAaEOr8EEdED\u002f2+g\u002fWUZzQLiovLdXRW1Awg67e4Osa0BuEhVO9\u002fhqQFVLVDjqRWhA8\u002fXtaStDZkByMUZJx7NhQEnXZ3t88V9A2Y3NnIABX0D5ObkrWHxeQAWEfpL54l1AL7GLOkTzXUBUKCKkkY1fQKkPXQAjtl9ANgYQv0zqX0Cxyqs44rFgQC9efooIEmRASJFs92UJckAqxRK0PwVcQBAcGYxxiSNA4H2H+WM3GEDwRVcNd8UUQLBsux+QqhBAcN8Ijvr5EEAA\u002f1ZuPDcqQMxVwHNZeTRAst6LWv1mR0ByZfK01l9IQMCnyHpox1VALpjp1zaSWkBkpvhaojxoQED1Gds2wGpAkJnbHl52a0CeM\u002ftSG\u002fFtQJAG5UIMyXBAEmorMrehckBVSC0Fje9yQEta9sY6DnNAptBchzKmc0CsTZe3SapzQMntB4lhgXNA3rnodHBnc0A+iHuFzm9yQNISaiQzrXFAD24SGWu4aUDquL9cwgRoQEm\u002fmFMbRGdA7pNFHiRWZED6r+zlQR1iQLIHb4x6wVlA1AaNxTV5VUD+WYnNljhUQLRDiVKGelNAlhM+ApB7UkDeu3a8FgNSQDYRgd1AI1NAB\u002ffg2q9FU0Duynn\u002fnXJTQHg35Icyx1RA2xmDTqJyW0CO99eNtWpvQH1ROpt2f1lAQDq3jXouGECg\u002fR+bSf8HQGDLVODM7wJAQA0\u002fQZoP\u002fj\u002fAxdYawYoBQGCSwLKteihApCgO\u002fknnM0AG+dcpmEFHQAYpJxvoOUhAltMDqQOYVUBo1p5q4UhaQPiFM9FEvWdA8DKEJAgmakAHCXiXNtRqQKMklKXTMW1AjeWSHwxScEDmojSKdA9yQBI2ykAoWHJAuq9nNLV0ckB09UAYR\u002f9yQLZdK7Br\u002f3JAMJIrPa7UckCSHl9Ka7pyQFzhD9DKw3FAzEWaKdcCcUCu9G2T1WRoQPaYqTcirGZA1IJ60KfoZUDV1qbK4etiQE73\u002f2Uwo2BAnCjpVCVWVkBT36cr9rpRQD4duytuWFBAAp+AhUwDT0Bug2Y8YalMQEC\u002f0fpqMktAUMK+T2LoTED27RaPVyVNQMjXgsWqdU1Aa+l3xMXoT0C6u\u002fU2SWtWQEqpldMBTW1AQBuYGo4aWEAQiZuoZfEVQMCfG5WOQgdAoKOFtXZzA0Bgm85n12sCQGCUlz8tKQZAqGqnDr0GK0DsdlA48k41QAR4nuHK70dAgrfPgp3lSEC44lhwG8ZVQNie4OpeW1pAsCepnIhyZ0CiKF3F\u002fsNpQPznB9ZSa2pAdsgUFyWwbECy\u002f6CSWftvQP3HABjXpHFAI1D1bnHpcUB0hR2dTgRyQCmDufGWhHJACkwsLAaCckBgAgP\u002fW1ZyQErgwskUPHJANEDLiQFIcUAoV62rmYlwQCZezmxVg2dAoga3UbfJZUBstJxMYwVlQJQEzkx2AmJAzOpIa1tjX0D0YlMUZytUQEy2loYgsk5ACH3S2CS+S0D8gs4Ewe1JQCLsTAGUUUdARM6ci152RUB4Ci+Vk75GQPrPDfP79EZA0IQP7Vs9R0CktWfjD4JJQPRSahqhAlNAyrohRGPBa0ChC3YxVKNWQBDl+qkM3SFAAC2CiuFpHEDwtsh2T3sbQPCLIbi1Hx1A4PpIcEbfH0CgPIr79oczQHQqzjbYXDtAnAcFxjOoSkDmxLddNpVLQDL\u002fSm60sFZAskvDSAIEW0AmI5Q8xxBnQGJ8CmlPMmlAVjVXe6zLaUDEfqn7ad5rQJERCHL4225Ar4xuKefpcED3DoMmsSZxQCjevQ5dPnFA2CGr2sKrcUBMZjSs0aRxQGpFcahaeHFAYnGSKnlecUDi9zngc3JwQOmAwQ9bdm9AU65LvfQlZkAS3X0XyXBkQP\u002fMlNenrWNA+hzKG3mqYEB5XwzUG6dcQHipE\u002f2tF1FAdFjGgqvoR0C2WW1ZjKtEQNwpR792o0JAvIdqhV80P0CIJm19\u002fyM6QLQcxktNIDtAeDtLJPRzO0BYoPiY+OU7QLwa+Ss4tz9ApjuG8ONuS0D57LjswRxpQNRmgUboa1ZACKMUB9MWL0CQJTX2QmwsQFh9o\u002fnpQixAQJ\u002fpFuq2LUCwKcPsXlIvQOgti5R0cjtAYtVIM72OQUBcnZAduglOQE0scK62605A3iYMgrPiV0DY+4117fJbQNIKug5h3GZAVn6fSbHSaEB6eSgLkl9pQMKeL87jRWtA+GuZv5T\u002fbUCZES56plZwQIT7RbHbjHBA5CHEa9uhcEAghxlr3f9wQCD3eOjL9XBAU8Oum1nJcEAUQAaNHbBwQGbj9B6Cmm9AEkH7yXk7bkAMQQ\u002fpHTplQAlcFKQJjmNA3vs7IV\u002fOYkA7sJWXMqpfQK08Ibq9AltA+diGEfiuTkD6gqt\u002fCA9EQDYjH1PXpEBADFuDvOTxPEDMxhxpkEw2QHyNTurKQzBAlHGJkjgGMEDAhsCYakUwQOCFYKJKnjBAmMb2JfHUM0Am0cJ+xJ1EQER+G68pK2dAAOXBJ2S9VkBMMI53KJc1QPDW5izChDRAPAdpuk2DNEBgTK8+iWE1QJDUM8ZrOjZAqLpy5D33QECUO7MukLJEQJospeuiXVBArvDn9BLKUEAu7pQ4yNdYQLf\u002fBOCstVxACmOJBi7CZkCXT22qSppoQBzMIfh9HmlAMoZYvBjmakCGDco5TXFtQMRAzRzb7G9AtsxkJDkocEDMoIONbztwQGbG8VNLj3BAdG5YxU+DcEDveMP9GldwQHmF3oloPnBAV74IuQnFbkCi+2YhtXFtQOCYGi7rr2RAtIBXvU0MY0C+cJq0D1BiQFvWEPcexF5A9A86OcYoWkAcZYJ2ewJNQF7VwP4FP0JALOur091+PUC8JA32JwM5QDCH8Mo5EDJAuOkbI+b1JkC4Lrnf5v0kQIirdDGQYiVAIA8FNYr0JUBg86mCxZorQAYqF\u002fmN\u002f0BAn+OnW8QAZkAax8Hn65haQGbP26vFv0lAZrUMaGZqSUDMPVoWw3JJQPBiYH\u002f\u002f4UlA3GbbpTFDSkCYmpBgii1PQD\u002fD1lQkHlFAiUp3AiD7VUDye5ALGlJWQEecwuKuu1xAm1qQlqLIX0AQGPc2XGtmQKjtd2qc02dA3q8lOvo3aECdvrwl6o9pQBB76\u002f\u002fbdGtAyC0ya1JAbUBFPy6OR4VtQNx0CvdVn21Agn4uMFsBbkB2HXzPx9xtQNTOCtvlhm1A38kZzadZbUBjgmCPZNZrQF5pkpi5r2pA\u002fv5CBcn4YkAGl+Kotn5hQGO8ZFQp1GBA4TtYRTNNXEAUkwO4yghYQHDqq8nR70lAMEaEjnmmPkD83CW9DY43QBB88eZy7DJAICw7ns8NJ0AABap6UdcOQMCroCNJifA\u002fQJWbg\u002fSB8T9ArgEFuVrzP+CWh7KgZwdATMdiTLIwM0DNIJlsEshiQJ4stWP71VpAbIbgQYd2SkDgChWMxiBKQDrol\u002f+XKEpAuuSxpIeVSkBuFb8VLPVKQMOof\u002fDnzk9A3snIQwZqUUCAlDrqIzhWQOdkhIoWjlZA2F\u002f8MUjkXEDknaLA+edfQMbZN+fAZmZAqMz39XbKZ0AxoILHjC1oQNAgM0cHgWlAZo6cam5fa0BEAdR+EyRtQEYUX0zbZ21ACmkyI3CBbUCtPMjuxuBtQGrZNQO0u21AeqodM+ZlbUD73uIRzzhtQMSjGdqKt2tArlF5KJ6SakCA2+VR5+ZiQGiyCWzAbmFABMwR5AnFYEBaIuy7WjVcQG5y2GKi9VdAtDCixefdSUCEM3nDtpA+QMw3pCutezdAODRPoLvbMkBQojds8O4mQGBHk8hFRg5AgM+oC3aJ7T8ANxsOGF7vPwDHw9qNdfE\u002fIB0eklI1BkCgBMeE\u002fOgyQHMqloTOrmJAkH+\u002fOCYPW0AIq0eQHR9LQA66Zp\u002fUyEpAvM3mmxXQSkDI8hnxvzpLQLKSaHTkmEtAR\u002fI3dXkxUECmTp06ka9RQDD6L3jlb1ZAfidgneTEVkCbAJ65NgldQBu6cdYyAmBAM3e7JGViZkAfspxX9sFnQLa9nfbgI2hAGCLO9EpzaUBC4FNjvUtrQJ+sVLEvCm1AGGc\u002fs+VMbUAKIsAUDGZtQBX5Ytjywm1AmhV4Y2udbUDMoG37rkdtQPBDX9K6Gm1ATiSJgUSba0AIdEde7HdqQLah5ZBy1mJAPgSx+A5gYUDLhjYJHrdgQIoKZa9qH1xAcYWVWwvkV0Ce6w0l381JQNDlIMk7fj5AhHOfNJhsN0B8XfYvZc4yQGC5S3B11yZAwJ1x\u002fMvZDUAAUVLKIMXqP4A80OXfgOw\u002fgF50XCbu7z+AVcldPz4FQBhVfzNFrDJAQDrmpkOYYkCJTz6\u002fMx5cQPwECgljIU5AyEdU6YbGTUAUpDyldcpNQBcIm935KE5A8f6u83h\u002fTkBcJH9Z1X5RQMwwkt3Y51JAXMC7jUZoV0DBofJo5rhXQGkiug+eq11Agt\u002f1JB9AYECabEo3Ak1mQGYCx9wkmmdA\u002fC18Ot\u002f2Z0DbFMKTRjRpQNkcvmls8mpADOmiZJuVbEC2ZTUhn9NsQPrZ\u002fn\u002fg6mxAgurM3A49bUBsrZBsfxVtQFYASPEDwGxAdrfEKaSTbEA8WpZ++RtrQLqEjLeD\u002f2lAPIaJ5WCLYkCl\u002f\u002frq7xxhQBqEyeZ9d2BAhJCT\u002fB27W0AdDl+C2JNXQB4RD3ekiElACGINGek4PkA8mDdsBjo3QIC66kREpjJAYNpVL46fJkCAjn2IZfYMQADPzGLufOM\u002fgCXGQOPZ5D8Amk5ZTc3nP+AUmHv0WQJAwPGAXWnTMUCSteDX+zliQB58p4ibp1xAYRJ6BuqXT0ByyZ9imDlPQDwNlep7O09ACmhLMBGTT0Dzy+OaYuVPQPoTD+EbHlJANfL204F8U0Bw0ttzTt1XQJu9U4TJK1hAedpfftD2XUDKyLfSbVxgQEjVFS2lQWZAFoE1EhmGZ0CaE6FBY+BnQMrAkRhZFWlATgfK5zjHakBe+eVwv11sQHjgYzmWmWxADrOh7vavbEBzdYVpK\u002f1sQPDztfWl1GxAmynmSEF\u002fbEDxrPzvIlNsQAcPBTb\u002f3mpAVPxora\u002fFaUAhNX\u002fXumZiQPymBVkV\u002fGBAcpar\u002fVBYYED8JUky04lbQE1d+HRwbFdAKhowLihoSUBMluavfx0+QBCj8LSMKTdAWFW64kOcMkAwJsAQ7pwmQMCnNRPUDQ1AgKxADV624j+ATxybI\u002fDjPwCzlDyoteY\u002fAEP7DEm9AUCICJfuXYoxQBoT3AbyEGJA\u002fudeZPTcXUD86iawMWFRQHKFdkPzLFFAZM8uQDcrUUBqF5EfYk5RQBD8AQ2EclFAM7ts15hwU0DYQm62MbdUQO\u002fo06w60lhA7ZmmYgYcWUBrOmQAAJFeQCZ3QTeQlWBAQ83Az50mZkCm5aMj3FhnQIjQT74MrmdA0zLFOmXRaEBq2IMly2lqQPRJSgYz5mtAsgE2oY8dbEDmaecQIjJsQHp3UZUTdWxAiPp4C4hKbECsbeQdQfVrQJ4r1nuhyWtAblSoLopcakAe8XA5mklpQAhGpDh8FmJAnEDn69+zYEB7\u002fSyArhNgQPvsD8KeHFtAQK+2AMsUV0DMBeERDCFJQBQZS3K46D1APL9v8T8QN0CcKHCh65MyQDDR4HqUvSZAICevc08mDkCAcWOMqBLmP4DW4PP0F+c\u002fgAFoCyqX6T8AiE7YCuYBQJA29QAyKzFAxFvk6uvBYUBe+BnIPgBhQKYeWMDJSVZA7iyPOkb6VUAXJF\u002fYNOxVQC+cfIjr6lVAAhbbVxH7VUB5iqzkTFRXQJIBuIyNSVhA1b8ZzJp\u002fW0BpVDu7YrpbQGLGe8yxEGBAGak2SLogYUB4C2XKlLllQMtoeQcBuGZAmb7ppM3+ZkAWP8rF3vBnQJA50QU0Q2lAHO4UWUh5akD4+y+7uKRqQL1CyZZ9tGpATAHPpf7bakCo3hBpsqtqQPyenU0oVmpAQGhOIJQrakDxrQKZS89oQDr305k5zGdAtwbaU4MOYUD60pC654VfQLaMfgZbWl5AbsXZc5GjWUCYP6Qg1t5VQLg0TWhXE0hAmObTFNUhPUBMCkeo2bw2QEjcuQ26jDJAuKyGwFOnJ0AAEWJFpQkTQIBDhYsdX\u002f8\u002fwAzwlob0\u002fz+AUIgHAKEAQMCOsKTG2wtAJAUMBjW5MUDI3JQsxhdhQIYx01NNQ2RACb0qBfHgXEAa8PJPb09cQF8AdWF3JlxAokC0YCjbW0A7ab5nC8VbQEX3GuzIAFxAYH4Q1Ep0XED7cExmrlJeQLchqYLKd15ABIZY66+zYECrpygg1XJhQEwmD2CY2mRAsQPSiHieZUCaKPgbXtVlQNfFWs47kmZAfgtGIZmcZ0C4pJVTbo9oQIWzXh7\u002fr2hA3jnoTWy7aEBm3GJuLcpoQOhTWtIalGhA6j7k5i09aECex2lW8xJoQN5HkxAxwWZA+pZ0E6HJZUD2IA1E7O1eQK4+0MPoiFxAtNS7+tp0W0DnTJKNKCJXQIRT8Lbes1NAcuUiuya\u002fRUC0XgMphMY6QNw1uPDvPjVAdFEVzNKpMUBY5WsutwYoQGDY0MNogxlAAGxjBtJ0E0CA2LlgUd0TQKC\u002fDk8tgBRAcKdpImy8G0DIIymaPZM1QHAELgXI1WBA818RgQ3YZkDb2u7KlKlgQG\u002f6udrCPmBAc5n4MAkdYECvI\u002fs9kKhfQIEn5QFhb19AHrVPXCu2XkABcBXkNsFeQMd10btgmV9ALH5LdZGuX0CQr9bAecpgQHKxpFWNU2FASNZJeLoCZEB3HoKPtKdkQKqz6WmN1mRA8e9Yv7t5ZUB3l\u002fVbImVmQK2pHNWxQGdAtK2dpzVeZ0Duvzi8e2hnQL64NuNGcWdAZsf\u002fWKE5Z0DsoWFlt+FmQG9tuSkwt2ZA4WjucK5kZUBoNxYB8m1kQJTmBSsDelxAfb5CKRktWkCU+fqVGiVZQPgRMIh+ClVAuMn8cQDSUUB8vg6gzmtDQKDMU4UXBDhAnJ+CKko\u002fM0B4Sg44TjcwQHADkNIdLCdAkPcz+Ke4HUBg20h4HMkdQGDte9rZix5AUFA9n7CbH0AI77Skh6MkQGgnK5a3PDpA6L1jUoggYUCuyczpvcpoQEC6TVENJGJARMzjKFybYUB2J8paSG5hQKWHZlj\u002fB2FA8HzewercYEAMpr8M6x5gQD+O2oIj+V9ASAJfyU0IYEBevjmxNw1gQHJ86Aq8pGBAFsSYmjYKYUAhNbuojEtjQGDD0J0f4WNAbh7YKDcMZEAOOlZtY6RkQCIEedmfhWVA9y+olNFeZkCW60er3nxmQN+8Fixyh2ZAZ3Dcb+ySZkCmmAAQ5ltmQDIePdinA2ZALLncQMXYZUA6fuMEQoJkQOjTKbC1iGNABkc1kE62WkBPQLTdt3RYQNTGRRrvcldASm4EgWJ4U0A4eKqR92FQQKKWTRebkEFAtFeq12rDNUBgcXQ8kJoxQNB3dJYbCy5AMOqwWEh7JkCQjv5SqLggQIBqZuKUiiNAKPwHaKoWJEAIzkT1d9IkQFCnJeZH2CpARFjLdZrBPkDiJXvgK51hQGAM8oOLgmtAF5f7cNDsY0BPZ+8nozRjQJc3ohnU9WJAREFkzh1iYkBsiF4EFiFiQGBcyZpx1GBAWs3wDu95YEDjBsDzJwNgQFXEWDqdAGBA4GD6GSkkYEDhoZ+BQV9gQIIIC9t2L2JApOZOUQm6YkDVMnh58OJiQM35lP6sdmNAhxng+aVaZEBBUXLujENlQKyZpF\u002fZZWVAgk0ODUpyZUAyVIPGXoplQHkizBqRVmVALA2MxZ\u002f+ZEBNv69kNtNkQKAI174YdGNAcvdQjGNzYkDpHbmCPWxYQOfWFslxNFZA+zI+Y9g4VUC8ZxrHlmJRQCjnTCq\u002f7UxAECmku0ZBPkCs\u002fLLw6gQzQOjeHDyMii9AOFmj4kq8K0AQPSOju8YmQMDS\u002fiYMBCVAiKWOg7xZLEDg0ab2giwtQLDOg4N0Pi5AhPG7aAIiM0DiGEz1UIBDQBaHSqEus2JAMOokHSGaa0BnMyna0fpjQAfLXrHpQGNA\u002fan4unYBY0B+wX7YH2xiQLZeC2RQKmJAcwuJiLLYYEDT4t\u002frRXxgQJQOnh0nAWBAypytXbz8X0BFwtg5Oh5gQJYVHqEIWGBAEnws9jMlYkC80KPUmq9iQAldl\u002fV92GJAxvB3GUlsY0Cs4054qlBkQCw39WxxOmVAv0nkdPJcZUA7roe\u002feWllQBGuFdgigmVA7HDid3tOZUDw1FprkPZkQHYwL5siy2RARsutabBrY0CON9gysmpiQKCGKABPWVhAFLXzlskhVkCkJoxOYCZVQGwIakJKUVFAjsh83wPOTEDUrrOtpRo+QAjt+6iW8TJA6GIGWoh0L0AYb1BlvLIrQED4sg0p1SZAsPBLPaM3JUCoESLbx7csQEC8iWUsjS1AuDZWck+iLkCIW\u002fIyeF0zQCb+i9BoqkNA4BpVp+e+YkC8oiPbR+lsQFk0p2X4tmRAmhmlwpXjY0AaZj3hvppjQMJ0NhGh7WJAAixkjnegYkDxCe61GwdhQA7q64ljj2BA6p0KLDquX0C7uQEt46FfQOUhKbhCfF9Ayl0B7E7NX0CDrmuaHI5hQDu8uCVzF2JAEktqPYBAYkC8IiZVd9ZiQAhAbN6mwmNAJki9S\u002fK6ZEDqU5MnuuBkQIpYQsin7mRA3LoHkGUQZUD+POzQFN9kQJ8rY7qWh2RAiz7QTOtbZEDz0Drko\u002fdiQHGqeVlz8mFAnzrvWgZSV0ARAJH+gB5VQLRDw5rVJVRAqkupb9ZhUED8QpQeARlLQBCX5G8dHDxA7FvwbhUOMkAwogaZ6qEuQFCgl300lytAIPpti3UaKEAAmpzawaAoQNgA+gNuSjFAoGSDL4jIMUBswhizyGoyQBjpoDS3BDdAVKY2Pwk3RkAjK1dJV3djQDYlLk0EAnBAjGsUtzMcZkCQigYc7gRlQL8oM59fo2RAnnw+t124Y0DPlLrM\u002f01jQJlPiwAvAWFA5V2Zf6FHYEB66k2yjgNeQDCXrsQe6F1ARHFTBQHrXEBHlXgyMvlcQIu9+Qt2419AVseUh9SBYECKqGyA4a1gQK58GDf7UWFASbt38k1dYkAVBZYCyINjQAZd0k8fs2NA\u002f2oKhhDFY0C4y2pg6P9jQJmzGMPM1GNAi42Enn9+Y0Amo939RVJjQJkCT6i34mFAM9ot4yLUYEBTiTyyzvVUQG\u002foZHtF0lJAkCh3mzvjUUBE89OIKatMQNZcVg3bfEdAkI2Cp8jjOEBcOhd2Ht4xQMQl2N3YbTBAmDecIY\u002fCL0AYbTIAcwEwQHTm2AuXKjNAwLwaqTN4O0DgNBkaDCs8QDBkd9+xDT1AtP2io7OUQUCbHKQanEZOQJKw7wJoxWVARHUYQZUvcEC\u002fQNNY\u002fTtmQBxa4CsjHGVAsAnuunu3ZEC6DV0SyMRjQGz4Io3QVmNAKUPdXlb0YEBfKi7UDzNgQAY+5C1Oul1A2VDy+TWdXUDwKAz1c4lcQA5\u002f55lGkVxANjW2\u002fJN2X0ALeYso5kxgQL1W+Ld+eWBAu3s3xeIfYUAY74G+oS9iQHyLQpgBXGNAh8SXln+MY0DfWHi86p5jQIYK3yeg3GNADujItyyyY0DYoNr7+VtjQEdO+mKvL2NAdMXCjf++YUAMOifUlq9gQOpzhVSqrlRAQ5O2d0aOUkDP4fWY86BRQMa\u002fdeswOExAYrVwrH0cR0CM4CNf37E4QLTXnR8FFDJApPg60KbPMEAIff1ouWMwQBQyhglVwjBA9F98JZZLNEDkguD7wwY9QMi5qdVgwD1ANC3tH0mrPkC0gvfCNnxCQPLRMnlFb09AUHXec1cZZkDuK5R0yURwQLB5RA0KSmZACnQjtCAmZUAqM8GYAsBkQMa8ZFetyWNAcqgqbwNaY0DZu3rDW+1gQIBTx2B4KGBApsDPrS2WXUAVZrQSUXhdQNqeKfEmWlxA1mlOvRhfXEC1JgPFhEJfQNylOPSdM2BAZsIkgnpgYEDEZuYJ+QdhQOqrnUfRGWJAbXv5iPJIY0DD5SzH+HljQKbEKiOcjGNA6BPZyqDLY0A6D8ydeKFjQBaajrdQS2NA7v1YH\u002f4eY0BIRDU\u002fza1hQFb07wwKnmBASLdmrh+NVEC2PHbWV25SQKFf6mjigVFAvnyPJcwCTEDGFrBCN\u002fBGQAhUxThgnjhAaGAwY0YyMkBomujs4QIxQFzWtcGHpjBAELvUcOQiMUCc3IPT3Nk0QOzod8UNyT1AxKBsM+CFPkDU1ZEps3Q\u002fQA6MY9ai7EJAo8rjp4f+T0BqK6L4u0FmQM5YKPKAbnFAb5bV26jTZkDA0pdPN3FlQOJI7Amw9GRALoJ8OxDHY0CEMPs+uD1jQLnUfCpdOWBAvRpuH4h\u002fXkBeLK3cSvBaQImXFiHNx1pABoic4IAeWUDmEjnFOgBZQK1db1Jj41tAmjjPlRYiXUAnMGe6hIRdQB0KAOEc9l5Ar7X4NpyrYEAXSNuKv\u002f9hQAvK5rpxN2JAlgwa38ZMYkB87Ce1y5piQMGhA9Flc2JADkYaSj4dYkALQcHCdvBhQBvwiVq+emBAoE1ihezSXkBoVTyZWHxSQAagPlimglBAWOxqyfFRT0BUQsc8LgJJQByEH1RUnERAqJqJrfC2OEBc7Y3k\u002foo1QFQx5KnUszVAJHlIjQlVNkBU6VhjkbE4QPyH\u002fYQEQT9ASHRs+aywRUBGyN39GyhGQNpZIdwHvkZAPs3BAyqmSkD1Vh1VZshUQBYLYG3442hAPNfv7K7FcUC9yPxBoOBmQNaLRaQ4aWVAs9pV+DrlZEBk14SFT6VjQHnNYhOHE2NAn1zNi1m8X0BVhwng8KddQOR2EFjH11lAbkDxISSsWUBBnO+pdNtXQO4An9hctFdA1NSIIDmfWkBdr58pweZbQCXcz3b+S1xA0LR8+T3IXUBb6Ai7Tx1gQOaFXAJhemFAwks8xW+zYUCyN3wrSclhQPn3\u002fj+MGWJA\u002fENHwC3yYUB+FPh4u5thQHZaxjrVbmFApTTH18ryX0DRmnjhZdNdQGWGlYkdvFFAx32RXIGqT0DsqnQabQlOQF7MIzc\u002fC0hAPD8xnCDwQ0BACMAG90U5QMx7iKI8UzdArBMD2GX6N0AogiA+ofc4QABTY2VEADxA\u002flpQvvnHQUCsSg4eqGRIQK7quLuW5EhASose49qESUB2Bb5dQKpNQHiUxfw3mFZAvArfZSDaaUDU9cf2cudyQCoikWNYSmZA5synENl4ZEChWP\u002fx\u002fdRjQOJhs4JuR2JAgqQZDxOSYUCyJp+cOSNbQM5ycsBgiFhAP0vyNaO4U0DEhViw9IBTQEjh1XamHlFArOnoS7LZUEDM2+ymo+VTQJq3st9pSFVA1B92IMO1VUDgcNBIT05XQAbyYT3F5FlAWMLbJq+tXEAubbOMcx1dQMRDGfKHR11Aa9zXgNHSXUDE2BXsvnldQJG77smRyVxADqEwEdFwXEB1\u002fr1JKK5ZQASQN8l2wldAxHXBTEWyS0CYY\u002fw9vPBIQOjcoABHzUdA8p8A+NDkQ0C+fVdNJpVBQGxd\u002fzI6Rz9AtKTIzJTTQUBaP2P\u002fGGFDQIhum2hKwERAVkGCo7nfR0BSqOxp7PZNQOpd+5O4f1NAeNR+eevRU0AAKne+KThUQC8TDvLOy1ZAIOi3r5zCX0AQpdqZC15uQJjrNVKs+XJAusl\u002f\u002fN8pZkDvOtxOKlBkQGT2kstqqWNACJJlmdYUYkCL08NzR1xhQAdPxV50k1pAb+NUZc7sV0Dl8zUZ9wZTQLa7NnRBzlJAgtUyWaJfUEA3fI0eIxhQQKDHcEHhJFNAQ2w0y7uIVECYANiEWPZUQLM1BgGCj1ZAhK8CjVYlWUAvtullwOlbQLQiu0cNWFxAyBKuJnSBXECUmJs7iAddQAhFnZnzrFxAcMeDvN38W0BqQXuFmKRbQH6T8i9m6lhA\u002ff+vF8EHV0A2qnDdxd9KQIhFakDKQUhA3P4TTa8uR0AYKPHu2IlDQALR50hKckFAyuzhvaYeQECsgJFoy6VCQPxzaZH7U0RAOnkO6SbKRUDs\u002fVo4xRJJQJ9UQ\u002fEXY09AHJoYVTFSVEBw+s+tAKZUQGIGU4gwDlVAMAcD9u2sV0D+uRlp3V1gQOaHbiTRzm5AUswLJ3kSc0DpwWT0WPBlQCzDNPPxCWRA6pRvx7peY0AadJGnUL9hQFleErnQAWFAbPZ6WsWmWUA+JKGR9u1WQClrcOwk5lFAQsnAvdqrUUAoSeYVelROQGKeNuF6vU1AThSNcG3rUUC+M7ekXFBTQMC84o4wvlNA5A9MpIhXVUADPdFA7+pXQPDcSAJeplpAVg1F4v4RW0DsITX3LjpbQCMtS7FWt1tAzIUIf3daW0AyyUeH7qpaQKEKqwupU1pAvNABfAqpV0BI6YiYbtZVQEzUDW4flElAcAP14OMxR0D0TDR6KzpGQBBhmJr4BUNAIsAlxytLQUDyFanvP\u002flAQLRWssB6DERA3GN4NLfuRUDYpvrWUolHQK7FN03iEktA3JSXxS3eUEB+P4fyZ6pVQJl41AapAFZAbMRabsprVkBK1gq7NBtZQP9gJf5bJmFA4fTVPLV\u002fb0BX4s+GHkBzQK5demPXo2RAolXzMN2LYkCgacZmN89hQHvG2TOOBWBASQUZgp5pXkA16anb7zNVQMXraEGjNFJApFuJIcVRSUBwGSPs4dBIQEh23tfMN0NAMiosPhp\u002fQkDqIYxDCHlIQCaI1GYPPktAahxfeRkXTECCLf\u002fGJDpPQA78o5wwF1JAdCJxECSbVEBK9ieqxPhUQCBtgizbGlVAjHhPXcNxVUCW0ei7sxFVQMa7iBAHb1RANtdQ8SQhVEDYarVZ+eFRQILIQktLcVBAFrzD4T\u002fEREDg+28SDpdDQEhIr8ZpK0NAdJUqDL4tQkCmxKLlVjpCQIrrgB4SpUZA2mjZ6NInTECruwlFLupOQHVK5u11j1BArpcYTmfaUkB83v2kPd9WQHUKQUnISlxAQS2d7G6pXECPO8PUkx5dQKX2khcqAmBAvpuuJWjGZEAj+LmLbC5xQFDcBzknPnNAeQH8dyl0ZECuD8\u002feGVdiQPF8l32qmGFAnDZ1uViVX0BnRUR56O9dQKdLFuT\u002fo1RAlwktg3qdUUDGxpBDcAhIQDRDH4pKhkdAYuhQSdHdQUCQxb1JkyFBQAz0lQegFkdA4k6z6FjaSUC+QkP22bJKQGCldrc4001ATFd41SlgUUCyc\u002fR0bN1TQD73iSmMOVRAmtZnwQJbVEB5rkGKA69UQK8NTMMdUFRAVKMcbsmwU0AUVd4Nz2RTQAIDH\u002fvoN1FA2qLGkNesT0B2OUhKYmhEQC64ikcQZUNAHrJ8ZTkMQ0B23okgf1lCQCaAcTwNoUJAgrJ4EpSiR0CKEzoJdW5NQExow80MJVBAsE85huxHUUA3mn9cOKFTQNDuCOm3t1dAWeO9GD8xXUBCWwMoi5BdQIMHdstwBl5A2Sydbut3YEC1e4VijzxlQBoOAtFMV3FAVMYcJEw3c0CJ+ftKhCRkQKFDrljL\u002f2FA3nR9L6o+YUByvX5XSNReQJFbrqLkKF1AtsveVHm7U0BirjcXE6pQQGhX5swN+UVAEELNpQV1RUCkwyxBa2s\u002fQNQzrXGu6D1AYlKskwjjREAK74kF+aRHQHaHSOO3fEhA7gXxijeZS0BiA2AC7T1QQAduZgCMsVJAsmLfBpsLU0CWRjIpPCxTQEoRwpNTfVNAFOQVg30hU0BeCSRDwohSQPqBlIFWQFJARO7ZKOwzUEAMtc48WdlNQBg1QgA2A0RA9kgFPzJFQ0Ck79hfYgtDQMwLym7B00JAHBOc\u002f3p7Q0BMNkyDqW9JQFK3AOW8rk9AduOKmc5YUUBZ27gxwYhSQGzkxKzT91RAGorlmFMoWUAm9e4uAbVeQHWg21kcFV9Arylh9u6LX0CqIiXYsTxhQDxFwKgC\u002f2VAFu3IAFaXcUD64zEIrzVzQLP4QSDRFmRAgJdNhuDwYUDywsm8US9hQBJHCvSDs15AvXKREi4HXUBmA9Rfb5RTQOt3nhJPgVBACOsRgBqhRUD8fMJrxhxFQKBcOSPPsz5AMOoSkocvPUDgzUNGrYVEQJpyLidjR0dASMpYJAcfSECGma6P9zpLQI689IcEDlBA90qGnDWAUkDWxKwJ+tlSQE5+\u002fRB++lJAmNgqZVpLU0DpkR5WMvBSQFyD5d28WFJAyvS5yvoQUkDZEWFkawpQQCyDCRycj01AIHUzveL4Q0CS9H2HukZDQFy0Npw2EkNAGDgYkYbvQkDqKa0ehqdDQJwtMy9WxElAKFFdDDALUEAxcjZ\u002f0I9RQLl17ePewVJAS9xkIGo0VUCJ+PSu8mhZQPjNNBtj+F5AyBlMGZlYX0DXnFipic9fQGsid0i3XmFAcI2B\u002fz4gZkB2B0hb3aFxQILDh\u002fV4GHNAuRvcgjxyY0AUQGgo7T9hQO+YRfgDemBAJ7kbdswzXUCJRfk62H1bQCA44cAI1VFALOLr2vFgTUDKVXP9g79BQC5foq9LOEFAuHxLAHmoNkCAa9eUJRg1QKJUe3hIfEBA3msmqWU+Q0BA4Wc7xhVEQMr6bfr6LkdApjs4bkUFTEDmUSL+tWpQQFyXC73YwlBAZCIwfNviUEDU0ElfjzhRQAAZiZjI6VBAYIgkxl5lUEA9dq9j9iZQQDDTHDgi3ExA\u002fugD3+3MSkBASRmOIj5EQCaJY+KeGURApm96FhYkRECm6Xt7m\u002fhEQKiiHuqWbkZAsq1mCyJbTkCY7GBqtr5SQEAZ\u002fX9RZVRAtrnl7GmtVUAyR\u002fs2LkNYQIOiJ3qonVxA88Rfh6UgYUBqBOaN9VBhQFaFS8ecjGFAjgj3PvsCY0CQkIe+W7FnQD83BB3NFnJAwo6nLlwVc0D4AS80MGVjQDjnoGMUMmFAQ2RvNuNrYEDdghrTLRZdQPkMh46aX1tAnr8mYlCzUUDcMGX6SBtNQGjoIrHmdUFA3LSzlILuQEAskPgFXBE2QDRu9fu0gDRADu9r8QAyQEC4\u002fW46f\u002fRCQGYVGkD2y0NAHiEyv2DlRkAiRNh1pLtLQLtQP0zJRVBANl3wmPidUECo1Pz+Bb5QQBBdXVvSFFFAw23mRGrHUEBmxls120RQQKK7ZSFRB1BAhm0ZcYCqTEB+eDGwRqVKQD6wGnJ1VURAhBx+JSY8RECoG0ZokktEQFj2zJRlM0VAUERO0we4RkDlcYs4aMdOQJjbp7dN\u002fFJAqhS+jj6lVEBIW8QG0O5VQHLBEv3ThlhAe9Qjj2zjXEDrID5hxkNhQMNBW0wRdGFAwUv4x7CvYUDa5l5svCVjQLTsqUS+0WdACjkwMWUfckCQqWLcWetyQMTXh3Gh2GJAFzJlotmeYEBnFRXOnaxfQAWW11ah31tADLdGld8jWkDtkOX81VpQQISZb4B3WEpAzPTP+aMqPUAcnoidkhk8QNSiNCG6PTBAwBIEZrxkLUDc6nqyzNs6QKIDM4XvOUBA\u002fD9CTwcUQUCI0jg7NDZEQOpyUG1MGElAv4MVc\u002f34TUAZ1D5+MK9OQIrw8bZb8k5AAjIs6hrKT0Cy5dS5vVZPQK17s3pWgk5AzMt5RzEdTkA4IfOhUF1LQGDge1afy0lAwmtNmoY3RkBM4coDZ5dGQGQPDlko3EZA\u002fDc0DeSRSEAM4dKNrrBKQNLvWwjPEVJAubN6SAjyVUC0JpJrKbBXQNaFBKaJBllAzJmrv6iwW0APdL9G9QxgQBU9\u002f2s222JA1uZcE90KY0CYGn9+okVjQF1H7FbqtGRAbC7e3iY9aUC+oHairnZyQEY8r1dsyHJAWtO0zjWDYkDwBdKLhEdgQDprpxyb\u002fF5AReZRNWAsW0D3VsCmKG9ZQCYmJW0NPU9AilSSNPnbSEBcaUfKFCw6QBz4y4lYGzlAmOkqjlCjKkCQwapSpqonQMAeS+kOYDhAED04ZPcSPkAYULEaA88\u002fQLT0FuHsF0NAeAWUgHwRSEDeT15DSxVNQCpHGUQj1U1AGXlIS+0cTkDHivfroCVPQGUqIR+b1k5Aj9FfhasqTkCe9dNl2dZNQLJENewMkEtAtOmSJqdOSkBOkEB+XIBIQPzBmFIYK0lA4jNGVHeQSUBCq8IyE8JLQKYkYYwfO05AftQyEp84VEBuSEv1rDpYQFxI+pQtAVpA7PcZHtdbW0A7RW\u002fy6gleQAIYFS6FN2FAwFBNbNr7Y0B5uy+OmypkQCrD0W48ZGRAkBqFrn7LZUD42qm0nzFqQPxUsE2lp3JAYqY060akckAdCCJkJz5iQPWcADq6AmBAP\u002f1O0DdzXkCi\u002fPa9fqNaQKYaO2+K5lhAsESeY6cwTkBgIij8o9JHQDwhBhj8MDhA6BKeDyUiN0Cw8z7F4QQnQPChdQV+PCRAZIPa3q8wN0CQ3cg7Fgk9QLTrXKRK0D5A5BNTHTGtQkCqW9D0C8pHQGRgsVOUAk1Anp1FYRPQTUC5g3mCPB5OQAainzyaZE9A\u002f6jIu4w+T0DNyN5ger1OQByAHsFke05AkML5RGOqTECIaIQYcbNLQMDIRNiocEtAmGJTapJZTEAcndhOwdlMQCJCaqhtb09A4qYMCJoXUUBOGuXlQHlWQIi8D6d0jlpAGSINKNlXXECe744c8bJdQFH6zQYHL2BAmD76tq9aYkAfgMR\u002fLhBlQI\u002fkCg7BPWVAcK9r6uR1ZUC08vaVH9NmQCBv40hUEmtAmIGLrorNckBUO3gxyQhyQK2YasRHtWFAitS+0K0bX0Bo\u002fmAOpZddQEJiA4bg6llA7N16WTI+WEAyMsgE\u002fadNQFzfRoAOl0dA8HvCd8Y1OUAY5nwPkD44QGAuj\u002fXKkSxAGLgO0lBfK0AkIquicbk+QJo879bY00JAosdYlDrhQ0C8bYzWpMJHQNyEasla8E1A1KDcWM5bUkBYp\u002fQB3\u002fJSQDVBy8ncL1NAkhWaPJWRVEAgb20le+pUQEkIYkJFD1VAyOAKj3IVVUAkIzUnzRVVQH3tfTSEHFVAOVuZ01Y3V0B7PWu\u002fl\u002fZXQIFsiyZ9VVhA9dGMAgUKWkCtPL3c8KhbQAfhiFOOo2BA0jDNRC2WYkA0o4Xo7WhjQI+hLH55BmRAdAJ+E2M3ZUAYc7BJVBtnQKZcC0ybZmlAhkSKE6WMaUCy1KzAartpQGMGm99O3GpAMWi0hApLbkA25LX3WB5zQESzCH5DBnJAXMcQDv60YUAbhoV7NhxfQHWUEMySmF1AZqgTDsfsWUCmSWqbjEBYQChOVxczsk1A3LHeRlijR0CghxX1O1g5QJBi3wqeYThA2AgyaansLEDQ+\u002f8rrcMrQFDBK3CIAj9A\u002foZqCH\u002f7QkAEoaoE0AlEQAIaq8y67kdA3ld+n40iTkD\u002fi\u002ffjTXlSQLJWxCNoEVNAMExM\u002ftxOU0AwtAO8c7RUQLs3vnlgD1VARVWF3vM1VUDQ5859yjxVQEKs8tK\u002fQFVAzdB3iUJJVUDOvnS9QWpXQAN\u002f0xgOKlhAUhahMiWJWEBIKY27Iz5aQFRqtz0P3VtAsA9b7LC8YED2xqpXJq5iQDLZ0yNSgGNAhA7n0WYdZECMKn+KWU1lQHWZnAObL2dARgeDoJ14aUDkAffif55pQF7g1qkUzWlARBThccPsakD+3F0QiFduQAwaG+TiHnNAW83gDVdjcUDfassTxDRiQLM5aEufQ2BATduSdvApX0DrqEiQr9xbQCBuZLOCXFpAWALD0MEBUkBZtcW15L5OQHJyv1EipEVArFbwnzxFRUAmgySnaDdCQG4qo5+Ox0JApJSDFspZT0C7gcuUyPJRQAqjB84Bo1JAYBK\u002fdfIuVUCGJIg0+1JZQGEUm2zyMl5AduP8PKwhX0A6tQCCnoVfQKHJRWI\u002fEGFAKQswIbaJYUDMpHtSR9xhQNRVPPcg9mFAb8KmUkVnYkCQpOx3x5piQEhiqjVNB2RAuTIi2I1hZECqPTvbu4xkQHIsyd2KSmVAjXTKlA32ZUBwu0\u002fHIyRoQI3ziSetkmlAjohIHBAqakBa\u002f9+1DppqQAViICY9cGtAnHryTwW+bEBguzf3TUpuQInkaX6rY25AMhw4pM+CbkCaD2e\u002f\u002fkFvQBDxAb25vXBABJx3r+0Zc0AY1hVRsbxwQHJkpWLyfGRAVR737YP7YkCee\u002f8M4XRiQARBrDVQMWFAUiytT42fYEA7kHpZwBxbQKf+WTjUUFlAhhXaL9u4VkAQGs4b\u002faZWQJrgd6roEldA80iXw8szWEAqK6cmTCJhQCnbydL5wGJARlNl2Os9Y0CI6OqUXwxlQITVpZawBmhAPM\u002fWhxuza0A8BRn+nnBsQD4BlB9TwWxAiGFvsoz4bkDE+uJrx9hvQIBh90XQO3BA+FfkVPJUcEDs0TOD\u002fLpwQNj2YggD3HBAS7p6X8MlcUC8wiLdEC9xQKhEhJRhM3FAhvzWDQFGcUCq1aw4z1ZxQNWj7DmhjnFAhCOvVP6zcUDmyuLzgMNxQEZMkfz9znFA3ZKGwfjkcUA4tggbKQdyQOf4hSNsL3JAGulQl\u002foxckDzG2LtHDVyQHruU646SHJAu5gV6hR\u002fckBU1GKugbtyQAoqUYORsnBADiytYYO6ZEAxPSecLkNjQH6SS7krwGJAWF6azpeFYUAxXh6QCvhgQA\u002fYcel8AVxAPNlN8BZJWkAK5NWVj95XQGEPU3pbz1dAlwuwWblnWEAn6RXRlJtZQC2nyGIX\u002f2FAOqmWmeinY0DqrLYt2idkQAb3t35XAWZATqlFUjMOaUA4BTz9VNNsQDLX7aw1lm1ArB8Tzz7pbUAMWgaa2BhwQGjXX9l\u002fjHBALonFrlfecECmPRktL\u002fhwQELkp64IYHFAzHsZhXaAcUDyCb2iGbtxQBrvqzV8wHFAVpmXhPXCcUAgVGyiuM1xQKrlRtG013FAtSEDX6r6cUD58y83HRNyQFqQHBNtHXJAAaa\u002f+BwlckAy59US6zNyQEDxH1MlS3JANAXPrK5mckBGSlftbmhyQPjPWXOUanJAjH+8yal3ckB8I0rcxJxyQJntjGV0sXJATlEW8xdfcEBQchsNE41nQIAHxlCYhGZA988OuWYpZkAd0ZP7mVFlQBR8RPtT8mRAtSkz90YXY0ACesPc5KViQGeC2B0VZ2JAXDlteMptYkC01PXicKVjQLCT56SZoWRA+\u002fbThFBpa0C8kuDUMnNtQHDofRuiD25AJh3VNaIocEA4tY+vZAVyQFhgm8jLWHRANNHnfUnSdECqJhuHMQZ1QIrdBcAjdXZAuEI9Z4kFd0BaoqyYPml3QI+lS460h3dAimhY8snyd0D0NdnjxgR4QLr3yiJdgHdA1s32yqxYd0C2yjoFNEZ3QKy784\u002fu+HZATQActgO4dkDiGvKGR\u002fx1QA\u002fUz1nGjnVAdMirz+VjdUCzqkvJ70R1QIQ2n8tXC3VABBe94EK1dECYWX4zv1N0QL49IXylTXRAbCFoRS1GdEDGExFgwRh0QIiAonUWlHNAhkzFNFQ6ckA=","shape":"46, 43"},"type":"contour"},{"hovertemplate":"(%{x}, %{y})\u003cextra\u003eSampled\u003c\u002fextra\u003e","marker":{"color":"black","symbol":"x"},"mode":"markers","name":"Sampled","showlegend":false,"x":[0.0,2.6839572191238403,-1.3043122459203005,-3.7681088782846928,0.21984588354825974,2.4446242302656174,-3.564979713410139,-1.0287749860435724,-3.6161988792175643,5.0,5.0,5.0,-0.17886623546469638,-5.0,-5.0,-5.0,-5.0,-3.724633211657928,-1.4686378049356965,1.8658892929591087,3.429641694538395,-3.1119459191737473,1.6157428482498424,2.0218283985956753,-0.5153288674787962,0.15994097462458695,-1.5135569277809473,3.541320264726837,0.7317112782952795,-0.6452598727674947,-2.3001403114985437,3.396867587463463,1.4998517702167085,2.9734206701064454,3.4115696473989088,3.1680031014627366,2.845814350135721,-2.796980260197525,-2.4464332918507883,-3.240325079590559],"y":[0.0,-1.7119032144546509,0.9845235757529736,-4.171121204271913,3.442507181316614,-2.551762666553259,4.5196866150945425,-0.010952670127153397,-1.8063080454007023,-1.8272727452055795,-4.0077941098131165,2.3821464678185595,-5.0,-5.0,-3.4135687930880723,2.3976575462608958,-1.5698230896848084,-3.0544155255459042,4.473972769253379,1.7235259778464334,-1.8501443402847846,-3.2074955786277655,5.0,-0.8606960006597283,5.0,2.291858375898036,2.897931432255659,-0.32923908176509187,2.237350386669802,2.602360207671558,3.0099776273225296,-2.400577191734534,2.586904134541955,0.6046002790248344,-1.2728296877303797,1.1059678313223065,0.1576195009640494,1.814689990461842,3.4358558071793244,0.6277581071106497],"type":"scatter"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"xaxis":{"range":[-5.0,5.0],"title":{"text":"x1"}},"yaxis":{"range":[-5.0,5.0],"title":{"text":"x2"}}},                        {"responsive": true}                    )                };            </script>        </div>
+    <div style="height:100%; width:100%;">                            <div id="bdabb935-659d-491d-9e83-3e0ecd98a754" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("bdabb935-659d-491d-9e83-3e0ecd98a754")) {                    Plotly.newPlot(                        "bdabb935-659d-491d-9e83-3e0ecd98a754",                        [{"colorbar":{"ticksuffix":""},"colorscale":[[0.0,"rgb(161, 105, 40)"],[0.16666666666666666,"rgb(189, 146, 90)"],[0.3333333333333333,"rgb(214, 189, 141)"],[0.5,"rgb(237, 234, 194)"],[0.6666666666666666,"rgb(181, 200, 184)"],[0.8333333333333334,"rgb(121, 167, 172)"],[1.0,"rgb(40, 135, 161)"]],"hoverinfo":"skip","showscale":true,"x":{"dtype":"f8","bdata":"AAAAAAAAFMAAAMAXk7QSwMdxHMdxHA\u002fAah1TMpF1DcDk9+vVvcMKwOeOBkajVQfA++XQjETfBsCO4ziO4zgGwAAAgAEhWATAvV2asWpOBMA\u002fwIQQLt0BwNaByGDncgDAF9y2jW+T\u002f78UAFYFmK\u002f6v6qqqqqqqvq\u002fAAAAwbCb+r8AAADd9qbxv8YctRO4N+W\u002fcBzHcRzH4b8AAAAAAAAAAHJLAyMnR8Y\u002fcBzHcRzH4T8vayOwtqXpP3q0PfxsGPk\u002frKqqqqqq+j9bCULJhvr+PwAAAEC\u002ffwJAEmonzZl6BECQ4ziO4zgGQObSbNFAVwZAnfwSRXRwB0AAAID3YToJQFRVoPZw8glAO9jyfr75C0DIM2Tv\u002fqUMQMZkcJsT0A1AyHEcx3EcD0AAAIA57+YPQKMUL7ifgBFAAAAAAAAAFEA="},"y":{"dtype":"f8","bdata":"AAAAAAAAFMAAAIBBcuUTwHIzGfjDARPAx3Ecx3EcD8AAAECf2nULwALPUmmdCAnA9uG6vdrmBsCO4ziO4zgGwLpr3AZD8wTAg+Ap8xUJBMDQSTHifscDwNVn6jAXMQPAwucPnDOiAMAAAABDs3j9vzHsMRH5Lvy\u002fqqqqqqqq+r\u002f2E0micpH1v7VVWG42AOS\u002fcBzHcRzH4b+yb9SCopnbvwAAAAAAAAAAAAAATBF33D8LnsYmemrdP3Acx3Ecx+E\u002fekglduAh6z\u002fIt0leKNvvPwAAAMAVc\u002fY\u002frKqqqqqq+j8IBn+1Vdn7PyAPyRoPOwBA\u002fVm3IPvZAEAx5k1rF3cBQCSLmNqOugRALJL9sqO8BUArktip2BgGQJDjOI7jOAZAFFHkGyGGBkCiiydv3pkGQEUEM7ilvApAe98xRmbkCkAAAADGC3YMQMhxHMdxHA9AVx1P9qy0EEAAAODUMhASQAAAAAAAABRA"},"z":{"dtype":"f8","bdata":"rrNB1qy9Y0Aw\u002faXqofFjQD3lh\u002fYDbmhAppiG7QSMakDNxUSKjLJuQJmq0n+XbXJA3ZefND3dckDdkfjXC3tzQCl4rTEcQ3VAxNk2D0BMdUDA+7dhcYh3QLR3voPdvXhAOnHBO9RGeUB5fZLoDg97QFwwHYSuEHtANA7EhJsVe0BdoHoKB2R9QOFO0ZADUX5AWdXLcLJvfkBlxGan0Ix+QK09RxPtdX5AIyVv8ncqfkBTUbfIsPR9QDYt+y1Xi31A0CErW+WJfUCdKs6lxJd9QOF2sRBw2X1AMzifqIAifkCNknEEpnV+QPa6tn7pe35AAyYX5F25fkCK9UMdnCl\u002fQFqTqdJjWn9ACdR5Tnzsf0BiT46Nbg+AQPYsaaWCO4BACDMDboNsgECyqOBryYmAQFc1L8n68YBAIij7nKhQgUBhretcRp1jQJPSCeFKy2NAMxE9WS42aEDvDuRoFU9qQDNsSgcwbW5Aq\u002f2+vctFckBSi2ZvzbRyQFjamJm8UXNAesLuHn4XdUBkh9P\u002fliB1QD79FethWndAkqPH78aOeEBGL4Q4XBd5QLCvv\u002fXA3npAXC0kL2DgekD14RMLTOV6QPX7H1N0NH1AT\u002fTAfIkjfkAS0aIz1UJ+QEYX31XkYn5AkOR7iJtMfkAHbOvKcwF+QOOY7gvsyn1A1DOQHrZZfUBLLDomslZ9QJrYydnDX31A1LYTMPqZfUDSjG8PEt59QJjx1LgTLX5AIFAMmBIzfkAtJDs8J25+QCVzrTYK235AYViMba8Kf0AneYIXXZp\u002fQLogOmE4zH9AEgkuOOoRgECJ8\u002fNb40KAQLDQSeRJYIBA9BS5kQjKgEB0UlnaUC6BQO2ZP0qtnmJAnKCi4NqUYkBKls\u002f3bE9mQMPnXKxoMmhAPwd8BGb1a0BTEr5i0dBwQJw2QAGEOHFA\u002fVJh3GvLcUDkgx\u002fvL3ZzQPad50PGfnNAgiYBGU+bdUCeQS68ZcJ2QGRCteDIRXdAH9lqCer\u002feEC2nT24gAF5QEoFjNlSBnlAZR58imhVe0CdfNxzfFV8QC0KNv85enxAVmOhuAu2fEC9MoNE76V8QAdKtGYcX3xAeKq3FpkifECU0QBOOWp7QHggnuCfWHtAYPo+dsM0e0Cyzt1IZCh7QHgpqvTgPHtACwfIAtRje0B2d2LDNmd7QIo8+iMQi3tAyrVgVqHWe0Alr4jhzvp7QMDTEW1EcXxA6H9AHVSdfED\u002fftkGMe58QJOCyEC8TX1A\u002fY0c0MqJfUBxGP4bI3Z+QJDjVSHMon9ApscChZuRYEBrx0tIMhlfQADXhKCKLl9AYzKd4YA7YECIF5niBMxhQKgGB5MGj2RA7BX\u002fpHT7ZEBRDLDF85dlQGmddMugcWdAQsdhYnR7Z0AxFj\u002fIgP9pQATXrq42d2tAHmjlQiUlbEA0jUGnUpVuQOFcgrmyl25A3DUDxemebkAR3E\u002f+gENxQFkuzo4fbnJA2qbNusmnckAFf7nG\u002f2VzQD7FUFi9eXNADq7D7Rtec0ANIHWK7BdzQCTwI0twTHFAcP35E6\u002f8cEBLInuaKxRwQBkIjyopjW1A6bzJv+z0a0Chf8wyCb1qQJTIEyD0qWpA9aow9nEIakCq+7kiLERpQKdI7z2HD2lAYcs0tcPUaEAyvQab7d9oQEVPcs4yGGlASHoXQNiNaUC+YU40JvFpQCQscm2QLWxAtIue4n+3cEAwSaJUiZ9gQFokfng6WV5AjS\u002fXtfvFWkDmQR2Agr9aQBUFXRvEg1tA9\u002ftvDnDRXUCIq7Ir2jpeQALImmNh2F5A2PwAnQNsYEAZ3iOilHFgQKDgg98r9GFAKz\u002fc8X7pYkC7wlStMmBjQNfcLSE0J2VA3BX0QQcpZUDyj2Ndky5lQNGwHwIIfWhA6vpHPdPZakACkqHSBVxrQPLqKkLRTW1AgJjR4N6bbUCJmc6dp6FtQJSi8LWjH21Al7OYIt3XaEBeyh\u002flgwloQIb0eQb2nmVA1EFN9BH9YUDkUbmpBUxfQI64xOkyh1tARAPs+wtKW0AU\u002f\u002fThSDVZQJ6kdvJjalZAhjcO1yOJVUDlAEkdXelTQG3lp4Y9rFNAU4fIwmWhU0BIF9r7bCVUQAZrZiQqwFRAmCR++XwiWUAo6EAUMMFiQPEMg5Ma9WBAvHsi3mqZXkDQhwaOSytZQJ0Id0maeFhAfOzi1EsEWEA9q4Kq1KRYQFhbTz7q01hAmtPOcuwfWUCcYsYbAjpaQAH1yR+iQFpAJV7wyYozXEDtUlDEX5FdQLZLt8uIQl5AiRQ0\u002fCCKYEB415jbo4tgQBYJAME8kGBAVQwMFEiAY0Arlhevx9RlQEUXbwT2W2ZAEDCTH8qAaEBtc09K9+FoQBOxoJeoCmlAZ6uUznyUaECtKJWVDR1kQIWvyTVvPmNAk\u002f3wBE+cYEBYKq6cfC1ZQPKUU8O06VNADBEihyM4T0CUimTOLKtOQCAPFnMF1klA3F9ebOkyQ0DsAklnCgpBQIDSrboIiTlAqDsBZkf8N0Cw0snZsec2QDh\u002fguZZJjhA8GSqZmUuOkA43NVoYo5FQDxAlLJrvFdABVoXFZlaYUArqrp6\u002fB1fQKOJyTV6fFhAU0rF\u002fOtbV0BzIZaslSFWQN29wKnqs1VA\u002fZuqdla+VUDmF0ovG9dVQHfHyte\u002fYFZA6H95q4hkVkCfjMo6+qlXQBeBpx3srVhAWLSNgFQ4WUDbm\u002fIV3o5bQCQfC8B4kVtA+s+m6mWZW0DuMowWlnlgQD+bCVeKwGJAgOmGd8BIY0DtiuiAj4RlQJDLdA4v8GVAaRPiRQEvZkDkQ3JmvcNlQIHxDGRyTWFAu4pF18xqYEAAXKeS23FbQIzzzg\u002fbJlNAJNhTv1RfS0BgmfzXHGJCQPwWzGBWzkFACCYYrG5zOUBAX\u002felIb8mQCCq8af79BpAwMdThZ8gBcDAaK9CJMgRwCCK6zDDuRfAIIb\u002fMn1OFMCAgc4nN\u002fcJwNCD\u002fDpYcipAsSJZz7toUEAP4Eg7N31hQPHgyARPUF9AB0ORh5VgWEDfPtPC\u002fSRXQNLA6xipulVAMr5RWJQMVUB5txCJUw5VQKsoLW\u002f9GlVAX6MFv5aCVUBa2dRWtIVVQJYmyHREolZAQRjGnOyQV0ASkOO3GhJYQBu9XJXpSlpA\u002f4zd\u002fWlNWkBdDAeJB1VaQKSXuoIXjF9A8wMdHuMHYkDIrMSe0o9iQD6ZHEmXzmRAm6xXdig8ZUCRkKBY439lQBJRvODMF2VA+sL90uCoYEDfDUCjko1fQMXK\u002fQvnK1pAhL3p54HhUUCwgB+xwdJIQNiPBqGUpD9AsDKginx8PkDozDteoU00QMDfCTEvuhhAACCwHyhx+D+AwIAliqkfwOBpdBItfCPA0Pk+hmSJJsBw\u002fUb+ruokwDDuJSbuTiHAYBNV7n7lHkBaDrNqog1OQMdGaUefvmFAuL+\u002fhtGyX0D8VivKeUZYQB04WUyv4VZAsikDH8gvVUBCxT2pAiRUQI7ONbxMGVRAV3FLJqEUVEBM5aOVu0tUQNfklAPmTVRAVP2S7n8wVUBVwJs+7QBWQJAaMZfzdFZAsigat+CCWECawQy0OoVYQF37EbRjjFhAQdB\u002f5SOOXUCp1qQHyP5gQHwz5j6DhWFAuEPqRWfEY0B6umOzxTNkQNZm6V6VfWRAxZQv7qgaZEAaR0EwFoFfQDd14MMUw11ASLQJUBhzWECuZrdAaUJQQLDuRIINtkVAeAi2fBOjOUAIpyO6n344QOAzw3F84CxAAHUe9iAF4D+gM1V5jlsQwIAWRZr6xSrA4NKvNvdaLsCQGMyEHKgwwBD3yKnCoi\u002fAoCSAbxkELMDAKndfe4QCQHQSVbINOktAMFve3EXtYUBMiWCZePpfQHPkQmM7Q1hAYKMGQpPHVkBaOmHmlu9UQNWjfy+OtFNALFG9hr6jU0DiOoB5pZZTQN4xPyZ\u002ftlNAdb0IBTa4U0AKXsHfcX9UQAbxkhGgQVVAMgTIsWqvVUAX8cxInqhXQIe9QjzlqldAP5quddSxV0D5JwwV5pZcQGlpwxSve2BAzg+\u002fNBABYUCgjCP78TtjQPzoWG4nq2NAzPnOsrr2Y0BMje\u002fsrpZjQOJgkTKan15ASSod79noXEAQ6goCP69XQGBoMGlhRU9AEH8zjL+pREDg+iU8FeU3QJCwJ1W5xjZAYB5gxsjfKUAAtfwny1vlvwD5\u002f0SEiBTAEE5GEKs9LMAw9KMszKUvwLBdMznsKzHAWIf8igw4MMBQ10Ph77YswIAM+VSKTQBAFKCPzoz0SkDijXeoNvphQJCoNW00B2BAE0LGzgFEWEBC4s+P1sJWQP\u002fu4Vj94VRATf7L63ucU0ArR6qBXIpTQCx1tDF3e1NADzN5h26WU0ABimlhDZhTQFpOso+lWVRAphFnLOgYVUDhtZF4aoVVQD\u002fmOSVHeldABY9YBYp8V0B96OrebINXQE3u7xLpYVxAehfTERlfYEDSDK0ECeRgQPAzAPc4HWNAXRGzsCyMY0BABUFu2NdjQPNHz710eGNAFmIOLNVuXkBfhNAkd7pcQEW7GRteiFdAgLnKjoIQT0CU470M1oZEQIBhujaBvzdAWNDuI1SjNkDgBmOA+sApQADnHgJUZuO\u002fQEYez\u002fcaFMBgaN7la8srwEAPZm9mIi\u002fA0Bne0CLdMMAA9Kk8BbsvwPCp1Myo9ivAAKgRLnKfA0C0Es2iXR9LQF6uqCKoF2JAK4j3Kd4dYECfvg2r5UdYQJlMXA1nu1ZApug0oO\u002fIVEDtKLhbo29TQHTmX2seW1NAPLB6tfdIU0BSm\u002ferQVtTQBUhGmu2XFNAse7ui4kUVEDcaeZWyM5UQOeFu+EUOVVAY6cl2VEmV0CLwAxjjShXQMx4HfNZL1dA1cLKfBkBXECNbdfV7ilgQLF1pGrDrWBAEVGZvC3iYkAKwM7\u002fM1BjQOZcNgJvm2NAQ8RPD0c9Y0Ay+ALxURReQD+uEDnpZVxAoiMzbM1GV0CeaNQLR81OQJApHkw4ckRAeLdvpJnqN0DwoyV\u002fJ9Q2QHDHNPnbiypAAGDO2e2OvD9AExpH+74QwHAUH4R5fSnAsFAbfdKlLMDAm6m\u002f1\u002fUuwFCket7xtCzAYNvaEZnQKMBADxILQJsQQFLQ\u002fs0Y4UtAXoUs6juWYkBGucK6qH1gQHao1ed8bFhALhlncKa+VkDX0l4v2KFUQLOZiMMyKlNAIekDJHsTU0BvaxWp5\u002f5SQKBJpwDwDVNAusnsSWAPU0DATpW3pshTQLdpIfbJhFRAjrEWD93vVEBKM\u002fcccd1WQJBdNgaq31ZAsK6pbG7mVkCpg70RTaRbQIQ89WV40F9AVCrgPhlmYEDQvYP3cnliQDof6bxs3mJAaxNfgVAdY0D\u002fBwyNfL9iQJKxeU\u002fOlF1ASHt9XmEFXEA2GC24lExXQB7\u002f\u002fDJJIFBASHlYvn\u002f0RkBY6DVwMuQ+QDgHrrss8D1AWB\u002fThWegNUDwP6BimuUkQGB\u002fUHFJqxtAAGy1fXCt1z8AIuRVtlvjvwAiT+mw0um\u002fALi3zLWy8z8AEZLzVSoNQOhwGtUZWTVAFhLzBHAaUkBco\u002fVsYPtiQPunqqKgyGBAj1WSv5WUWECJT5gEddZWQDreg5b1rlRAmT8pew9GU0ADVw\u002f+czNTQOFRSnpaJVNAxjcpWdJKU0DR6nENwkxTQM5BhOLXJ1RAvrrQ9Ib3VEDM9OeHPmtVQBY4IbSvc1dAk\u002fS8a\u002f51V0Bdc4XOBH1XQBpEdhhqSlxAcGOFWDIvYECT8KkB8qdgQLtE3eVWmWJA\u002fbkA\u002fk3zYkDNWHIXFx9jQMgCIM6eu2JAnI+tkWXXXUAqwjGfp19cQHHdeQrI+FdALYAYJa5kUUBoDoU7vGtKQERsqQCuy0NAWLx6z2xhQ0CYP3VPM5k\u002fQHCvwkYESzZAyCcf5VKAM0BAHwAFx+MtQGA3hoVBLC1AgNBR2kjELkBoR8JijmoyQBirz+niXTVA\u002fClQyXtKRECIAc5HvflWQKTQJEz6IWNA7cTKR4TlYEBd3WFHraZYQA5hhBMn41ZA\u002fD7tgSG5VEC9JwnyNFhTQEn3xQSDR1NAA2fAamA8U0DeDfWz4mtTQFQ9xtwKblNAxeb5GgpYVED+FzCYXTBVQPE0hMXup1VAyKre7KG8V0AtSETw+r5XQHLtDoEgxldAr6ISRrucXEDiyz69sFRgQBYwyimny2BA7feeCmGwYkD4t8my\u002fgVjQJgClTGsKWNASE5t9x7DYkBeIMn1rfhdQOw5n6lCiFxA9MKguJg7WEB64wSBE9pRQBTfbN\u002fcp0tAlDj3elpWRUAYGKLYnPFEQNBQWVKKkEFA+C6qIfF9OkCoZxkppfc3QKBg8CFBJDRAWG+TlW0DNEBwMeQQRDA1QEi9Lr86mzhA+L0VvuXEO0DAHtnTsc9HQO9pZHHazVhALhndPdlTY0D5VgTNbgthQO3wS6I9wVhANkJ\u002fQev2VkBMLqouj8lUQCvmkfNHclNA1TnL2+5jU0CrQm3icVxTQHv\u002fZIJcmFNAyKFIosqaU0DINuHBVpdUQIb8nxt8elVAuwooguT2VUD0MHUhJBtYQIWokVeKHVhA54Nb4tckWEDMQnuF3QddQN9d44MrhmBAOwItIgX7YEAKqOFvWNBiQCKaf\u002fCJIGNAL8tWVsY5Y0AzISSb3M5iQAxtG4gJIF5AHhb2a3e3XECglYr2l4dYQHodt+kbX1JAHv8oijwPTUCc8ixg2BhHQOgjEwuJukZA+JY5mQmWQ0D4VlNf31I\u002fQBBDJun1HT1A+HwTbT0rOkD4mps58FE6QAjS8+k59TtAABcflEDaP0AwjG8XCqRBQD6EWy8t+0tAkh7gXxoBW0D2zj7PXzBkQGuYszzHvGFAYYY8DEdmWUDWPAnu+31XQOz7011jOlVA3lv3Mfr3U0DCeO2RPvBTQNSi0a1Z81NAHxPHsgJVVEDIM5DZSlhUQJRhCPfvj1VAUVdu8HSWVkB5J0bX3iJXQFcvt0ZSe1lACesgaOV9WUCYssoJu4VZQIs4WLiblF5APllyHoc\u002fYUCCesFOTa1hQHI63lYWTWNASGubUpSJY0Cs+bKNYXpjQIMqRSSX+2JAhjjh9R17XkB48NT7eSRdQPFEnbrrPFlAU9vegDyxU0C5t4BlPmFQQEzsUM3o3UtArqEakDyTS0BoJGuTqSlJQLQOcI2CfEZA+KxlDq7lRUA0EZ3hMuFFQCxpcu+ObkZArPkmrXUOSEC4QEGdLNxKQGhR9hU\u002fEU1ACjPNc\u002fuGVEAk3vNqzBxhQO9zB5MNLmhAiJ82pYphZUButr+FHaJeQLhw5MCvPVxAmm2TzeRVWUALUgK6YpZXQEBYxHURhVdAQil6Bmh9V0AbC++u7s9XQPdKGhwg01dApe8kxGgSWUAOsCiEFSVaQB5kh2jPt1pAZGaZfQYkXUDYemgDpyZdQFjFwuekLl1AvFFgResUYUC+pl2yWNpiQOhLWDjHNmNAKuMpLFlgZEA0Te8883BkQMOj0jAH\u002fmNAzulisdNAY0CAdZIG3OBdQAFHlr0idlxA7fIyVQ10WECLi5l9VxZTQMowqY4HIlBAvJFmGk5ZTECi\u002fcXstiJMQEx6u6jZhUpArCqsJUdtSUBouPct9ZBJQOQWFjS\u002f3UtArpf6+GBDTUCs1kRZPzZQQKvDOdyRg1JAYg5iZZIuVEBVmhOxNWpcQCLl53FfoGZAdohQGhLAaEDupP0sou1lQFXHZuq9h19AsGZ7JwsUXUDcEBggLRRaQKhbkNvHOVhAgcvwrEAlWEAGI0lnQBlYQK\u002fcutRYYFhAK\u002fUGSlNjWEAFBWpG9pVZQBlpqzovolpAfXPy3Q4yW0B55nA1RZRdQKSO0enbll1AeHEe+LueXUBkUgtJ8ENhQJ6xnm+dAWNA+SiGOAhcY0CiV6JtZ3pkQB2eT9c1h2RA2CAF6mELZEAAail27kdjQH7ZPjTPwl1ArhHDLhpSXEB0E+ZeAEBYQEmPaw8Jz1JAQDpg0OyjT0Cy8SGQdLFLQLLhxIKmektAcLOWeOLdSUDAokN6MM5IQEjQvU+0+EhAuIWmzVtjS0CUP+QpXdZMQI8cNVVMDVBARffcc41sUkAFmZSH0CNUQFZ40L1Il1xA9otwu\u002fToZkDFIOtN\u002ftlpQMAiN+qH\u002fmZAvoAnzdGoYEAVvtN61sFeQMq9yaxClFtAxxCCpiuEWUDJEIo4+2hZQBHLCHzfU1lAIKNRI1SCWUAAXwmX1YRZQJLkexnxmlpA6la9LR+YW0C6wsz3RCFcQDZcUH7Ra15AFoekGVFuXkCtvzj66nVeQIyL86cfm2FAf3Xof\u002fdIY0Cm5pk1gZ9jQGMFIluIqWRAVFOfgrqvZEA7Ls3geyRkQB91OjQOVmNAIzsr9EGMXUDu02Tcnw9cQNhtuDiJ3FdA4q5EoORAUkDep7C5aVtOQHht+EEcT0pAsOl1dxgXSkDgWGV84XJIQNj\u002fbwERZ0dAtFYFi0KZR0CoirXe0i1KQOre5LJ3tUtAavysQ0YlT0BaDDft1g9SQNYKJIwU3FNAOFLfvFqyXEAjRQtXYFNnQP1FvnHzUm5ApornNH5ma0B63f4C+IdkQGwfwBioDWNAmIkleyUfYUAwtnZhpEpfQCOQ7R09EV9AgPajzv\u002fRXkCCqbp7UoleQLT5wwB3iV5ABTHzdlsLX0DWhnBXPLZfQCFDbiPsDGBADZ1t5zvvYEDYrbk5OvBgQDelUTpA82BAPHjcMqfjYkCX4hpILUVkQMKTPiHPimRASfN1\u002fipHZUBLf5zPRDdlQLOW0PkKe2RAehlHbqmJY0C\u002fzWQ4JctcQHGNn+GwHltAGH1opvpfVkBihT4TKvdPQLBJrsoV4EhAuLvMbyYmREDUZ3gWF+RDQKj0rvWn70FAHLrwiT+aQEAAsfwRmsVAQGDHUKKAlUNAxML1GMlLRUDssVvoyCxJQMDd\u002fxBt1U5AtsVGW\u002f93UUDJTmwdR5pbQGb3SW+WIGhATuMRrGGqcUBEj8rq9i9wQHvc\u002f8ZiAWlAlLiILChTZ0BaURQFRAZlQGGCGlztCWNAV8MtnCHbYkA7nOuo9KFiQJATpVc2M2JAAJzHVsYxYkCznaW5cxFiQCrqWtWsLmJAuncfqVhGYkAeJV2hOsliQIKicC7ayWJAZp3RNcDLYkAmooV9NxhkQHq3sg8DC2VAqpUaXuk4ZUD4sVid2pBlQLVadCw\u002faGVAXTcvOAt8ZEBQ+KjQKWxjQE\u002fWPWatjltAtOnB9By2WUC1HPF7J3JUQNBmdGHihUpA0FMtv6ttQkCYJVoJLeE5QEjkd6yuRTlAcFHIF4WcNEDgw3j2ISgxQIgt+nvHWzFASDWzsbw8N0BIBZF1Tfg6QMgyaD3KxEFAkJXBDfoVSEBqf16qEbJMQMl7MEP50VlA\u002fN9QaS+xaEDO\u002ftXl875xQASd5f1LRHBAdMDxVIMlaUDTKfOXiXVnQGN2zlqDJWVAlP+n8+AkY0A3fBHGfPViQGjfU1V4u2JAgNEnU0RKYkCnCy+Bx0hiQJ9OeA81JWJAYDgFRYdAYkAY4UDuTldiQH+iLLzk1mJASHDK+YDXYkAijZfxXNliQE5uQ4T8H2RAewOep7MOZUCgQGvOtjtlQPSd2Erkj2VAC39yhGFmZUCbyf42iHhkQHYIfMq2Z2NAAUooHdZ+W0C\u002f9sBJH6VZQBYLfIaxXVRAXOALb3JSSkDwoPu6sTNCQMjQpP6zYzlAQEc6d6nHOEBglw7OLxo0QFDrEaJEojBAgMzJoO7VMEDgM9cWEbw2QIg812QkezpAxE8hLVmKQUCsv11XzeFHQIKszUiMgkxA\u002fv4xtRXGWUBki1fJuLdoQGoQeT6eQHJAQyTTqgvEcEBjo9WGlwZqQKGit9U\u002fS2hA6wysRwjnZUAIHJl\u002f+8pjQG+DrbDOl2NAxe9QAXJYY0AsPcCgpNdiQGhUqZDW1WJAAp89pqmdYkAueKgq56xiQGADyy8DvmJAqvk5hYwoY0A1QS+REyljQL6inh6vKmNAsw60g6hLZEBzHx7ZwR9lQIb1lu7wRmVABlaP6kCCZUBYBkvyxFJlQEqlbEsrWmRAgk6LzmdDY0BHe0vplgxbQHSEf2glLFlAsXoTrYPQU0B40LQbdPtIQFAwysSnt0BAeHOE6Fs3NkDIIo4AZ5g1QPi5V4W91DBAsDK97Y2dKkAg+coxtAsrQNB9HErSlTNAGC3bnQNuN0BwHlrYaCBAQGjw\u002ffcZokZAsidprslhS0A6JZgiaoNZQFf1xd\u002fF5mhAm4QzNuabc0AaZ0RgsBNyQCjB4CTVNmxAD8CljRBXakCdNwslSbVnQKHY8KtOSmVAjW0xd40MZUBWu\u002fNXWL5kQMd3VmO7EmRA0kVC5w8QZEAz3QLQ9Z9jQB00A5djjmNAbctd2weQY0CSg02SfMBjQP8CcnjIwGNADx6AN7DBY0Db0T49s3ZkQCBMK01H+mRA\u002fEVf0EgPZUC7GqOv0fpkQJ9G6uvct2RASTzM0kmdY0AOTctxmnViQPhabUgsGFlAUqtLU9MrV0B4aw87Sa5RQPjWyD2dW0RAANidPWTVN0CwCvOppe8oQEA4Hr9ssCdAAOolnh9xHEBAUtCufwQPQCCr5jzLOBFAkIVbg3ecJkDQxIEjcicvQLA5pDaNRzlA5FAN5Hm9Q0BgCoW7\u002feZIQI3cad+TP1lAP4ARsAu1aUARdVaKJyZ0QIKWY+Buk3JANiHV3s7ubEDk+v0n5PpqQFhcSWd3OWhA7uZhQdepZUByvEHgeGdlQLZfI+rkEmVAuSBgOn9VZEAA5CK1eVJkQNduPFoLzGNATWF+4Y2tY0BRojeiGKljQEWoluhSwmNApYI4xIbCY0DTBgNoJcNjQIbXmZlQSmRAiELGB62oZEDv1qn64LRkQFg30yMEeGRA9Z3Tqd4qZECwyC2l5\u002f5iQAUBqe+Kz2FAQHyDrKm3V0C+hu847spVQKwVQ8aQTlBAPNeeQNusQUDwlzXvm6YyQADiEqKkJR5AwBDG6Hu8G0DA9AqXBVcDQABgImTGtta\u002fAEAJerAq0z+Q2\u002f3qxSUgQEDtjweMSylA4NCTFTHtNkBkTY6kZuxCQGRsjrjBUkhAA+3YUrZ6WUAQySZ6s0ZqQLw7B1cM\u002fHRAb8aUGkw2c0DHmoguGyFtQDLf\u002fXUq62pAKwELuC7MZ0BeCI8+6+JkQESBW6jtlmRAxb50Dbc1ZEDNYAgs9FhjQLXa+vddVWNAcImxkZSuYkDepufPh39iQPL+Bbd4c2JAmAUpnD1vYkCe9v28UW9iQIFrzc2Pb2JAkiURbY+xYkBkdmBdXcliQMci+N\u002f\u002fwmJA+1tuvZIoYkAmcydKI8JhQEwCj+vWa2BAzjK5zztaXkBMr6KjPJ1SQNtotTIgxVBABClkxOckR0BQm\u002fprLKoyQEAtHo0l4w5AgACwaxo5FcBg4f9wwhAXwOA7rWwx0SHAEB9oEYNvIsCgsaP2CvwdwIBAfMnXHgxAQHzWCyR2IkDoFGXkWo41QFSy3mRobENAlGeuqCiQSUACQH\u002fZzZNbQLOqFDzUbWxAp\u002fetfIj5dECLcrixUf9yQM7RNCd9uGtAWa9OdBRNaUCOjO7vZOllQL8teDF2zWJAiE3cT7p9YkCGOOT3ZRhiQJBoxmSZNmFAPk9mbQEzYUB4u6AyApJgQKI77ctuamBAqsvx3nJiYEBquE2HGG5gQGQl4As8bmBAWBWy0KhuYEBDMukCKsNgQG4uY8B11mBAeM69vGXMYECDIx1TVBVgQDbR+n27Sl9ATotSkVyAXECinonUfv9ZQK7YBw+jaE1AMPkond\u002f0SUA0lMwOWFpAQODfFaGuzB9A4FTMeNpyEsCQlsyodD4nwCDVOEuK3CfA0FvX73lIK8BweSvhbRcnwNCGfqruriHA4Mkz3H7ME0DwHd5CDSknQHj\u002fX15ldzlAtMl4cWQ5RkC0xGyBq9xMQIYovdNEHl5A51QAEJM3bkBk4oEuMOZ0QLpN5hGH2nJA5lxtbfIda0DA9Mfp0qFoQP9RbJFeKWVAwLLVfOX\u002fYUA6tAoGbq9hQBXFoSN7SWFAcXfMwmFoYEA1u+9b1mRgQCHijMS\u002fkl9A0f\u002fyik9NX0AUnst\u002faEJfQF1wVWW1bV9AZN\u002fbuBBuX0AeJ2boJ29fQGndWiP+G2BAR2ov4Kc1YECC9\u002fGJMyxgQNiyYZTz515AdyyNoPAFXkDqNCk2LjlbQKgIP8XOulhAVEB7n085S0Do5Qsz6tpHQPgoFK+VDT1AgEx\u002fh+cUFUCAw8hfZS8awFAlnV5QtCnAkHh7hUo5KsAwkfxnX7oswMBGUSa3BifA8POD2G0DIcBAp3ngeXkYQGBCBH4iCCpAuMIrsfxYO0D44IaZB2ZHQMjKgsqCK05Afh9+G\u002f7+XkCRP5G19MJuQEb8ceWMW3RAMsu30MABckCAEa1dYgdoQEbJq67sQmVAMwhcK5pyYUBrdCm4ICtcQNP7H1GkhltAateZL7K5WkA64EBNsQxZQHid6E9gBllA9ZgyJlcZWEDlWJlPNRBYQMYnx3CJJFhAEV1OjMPMWEAhQRYloM1YQLera0NA0FhAE8mjFZZ0WkB9cZ0jCyJbQAACONkoJFtAYTjGVE7yWUCRnoG6HhpZQMuHRDg2ZVZA7PjPgdwCVEBIXTu9ephDQLiuzgBlnUBA+FkM15sUMUBAdiQx4PcCwCBInB6S4SXAcCac4554LMAQTiz0UZMswMCRGd7dOSvAIC8bV0GeHsCAYF4kXW8LwJC\u002fijJe7yxAmBY48vdgNkDAUT8qQy5DQAptyhjnvE1AoH3Ara17UkDM5UAiM4thQPsO5WBJgXBAmm\u002f4kzYpdEBmc4mLF7hxQPd5GMksCmdAFcD5x3IwZEAuKxsQpEZgQBPV68eQt1lAjMxgEZgSWUCZ3Od\u002fN0ZYQFWQzWCfolZAls9tpJucVkDiXk7pBMtVQJ50LLTI11VADW5CPXT3VUAFgq7YhM1WQKZ+wHaRzlZAWpJVlcPRVkCVH4cU+cpYQPhq4p7BrVlA8HSE0z66WUA\u002fiJyQmq5YQBD3StiV3ldAwRhy2F06VUD8\u002f46tGuVSQCxt05ZX90FAKHhDqlk1PkCgi\u002fV7aqAtQAAhiJOL8ArAAPY3lUECJsAggYrzqOYqwOAsoVa14yrAAEvXXid5KMBAWYSlbb4VwADNtyxZaOy\u002fYNu2ErDZMUDQmvL9QgM6QHxcRYYZMkVAZtpnlCzxT0A8f1HoU6JTQAMTP0xoLmJAkt+T4KHRcEAoZMtSIPRzQKS\u002fmJ87a3FAiKRcHIMEZkDRy+FSHRVjQJbJ4bTPIl5Azg1rzpsxV0CMVM5sTIxWQPpRFabAwFVAlQDLr7UnVEA1HNWnBiJUQK7KQVFFblNABw7tz8WSU0AIgiD9wL5TQL8mdzzNxlRAgADidA7IVEDOD8+F4MtUQP9ufsRDI1dAaTEn+UZDWEBnyFjbB1xYQIJLRzSFf1dAv49APA+6VkB\u002fbJKI\u002fCpUQGcnlZIh5VFA5Pk3oLibQEAY35+drbw7QHCTlG7aOCpAwPMfdhhODsBQJDB03\u002fwkwKAdDNP8MijA0PXsmtMSKMBA2fc4OZwkwMA2ZMhHfQXAgFQ\u002fSmxhAUDIVG909LQ1QKi4UGsvGj5AsLYgT8VrR0DesAMbzSpRQGYwf3cp31RAUFugiH\u002fYYkAjQvMgpCFxQGfiKCZE2HJAxy0wcX+Xb0AuPWz6bGlgQH2lF+Aw\u002f1lAssYkmZDSUEAEKq6T95JCQEQnhWwAR0FAQCLSrVN7P0CwjA9NXyw6QGiFu6MhHjpA4BMJiV1JOkBg458+IT09QAgblJuCKz9AAHq2EuI1REDo4\u002fwHIDtEQPTqPaUTS0RATgbpgsYHTkAHYiNiV+pRQBlwQ2K0Y1JAuutzsscYU0D2RL4Cv7RSQDwbHNvf41BAhNdz6\u002fowTkDY+TmUEiA+QJAv5WziCTpA4BhLlRtZL0Dgcy+BWWMWQEAulP5rWQ1AgA4bOw7yGEDg2BBm+04aQJB8GmdHpSVAUOyqGrg2NkAgG0tmj3A8QLwgcfdFn0lAxF+3fdpATkDO6qYMkZ1TQGYYyqOETFlAUhZJlOUUXUBr+9R5l+JmQGDAYJ7dx3JAOo5CZWeVckCD\u002fWiSksJuQNDFRunStF1A4EaeeBSUVkCkLWNLEBRKQGjIEAVtPjVAeNgUm26lMkAwJgyqFzcvQHAv2NvITyVA8G11GPI4JUDgiEFG4I8nQHCfQbsKGC9AqJhTJDnoMUCwvF46EPQ8QFCCK1t8AD1A+CorEEkmPUCk+K6ViCdKQOg7fPGSqVBAT0chXa1JUUDDltCKWqdSQB3kRSwEblJAMNR9N8LvUEDoNak\u002fr6xOQJTDzRDG8kBAOERUDcY+PkCYxH52Mys1QGDSc3uUGSpAQObTXXDYKECo24w0PBIwQCCByy5SezBAALHHRMRXNUBI5SaQgctAQGzRnwmBDERAcGrry9i7T0DDMaO7cDVSQMCJirKOt1ZA6gZQzsxhXEBTI9ms+hBgQNTTyQg1RmhAPqabp5ZEc0Ccp3xGPIJyQDD7TRXYgG5AAIDQrCGvXECI\u002fb+eIHNVQBRRZfijj0dAUF0TixXcL0DQ\u002f0Ku76gqQLD\u002fKkzhmiRAYLrxXMDmFUDgTKg1D70VQOC5kM3d1xtAgHfBAagJJkBQiF3kMhErQNC1KAfvOjlA+ORQpw9IOUDIv6F4AXA5QCTLQRpg+UhAcFkBx8xTUEBz\u002fIZgeAJRQH1U2Fk+oFJAzq1fCE13UkBtG4XauRhRQHBiD0dxJE9AOBTCI87sQUAks9Gx\u002fyxAQDDziKn8uDdAwPfOhFZFMECYWdrUxRMwQKhlYOPrEzRA2Ee4gryCNEAQ+JueHZE5QPiXFLOFCUNAkIoMId1URkCQk8f9IwtRQMD0qGCvY1NA6pkJHx3lV0CihM6K0YpdQIg1FUAho2BAzq6yqVXIaEACvucEBXBzQBL7MsM+fHJAnsvUwntrbkD4TtqwmVdcQLo2jWktElVAeL2LJrK2RkDwp7SuXUYsQBA4FO\u002fAEidA8FdcS5cGIUDABabh5tMNQEDJeQVEgw1AwFsLb6paFUCQ2Ys88\u002f4iQAD2k7j9IShAgOO3TEz9N0CIiHbcqwo4QGAFtyVdMzhA6DlVs4qXSEDTk9Om1jlQQHWrEkql7VBAJX8qVRqiUkA17TAo+35SQIfR6KmmK1FAHkf9N6lXT0AUfrOibU1CQJBPqdBelEBA6JOs2AuvOEAg6Cb7kHUxQBj5j9t9aTFAAErLP82HNUDQABiThfg1QJg1CBdrFztAXEIJS4HXQ0B0NxbyHCZHQGea39todlFAVrfiEyPPU0BDgcwYBFBYQG7FDHTJ811AvgegEK\u002fWYEAE1GlC4vVoQC2+Q3z0fnNAyG\u002fA3lJvckB4G4OMWjtuQDhbWPlljFtA+Scjk2gwVECcAtyhzrtEQLARzasB4iNAgDNPGERaHUBgXDzloEoRQABIjkAdCNe\u002fAGAvdbBY2b+AZ0KzB8j4P4D+G0K6zhdAwA\u002f8BpdMIUBwa36lXh41QGiX4idWLDVAaA4guNVWNUCg+HGfrbtHQEsFgeu3A1BAFeogiwzEUEB8ChLT+a9SQECPT3kgm1JAom60klxjUUC8UpszvedPQHgKY5MbS0NAhIm2bS6iQUDYOrRYSig7QACYL7xkeDRAyI4fVUrENEA4qcF0wig5QBhTomLinTlASOoMXcbiPkBc+CWtp9VFQPS\u002fXa5tK0lAOb3J3V9+UkADRPx7K9dUQL23xXoPVllA3GiI9mj0XkCIP\u002faphFRhQA0SFlZSZGlAjQwg1pqic0Bns8EpYWxyQJnR6gLZL25AVG\u002fsZlFaW0BFNiF1mPhTQNT8YJQWPkRAcKFPayvMIUAgDg9A4S0ZQACu4Cy2QApAgFenSiQC9r8AgYf79ZL2vwAkBnk2feM\u002fYGmEqupLFECAwh2iHzgfQJgYYh\u002fOaTRA2BuEfOx3NEDwjbVC4qI0QCBU6rA4h0dA0Gz9FrPvT0DcE6L6aLtQQKQp7\u002f+ttVJANyVhnoekUkAW6Zgt6HNRQEUj\u002fCCiCFBAQDIW5qiQQ0C0+JuP0utBQJCYNw050ztAGGTw\u002fN1FNUC4TZXtr6c1QFgHxyx\u002fHTpAWKd8LrSTOkAAdKBO4uE\u002fQKiGoEMWW0ZAiIAmd4eySUDmo7WCCcNSQEpGvMzDG1VAuKRjDv+ZWUB6HzuuyTZfQNR5\u002fFQFdWFA+dEVZK6AaUAERz31oatzQHVmElAy4XJACzx\u002fOtowbkCe5vb7RKxWQHDKgL0bfExAcFkMQTJ4KEAg7sYv+ZQ2wGjlp5Q7RjnAKLkXJUlEPMDYqX+B+Og\u002fwNCPZwwU6T\u002fAGH5PACB+OsBohzbdXBkzwCCFM5Vmky3A4H6dqrOUEkBAr3arTusSQADEDpPW8hNAFKAMRtgoR0BGyq4Fp8FSQOvrfhxNNFRAeXP6AvZKWUD+Io\u002f2gwtaQEaSEGcbb1pAg2sEqYrsWUCvGXmlXWlWQNWWup0j9FVA4yBNCob1VEDqEHsFoa1UQCXYMr+5ilVAOuv5m\u002f4tV0CX\u002fmRN7lJXQGbJz46y3lhAW9AX5u05XECpY0v97N9dQADphZ6MuGFAde9fUszJYkAV3ZN398pkQJa0zcXuPWdARD0I8JrUaECOU5Dofo9vQOEtxjynUHVAl4jg5cvxckB4Cv4TsUxuQMfH7y3hw1ZAAG863YCbTEBAeVe6yqAoQIjB50cknjbA+IO75s1QOcAQae+xtk88wACtjT9f7z\u002fAmMyPIkPvP8DgipiWz2w6wEh1OmBD8jLAcDfbkRctLcAAZi7JyjcUQIBU5xBXjxRAoB6bZr2ZFUDcGMrGQ5tHQOPyrNaHFFNAOHtJ1DeNVECnTTki8r9ZQCFyKK8FiFpAu9r25Rb6WkBhAnahrX9aQKT5M+jbEldA6eavNEmgVkAPQwc8lqhVQJt8haCraFVA41FalxpJVkD2R7+9a+1XQAEuQPNZElhAMqmmWYqdWUCaLOBQm\u002fVcQAApthp7mV5AcgbEXOsQYkCY1rR6OyBjQJNtqch9HWVAI3NpQUiLZ0Cc86KBZh5pQLHUiCrRyG9AFlmi7JVddUAG\u002fhwOss9zQKyIoIFV429A\u002fM6x3OTxWECxeVEOFzhQQAh1VNaJgTJAeJlXxEaGMcAgOqirNUk0wGD19MhaVTfAOCiL+p7ZOsAoC+Dc7tc6wGgtYNhnmjTA8GaRTMjRKMBgceJLCZkewODr93mzoCtAMExt5Z3QK0CgI5P+bGIsQBiDjN91Jk5AL9QgFkFEV0DLYLD\u002fh\u002fRYQBppEji7K19AUsZRrgMdYED7IAdjj5lgQBSITZsWgmBAeW9haOFeXkCYCTY1xAJeQIWYKseJQ11A2HSLI989XUAah2OhNy9eQN3leoM\u002fzl9AwH340ALyX0Bbycb3erZgQICobiHiSWJAoXXQsJsNY0Dsu0EbgptlQCAn+uoZlGZAq6+A9oZkaEBO1Vv1WJhqQAJB7sFBBGxABtHz82X+cEBMKxekhtJ1QG\u002frpUp7HHZAOu9ZzQxFckDWRCgPCedgQDyWTLM33VhAlE8FKNLSSUBwe\u002fWT5FYsQACpM5KDjSZAgODadP4mIEDgMtb5p2wRQKDw5z42cxFAkF\u002f+DL3iJUCYoIUvvKgzQNDFE6G2vjhAvIasBgnrR0CQ+7bR\u002ffdHQGhZVthrH0hA5nOSl3utWEBmU\u002fK+JPBgQMFQKD7d52FAdjL6wiabZUAQQna34EtmQHywk7QeGGdA+QHcAzQsZ0Bghw+1SkBmQN8C8bKMG2ZATjdTSwzPZUABe9o7X9BlQNU6HNH0NmZAn9dUHFvkZkBY7dEoNvNmQJDOXQYJkGdA2aD59S\u002fbaEA9UScG0HppQETPIPk4jGtAGmcYwCFUbEAoXvH82cdtQAdAS+VMiG9AFukfVBpUcECup1kdgapyQMQQoT9lW3ZA+xX\u002fI3DJeEA0+NJAch91QGfP5r+eGWdApPHJE+irYkC7260oEWZZQMyi2Sqsv09Avj4+8TM+TkBGOJFnXI5MQFSX08lBb0pALF7k\u002f7luSkB83zqZEmhNQMv582gYz1BAvWV4WXgNUkC7VF4B0sNXQM29ZANGyldAVLxbEOrdV0A4zgNNfkdiQDyvpU23+WZAHN2O2dv4Z0C8YGD3XtRrQPrJt7vmkGxAvkACq4dzbUBg\u002f+IC5ZJtQIO+Jz+UtGxAgG2mvy6ObEClSYHK4jZsQM5w\u002f\u002fAOFGxAyzkHVmVQbEDUE\u002fLsOMlsQP9GuIPr02xAH7bLiXxGbUCfgnjFoz1uQDNKYzv\u002ftW5AdNnSrbMjcEAqQPaGrG9wQI2+KpT1\u002fHBA4gKBJTqncUA3gPzMVxRyQG5DGV1g13NA4AGpluyRdkBxCKLNcVR8QPKlE++bCnlAwg1Kau8mcEC80JhYmBdsQKwVH3GMVWZAEgar87mbYUBq7lKr+zdhQGsSvwSjxWBAMX8E4sMhYEAoCxza7iBgQNMSGPmTqWBARDXk3xySYUD9nmqJFx9iQPjNdPKItGRA1bU+Mny3ZEAe17gvd8BkQNtxECT7nmpAP+qW9hsCb0BA0UBarvBvQGFcd7IRw3FAriwtRZQYckDtJKnSH3lyQEw6tJABf3JALoMpYP3tcUDBzRCaF9VxQGldRPaYlnFAHTIzWrtfcUBkbgyAiVtxQAvGsM+\u002fcXFATzzh7TN0cUDDfWQDyZBxQGM9C+AS1nFAIwFF57z5cUDVtOsSCnVyQAu7daPApHJAz69YSVP+ckDKTzLUJGtzQHtymAkjsXNADBV+ImjSdEBA2WNF7Ih2QFxbSDEwd4BAu+QAr2tkfkCKjQ23Cg53QDHHFSdKPXVAhHz71DayckAQgxitE39wQD2KTpEbTXBANR4BJ5oRcEBkdcOLilZvQCe15nV9VG9AoDiD07Jxb0CeOhm1wgJwQH6RjVQ2M3BAPKff0ykjcUBUIx5oQiRxQFC2SLqYJ3FAAmQzQvVfc0CGG2WCfwh1QC41CCfxYHVA8bLwkGihdkC0o43PGNN2QIRTvS9k8HZA2GmdcrnRdkASUCUWW991QGar6v7quXVA1NR+5lpWdUD8Eys13uB0QEpOyfhiqXRAnt5KZiKKdECdwz6CpIh0QG7K8LO9fnRAKBZcy6p9dECcFfxkWYJ0QHHiyw0xnnRAhNLRQ8erdEAS6iDctsd0QMJAi9V37HRARvcTdikFdUAvtliqNm91QERmB7xrC3ZA","shape":"45, 40"},"type":"contour"},{"hovertemplate":"(%{x}, %{y})\u003cextra\u003eSampled\u003c\u002fextra\u003e","marker":{"color":"black","symbol":"x"},"mode":"markers","name":"Sampled","showlegend":false,"x":[0.0,2.3123764991760254,-2.5430317036807537,-1.103262770920992,3.9877609722316265,3.1535071693360806,-1.663010362535715,-4.676342364400625,0.8014787140085441,3.7265998977351016,-2.9168153258086593,3.496945373331099,1.9361636983527066,2.559863665356951,5.0,5.0,5.0,5.0,5.0,-2.8590174676180573,-5.0,-5.0,-5.0,-5.0,-5.0,-1.6678695877490144,3.2433795230560154,-2.0561053811254437,-3.3455769264828508,1.5684633114972528,2.929909267084055,0.17404641351330558,-1.9734950576510124,-3.6824058467497496,-2.5382894397004905,4.375609281419346,3.581052656407767,2.792604099401035,-2.2329980173599604,-0.6630516419326333],"y":[0.0,1.4030969142913818,-1.8419678322970867,3.557639643549919,-3.432545894756913,4.51581890694797,-4.9740686640143394,0.4447673074901104,2.1831501372478432,0.9955026475488404,4.1764410482204175,2.1064360195116465,-2.398970014718524,0.45962384974197396,-4.751724125421662,-0.43125212456083795,2.762132002755853,1.7405602540678746,-2.504436397281155,2.81549283781545,3.3421129599160246,-2.862721903100687,5.0,2.59109278467203,-1.3480097140575231,-3.1292064884563624,-2.079200000033752,2.7171091064103816,-0.6250259547402296,2.8251312908118544,-5.0,5.0,5.0,-5.0,3.361523197552683,-2.4724099799434285,-2.618780187226972,2.028837403546177,0.8478853518993354,-1.76146799771119],"type":"scatter"}],                        {"template":{"data":{"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"choropleth":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"choropleth"}],"contourcarpet":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"contourcarpet"}],"contour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"contour"}],"heatmap":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"heatmap"}],"histogram2dcontour":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2dcontour"}],"histogram2d":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"histogram2d"}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"mesh3d":[{"colorbar":{"outlinewidth":0,"ticks":""},"type":"mesh3d"}],"parcoords":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"parcoords"}],"pie":[{"automargin":true,"type":"pie"}],"scatter3d":[{"line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatter3d"}],"scattercarpet":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattercarpet"}],"scattergeo":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergeo"}],"scattergl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattergl"}],"scattermapbox":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermapbox"}],"scattermap":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scattermap"}],"scatterpolargl":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolargl"}],"scatterpolar":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterpolar"}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"scatterternary":[{"marker":{"colorbar":{"outlinewidth":0,"ticks":""}},"type":"scatterternary"}],"surface":[{"colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"type":"surface"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}]},"layout":{"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"autotypenumbers":"strict","coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]],"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]},"colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"geo":{"bgcolor":"white","lakecolor":"white","landcolor":"#E5ECF6","showlakes":true,"showland":true,"subunitcolor":"white"},"hoverlabel":{"align":"left"},"hovermode":"closest","mapbox":{"style":"light"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","gridwidth":2,"linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white"}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"ternary":{"aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"bgcolor":"#E5ECF6","caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"title":{"x":0.05},"xaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2},"yaxis":{"automargin":true,"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","zerolinewidth":2}}},"xaxis":{"range":[-5.0,5.0],"title":{"text":"x1"}},"yaxis":{"range":[-5.0,5.0],"title":{"text":"x2"}}},                        {"responsive": true}                    )                };            </script>        </div>
 </div>
 
     </div>
@@ -4948,9 +4948,9 @@ return Plotly;
       <td>1_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>32.260531</td>
-      <td>2.683957</td>
-      <td>-1.711903</td>
+      <td>25.453602</td>
+      <td>2.312376</td>
+      <td>1.403097</td>
     </tr>
     <tr>
       <th>2</th>
@@ -4958,9 +4958,9 @@ return Plotly;
       <td>2_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>122.929287</td>
-      <td>-1.304312</td>
-      <td>0.984524</td>
+      <td>78.464875</td>
+      <td>-2.543032</td>
+      <td>-1.841968</td>
     </tr>
     <tr>
       <th>3</th>
@@ -4968,9 +4968,9 @@ return Plotly;
       <td>3_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>44.904510</td>
-      <td>-3.768109</td>
-      <td>-4.171121</td>
+      <td>59.487461</td>
+      <td>-1.103263</td>
+      <td>3.557640</td>
     </tr>
     <tr>
       <th>4</th>
@@ -4978,9 +4978,9 @@ return Plotly;
       <td>4_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>82.099507</td>
-      <td>0.219846</td>
-      <td>3.442507</td>
+      <td>79.075214</td>
+      <td>3.987761</td>
+      <td>-3.432546</td>
     </tr>
     <tr>
       <th>5</th>
@@ -4988,9 +4988,9 @@ return Plotly;
       <td>5_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>61.215731</td>
-      <td>2.444624</td>
-      <td>-2.551763</td>
+      <td>285.748888</td>
+      <td>3.153507</td>
+      <td>4.515819</td>
     </tr>
     <tr>
       <th>6</th>
@@ -4998,9 +4998,9 @@ return Plotly;
       <td>6_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>136.068168</td>
-      <td>-3.564980</td>
-      <td>4.519687</td>
+      <td>432.976850</td>
+      <td>-1.663010</td>
+      <td>-4.974069</td>
     </tr>
     <tr>
       <th>7</th>
@@ -5008,9 +5008,9 @@ return Plotly;
       <td>7_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>163.513045</td>
-      <td>-1.028775</td>
-      <td>-0.010953</td>
+      <td>259.739252</td>
+      <td>-4.676342</td>
+      <td>0.444767</td>
     </tr>
     <tr>
       <th>8</th>
@@ -5018,9 +5018,9 @@ return Plotly;
       <td>8_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>54.146446</td>
-      <td>-3.616199</td>
-      <td>-1.806308</td>
+      <td>68.873855</td>
+      <td>0.801479</td>
+      <td>2.183150</td>
     </tr>
     <tr>
       <th>9</th>
@@ -5028,9 +5028,9 @@ return Plotly;
       <td>9_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>149.968011</td>
-      <td>5.000000</td>
-      <td>-1.827273</td>
+      <td>20.287307</td>
+      <td>3.726600</td>
+      <td>0.995503</td>
     </tr>
     <tr>
       <th>10</th>
@@ -5038,9 +5038,9 @@ return Plotly;
       <td>10_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>572.570052</td>
-      <td>-0.178866</td>
-      <td>-5.000000</td>
+      <td>59.475043</td>
+      <td>-2.916815</td>
+      <td>4.176441</td>
     </tr>
     <tr>
       <th>11</th>
@@ -5048,9 +5048,9 @@ return Plotly;
       <td>11_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>297.595656</td>
-      <td>5.000000</td>
-      <td>-4.007794</td>
+      <td>11.995035</td>
+      <td>3.496945</td>
+      <td>2.106436</td>
     </tr>
     <tr>
       <th>12</th>
@@ -5058,9 +5058,9 @@ return Plotly;
       <td>12_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>112.193315</td>
-      <td>-5.000000</td>
-      <td>-3.413569</td>
+      <td>93.604921</td>
+      <td>1.936164</td>
+      <td>-2.398970</td>
     </tr>
     <tr>
       <th>13</th>
@@ -5068,9 +5068,9 @@ return Plotly;
       <td>13_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>281.877568</td>
-      <td>5.000000</td>
-      <td>2.382146</td>
+      <td>33.783395</td>
+      <td>2.559864</td>
+      <td>0.459624</td>
     </tr>
     <tr>
       <th>14</th>
@@ -5078,9 +5078,9 @@ return Plotly;
       <td>14_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>250.000000</td>
-      <td>-5.000000</td>
-      <td>-5.000000</td>
+      <td>509.020998</td>
+      <td>5.000000</td>
+      <td>-4.751724</td>
     </tr>
     <tr>
       <th>15</th>
@@ -5088,9 +5088,9 @@ return Plotly;
       <td>15_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>307.961153</td>
-      <td>-5.000000</td>
-      <td>2.397658</td>
+      <td>3.732803</td>
+      <td>-2.859017</td>
+      <td>2.815493</td>
     </tr>
     <tr>
       <th>16</th>
@@ -5098,9 +5098,9 @@ return Plotly;
       <td>16_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>1.979475</td>
-      <td>-3.724633</td>
-      <td>-3.054416</td>
+      <td>301.438248</td>
+      <td>-5.000000</td>
+      <td>3.342113</td>
     </tr>
     <tr>
       <th>17</th>
@@ -5108,9 +5108,9 @@ return Plotly;
       <td>17_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>152.440858</td>
-      <td>-1.468638</td>
-      <td>4.473973</td>
+      <td>138.515644</td>
+      <td>-5.000000</td>
+      <td>-2.862722</td>
     </tr>
     <tr>
       <th>18</th>
@@ -5118,9 +5118,9 @@ return Plotly;
       <td>18_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>38.262258</td>
-      <td>1.865889</td>
-      <td>1.723526</td>
+      <td>187.401593</td>
+      <td>5.000000</td>
+      <td>-0.431252</td>
     </tr>
     <tr>
       <th>19</th>
@@ -5128,9 +5128,9 @@ return Plotly;
       <td>19_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>1.204800</td>
-      <td>3.429642</td>
-      <td>-1.850144</td>
+      <td>530.000000</td>
+      <td>-5.000000</td>
+      <td>5.000000</td>
     </tr>
     <tr>
       <th>20</th>
@@ -5138,9 +5138,9 @@ return Plotly;
       <td>20_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>20.491141</td>
-      <td>-3.111946</td>
-      <td>-3.207496</td>
+      <td>130.027404</td>
+      <td>-1.667870</td>
+      <td>-3.129206</td>
     </tr>
     <tr>
       <th>21</th>
@@ -5148,9 +5148,9 @@ return Plotly;
       <td>21_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>396.265231</td>
-      <td>1.615743</td>
-      <td>5.000000</td>
+      <td>303.208674</td>
+      <td>-5.000000</td>
+      <td>2.591093</td>
     </tr>
     <tr>
       <th>22</th>
@@ -5158,9 +5158,9 @@ return Plotly;
       <td>22_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>78.373405</td>
-      <td>2.021828</td>
-      <td>-0.860696</td>
+      <td>312.658912</td>
+      <td>5.000000</td>
+      <td>2.762132</td>
     </tr>
     <tr>
       <th>23</th>
@@ -5168,9 +5168,9 @@ return Plotly;
       <td>23_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>338.597483</td>
-      <td>-0.515329</td>
+      <td>248.825210</td>
       <td>5.000000</td>
+      <td>1.740560</td>
     </tr>
     <tr>
       <th>24</th>
@@ -5178,9 +5178,9 @@ return Plotly;
       <td>24_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>77.906836</td>
-      <td>0.159941</td>
-      <td>2.291858</td>
+      <td>6.872877</td>
+      <td>3.243380</td>
+      <td>-2.079200</td>
     </tr>
     <tr>
       <th>25</th>
@@ -5188,9 +5188,9 @@ return Plotly;
       <td>25_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>33.783560</td>
-      <td>-1.513557</td>
-      <td>2.897931</td>
+      <td>19.245979</td>
+      <td>-2.056105</td>
+      <td>2.717109</td>
     </tr>
     <tr>
       <th>26</th>
@@ -5198,9 +5198,9 @@ return Plotly;
       <td>26_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>12.692627</td>
-      <td>3.541320</td>
-      <td>-0.329239</td>
+      <td>99.287168</td>
+      <td>-3.345577</td>
+      <td>-0.625026</td>
     </tr>
     <tr>
       <th>27</th>
@@ -5208,9 +5208,9 @@ return Plotly;
       <td>27_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>69.281651</td>
-      <td>0.731711</td>
-      <td>2.237350</td>
+      <td>39.160476</td>
+      <td>1.568463</td>
+      <td>2.825131</td>
     </tr>
     <tr>
       <th>28</th>
@@ -5218,9 +5218,9 @@ return Plotly;
       <td>28_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>64.462918</td>
-      <td>-0.645260</td>
-      <td>2.602360</td>
+      <td>493.052695</td>
+      <td>2.929909</td>
+      <td>-5.000000</td>
     </tr>
     <tr>
       <th>29</th>
@@ -5228,9 +5228,9 @@ return Plotly;
       <td>29_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>7.344320</td>
-      <td>-2.300140</td>
-      <td>3.009978</td>
+      <td>365.933375</td>
+      <td>0.174046</td>
+      <td>5.000000</td>
     </tr>
     <tr>
       <th>30</th>
@@ -5238,9 +5238,9 @@ return Plotly;
       <td>30_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>8.130590</td>
-      <td>3.396868</td>
-      <td>-2.400577</td>
+      <td>261.281221</td>
+      <td>-1.973495</td>
+      <td>5.000000</td>
     </tr>
     <tr>
       <th>31</th>
@@ -5248,9 +5248,9 @@ return Plotly;
       <td>31_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>39.409917</td>
-      <td>1.499852</td>
-      <td>2.586904</td>
+      <td>210.946552</td>
+      <td>-3.682406</td>
+      <td>-5.000000</td>
     </tr>
     <tr>
       <th>32</th>
@@ -5258,9 +5258,9 @@ return Plotly;
       <td>32_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>15.818640</td>
-      <td>2.973421</td>
-      <td>0.604600</td>
+      <td>4.532426</td>
+      <td>-2.538289</td>
+      <td>3.361523</td>
     </tr>
     <tr>
       <th>33</th>
@@ -5268,9 +5268,9 @@ return Plotly;
       <td>33_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>4.276327</td>
-      <td>3.411570</td>
-      <td>-1.272830</td>
+      <td>44.358208</td>
+      <td>4.375609</td>
+      <td>-2.472410</td>
     </tr>
     <tr>
       <th>34</th>
@@ -5278,9 +5278,9 @@ return Plotly;
       <td>34_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>6.826229</td>
-      <td>3.168003</td>
-      <td>1.105968</td>
+      <td>12.458924</td>
+      <td>3.581053</td>
+      <td>-2.618780</td>
     </tr>
     <tr>
       <th>35</th>
@@ -5288,9 +5288,9 @@ return Plotly;
       <td>35_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>24.579469</td>
-      <td>2.845814</td>
-      <td>0.157620</td>
+      <td>150.399690</td>
+      <td>5.000000</td>
+      <td>-2.504436</td>
     </tr>
     <tr>
       <th>36</th>
@@ -5298,9 +5298,9 @@ return Plotly;
       <td>36_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>44.156082</td>
-      <td>-2.796980</td>
-      <td>1.814690</td>
+      <td>1.383135</td>
+      <td>2.792604</td>
+      <td>2.028837</td>
     </tr>
     <tr>
       <th>37</th>
@@ -5308,9 +5308,9 @@ return Plotly;
       <td>37_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>245.438023</td>
-      <td>-5.000000</td>
-      <td>-1.569823</td>
+      <td>99.175548</td>
+      <td>-2.232998</td>
+      <td>0.847885</td>
     </tr>
     <tr>
       <th>38</th>
@@ -5318,9 +5318,9 @@ return Plotly;
       <td>38_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>8.056916</td>
-      <td>-2.446433</td>
-      <td>3.435856</td>
+      <td>172.623680</td>
+      <td>-0.663052</td>
+      <td>-1.761468</td>
     </tr>
     <tr>
       <th>39</th>
@@ -5328,9 +5328,9 @@ return Plotly;
       <td>39_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>96.964785</td>
-      <td>-3.240325</td>
-      <td>0.627758</td>
+      <td>263.763696</td>
+      <td>-5.000000</td>
+      <td>-1.348010</td>
     </tr>
   </tbody>
 </table>
