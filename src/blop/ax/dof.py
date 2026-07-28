@@ -8,7 +8,6 @@ from typing import Literal, cast
 
 from ax import ChoiceParameterConfig, RangeParameterConfig
 from ax.api.types import TParameterValue
-from scipy.optimize import Bounds
 
 from ..protocols import Actuator
 
