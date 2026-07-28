@@ -76,7 +76,7 @@ for name, det in dets.items():
     print(f"{name} : {det}")
 ```
 
-# Setting up an optimization
+## Setting up an optimization
 
 ```{code-cell} ipython3
 toro_R = motors["toroidMirror01"]["R"]
