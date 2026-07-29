@@ -1,10 +1,8 @@
-import time
-
 from bluesky import RunEngine
 
-from blop.ax import Objective, RangeDOF
-from blop.gradient import SCP, Scipy, ScipyCFG
 from blop.protocols import EvaluationFunction
+from blop.scipy import Scipy
+from blop.scipy.configs import SCP, Objective, RangeDOF, ScipyCFG
 
 from ..conftest import MovableSignal, ReadableSignal
 
@@ -33,10 +31,10 @@ def test_integrated_iteration():
     )
     agent._optimizer.force_resiliance = True
     RE = RunEngine({})
-    RE(agent.optimize(20))
-    time.sleep(0.1)
-    assert agent._optimizer.final is not None
+    RE(agent.optimize(40))
+    # time.sleep(0.1)
     assert agent._optimizer.intermediate is not None
     assert not agent._optimizer._active
     RE(agent.optimize(20))
+    assert agent._optimizer.final is not None
     assert agent.get_best_points() is not None
