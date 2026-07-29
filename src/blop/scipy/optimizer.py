@@ -1,69 +1,17 @@
 """Core Scipy optimizer porting scipy algorithms."""
 
 from collections import OrderedDict
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
-from enum import StrEnum
 from threading import Thread
 from typing import Any, cast
 
 import numpy as np
 from scipy.optimize import OptimizeResult, dual_annealing, minimize, shgo
 
-from blop.ax.dof import RangeDOF
-from blop.ax.objective import Objective
 from blop.protocols import ID_KEY, Optimizer
-
-
-class SCP(StrEnum):
-    """Enumeration of all optimizers currently supported/tested.
-
-    #TODO all commented optimizers require jacobian and are currently suspended in impl until its clear that external
-    # gradient sampling is necesary and clearly cross implementable. likely necesary for noisy opts but this is clearly
-    # a usage defined addition.
-    """
-
-    Default = "Default"
-
-    Nelder_Mead = "Nelder-Mead"
-    Powell = "Powell"
-    CG = "CG"
-    BFGS = "BFGS"
-    # Newton_CG = "Newton-CG"
-    LBFGS = "L-BFGS-B"
-    TNC = "TNC"
-    COBYLA = "COBYLA"
-    COBYQA = "COBYQA"
-    SLSQP = "SLSQP"
-    Trust_Constr = "trust-constr"
-    # Dogleg = "dogleg"
-    # Trust_NCG = "trust-ncg"
-    # Trust_Exact = "trust-exact"
-    # Trust_Krylov = "trust-krylov"
-
-    Dual_Annealing = "dual annealing"
-    SHGO = "SHGO"
-
-
-@dataclass
-class ScipyCFG:
-    """
-    Configuration dataclass that encompasses the core optimization problem and extra parameters within Scipy.
-
-    Used as the optimizer/generation function is not injectable like in Ax
-    """
-
-    dofs: Sequence[RangeDOF]
-    objective: Objective
-    # dof_constraints: Sequence[DOFConstraint] | None = None
-    # outcome_constraints: Sequence[OutcomeConstraint] | None = None
-    optimizer: SCP = SCP.Default
-    initial: Sequence[float] | None = None
-    rescale: Sequence[float] | float | None = None
-    max_iter: int | None = 100
-    eps: float | None = None
-    threads: int | None = None
+from blop.scipy.configs import SCP, Objective, ScipyCFG
 
 
 class ScipyOptimizer(Optimizer):

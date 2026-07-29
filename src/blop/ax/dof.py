@@ -124,10 +124,6 @@ class RangeDOF(DOF):
             scaling=self.scaling,
         )
 
-    def to_scipy_bounds(self) -> Bounds:
-        """Convert DOF to the Scipy equivalent Bounds."""
-        return Bounds(lb=self.bounds[0], ub=self.bounds[1])
-
 
 @dataclass(frozen=True, kw_only=True, eq=False)
 class ChoiceDOF(DOF):

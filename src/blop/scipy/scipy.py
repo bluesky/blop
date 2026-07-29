@@ -6,8 +6,6 @@ from typing import Any, cast
 import bluesky.preprocessors as bpp
 from bluesky.callbacks import CallbackBase
 
-from blop.ax.dof import RangeDOF
-from blop.ax.objective import Objective
 from blop.callbacks.logger import OptimizationLogger
 from blop.callbacks.router import OptimizationCallbackRouter
 from blop.plans import optimize
@@ -18,9 +16,10 @@ from blop.protocols import (
     OptimizationProblem,
     Sensor,
 )
+from blop.scipy.configs import SCP, Objective, RangeDOF, ScipyCFG
 from blop.utils import InferredReadable
 
-from .optimizer import SCP, ScipyCFG, ScipyOptimizer
+from .optimizer import ScipyOptimizer
 
 
 class Scipy:
