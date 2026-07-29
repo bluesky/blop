@@ -4,8 +4,10 @@ from unittest.mock import MagicMock
 import pytest
 
 from blop.ax import Objective, RangeDOF
-from blop.gradient import Scipy, ScipyCFG, ScipyOptimizer
 from blop.protocols import ID_KEY, AcquisitionPlan, EvaluationFunction
+from blop.scipy import ScipyOptimizer
+from blop.scipy.configs import ScipyCFG
+from blop.scipy.scipy import Scipy
 
 from ..conftest import MovableSignal, ReadableSignal
 
