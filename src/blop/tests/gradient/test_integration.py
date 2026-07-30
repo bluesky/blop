@@ -29,12 +29,12 @@ def test_integrated_iteration():
         evaluation_function=deflating_evaluation(),
         timeout=5,
     )
-    agent._optimizer.force_resiliance = True
+    agent.optimizer.force_resiliance = True
     RE = RunEngine({})
     RE(agent.optimize(40))
     # time.sleep(0.1)
-    assert agent._optimizer.intermediate is not None
-    assert not agent._optimizer._active
+    assert agent.optimizer.intermediate is not None
+    assert not agent.optimizer._active
     RE(agent.optimize(20))
-    assert agent._optimizer.final is not None
+    assert agent.optimizer.final is not None
     assert agent.get_best_points() is not None

@@ -1,4 +1,5 @@
 """Normalized SciPy optimizer wrappers used by the cooperative optimization loop."""
+
 from typing import Any
 
 import numpy as np
@@ -173,8 +174,9 @@ class DualAnnealing(InnerOptimizer):
             # Adapt SciPy's (x, f, context) callback to the outer callback
             # contract that expects a normalized result object.
             callback=lambda x, f, c: callback(self.dual_callback(x, f, c)),
-            minimizer_kwargs=self.inner_args if self.inner_args else {} | {
-                "callback": callback, "bounds": bounds, "options": opt | kws if kws else {}},
+            minimizer_kwargs=self.inner_args
+            if self.inner_args
+            else {} | {"callback": callback, "bounds": bounds, "options": opt | kws if kws else {}},
             **self.base_args if self.base_args else {},
         )
 
@@ -227,8 +229,9 @@ class SHGO(InnerOptimizer):
         return shgo(
             func=cost,
             bounds=bounds,
-            minimizer_kwargs=self.inner_args if self.inner_args else {} | {
-                "callback": callback, "bounds": bounds, "options": opt | kws if kws else {}},
+            minimizer_kwargs=self.inner_args
+            if self.inner_args
+            else {} | {"callback": callback, "bounds": bounds, "options": opt | kws if kws else {}},
             **self.base_args if self.base_args else {},
             workers=workers,
         )
