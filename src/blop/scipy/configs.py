@@ -109,7 +109,7 @@ class SCP(StrEnum):
     # a usage defined addition.
     """
 
-    Default = "Default"
+    Default = "L-BFGS-B"
 
     Nelder_Mead = "Nelder-Mead"
     Powell = "Powell"
