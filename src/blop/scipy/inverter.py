@@ -1,50 +1,193 @@
-from dataclasses import asdict
+"""Core Scipy optimizer porting scipy algorithms."""
 
-from scipy.optimize import OptimizeResult, dual_annealing, minimize, shgo
+from collections import OrderedDict
+from collections.abc import Mapping
+from concurrent.futures import Future, ThreadPoolExecutor
+from threading import Thread
+from typing import Any, cast
 
-from blop.scipy.configs import SCP, ScipyCFG
+import numpy as np
+from scipy.optimize import OptimizeResult
+
+from blop.protocols import ID_KEY, Optimizer
+from blop.scipy.configs import SCP, Objective, ScipyCFG
+from blop.scipy.normalized import InnerOptimizer
 from blop.scipy.optimizer import ScipyOptimizer
 
-
-class InnerOptimizer():
-    def call(self, cost, callback, kws=None) -> ScipyOptimizer.Result | OptimizeResult:
-        raise NotImplementedError("Optimizer spec not Provided")
+ScipyResult = ScipyOptimizer.Result
+_Request = ScipyOptimizer._Request
 
 
-class Optimize(InnerOptimizer):
-    """
-    Parameter Normalized implementation of scipy Optimize to be passed to a loop inversion.
+class OuterOptimizer(Optimizer):
+    """An optimizer object to supply an interactive interface for the scipy optimizers, with some caveats."""
 
-    derives from inner optimizer protocol class
-    """
-
-    def __init__(self, optimizer: SCP, config: ScipyCFG) -> None:
+    def __init__(self, optimizer: InnerOptimizer, config: ScipyCFG | None = None, timeout: int | None = 200):
         self.optimizer = optimizer
-        self.config = config
+        self.session(config=config if config else optimizer.config, timeout=timeout)
 
-    def call(self, cost, callback, kws=None) -> ScipyOptimizer.Result:
-        bounds = kws.pop("bounds", self.config.dofs) if kws else self.config.dofs
-        x0 = kws.pop("x0", self.config.initial) if kws else self.config.initial
-        return minimize(
-                    fun=cost,
-                    x0=x0,
-                    method=self.config.optimizer if self.config.optimizer != SCP.Default else None,
-                    bounds=bounds,
-                    callback=callback,
-                    options=kws,
-                )
+    def session(self, config: ScipyCFG, timeout: int | None = None):
+        """
+        Through path for initialization and stateful reinitialization of optimization.
 
-class DualAnnealing(InnerOptimizer):
+        derived so that mutiple initializations and lifetimes can be used for optimization.
+        Such as the standard ScipyOptimizer(...) call or a following "with"
+        """
+        self._params: list[str] = [dof.parameter_name for dof in config.dofs]
+        self._increment: int = 0
+        self._objective: Objective = config.objective
+        self.force_resiliance = False  # kinda hidden for now
+        self._scale = np.ones(len(config.dofs))
+        self._active: dict[int, ScipyOptimizer._Request] = OrderedDict()
+        self.intermediate: OptimizeResult | ScipyOptimizer.Result | None = None
+        self.final: OptimizeResult | ScipyOptimizer.Result | None = None
+        self.SUGGESTION_TIMEOUT = timeout
 
-    def __init__(self, optimizer: SCP, config: ScipyCFG) -> None:
-        self.optimizer = optimizer
-        self.config = config
+        if config.rescale is not None:
+            if isinstance(config.rescale, list):
+                self._scale = config.rescale
+            else:
+                self._scale *= config.rescale
 
-    def call(self, cost, callback, kws=None):
-        self.final = dual_annealing(
-            func=cost,
-            x0=_x,
-            bounds=self._bounds,
-            callback=dual_callback,
-            minimizer_kwargs={"callback": default_callback, "bounds": self._bounds, "options": kws},
-        )
+        def cost(x):  # thread safety needs timeout so there is not infinite hang on programs
+            """Cooperative thread that defers evaluation of cost call by scipy to the run engine."""
+            req = _Request(args=x, future=Future())
+            self._active[self._increment] = req
+            self._increment += 1
+            res = req.future.result(timeout=self.SUGGESTION_TIMEOUT)
+            if res is None:
+                raise ValueError("return value is not present")
+            return res
+
+        kw: dict = {}
+        self._thread_pool = None
+        if config.max_iter is not None:
+            if config.optimizer is not SCP.Trust_Constr:
+                kw["max_iter"] = config.max_iter
+            else:
+                kw["maxiter"] = config.max_iter
+        if config.eps is not None:
+            kw["eps"] = config.eps
+
+        def default_callback(intermediate_result: OptimizeResult):
+            if self.intermediate and self.intermediate.fun < intermediate_result.fun:
+                return
+            self.intermediate = intermediate_result
+            self.intermediate.nit = self._increment
+
+        def mini_worker():
+            try:
+                if config.threads:
+                    with ThreadPoolExecutor(max_workers=config.threads) as pool:
+                        kw["workers"] = pool.map
+                        self.optimizer.call(cost, default_callback, kws=kw)
+                else:
+                    self.optimizer.call(cost, default_callback, kws=kw)
+
+            except (KeyboardInterrupt, TimeoutError):
+                # have to have timeout, so made it that it can be restored to its state on agent auto reboot
+                if self.final:
+                    return
+                if self.intermediate:
+                    self.final = self.intermediate
+                else:
+                    self.final = ScipyResult(list(self.optimizer.x0), np.nan, nit=self._increment)
+
+        self._t = Thread(target=mini_worker, name="optimizer")
+        self._t.start()
+        return self
+
+    def __enter__(self):
+        """Magic convenience to use "with" to better control thread lifetime."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Lifetime threads when using with."""
+        self.close()
+
+    def suggest(self, num_points: int | None = None) -> list[dict]:
+        """
+        Provide a set of points in the input space, to be evaulated next.
+
+        The "_id" key is optional and can be used to identify suggested trials for later evaluation
+        and ingestion.
+
+        Parameters
+        ----------
+        num_points : int | None, optional
+            The number of points to suggest. If not provided, will default to 1.
+
+        Returns
+        -------
+        list[dict]
+            A list of dictionaries, each containing a parameterization of a point to evaluate next.
+            Each dictionary must contain a unique "_id" key to identify each parameterization.
+        """
+        if self.final is not None:
+            vector = [x_n * s for s, x_n in zip(self._scale, self.final.x, strict=True)]
+            suggestion = dict(zip(self._params, vector, strict=True))
+            suggestion[ID_KEY] = self.final.nit
+            return [suggestion]
+
+        suggestions = []
+        for id in list(self._active.keys())[: num_points if num_points is not None else 1]:
+            x = self._active[id].args
+            vector = [x_n * s for s, x_n in zip(self._scale, x, strict=True)]
+
+            suggestion = dict(zip(self._params, vector, strict=True))
+            suggestion[ID_KEY] = id
+            suggestions.append(suggestion)
+        return suggestions
+
+    def ingest(self, points: list[dict]) -> None:
+        """
+        Ingest a set of points into the experiment. Either from previously suggested points or from an external source.
+
+        The "_id" key is optional.
+
+        Parameters
+        ----------
+        points : list[dict]
+            A list of dictionaries, each containing the outcomes of each suggested parameterization.
+        """
+        for res in points:
+            y = res[self._objective.name]
+            if res[ID_KEY] not in self._active:
+                if not self.force_resiliance:
+                    raise ValueError("optimizer did not expect to receive an update")
+                continue
+            self._active.pop(res[ID_KEY]).future.set_result(y)
+
+    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
+        """
+        Get a list of the optimal point found during optimization.
+
+        Returns
+        -------
+        list[tuple[int, TParameterization, TOutcome]]
+            Each element in the list is a tuple of:
+              - trial index (int)
+              - parameter values (dict)
+              - metric values (dict, where values may be (value, sem) tuples)
+
+        See Also
+        --------
+        navigate_to_best : Plan stub to move actuators to a best point.
+        """
+        result = self.intermediate
+        if self.final is not None:
+            result = self.final
+        if (result is None) or (self._objective is None):
+            raise ValueError("no optimization epoch has been recorded")
+
+        vector = [x_n * s for s, x_n in zip(self._scale, result.x, strict=True)]
+        cart = [
+            result.nit - 1,
+            cast(Mapping, dict(zip(self._params, vector, strict=True))),
+            cast(Mapping, {self._objective.name: result.fun}),
+        ]
+        return cart
+
+    def close(self):
+        """Clear out futures to allow cleanup of threads."""
+        for ind in list(self._active.keys()):
+            self._active.pop(ind).future.set_exception(KeyboardInterrupt("Execution has been suspended"))
