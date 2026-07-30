@@ -22,7 +22,6 @@ First, let's import what we need and start the data infrastructure:
 ```{code-cell} ipython3
 import logging
 import time
-import warnings
 from typing import Any
 
 from bluesky.protocols import HasHints, HasParent, Hints, NamedMovable, Readable, Status
@@ -32,10 +31,9 @@ from tiled.client import from_uri
 from tiled.client.container import Container
 from tiled.server import SimpleTiledServer
 
-from blop.ax import Objective, RangeDOF
-from blop.gradient import SCP, Scipy, ScipyCFG
+from blop.scipy import SCP, ScipyCFG, Objective, RangeDOF, Scipy
 
-# Suppress noisy logs from httpx
+# Suppress noisy logs from httpx 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 ```
 
