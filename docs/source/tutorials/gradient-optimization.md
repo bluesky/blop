@@ -176,7 +176,7 @@ RE(agent.optimize(10))
 Sometimes a default **Agent** optimization may not do all that you'd like. We expose a configuration object called ScipyCFG and a pure scipy interface so that the classic parameters of scipy minimize can be tweaked (and some multipoint sampling can be used).
 
 ```{code-cell} ipython3
-config = ScipyCFG(dofs=dofs, objective=objectives[0], optimizer=SCP.Dual_Annealing, threads=4, max_iter=2, eps=0.1)
+config = ScipyCFG(dofs=dofs, objective=objectives[0], optimizer=SCP.DUAL_ANNEALING, threads=4, max_iter=2, eps=0.1)
 agent = Scipy(
     sensors=sensors,
     config=config,
