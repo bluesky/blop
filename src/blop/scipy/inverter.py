@@ -3,6 +3,7 @@
 from collections import OrderedDict
 from collections.abc import Mapping
 from concurrent.futures import Future, ThreadPoolExecutor
+from dataclasses import dataclass
 from threading import Thread
 from typing import Any, cast
 
@@ -11,14 +12,16 @@ from scipy.optimize import OptimizeResult
 
 from blop.protocols import ID_KEY, Optimizer
 from blop.scipy.configs import SCP, Objective, ScipyCFG
-from blop.scipy.normalized import InnerOptimizer
-from blop.scipy.optimizer import ScipyOptimizer
-
-ScipyResult = ScipyOptimizer.Result
-_Request = ScipyOptimizer._Request
+from blop.scipy.normalizers import InnerOptimizer, ScipyResult
 
 
-class OuterOptimizer(Optimizer):
+@dataclass
+class _Request:
+    args: tuple
+    future: Future
+
+
+class InteractiveOptimizer(Optimizer):
     """An optimizer object to supply an interactive interface for the scipy optimizers, with some caveats."""
 
     def __init__(self, optimizer: InnerOptimizer, config: ScipyCFG | None = None, timeout: int | None = 200):
@@ -37,9 +40,9 @@ class OuterOptimizer(Optimizer):
         self._objective: Objective = config.objective
         self.force_resiliance = False  # kinda hidden for now
         self._scale = np.ones(len(config.dofs))
-        self._active: dict[int, ScipyOptimizer._Request] = OrderedDict()
-        self.intermediate: OptimizeResult | ScipyOptimizer.Result | None = None
-        self.final: OptimizeResult | ScipyOptimizer.Result | None = None
+        self._active: dict[int, _Request] = OrderedDict()
+        self.intermediate: OptimizeResult | ScipyResult | None = None
+        self.final: OptimizeResult | ScipyResult | None = None
         self.SUGGESTION_TIMEOUT = timeout
 
         if config.rescale is not None:

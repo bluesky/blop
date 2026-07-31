@@ -1,20 +1,18 @@
 """Scipy Backend for Pertubative gradient and in house global optimizers."""
 
 from .configs import SCP, Objective, RangeDOF, ScipyCFG
-from .inverter import OuterOptimizer
-from .normalized import SHGO, DualAnnealing, Optimize
-from .optimizer import ScipyOptimizer
-from .scipy_v2 import Scipy
+from .inverter import InteractiveOptimizer
+from .normalizers import SHGO, DualAnnealing, Minimize
+from .scipy import Scipy
 
 __all__ = [
     "SCP",
     "ScipyCFG",
     "Scipy",
-    "ScipyOptimizer",
     "DualAnnealing",
-    "Optimize",
+    "Minimize",
     "SHGO",
-    "OuterOptimizer",
+    "InteractiveOptimizer",
     "Objective",
     "RangeDOF",
 ]

@@ -5,8 +5,9 @@ import pytest
 
 from blop.ax import Objective, RangeDOF
 from blop.protocols import ID_KEY, AcquisitionPlan, EvaluationFunction
-from blop.scipy import ScipyOptimizer
 from blop.scipy.configs import ScipyCFG
+from blop.scipy.inverter import InteractiveOptimizer
+from blop.scipy.normalizers import ScipyResult
 from blop.scipy.scipy import Scipy
 
 from ..conftest import MovableSignal, ReadableSignal
@@ -22,7 +23,7 @@ def mock_acquisition_plan():
     return MagicMock(spec=AcquisitionPlan)
 
 
-# agent._optimizer.close() is called so the standard timeout doesnt make the testing take forever
+# agent.optimizer.close() is called so the standard timeout doesnt make the testing take forever
 
 
 @pytest.fixture(scope="function")
@@ -88,7 +89,7 @@ def test_general_init(mock_evaluation_function, mock_acquisition_plan):
     assert agent.actuators == [dof1.actuator, dof2.actuator]
     assert agent.evaluation_function == mock_evaluation_function
     assert agent.acquisition_plan == mock_acquisition_plan
-    agent._optimizer.close()
+    agent.optimizer.close()
 
 
 def test_agent_init(mock_evaluation_function, mock_acquisition_plan):
@@ -112,7 +113,7 @@ def test_agent_init(mock_evaluation_function, mock_acquisition_plan):
     assert agent.actuators == [dof1.actuator, dof2.actuator]
     assert agent.evaluation_function == mock_evaluation_function
     assert agent.acquisition_plan == mock_acquisition_plan
-    agent._optimizer.close()
+    agent.optimizer.close()
 
 
 def test_agent_to_optimization_problem(mock_evaluation_function):
@@ -129,9 +130,9 @@ def test_agent_to_optimization_problem(mock_evaluation_function):
     assert optimization_problem.evaluation_function == mock_evaluation_function
     assert optimization_problem.actuators == [movable1, movable2]
     assert optimization_problem.sensors == []
-    assert isinstance(optimization_problem.optimizer, ScipyOptimizer)
+    assert isinstance(optimization_problem.optimizer, InteractiveOptimizer)
     assert optimization_problem.acquisition_plan is None
-    agent._optimizer.close()
+    agent.optimizer.close()
 
 
 def test_agent_suggest(agent_prep):
@@ -142,13 +143,13 @@ def test_agent_suggest(agent_prep):
     assert "test_movable2" in parameterizations[0]
     assert isinstance(parameterizations[0]["test_movable1"], (int, float))
     assert isinstance(parameterizations[0]["test_movable2"], (int, float))
-    agent_prep._optimizer.close()
+    agent_prep.optimizer.close()
 
 
 def test_agent_ingest(agent_prep):
     agent_prep.suggest()
     agent_prep.ingest([{"test_movable1": 0.1, "test_movable2": 0.2, "test_objective": 0.3, ID_KEY: 0}])
-    agent_prep._optimizer.close()
+    agent_prep.optimizer.close()
 
 
 def test_agent_multithread(agent_prep):
@@ -156,9 +157,9 @@ def test_agent_multithread(agent_prep):
     agent_prep.ingest([{"test_movable1": 0.1, "test_movable2": 0.2, "test_objective": 0.3, ID_KEY: 0}])
     time.sleep(0.1)
     params = agent_prep.suggest(4)
-    print(agent_prep._optimizer._active)
+    print(agent_prep.optimizer._active)
     assert len(params) > 1
-    agent_prep._optimizer.close()
+    agent_prep.optimizer.close()
 
 
 # ============================================================================
@@ -187,8 +188,8 @@ def test_scipy_cfg_rescaling_scalar(mock_evaluation_function, mock_acquisition_p
     )
 
     # Verify rescaling was applied
-    assert agent._optimizer._scale[0] == 2.0
-    agent._optimizer.close()
+    assert agent.optimizer._scale[0] == 2.0
+    agent.optimizer.close()
 
 
 def test_scipy_cfg_rescaling_list(mock_evaluation_function, mock_acquisition_plan):
@@ -214,9 +215,9 @@ def test_scipy_cfg_rescaling_list(mock_evaluation_function, mock_acquisition_pla
     )
 
     # Verify rescaling per DOF
-    assert agent._optimizer._scale[0] == 2.0
-    assert agent._optimizer._scale[1] == 3.0
-    agent._optimizer.close()
+    assert agent.optimizer._scale[0] == 2.0
+    assert agent.optimizer._scale[1] == 3.0
+    agent.optimizer.close()
 
 
 def test_scipy_cfg_initial_parameters(mock_evaluation_function, mock_acquisition_plan):
@@ -243,7 +244,7 @@ def test_scipy_cfg_initial_parameters(mock_evaluation_function, mock_acquisition
     )
 
     # Verify initial parameters are set
-    agent._optimizer.close()
+    agent.optimizer.close()
 
 
 def test_scipy_cfg_max_iter_and_eps(mock_evaluation_function, mock_acquisition_plan):
@@ -263,7 +264,7 @@ def test_scipy_cfg_max_iter_and_eps(mock_evaluation_function, mock_acquisition_p
     assert config.eps == 1e-6
 
 
-def test_agent_invalid_optimizer_enum(mock_evaluation_function, mock_acquisition_plan):
+def test_agent_invalidoptimizer_enum(mock_evaluation_function, mock_acquisition_plan):
     """Test Scipy.Agent raises ValueError for invalid optimizer."""
     movable = MovableSignal(name="test_movable")
     dof = RangeDOF(actuator=movable, bounds=(0, 10), parameter_type="float")
@@ -276,7 +277,7 @@ def test_agent_invalid_optimizer_enum(mock_evaluation_function, mock_acquisition
             dofs=[dof],
             objectives=[objective],
             evaluation_function=mock_evaluation_function,
-            optimizer="invalid_optimizer",
+            optimizer="invalidoptimizer",
         )
 
 
@@ -310,7 +311,7 @@ def test_subscribe_callback(secoundary_agent_prep):
 
     assert len(secoundary_agent_prep.callbacks) == initial_count + 1
     assert callback in secoundary_agent_prep.callbacks
-    secoundary_agent_prep._optimizer.close()
+    secoundary_agent_prep.optimizer.close()
 
 
 def test_subscribe_duplicate_raises(secoundary_agent_prep):
@@ -321,7 +322,7 @@ def test_subscribe_duplicate_raises(secoundary_agent_prep):
     with pytest.raises(ValueError, match="already subscribed"):
         secoundary_agent_prep.subscribe(callback)
 
-    secoundary_agent_prep._optimizer.close()
+    secoundary_agent_prep.optimizer.close()
 
 
 def test_unsubscribe_callback(secoundary_agent_prep):
@@ -332,7 +333,7 @@ def test_unsubscribe_callback(secoundary_agent_prep):
 
     secoundary_agent_prep.unsubscribe(callback)
     assert callback not in secoundary_agent_prep.callbacks
-    secoundary_agent_prep._optimizer.close()
+    secoundary_agent_prep.optimizer.close()
 
 
 def test_unsubscribe_not_subscribed_raises(secoundary_agent_prep):
@@ -342,7 +343,7 @@ def test_unsubscribe_not_subscribed_raises(secoundary_agent_prep):
     with pytest.raises(ValueError):
         secoundary_agent_prep.unsubscribe(callback)
 
-    secoundary_agent_prep._optimizer.close()
+    secoundary_agent_prep.optimizer.close()
 
 
 # ============================================================================
@@ -355,7 +356,7 @@ def test_scipy_secoundary(secoundary_agent_prep):
     suggestions = secoundary_agent_prep.suggest(1)
     assert len(suggestions) == 1
     assert "test_movable" in suggestions[0]
-    secoundary_agent_prep._optimizer.close()
+    secoundary_agent_prep.optimizer.close()
 
 
 def test_scipy_large_rescale_factors(mock_evaluation_function, mock_acquisition_plan):
@@ -387,21 +388,21 @@ def test_scipy_large_rescale_factors(mock_evaluation_function, mock_acquisition_
     # Values should still be in original bounds
     assert 0 <= suggestions[0]["test_movable1"] <= 10
     assert 0 <= suggestions[0]["test_movable2"] <= 10
-    agent._optimizer.close()
+    agent.optimizer.close()
 
 
 def test_suggest_after_final_optimization(secoundary_agent_prep):
     """Test suggest() after final optimization returns final result parameterization."""
     # Set final optimization result
-    secoundary_agent_prep._optimizer.final = ScipyOptimizer.Result(
+    secoundary_agent_prep.optimizer.final = ScipyResult(
         x=[7.0],
         fun=0.95,
         nit=20,
         status=0,
     )
 
-    suggestions = secoundary_agent_prep._optimizer.suggest()
+    suggestions = secoundary_agent_prep.optimizer.suggest()
     assert len(suggestions) == 1
     assert suggestions[0]["test_movable"] == 7.0
     assert suggestions[0][ID_KEY] == 20
-    secoundary_agent_prep._optimizer.close()
+    secoundary_agent_prep.optimizer.close()
