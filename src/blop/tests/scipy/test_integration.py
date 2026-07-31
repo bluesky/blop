@@ -14,7 +14,7 @@ def test_integrated_iteration():
     readable = ReadableSignal(name="test_readable")
     dof = RangeDOF(actuator=movable, bounds=(0, 1e-4), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    config = ScipyCFG(dofs=[dof], objective=objective, optimizer=SCP.Dual_Annealing)
+    config = ScipyCFG(dofs=[dof], objective=objective, optimizer=SCP.DUAL_ANNEALING)
 
     class deflating_evaluation(EvaluationFunction):
         def __init__(self):

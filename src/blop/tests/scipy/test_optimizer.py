@@ -96,7 +96,7 @@ def test_scipy_optimizer_dual_annealing_specific(mock_evaluation_function, mock_
     config = ScipyCFG(
         dofs=[dof],
         objective=objective,
-        optimizer=SCP.Dual_Annealing,
+        optimizer=SCP.DUAL_ANNEALING,
     )
 
     inner = DualAnnealing(config)
@@ -114,7 +114,7 @@ def test_scipy_optimizer_SHGO_specific(mock_evaluation_function, mock_acquisitio
     config = ScipyCFG(
         dofs=[dof],
         objective=objective,
-        optimizer=SCP.Dual_Annealing,
+        optimizer=SCP.SHGO,
     )
 
     inner = SHGO(config)
