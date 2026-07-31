@@ -38,11 +38,8 @@ class Scipy:
         acquisition_plan: AcquisitionPlan | None = None,
         **kwargs: Any,
     ):
-        try:
-            if config.optimizer not in SCP:
-                raise ValueError(f"optimizer {config.optimizer} not in supported optimizers:{list(SCP)}")
-        except TypeError:
-            ...
+        if config.optimizer not in list(SCP):
+            raise ValueError(f"optimizer {config.optimizer} not in supported optimizers:{list(SCP)}")
 
         match config.optimizer:
             case SCP.Dual_Annealing:
