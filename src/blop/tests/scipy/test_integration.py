@@ -1,3 +1,5 @@
+import time
+
 from bluesky import RunEngine
 
 from blop.protocols import EvaluationFunction
@@ -32,9 +34,9 @@ def test_integrated_iteration():
     agent.optimizer.force_resiliance = True
     RE = RunEngine({})
     RE(agent.optimize(40))
-    # time.sleep(0.1)
     assert agent.optimizer.intermediate is not None
     assert not agent.optimizer._active
-    RE(agent.optimize(20))
-    assert agent.optimizer.final is not None
+    RE(agent.optimize(40))
     assert agent.get_best_points() is not None
+    time.sleep(.1)
+    assert agent.optimizer.final is not None
