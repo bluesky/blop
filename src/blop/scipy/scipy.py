@@ -42,7 +42,7 @@ class Scipy:
             raise ValueError(f"optimizer {config.optimizer} not in supported optimizers:{list(SCP)}")
 
         match config.optimizer:
-            case SCP.Dual_Annealing:
+            case SCP.DUAL_ANNEALING:
                 self.inner = DualAnnealing(config)
             case SCP.SHGO:
                 self.inner = SHGO(config)

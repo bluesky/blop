@@ -111,8 +111,8 @@ class SCP(StrEnum):
 
     Default = "L-BFGS-B"
 
-    Nelder_Mead = "Nelder-Mead"
-    Powell = "Powell"
+    NELDER_MEAD = "Nelder-Mead"
+    PoWELL = "Powell"
     CG = "CG"
     BFGS = "BFGS"
     # Newton_CG = "Newton-CG"
@@ -121,13 +121,13 @@ class SCP(StrEnum):
     COBYLA = "COBYLA"
     COBYQA = "COBYQA"
     SLSQP = "SLSQP"
-    Trust_Constr = "trust-constr"
+    TRUST_CONSTR = "trust-constr"
     # Dogleg = "dogleg"
     # Trust_NCG = "trust-ncg"
     # Trust_Exact = "trust-exact"
     # Trust_Krylov = "trust-krylov"
 
-    Dual_Annealing = "dual annealing"
+    DUAL_ANNEALING = "dual annealing"
     SHGO = "SHGO"
 
 

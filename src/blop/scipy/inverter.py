@@ -64,7 +64,7 @@ class InteractiveOptimizer(Optimizer):
         kw: dict = {}
         self._thread_pool = None
         if config.max_iter is not None:
-            if config.optimizer is not SCP.Trust_Constr:
+            if config.optimizer is not SCP.TRUST_CONSTR:
                 kw["max_iter"] = config.max_iter
             else:
                 kw["maxiter"] = config.max_iter
