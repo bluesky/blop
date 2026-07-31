@@ -17,9 +17,9 @@ from blop.protocols import (
     Sensor,
 )
 from blop.scipy.configs import SCP, Objective, RangeDOF, ScipyCFG
+from blop.scipy.inverter import InteractiveOptimizer
+from blop.scipy.normalizers import SHGO, DualAnnealing, Minimize
 from blop.utils import InferredReadable
-
-from .optimizer import ScipyOptimizer
 
 
 class Scipy:
@@ -38,6 +38,19 @@ class Scipy:
         acquisition_plan: AcquisitionPlan | None = None,
         **kwargs: Any,
     ):
+        try:
+            if config.optimizer not in SCP:
+                raise ValueError(f"optimizer {config.optimizer} not in supported optimizers:{list(SCP)}")
+        except TypeError:
+            ...
+
+        match config.optimizer:
+            case SCP.Dual_Annealing:
+                self.inner = DualAnnealing(config)
+            case SCP.SHGO:
+                self.inner = SHGO(config)
+            case _:
+                self.inner = Minimize(config)
 
         self.config = config
         self._sensors = sensors
@@ -45,8 +58,8 @@ class Scipy:
         self._evaluation_function = evaluation_function
         self._acquisition_plan = acquisition_plan
         self.timeout = kwargs.pop("timeout", 200)
-        self._optimizer = ScipyOptimizer(self.config, timeout=self.timeout)
-        self._optimizer.force_resiliance = self.resiliance = kwargs.pop("resiliance", True)
+        self.optimizer = InteractiveOptimizer(self.inner, timeout=self.timeout)
+        self.optimizer.force_resiliance = self.resiliance = kwargs.pop("resiliance", True)
         self._readable_cache: dict[str, InferredReadable] = {}
         self._callbacks: list[CallbackBase] = [OptimizationLogger()]
         self._callback_router = OptimizationCallbackRouter(self._callbacks)
@@ -95,11 +108,6 @@ class Scipy:
 
 
         """  # noqa: D401
-        try:
-            if optimizer not in SCP:
-                raise ValueError(f"optimizer {optimizer} not in supported optimizers:{list(SCP)}")
-        except TypeError:
-            ...
         if len(objectives) > 1:
             raise ValueError("Multiple Objectives are not supported for gradient optimizers")
         config = ScipyCFG(
@@ -196,7 +204,7 @@ class Scipy:
         blop.plans.optimize : Uses the optimization problem to run optimization.
         """
         return OptimizationProblem(
-            optimizer=self._optimizer,
+            optimizer=self.optimizer,
             actuators=self._actuators,
             sensors=self._sensors,
             evaluation_function=self._evaluation_function,
@@ -223,7 +231,7 @@ class Scipy:
             A list of dictionaries, each containing a parameterization of a point to
             evaluate next. Each dictionary includes an "_id" key for identification.
         """
-        return self._optimizer.suggest(num_points)
+        return self.optimizer.suggest(num_points)
 
     def ingest(self, points: list[dict]) -> None:
         """
@@ -246,14 +254,14 @@ class Scipy:
 
         For complete examples, see :doc:`/how-to-guides/attach-data-to-experiments`.
         """
-        self._optimizer.ingest(points)
+        self.optimizer.ingest(points)
 
     def optimize(self, iterations=10, n_points=1):
         """Optimization plan wrapper used by the agent interface."""
-        if self._optimizer.final is not None:
-            self.config.initial = self._optimizer.final.x
-            self._optimizer = ScipyOptimizer(self.config, timeout=self.timeout)
-            self._optimizer.force_resiliance = self.resiliance
+        if self.optimizer.final is not None:
+            self.config.initial = self.optimizer.final.x
+            self.optimizer = InteractiveOptimizer(self.inner, timeout=self.timeout)
+            self.optimizer.force_resiliance = self.resiliance
         optimize_plan = optimize(
             self.to_optimization_problem(),
             iterations=iterations,
@@ -267,7 +275,7 @@ class Scipy:
                 self._callback_router,
             )
         if self.sessioning:
-            with self._optimizer:
+            with self.optimizer:
                 yield from optimize_plan
         else:
             yield from optimize_plan
@@ -291,4 +299,4 @@ class Scipy:
         --------
         navigate_to_best : Plan stub to move actuators to a best point.
         """
-        return self._optimizer.get_best_points()
+        return self.optimizer.get_best_points()

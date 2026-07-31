@@ -1,14 +1,22 @@
 """Normalized SciPy optimizer wrappers used by the cooperative optimization loop."""
 
+from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
 from scipy.optimize import OptimizeResult, dual_annealing, minimize, shgo
 
 from blop.scipy.configs import SCP, ScipyCFG
-from blop.scipy.optimizer import ScipyOptimizer
 
-ScipyResult = ScipyOptimizer.Result
+
+@dataclass
+class ScipyResult:
+    """Class to unify Optimize Result and other Scipy Results."""
+
+    x: list[float | int]
+    fun: float
+    nit: int
+    status: int = 2
 
 
 class InnerOptimizer:
@@ -75,7 +83,7 @@ class InnerOptimizer:
         raise NotImplementedError("Optimizer implementation not provided")
 
 
-class Optimize(InnerOptimizer):
+class Minimize(InnerOptimizer):
     """Normalized wrapper around ``scipy.optimize.minimize``.
 
     This adapter reads default bounds and initial conditions from ``ScipyCFG``

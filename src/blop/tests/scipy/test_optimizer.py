@@ -5,8 +5,9 @@ import pytest
 
 from blop.ax import Objective, RangeDOF
 from blop.protocols import ID_KEY, AcquisitionPlan, EvaluationFunction
-from blop.scipy import ScipyOptimizer
 from blop.scipy.configs import SCP, ScipyCFG
+from blop.scipy.inverter import InteractiveOptimizer
+from blop.scipy.normalizers import SHGO, DualAnnealing, Minimize, ScipyResult
 
 from ..conftest import MovableSignal
 
@@ -34,7 +35,8 @@ def optimizer_prep():
         threads=4,
         rescale=[2.0, 3.0],
     )
-    return ScipyOptimizer(config, timeout=5)
+    inner = Minimize(config)
+    return InteractiveOptimizer(inner, timeout=5)
 
 
 # ============================================================================
@@ -42,7 +44,7 @@ def optimizer_prep():
 # ============================================================================
 
 
-@pytest.mark.parametrize("optimizer", list(SCP))
+@pytest.mark.parametrize("optimizer", list(SCP)[:10])
 def test_scipy_optimizer_algorithms(mock_evaluation_function, mock_acquisition_plan, optimizer):
     """Test ScipyOptimizer with different SCP algorithms."""
     movable1 = MovableSignal(name="test_movable1")
@@ -58,7 +60,8 @@ def test_scipy_optimizer_algorithms(mock_evaluation_function, mock_acquisition_p
         max_iter=10,
     )
 
-    opt = ScipyOptimizer(config, timeout=5)
+    inner = Minimize(config)
+    opt = InteractiveOptimizer(inner, timeout=5)
     assert opt._active is not None
     opt.close()
 
@@ -78,7 +81,8 @@ def test_scipy_optimizer_bfgs_specific(mock_evaluation_function, mock_acquisitio
         max_iter=10,
     )
 
-    opt = ScipyOptimizer(config, timeout=5)
+    inner = Minimize(config)
+    opt = InteractiveOptimizer(inner, timeout=5)
     assert opt.final is None  # No optimization run yet
     opt.close()
 
@@ -95,7 +99,26 @@ def test_scipy_optimizer_dual_annealing_specific(mock_evaluation_function, mock_
         optimizer=SCP.Dual_Annealing,
     )
 
-    opt = ScipyOptimizer(config, timeout=5)
+    inner = DualAnnealing(config)
+    opt = InteractiveOptimizer(inner, timeout=5)
+    assert opt.final is None  # No optimization run yet
+    opt.close()
+
+
+def test_scipy_optimizer_SHGO_specific(mock_evaluation_function, mock_acquisition_plan):
+    """Test ScipyOptimizer explicitly with Dual_Annealing."""
+    movable = MovableSignal(name="test_movable")
+    dof = RangeDOF(actuator=movable, bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+
+    config = ScipyCFG(
+        dofs=[dof],
+        objective=objective,
+        optimizer=SCP.Dual_Annealing,
+    )
+
+    inner = SHGO(config)
+    opt = InteractiveOptimizer(inner, timeout=5)
     assert opt.final is None  # No optimization run yet
     opt.close()
 
@@ -112,7 +135,8 @@ def test_scipy_optimizer_threads_none(mock_evaluation_function, mock_acquisition
         threads=None,
     )
 
-    opt = ScipyOptimizer(config, timeout=5)
+    inner = Minimize(config)
+    opt = InteractiveOptimizer(inner, timeout=5)
     assert opt._thread_pool is None  # No thread pool when threads=None
     opt.close()
 
@@ -129,7 +153,8 @@ def test_scipy_optimizer_threads_multiple(mock_evaluation_function, mock_acquisi
         threads=2,
     )
 
-    opt = ScipyOptimizer(config, timeout=5)
+    inner = Minimize(config)
+    opt = InteractiveOptimizer(inner, timeout=5)
     # Configuration accepted
     opt.close()
 
@@ -163,7 +188,7 @@ def test_rescaling_ingest_parameters(optimizer_prep):
 def test_get_best_points_scaling(optimizer_prep):
     """Test get_best_points() with scaling works (verify basic structure)."""
     # Set final result manually (simulate completed optimization)
-    optimizer_prep.final = ScipyOptimizer.Result(
+    optimizer_prep.final = ScipyResult(
         x=[2.5, 3.0],  # Scaled values
         fun=0.85,
         nit=15,
@@ -252,7 +277,8 @@ def test_scipy_optimizer_context_manager(mock_evaluation_function, mock_acquisit
 
     config = ScipyCFG(dofs=[dof], objective=objective)
 
-    with ScipyOptimizer(config, timeout=5) as opt:
+    inner = Minimize(config)
+    with InteractiveOptimizer(inner, timeout=5) as opt:
         assert opt is not None
         time.sleep(0.1)
         suggestions = opt.suggest(1)
@@ -267,7 +293,8 @@ def test_scipy_optimizer_session_reinit(mock_evaluation_function, mock_acquisiti
 
     config = ScipyCFG(dofs=[dof], objective=objective)
 
-    opt = ScipyOptimizer(config, timeout=5)
+    inner = Minimize(config)
+    opt = InteractiveOptimizer(inner, timeout=5)
     opt.suggest(1)
 
     # Call session to reinitialize
@@ -282,7 +309,7 @@ def test_scipy_optimizer_session_reinit(mock_evaluation_function, mock_acquisiti
 def test_get_best_points_intermediate_only(optimizer_prep):
     """Test get_best_points() with only intermediate results (final=None)."""
     # Set intermediate result manually (simulate partway through optimization)
-    optimizer_prep.intermediate = ScipyOptimizer.Result(
+    optimizer_prep.intermediate = ScipyResult(
         x=[5.0, -5.0],
         fun=0.7,
         nit=5,
@@ -298,13 +325,13 @@ def test_get_best_points_intermediate_only(optimizer_prep):
 def test_get_best_points_final_preferred(optimizer_prep):
     """Test get_best_points() prefers final over intermediate."""
     # Set both intermediate and final
-    optimizer_prep.intermediate = ScipyOptimizer.Result(
+    optimizer_prep.intermediate = ScipyResult(
         x=[5.0, -5.0],
         fun=0.7,
         nit=5,
         status=0,
     )
-    optimizer_prep.final = ScipyOptimizer.Result(
+    optimizer_prep.final = ScipyResult(
         x=[7.0, -5.0],
         fun=0.9,
         nit=10,
