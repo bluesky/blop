@@ -7,15 +7,17 @@ from ...backends import SimBackend
 
 
 class KBMirror(StandardReadable):
-    """KB mirror with curvature radius control (for XRTBackend).
+    """KB mirror with curvature radius and pitch-offset controls.
 
-    Exposes a single radius parameter that directly controls the XRT mirror R value.
+    Exposes a radius parameter that directly controls the XRT mirror R value and
+    an extraPitch parameter for local alignment around the nominal mirror pitch.
     Used with XRTBackend for ray-tracing simulation.
 
     Args:
         backend: Simulation backend (should be XRTBackend)
         mirror_index: 0 for first mirror (vertical), 1 for second mirror (horizontal)
         initial_radius: Initial curvature radius in mm
+        extraPitch: Additional pitch offset after initial alignment
         name: Device name
     """
 
@@ -24,14 +26,15 @@ class KBMirror(StandardReadable):
         backend: SimBackend,
         mirror_index: int,
         initial_radius: float = 30000.0,
+        extraPitch: float = 0,
         name: str = "",
     ):
         self._backend = backend
         self._mirror_index = mirror_index
 
-        # Curvature radius signal
         with self.add_children_as_readables(Format.HINTED_SIGNAL):
             self.radius = soft_signal_rw(float, initial_radius)
+            self.extraPitch = soft_signal_rw(float, extraPitch)
 
         super().__init__(name=name)
 
@@ -47,6 +50,7 @@ class KBMirror(StandardReadable):
         return {
             "mirror_index": self._mirror_index,
             "radius": await self.radius.get_value(),
+            "extraPitch": await self.extraPitch.get_value(),
         }
 
 

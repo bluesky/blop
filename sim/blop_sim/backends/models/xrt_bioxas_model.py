@@ -224,6 +224,17 @@ def build_beamline():
         z=[0.0, 0.0, 1.0],
     )
 
+    BioXAS_Main.PreDBHRScreen = rscreens.Screen(
+        bl=BioXAS_Main,
+        name=r"PreDBHRScreen",
+        center=[0, 29100, 76.37608487182582],
+        x=[1.0, -0.0, 0.0],
+        z=[0.0, 0.0, 1.0],
+        limPhysX=[0.0, 0.0],
+        limPhysY=[0.0, 0.0],
+        cLimits=[0.0, 0.0],
+    )
+
     BioXAS_Main.DBHR1 = raycing.oes.OE(
         bl=BioXAS_Main,
         name=r"DBHR1",
@@ -297,6 +308,8 @@ def run_process(BioXAS_Main):
 
     PhotonShutter_local = BioXAS_Main.PhotonShutter.propagate(beam=Mirror2_global)
 
+    PreDBHRScreen_local = BioXAS_Main.PreDBHRScreen.expose(beam=Mirror2_global)
+
     DBHR1_global, DBHR1_local = BioXAS_Main.DBHR1.reflect(beam=Mirror2_global)
 
     DBHR2_global, DBHR2_local = BioXAS_Main.DBHR2.reflect(beam=DBHR1_global)
@@ -322,6 +335,7 @@ def run_process(BioXAS_Main):
         "Mirror2_global": Mirror2_global,
         "Mirror2_local": Mirror2_local,
         "PhotonShutter_local": PhotonShutter_local,
+        "PreDBHRScreen_local": PreDBHRScreen_local,
         "DBHR1_global": DBHR1_global,
         "DBHR1_local": DBHR1_local,
         "DBHR2_global": DBHR2_global,
