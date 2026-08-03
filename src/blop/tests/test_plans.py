@@ -11,7 +11,7 @@ from blop.protocols import (
     EvaluationFunction,
     OptimizationProblem,
     Optimizer,
-    StoppingConditions,
+    SupportsStoppingCriteria,
     TrialFaultAware,
 )
 
@@ -483,7 +483,7 @@ def test_acquire_baseline_from_current(RE):
 def test_optimize_max_number_of_iterations_before_stop(RE):
     """Tests that the optimization stops at a set number of iterations"""
 
-    class StoppingOptimizer(Optimizer, StoppingConditions): ...
+    class StoppingOptimizer(Optimizer, SupportsStoppingCriteria): ...
 
     optimizer = MagicMock(spec=StoppingOptimizer)
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
@@ -510,7 +510,7 @@ def test_optimize_max_number_of_iterations_before_stop(RE):
 def test_optimize_stop_condition_not_hit(RE):
     """Tests that optimization stops before stop condition is met"""
 
-    class StoppingOptimizer(Optimizer, StoppingConditions): ...
+    class StoppingOptimizer(Optimizer, SupportsStoppingCriteria): ...
 
     optimizer = MagicMock(spec=StoppingOptimizer)
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
@@ -535,7 +535,7 @@ def test_optimize_stop_condition_not_hit(RE):
 def test_optimize_stops_when_change_is_within_tolerance(RE):
     """Tests that the optimization stops when the change in objective value is within a specified tolerance."""
 
-    class ToleranceStopOptimizer(Optimizer, StoppingConditions):
+    class ToleranceStopOptimizer(Optimizer, SupportsStoppingCriteria):
         def __init__(self, tolerance: float):
             self.tolerance = tolerance
             self._last_value: float | None = None

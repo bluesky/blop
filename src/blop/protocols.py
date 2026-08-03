@@ -82,9 +82,9 @@ class TrialFaultAware(Protocol):
 
 
 @runtime_checkable
-class StoppingConditions(Protocol):
+class SupportsStoppingCriteria(Protocol):
     """
-    A protocol for optimizers that can evaluate global stopping criteria.
+    A protocol for optimizers that can evaluate stopping criteria.
 
     This allows optimization plans to terminate early through tolerance, max_iterations etc.
     """

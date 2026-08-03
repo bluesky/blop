@@ -17,7 +17,7 @@ from .protocols import (
     CanRegisterSuggestions,
     OptimizationProblem,
     Sensor,
-    StoppingConditions,
+    SupportsStoppingCriteria,
     TrialFaultAware,
 )
 from .utils import InferredReadable, _maybe_checkpoint, collect_optimization_metadata, route_suggestions
@@ -219,7 +219,7 @@ def optimize(
             # Perform a single step of the optimization
             uid, suggestions, outcomes = yield from optimize_step(optimization_problem, n_points, **kwargs)
 
-            if isinstance(optimization_problem.optimizer, StoppingConditions):
+            if isinstance(optimization_problem.optimizer, SupportsStoppingCriteria):
                 stop_now, stop_reason = optimization_problem.optimizer.should_stop()
                 if stop_now:
                     reason = stop_reason if stop_reason is not None else "No reason provided"
