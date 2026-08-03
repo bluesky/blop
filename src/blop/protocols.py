@@ -82,6 +82,26 @@ class TrialFaultAware(Protocol):
 
 
 @runtime_checkable
+class GlobalStoppingAware(Protocol):
+    """
+    A protocol for optimizers that can evaluate global stopping criteria.
+
+    This allows optimization plans to terminate early through tolerance, max_iterations etc.
+    """
+
+    def should_stop(self) -> tuple[bool, str | None]:
+        """
+        Evaluate whether optimization should terminate early.
+
+        Returns
+        -------
+        tuple[bool, str | None]
+            (stop_now, reason). If stop_now is True, optimization should stop. If reason is provided, it will be logged.
+        """
+        ...
+
+
+@runtime_checkable
 class Checkpointable(Protocol):
     """
     A protocol for objects that can can write state to persistent storage.

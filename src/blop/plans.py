@@ -15,6 +15,7 @@ from .protocols import (
     ID_KEY,
     Actuator,
     CanRegisterSuggestions,
+    GlobalStoppingAware,
     OptimizationProblem,
     Sensor,
     TrialFaultAware,
@@ -167,6 +168,7 @@ def optimize(
     n_points: int = 1,
     checkpoint_interval: int | None = None,
     readable_cache: dict[str, InferredReadable] | None = None,
+    global_stopper: GlobalStoppingAware | None = None,
     **kwargs: Any,
 ) -> MsgGenerator[None]:
     """
@@ -187,6 +189,8 @@ def optimize(
     readable_cache: dict[str, InferredReadable] | None = None
         Cache of readable objects to store the suggestions and outcomes as events.
         If None, a new cache will be created.
+    global_stopper: GlobalStoppingAware | None = None,
+        The global stopping strategy to determine when the optimization should stop.
     **kwargs : Any
         Additional keyword arguments to pass to the :func:`optimize_step` plan.
 
@@ -217,6 +221,12 @@ def optimize(
         for i in range(iterations):
             # Perform a single step of the optimization
             uid, suggestions, outcomes = yield from optimize_step(optimization_problem, n_points, **kwargs)
+
+            if isinstance(optimization_problem.optimizer, GlobalStoppingAware):
+                stop_now, stop_reason = optimization_problem.optimizer.should_stop()
+                if stop_now:
+                    print(f"Global stopping triggered at iteration {i + 1}: {stop_reason}")
+                    return
 
             # Read the optimization step into the Bluesky and emit events for each suggestion and outcome
             yield from read_step(uid, suggestions, outcomes, n_points, readable_cache)
