@@ -11,6 +11,7 @@ from blop.protocols import (
     EvaluationFunction,
     OptimizationProblem,
     Optimizer,
+    StoppingConditions,
     TrialFaultAware,
 )
 
@@ -477,3 +478,106 @@ def test_acquire_baseline_from_current(RE):
 
     optimizer.ingest.assert_called_once_with([{"objective": 0.0, "_id": "baseline", "x1": -1.0}])
     assert evaluation_function.call_count == 1
+
+
+def test_optimize_max_number_of_iterations_before_stop(RE):
+    """Tests that the optimization stops at a set number of iterations"""
+
+    class StoppingOptimizer(Optimizer, StoppingConditions): ...
+
+    optimizer = MagicMock(spec=StoppingOptimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+
+    # Set up the optimizer to stop after 2 iterations
+    optimizer.should_stop.side_effect = [
+        (False, None),
+        (True, "converged"),
+    ]
+    evaluation_function = MagicMock(spec=EvaluationFunction, return_value=[{"objective": 0.0, "_id": 0}])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1")],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+    )
+
+    RE(optimize(optimization_problem, iterations=5))
+
+    assert optimizer.suggest.call_count == 2
+    assert optimizer.should_stop.call_count == 2
+
+
+def test_optimize_stop_condition_not_hit(RE):
+    """Tests that optimization stops before stop condition is met"""
+
+    class StoppingOptimizer(Optimizer, StoppingConditions): ...
+
+    optimizer = MagicMock(spec=StoppingOptimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+
+    # Allow for 3 iterations
+    optimizer.should_stop.side_effect = [(False, None), (False, None), (False, None)]
+    evaluation_function = MagicMock(spec=EvaluationFunction, return_value=[{"objective": 0.0, "_id": 0}])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1")],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+    )
+
+    # We only are running for 2 iterations, so stop condition should not be met
+    RE(optimize(optimization_problem, iterations=2))
+
+    assert optimizer.suggest.call_count == 2
+    assert optimizer.should_stop.call_count == 2
+
+
+def test_optimize_stops_when_change_is_within_tolerance(RE):
+    """Tests that the optimization stops when the change in objective value is within a specified tolerance."""
+
+    class ToleranceStopOptimizer(Optimizer, StoppingConditions):
+        def __init__(self, tolerance: float):
+            self.tolerance = tolerance
+            self._last_value: float | None = None
+            self._previous_value: float | None = None
+
+        def suggest(self, num_points: int | None = None) -> list[dict]:
+            return [{"x1": 0.0, "_id": 0}]
+
+        def ingest(self, points: list[dict]) -> None:
+            self._previous_value = self._last_value
+            self._last_value = points[0]["objective"]
+
+        def should_stop(self) -> tuple[bool, str | None]:
+            if self._previous_value is None or self._last_value is None:
+                return (False, None)
+
+            if abs(self._last_value - self._previous_value) <= self.tolerance:
+                return (True, "objective change within tolerance")
+
+            return (False, None)
+
+    # Stop optimization when the change is within 0.1
+    optimizer = ToleranceStopOptimizer(tolerance=0.1)
+    evaluation_function = MagicMock(
+        spec=EvaluationFunction,
+        side_effect=[
+            [{"objective": 0.5, "_id": 0}],
+            [{"objective": 0.55, "_id": 0}],
+        ],
+    )
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1")],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+    )
+
+    callback, events = _collect_optimize_events()
+    RE.subscribe(callback)
+    try:
+        RE(optimize(optimization_problem, iterations=5))
+    finally:
+        RE.unsubscribe(callback)
+
+    assert evaluation_function.call_count == 2

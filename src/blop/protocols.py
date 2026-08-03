@@ -82,7 +82,7 @@ class TrialFaultAware(Protocol):
 
 
 @runtime_checkable
-class GlobalStoppingAware(Protocol):
+class StoppingConditions(Protocol):
     """
     A protocol for optimizers that can evaluate global stopping criteria.
 
