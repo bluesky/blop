@@ -132,11 +132,16 @@ class QueueserverClient:
         self,
         re_manager_api: bluesky_queueserver_api.zmq.REManagerAPI | bluesky_queueserver_api.http.REManagerAPI,
         document_dispatcher: RemoteDispatcher,
+        *,
+        autostart: bool = True,
     ):
         self._rm = re_manager_api
         self._dispatcher = document_dispatcher
         self._consumer_callback: ConsumerCallback | None = None
         self._listener_thread: threading.Thread | None = None
+
+        response = self._rm.queue_autostart(autostart)
+        logger.debug(f"Set queue autostart to {autostart}. Response: {response}")
 
     def check_environment(self) -> None:
         """
@@ -189,7 +194,7 @@ class QueueserverClient:
         if plan_name not in res["plans_allowed"]:
             raise ValueError(f"Plan '{plan_name}' is not available in the queueserver environment")
 
-    def submit_plan(self, plan: BPlan, autostart: bool = True, timeout: int = 600) -> None:
+    def submit_plan(self, plan: BPlan) -> None:
         """
         Submit a plan to the queueserver queue.
 
@@ -197,19 +202,9 @@ class QueueserverClient:
         ----------
         plan : BPlan
             The plan to submit.
-        autostart : bool, optional
-            If True, start the queue after adding the plan.
-        timeout : float, optional
-            Timeout in seconds when waiting for queue to be idle.
         """
         response = self._rm.item_add(plan)
         logger.debug(f"Submitted plan to queue. Response: {response}")
-
-        if autostart:
-            logger.debug("Waiting for queue to be idle or paused")
-            self._rm.wait_for_idle_or_paused(timeout=timeout)
-            response = self._rm.queue_start()
-            logger.debug(f"Started queue. Response: {response}")
 
     def start_listener(
         self,
@@ -373,7 +368,7 @@ class QueueserverOptimizationRunner:
             future: Future[OptimizationResult] = Future()
             self._current_future = future
         try:
-            self._client.submit_plan(plan, autostart=self._autostart)
+            self._client.submit_plan(plan)
         except Exception as exc:
             with self._state_lock:
                 self._fail_future(exc)
@@ -423,7 +418,7 @@ class QueueserverOptimizationRunner:
             future: Future[OptimizationResult] = Future()
             self._current_future = future
         try:
-            self._client.submit_plan(plan, autostart=self._autostart)
+            self._client.submit_plan(plan)
         except Exception as exc:
             with self._state_lock:
                 self._fail_future(exc)
@@ -566,4 +561,4 @@ class QueueserverOptimizationRunner:
                 f"Submitting iteration {self._state.current_iteration}/{self._state.max_iterations} "
                 f"with correlation uid: {self._state.current_uid}"
             )
-        self._client.submit_plan(plan, autostart=self._autostart)
+        self._client.submit_plan(plan)

@@ -19,30 +19,8 @@ import xrt.backends.raycing.sources as rsources
 import xrt.plotter as xrtplot
 import xrt.runner as xrtrun
 
-limits = [[-0.6, 0.6], [-0.45, 0.45]]
-
-
-def build_histRGB(lb, gb, limits=None, isScreen=False, shape=None):
-    if shape is None:
-        shape = [256, 256]
-    good = (lb.state == 1) | (lb.state == 2)
-    if isScreen:
-        x, y, z = lb.x[good], lb.z[good], lb.y[good]
-    else:
-        x, y, z = lb.x[good], lb.y[good], lb.z[good]
-    goodlen = len(lb.x[good])
-    hist2dRGB = np.zeros((shape[1], shape[0], 3), dtype=np.float64)
-    hist2d = np.zeros((shape[1], shape[0]), dtype=np.float64)
-
-    if limits is None and goodlen > 0:
-        limits = np.array([[np.min(x), np.max(x)], [np.min(y), np.max(y)], [np.min(z), np.max(z)]])
-
-    if goodlen > 0:
-        beamLimits = [limits[1], limits[0]] or None
-        flux = gb.Jss[good] + gb.Jpp[good]
-        hist2d, _, _ = np.histogram2d(y, x, bins=[shape[1], shape[0]], range=beamLimits, weights=flux)
-        hist2dRGB = None
-    return hist2d, hist2dRGB, limits
+from ..core import SimBackend
+from ..xrt import build_histRGB, limits
 
 
 def build_beamline():
@@ -128,6 +106,74 @@ def main():
     beamLine.alignE = E0
     plots = define_plots()
     xrtrun.run_ray_tracing(plots=plots, backend=r"raycing", beamLine=beamLine)
+
+
+class KBBackend(SimBackend):
+    """XRT ray-tracing simulation backend.
+
+    Uses the XRT package to perform realistic ray-tracing through a KB mirror pair.
+    Much slower than SimpleBackend but more physically accurate.
+    """
+
+    def __init__(self, noise: bool = False):
+        """Initialize XRT backend."""
+        super().__init__()
+        self._beamline = None
+        self._limits = [[-0.6, 0.6], [-0.45, 0.45]]
+        self._noise = noise
+
+    def _ensure_beamline(self):
+        """Build XRT beamline if not already built."""
+        if self._beamline is None:
+            self._beamline = build_beamline()
+
+    async def generate_beam(self) -> np.ndarray:
+        """Generate beam using XRT ray-tracing.
+
+        Returns:
+            2D numpy array with shape (300, 400)
+        """
+        self._ensure_beamline()
+
+        # Get KB mirror radii from devices
+        mirror_radii = await self._get_mirror_radii()
+
+        # Update XRT beamline mirror parameters
+        self._beamline.toroidMirror01.R = mirror_radii[0]  # Vertical mirror
+        self._beamline.toroidMirror02.R = mirror_radii[1]  # Horizontal mirror
+
+        # Run ray tracing
+        outDict = run_process(self._beamline)
+        lb = outDict["screen01beamLocal01"]
+
+        # Build histogram from ray data
+        hist2d, _, _ = build_histRGB(lb, lb, limits=self._limits, isScreen=True, shape=[400, 300])
+        image = hist2d
+
+        # Add noise if requested
+        if self._noise:
+            image += 1e-3 * np.abs(np.random.standard_normal(size=image.shape))
+
+        return image
+
+    async def _get_mirror_radii(self) -> list[float]:
+        """Get KB mirror radii from registered devices.
+
+        Returns:
+            [R1, R2] where R1 is first mirror (vertical), R2 is second mirror (horizontal)
+        """
+        # Default radii from xrt_kb_model.py
+        radii = [38245.0, 21035.0]
+
+        for name, device in self._device_states.items():
+            if device["type"] == "kb_mirror_xrt":
+                state = await self._get_device_state(name)
+                mirror_index = state["mirror_index"]
+                radius = state["radius"]
+                if mirror_index < len(radii):
+                    radii[mirror_index] = radius
+
+        return radii
 
 
 if __name__ == "__main__":
