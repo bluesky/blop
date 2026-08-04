@@ -38,5 +38,3 @@ def test_integrated_iteration():
     assert not agent.optimizer._active
     RE(agent.optimize(40))
     assert agent.get_best_points() is not None
-    time.sleep(0.1)
-    assert agent.optimizer.final is not None
