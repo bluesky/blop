@@ -112,7 +112,7 @@ class SCP(StrEnum):
     Default = "L-BFGS-B"
 
     NELDER_MEAD = "Nelder-Mead"
-    PoWELL = "Powell"
+    POWELL = "Powell"
     CG = "CG"
     BFGS = "BFGS"
     # Newton_CG = "Newton-CG"
