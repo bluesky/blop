@@ -1,4 +1,3 @@
-
 from bluesky import RunEngine
 
 from blop.protocols import EvaluationFunction
