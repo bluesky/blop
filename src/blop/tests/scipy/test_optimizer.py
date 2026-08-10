@@ -102,6 +102,7 @@ def test_scipy_optimizer_internal_runtime_error(mock_evaluation_function, mock_a
         def call(self, cost, callback, kws=None) -> ScipyResult | OptimizeResult:
             cost([1, 2])
             raise RuntimeError("This should be caught by main thread")
+
     inner = ErrFun(config)
     opt = InteractiveOptimizer(inner, timeout=1)
     with pytest.raises(RuntimeError):

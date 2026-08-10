@@ -107,7 +107,7 @@ class InteractiveOptimizer(Optimizer):
         self._t.start()
         if not self.thread_start.wait(timeout=1):
             try:
-                err = self.thread_monitor.exception(timeout=.1)
+                err = self.thread_monitor.exception(timeout=0.1)
                 if err:
                     raise err
             except TimeoutError:
