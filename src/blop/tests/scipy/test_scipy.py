@@ -1,4 +1,3 @@
-import time
 import types
 from unittest.mock import MagicMock
 
