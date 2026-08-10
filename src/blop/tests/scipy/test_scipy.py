@@ -404,11 +404,13 @@ def test_suggest_after_final_optimization(secoundary_agent_prep):
     secoundary_agent_prep.optimizer.close()
 
 
-def test_optimize_after_final_optimization(secoundary_agent_prep):
+def test_optimize(secoundary_agent_prep):
     """Test agent setup of optimize plane"""
     # Set final optimization result
 
-    assert isinstance(secoundary_agent_prep.optimize(0), types.GeneratorType)
+    iter = secoundary_agent_prep.optimize(0)
+    assert isinstance(iter, types.GeneratorType)
+    next(iter)
     secoundary_agent_prep.optimizer.close()
 
 
@@ -422,5 +424,7 @@ def test_optimize_with_prev_final(secoundary_agent_prep):
         status=0,
     )
 
-    assert isinstance(secoundary_agent_prep.optimize(0), types.GeneratorType)
+    iter = secoundary_agent_prep.optimize(0)
+    assert isinstance(iter, types.GeneratorType)
+    next(iter)
     secoundary_agent_prep.optimizer.close()

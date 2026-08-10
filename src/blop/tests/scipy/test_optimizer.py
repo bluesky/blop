@@ -29,12 +29,7 @@ def optimizer_prep():
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
     dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
     objective = Objective(name="test_objective", minimize=False)
-    config = ScipyCFG(
-        dofs=[dof1, dof2],
-        objective=objective,
-        threads=4,
-        rescale=[2.0, 3.0],
-    )
+    config = ScipyCFG(dofs=[dof1, dof2], objective=objective, threads=4, rescale=[2.0, 3.0], eps=0.5)
     inner = Minimize(config)
     return InteractiveOptimizer(inner, timeout=1)
 
@@ -64,51 +59,6 @@ def test_scipy_optimizer_algorithms(mock_evaluation_function, mock_acquisition_p
     opt = InteractiveOptimizer(inner, timeout=1)
     assert opt._active is not None
     opt.close()
-
-
-def test_scipy_optimizer_internal_startup_error(mock_evaluation_function, mock_acquisition_plan):
-    """Test ScipyOptimizer passes error from scipy internal (optimizer not defined)"""
-    movable1 = MovableSignal(name="test_movable1")
-    movable2 = MovableSignal(name="test_movable2")
-    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
-    dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
-    objective = Objective(name="test_objective", minimize=False)
-
-    config = ScipyCFG(
-        dofs=[dof1, dof2],
-        objective=objective,
-        max_iter=10,
-    )
-    inner = InnerOptimizer(config)
-    with pytest.raises(NotImplementedError):
-        InteractiveOptimizer(inner, timeout=1)
-
-
-def test_scipy_optimizer_internal_runtime_error(mock_evaluation_function, mock_acquisition_plan):
-    """Test ScipyOptimizer passes error from scipy internal (optimizer not defined)"""
-    movable1 = MovableSignal(name="test_movable1")
-    movable2 = MovableSignal(name="test_movable2")
-    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
-    dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
-    objective = Objective(name="test_objective", minimize=False)
-
-    config = ScipyCFG(
-        dofs=[dof1, dof2],
-        objective=objective,
-        max_iter=10,
-    )
-
-    class ErrFun(InnerOptimizer):
-        def call(self, cost, callback, kws=None) -> ScipyResult | OptimizeResult:
-            cost([1, 2])
-            raise RuntimeError("This should be caught by main thread")
-
-    inner = ErrFun(config)
-    opt = InteractiveOptimizer(inner, timeout=1)
-    with pytest.raises(RuntimeError):
-        sg = opt.suggest()
-        opt.ingest([sg[0] | {objective.name: -1}])
-        opt.suggest()
 
 
 def test_scipy_optimizer_bfgs_specific(mock_evaluation_function, mock_acquisition_plan):
@@ -254,6 +204,51 @@ def test_get_best_points_scaling(optimizer_prep):
 # ============================================================================
 
 
+def test_scipy_optimizer_internal_startup_error(mock_evaluation_function, mock_acquisition_plan):
+    """Test ScipyOptimizer passes error from scipy internal (optimizer not defined)"""
+    movable1 = MovableSignal(name="test_movable1")
+    movable2 = MovableSignal(name="test_movable2")
+    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+
+    config = ScipyCFG(
+        dofs=[dof1, dof2],
+        objective=objective,
+        max_iter=10,
+    )
+    inner = InnerOptimizer(config)
+    with pytest.raises(NotImplementedError):
+        InteractiveOptimizer(inner, timeout=1)
+
+
+def test_scipy_optimizer_internal_runtime_error(mock_evaluation_function, mock_acquisition_plan):
+    """Test ScipyOptimizer passes error from scipy internal (optimizer raises operational error)"""
+    movable1 = MovableSignal(name="test_movable1")
+    movable2 = MovableSignal(name="test_movable2")
+    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+
+    config = ScipyCFG(
+        dofs=[dof1, dof2],
+        objective=objective,
+        max_iter=10,
+    )
+
+    class ErrFun(InnerOptimizer):
+        def call(self, cost, callback, kws=None) -> ScipyResult | OptimizeResult:
+            cost([1, 2])
+            raise RuntimeError("This should be caught by main thread")
+
+    inner = ErrFun(config)
+    opt = InteractiveOptimizer(inner, timeout=1)
+    with pytest.raises(RuntimeError):
+        sg = opt.suggest()
+        opt.ingest([sg[0] | {objective.name: -1}])
+        opt.suggest()
+
+
 def test_ingest_raises_on_unknown_id(optimizer_prep):
     """Test ingest() raises ValueError when ID not in _active requests."""
     # Try to ingest with unknown ID
@@ -395,3 +390,40 @@ def test_get_best_points_no_optimization_raises(optimizer_prep):
         optimizer_prep.get_best_points()
 
     optimizer_prep.close()
+
+
+def test_callback_updates():
+    """Test ScipyOptimizer recovers optimization reporting from optimizer"""
+    movable1 = MovableSignal(name="test_movable1")
+    movable2 = MovableSignal(name="test_movable2")
+    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+
+    config = ScipyCFG(
+        dofs=[dof1, dof2],
+        objective=objective,
+        max_iter=10,
+    )
+
+    first = ScipyResult([1, 1], 1, nit=99)
+    best = ScipyResult([1, 1], 0, nit=99)
+    worst = ScipyResult([1, 1], 2, nit=99)
+
+    class CallbackFun(InnerOptimizer):
+        def call(self, cost, callback, kws=None) -> ScipyResult | OptimizeResult:
+            callback(first)
+            cost([1, 1])
+            callback(best)
+            cost([1, 1])
+            callback(worst)
+            cost([1, 1])
+
+    inner = CallbackFun(config)
+    opt = InteractiveOptimizer(inner, timeout=1)
+    assert opt.intermediate is first
+    opt.ingest([opt.suggest()[0] | {objective.name: -1}])
+    opt.ingest([opt.suggest()[0] | {objective.name: -1}])
+    opt.ingest([opt.suggest()[0] | {objective.name: -1}])
+    assert opt.intermediate is best  # make sure it only keeps the best
+    opt.close()
