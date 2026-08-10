@@ -4,7 +4,7 @@ from collections import OrderedDict
 from collections.abc import Mapping
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
-from threading import Thread
+from threading import Event, Thread
 from typing import Any, cast
 
 import numpy as np
@@ -44,6 +44,8 @@ class InteractiveOptimizer(Optimizer):
         self.intermediate: OptimizeResult | ScipyResult | None = None
         self.final: OptimizeResult | ScipyResult | None = None
         self.SUGGESTION_TIMEOUT = timeout
+        self.thread_monitor = Future()
+        self.thread_start = Event()
 
         if config.rescale is not None:
             if isinstance(config.rescale, list):
@@ -55,6 +57,7 @@ class InteractiveOptimizer(Optimizer):
             """Cooperative thread that defers evaluation of cost call by scipy to the run engine."""
             req = _Request(args=x, future=Future())
             self._active[self._increment] = req
+            self.thread_start.set()
             self._increment += 1
             res = req.future.result(timeout=self.SUGGESTION_TIMEOUT)
             if res is None:
@@ -82,21 +85,27 @@ class InteractiveOptimizer(Optimizer):
                 if config.threads:
                     with ThreadPoolExecutor(max_workers=config.threads) as pool:
                         kw["workers"] = pool.map
-                        self.optimizer.call(cost, default_callback, kws=kw)
+                        res = self.optimizer.call(cost, default_callback, kws=kw)
                 else:
-                    self.optimizer.call(cost, default_callback, kws=kw)
+                    res = self.optimizer.call(cost, default_callback, kws=kw)
+                self.thread_monitor.set_result(res)
 
             except (KeyboardInterrupt, TimeoutError):
                 # have to have timeout, so made it that it can be restored to its state on agent auto reboot
                 if self.final:
-                    return
+                    ...
                 if self.intermediate:
                     self.final = self.intermediate
                 else:
                     self.final = ScipyResult(list(self.optimizer.x0), np.nan, nit=self._increment)
+                # self.thread_monitor.set_result(self.final)
+                return
+            except Exception as e:
+                self.thread_monitor.set_exception(e)
 
         self._t = Thread(target=mini_worker, name="optimizer")
         self._t.start()
+        self.thread_start.wait(timeout=10)
         return self
 
     def __enter__(self):
@@ -125,6 +134,14 @@ class InteractiveOptimizer(Optimizer):
             A list of dictionaries, each containing a parameterization of a point to evaluate next.
             Each dictionary must contain a unique "_id" key to identify each parameterization.
         """
+        try:
+            self.final = self.thread_monitor.result(timeout=0.01)
+            if not self.force_resiliance:
+                print(self.final)
+                raise RuntimeError("The optimizer has suspended or reached convergence")
+        except TimeoutError:
+            ...
+
         if self.final is not None:
             vector = [x_n * s for s, x_n in zip(self._scale, self.final.x, strict=True)]
             suggestion = dict(zip(self._params, vector, strict=True))

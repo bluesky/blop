@@ -1,4 +1,3 @@
-import time
 from unittest.mock import MagicMock
 
 import pytest
@@ -63,6 +62,28 @@ def test_scipy_optimizer_algorithms(mock_evaluation_function, mock_acquisition_p
     inner = Minimize(config)
     opt = InteractiveOptimizer(inner, timeout=5)
     assert opt._active is not None
+    opt.close()
+
+
+def test_scipy_optimizer_configuration_error(mock_evaluation_function, mock_acquisition_plan):
+    """Test ScipyOptimizer throws error due to bad internal configuration of scipy (no jacobian provided in result)"""
+    movable1 = MovableSignal(name="test_movable1")
+    movable2 = MovableSignal(name="test_movable2")
+    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+
+    config = ScipyCFG(
+        dofs=[dof1, dof2],
+        objective=objective,
+        optimizer=SCP.ERROR,
+        max_iter=10,
+    )
+
+    inner = Minimize(config)
+    opt = InteractiveOptimizer(inner, timeout=5)
+    with pytest.raises(ValueError):
+        opt.suggest()
     opt.close()
 
 
@@ -280,7 +301,6 @@ def test_scipy_optimizer_context_manager(mock_evaluation_function, mock_acquisit
     inner = Minimize(config)
     with InteractiveOptimizer(inner, timeout=5) as opt:
         assert opt is not None
-        time.sleep(0.1)
         suggestions = opt.suggest(1)
         assert len(suggestions) == 1
 
@@ -299,7 +319,6 @@ def test_scipy_optimizer_session_reinit(mock_evaluation_function, mock_acquisiti
 
     # Call session to reinitialize
     opt.session(config, timeout=5)
-    time.sleep(0.1)
     # State should be reset
     assert opt._increment == 1
     assert len(opt._active) == 1
