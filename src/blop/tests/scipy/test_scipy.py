@@ -44,7 +44,6 @@ def agent_prep(mock_evaluation_function, mock_acquisition_plan):
         name="test_experiment",
         timeout=5,
     )
-    time.sleep(0.1)
     return agent
 
 
@@ -62,7 +61,6 @@ def secoundary_agent_prep(mock_evaluation_function, mock_acquisition_plan):
         acquisition_plan=mock_acquisition_plan,
         timeout=5,
     )
-    time.sleep(0.1)
     return agent
 
 
@@ -156,7 +154,6 @@ def test_agent_ingest(agent_prep):
 def test_agent_multithread(agent_prep):
     agent_prep.suggest(1)
     agent_prep.ingest([{"test_movable1": 0.1, "test_movable2": 0.2, "test_objective": 0.3, ID_KEY: 0}])
-    time.sleep(0.1)
     params = agent_prep.suggest(4)
     print(agent_prep.optimizer._active)
     assert len(params) > 1
@@ -382,7 +379,6 @@ def test_scipy_large_rescale_factors(mock_evaluation_function, mock_acquisition_
         acquisition_plan=mock_acquisition_plan,
         timeout=5,
     )
-    time.sleep(0.1)
 
     suggestions = agent.suggest(1)
     assert len(suggestions) == 1
