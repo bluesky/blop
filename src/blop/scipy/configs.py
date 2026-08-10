@@ -122,7 +122,7 @@ class SCP(StrEnum):
     COBYQA = "COBYQA"
     SLSQP = "SLSQP"
     TRUST_CONSTR = "trust-constr"
-    ERROR = "dogleg"
+    # DOGLEG = "dogleg"
     # Trust_NCG = "trust-ncg"
     # Trust_Exact = "trust-exact"
     # Trust_Krylov = "trust-krylov"

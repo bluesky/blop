@@ -1,12 +1,13 @@
 from unittest.mock import MagicMock
 
 import pytest
+from scipy.optimize import OptimizeResult
 
 from blop.ax import Objective, RangeDOF
 from blop.protocols import ID_KEY, AcquisitionPlan, EvaluationFunction
 from blop.scipy.configs import SCP, ScipyCFG
 from blop.scipy.inverter import InteractiveOptimizer
-from blop.scipy.normalizers import SHGO, DualAnnealing, Minimize, ScipyResult
+from blop.scipy.normalizers import SHGO, DualAnnealing, InnerOptimizer, Minimize, ScipyResult
 
 from ..conftest import MovableSignal
 
@@ -35,7 +36,7 @@ def optimizer_prep():
         rescale=[2.0, 3.0],
     )
     inner = Minimize(config)
-    return InteractiveOptimizer(inner, timeout=5)
+    return InteractiveOptimizer(inner, timeout=1)
 
 
 # ============================================================================
@@ -60,13 +61,13 @@ def test_scipy_optimizer_algorithms(mock_evaluation_function, mock_acquisition_p
     )
 
     inner = Minimize(config)
-    opt = InteractiveOptimizer(inner, timeout=5)
+    opt = InteractiveOptimizer(inner, timeout=1)
     assert opt._active is not None
     opt.close()
 
 
-def test_scipy_optimizer_configuration_error(mock_evaluation_function, mock_acquisition_plan):
-    """Test ScipyOptimizer throws error due to bad internal configuration of scipy (no jacobian provided in result)"""
+def test_scipy_optimizer_internal_startup_error(mock_evaluation_function, mock_acquisition_plan):
+    """Test ScipyOptimizer passes error from scipy internal (optimizer not defined)"""
     movable1 = MovableSignal(name="test_movable1")
     movable2 = MovableSignal(name="test_movable2")
     dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
@@ -76,15 +77,37 @@ def test_scipy_optimizer_configuration_error(mock_evaluation_function, mock_acqu
     config = ScipyCFG(
         dofs=[dof1, dof2],
         objective=objective,
-        optimizer=SCP.ERROR,
+        max_iter=10,
+    )
+    inner = InnerOptimizer(config)
+    with pytest.raises(NotImplementedError):
+        InteractiveOptimizer(inner, timeout=1)
+
+
+def test_scipy_optimizer_internal_runtime_error(mock_evaluation_function, mock_acquisition_plan):
+    """Test ScipyOptimizer passes error from scipy internal (optimizer not defined)"""
+    movable1 = MovableSignal(name="test_movable1")
+    movable2 = MovableSignal(name="test_movable2")
+    dof1 = RangeDOF(actuator=movable1, bounds=(0, 10), parameter_type="float")
+    dof2 = RangeDOF(actuator=movable2, bounds=(0, 10), parameter_type="float")
+    objective = Objective(name="test_objective", minimize=False)
+
+    config = ScipyCFG(
+        dofs=[dof1, dof2],
+        objective=objective,
         max_iter=10,
     )
 
-    inner = Minimize(config)
-    opt = InteractiveOptimizer(inner, timeout=5)
-    with pytest.raises(ValueError):
+    class ErrFun(InnerOptimizer):
+        def call(self, cost, callback, kws=None) -> ScipyResult | OptimizeResult:
+            cost([1, 2])
+            raise RuntimeError("This should be caught by main thread")
+    inner = ErrFun(config)
+    opt = InteractiveOptimizer(inner, timeout=1)
+    with pytest.raises(RuntimeError):
+        sg = opt.suggest()
+        opt.ingest([sg[0] | {objective.name: -1}])
         opt.suggest()
-    opt.close()
 
 
 def test_scipy_optimizer_bfgs_specific(mock_evaluation_function, mock_acquisition_plan):
@@ -103,7 +126,7 @@ def test_scipy_optimizer_bfgs_specific(mock_evaluation_function, mock_acquisitio
     )
 
     inner = Minimize(config)
-    opt = InteractiveOptimizer(inner, timeout=5)
+    opt = InteractiveOptimizer(inner, timeout=1)
     assert opt.final is None  # No optimization run yet
     opt.close()
 
@@ -121,7 +144,7 @@ def test_scipy_optimizer_dual_annealing_specific(mock_evaluation_function, mock_
     )
 
     inner = DualAnnealing(config)
-    opt = InteractiveOptimizer(inner, timeout=5)
+    opt = InteractiveOptimizer(inner, timeout=1)
     assert opt.final is None  # No optimization run yet
     opt.close()
 
@@ -139,7 +162,7 @@ def test_scipy_optimizer_SHGO_specific(mock_evaluation_function, mock_acquisitio
     )
 
     inner = SHGO(config)
-    opt = InteractiveOptimizer(inner, timeout=5)
+    opt = InteractiveOptimizer(inner, timeout=1)
     assert opt.final is None  # No optimization run yet
     opt.close()
 
@@ -157,7 +180,7 @@ def test_scipy_optimizer_threads_none(mock_evaluation_function, mock_acquisition
     )
 
     inner = Minimize(config)
-    opt = InteractiveOptimizer(inner, timeout=5)
+    opt = InteractiveOptimizer(inner, timeout=1)
     assert opt._thread_pool is None  # No thread pool when threads=None
     opt.close()
 
@@ -175,7 +198,7 @@ def test_scipy_optimizer_threads_multiple(mock_evaluation_function, mock_acquisi
     )
 
     inner = Minimize(config)
-    opt = InteractiveOptimizer(inner, timeout=5)
+    opt = InteractiveOptimizer(inner, timeout=1)
     # Configuration accepted
     opt.close()
 
@@ -299,7 +322,7 @@ def test_scipy_optimizer_context_manager(mock_evaluation_function, mock_acquisit
     config = ScipyCFG(dofs=[dof], objective=objective)
 
     inner = Minimize(config)
-    with InteractiveOptimizer(inner, timeout=5) as opt:
+    with InteractiveOptimizer(inner, timeout=1) as opt:
         assert opt is not None
         suggestions = opt.suggest(1)
         assert len(suggestions) == 1
@@ -314,11 +337,11 @@ def test_scipy_optimizer_session_reinit(mock_evaluation_function, mock_acquisiti
     config = ScipyCFG(dofs=[dof], objective=objective)
 
     inner = Minimize(config)
-    opt = InteractiveOptimizer(inner, timeout=5)
+    opt = InteractiveOptimizer(inner, timeout=1)
     opt.suggest(1)
 
     # Call session to reinitialize
-    opt.session(config, timeout=5)
+    opt.session(config, timeout=1)
     # State should be reset
     assert opt._increment == 1
     assert len(opt._active) == 1

@@ -105,7 +105,13 @@ class InteractiveOptimizer(Optimizer):
 
         self._t = Thread(target=mini_worker, name="optimizer")
         self._t.start()
-        self.thread_start.wait(timeout=10)
+        if not self.thread_start.wait(timeout=1):
+            try:
+                err = self.thread_monitor.exception(timeout=.1)
+                if err:
+                    raise err
+            except TimeoutError:
+                ...
         return self
 
     def __enter__(self):

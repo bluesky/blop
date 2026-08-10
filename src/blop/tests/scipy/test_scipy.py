@@ -1,4 +1,5 @@
 import time
+import types
 from unittest.mock import MagicMock
 
 import pytest
@@ -405,4 +406,26 @@ def test_suggest_after_final_optimization(secoundary_agent_prep):
     assert len(suggestions) == 1
     assert suggestions[0]["test_movable"] == 7.0
     assert suggestions[0][ID_KEY] == 20
+    secoundary_agent_prep.optimizer.close()
+
+
+def test_optimize_after_final_optimization(secoundary_agent_prep):
+    """Test agent setup of optimize plane"""
+    # Set final optimization result
+
+    assert isinstance(secoundary_agent_prep.optimize(0), types.GeneratorType)
+    secoundary_agent_prep.optimizer.close()
+
+
+def test_optimize_with_prev_final(secoundary_agent_prep):
+    """Test agent setup of optimize plane"""
+    # Set final optimization result
+    secoundary_agent_prep.optimizer.final = ScipyResult(
+        x=[7.0],
+        fun=0.95,
+        nit=20,
+        status=0,
+    )
+
+    assert isinstance(secoundary_agent_prep.optimize(0), types.GeneratorType)
     secoundary_agent_prep.optimizer.close()
