@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.agent &#8212; blop 1.0.1.dev12 documentation</title>
+    <title>blop.ax.agent &#8212; blop 1.0.1.dev13 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=eb531586"></script>
+    <script src="../../../_static/documentation_options.js?v=4f2b919f"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev12" />
+  <meta name="docsearch:version" content="1.0.1.dev13" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -852,6 +852,7 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ax.analysis.plotly.surface.contour</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContourPlot</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ax.core.analysis_card</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnalysisCardBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ax.core.types</span><span class="w"> </span><span class="kn">import</span> <span class="n">TParamValue</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ax.global_stopping.strategies.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseGlobalStoppingStrategy</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">MsgGenerator</span>
 
@@ -1072,6 +1073,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Constraints on outcomes to be satisfied during optimization.</span>
 <span class="sd">    checkpoint_path : str | None, optional</span>
 <span class="sd">        The path to the checkpoint file to save the optimizer&#39;s state to.</span>
+<span class="sd">    stopping_strategy : BaseGlobalStoppingStrategy | None, optional</span>
+<span class="sd">        A stopping strategy that decides when/if optimization should halt early.</span>
 <span class="sd">    **kwargs : Any</span>
 <span class="sd">        Additional keyword arguments to configure the Ax experiment.</span>
 
@@ -1102,6 +1105,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">dof_constraints</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">DOFConstraint</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">outcome_constraints</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">OutcomeConstraint</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">stopping_strategy</span><span class="p">:</span> <span class="n">BaseGlobalStoppingStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span><span class="p">):</span>
@@ -1121,6 +1125,7 @@ window.runMermaid = runMermaid;</script>
             <span class="k">if</span> <span class="n">outcome_constraints</span>
             <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
             <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">checkpoint_path</span><span class="p">,</span>
+            <span class="n">stopping_strategy</span><span class="o">=</span><span class="n">stopping_strategy</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_readable_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">InferredReadable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
