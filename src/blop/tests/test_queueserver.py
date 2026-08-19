@@ -3,6 +3,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from bluesky.callbacks.zmq import RemoteDispatcher
+from bluesky_queueserver_api import BPlan
+from bluesky_queueserver_api.zmq import REManagerAPI
 
 from blop.protocols import CanRegisterSuggestions, Optimizer, QueueserverOptimizationProblem, TrialFaultAware
 from blop.queueserver import (
@@ -133,6 +135,31 @@ def test_queueserver_client_submit_plan_without_autostart(mock_re_manager, mock_
 
     mock_re_manager.queue_autostart.assert_called_once_with(False)
     mock_re_manager.item_add.assert_called_once_with(mock_plan)
+
+
+@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
+def test_queueserver_client_submit_plan_propagates_item_add_rejection(mock_re_manager, mock_document_dispatcher):
+    """Test submit_plan propagates queueserver item_add rejection unchanged."""
+    response = {
+        "success": False,
+        "msg": "Failed to add an item: plan rejected by RE Manager",
+        "qsize": None,
+        "item": None,
+    }
+    error = REManagerAPI.RequestFailedError(
+        request={"method": "queue_item_add"},
+        response=response,
+    )
+    mock_re_manager.item_add.side_effect = error
+    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
+    plan = BPlan("count", ["det_forbidden"], num=1)
+
+    with pytest.raises(REManagerAPI.RequestFailedError) as exc_info:
+        client.submit_plan(plan)
+
+    assert exc_info.value is error
+    assert exc_info.value.response is response
+    mock_re_manager.item_add.assert_called_once_with(plan)
 
 
 @patch("blop.queueserver.threading.Thread")
