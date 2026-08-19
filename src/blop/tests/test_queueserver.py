@@ -112,26 +112,6 @@ def test_queueserver_client_check_environment_raises_when_not_ready(mock_re_mana
 
 
 @patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
-def test_queueserver_client_check_devices_raises_for_missing_device(mock_re_manager, mock_document_dispatcher):
-    """Test check_devices_available raises ValueError for missing devices."""
-    mock_re_manager.devices_allowed.return_value = {"devices_allowed": {"motor1": {}}}
-    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
-
-    with pytest.raises(ValueError, match="Device 'motor2' is not available"):
-        client.check_devices_available(["motor1", "motor2"])
-
-
-@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
-def test_queueserver_client_check_plan_raises_for_missing_plan(mock_re_manager, mock_document_dispatcher):
-    """Test check_plan_available raises ValueError for missing plan."""
-    mock_re_manager.plans_allowed.return_value = {"plans_allowed": {"other_plan": {}}}
-    client = QueueserverClient(mock_re_manager, mock_document_dispatcher)
-
-    with pytest.raises(ValueError, match="Plan 'my_plan' is not available"):
-        client.check_plan_available("my_plan")
-
-
-@patch("blop.queueserver.bluesky_queueserver_api.http.REManagerAPI")
 def test_queueserver_client_submit_plan_with_autostart(mock_re_manager, mock_document_dispatcher):
     """Test submit_plan adds item and starts queue when autostart=True."""
     client = QueueserverClient(mock_re_manager, mock_document_dispatcher, autostart=True)

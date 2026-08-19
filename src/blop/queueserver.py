@@ -156,44 +156,6 @@ class QueueserverClient:
         if status is None or not status.get("worker_environment_exists", False):
             raise RuntimeError("The queueserver environment is not open")
 
-    def check_devices_available(self, device_names: Sequence[str]) -> None:
-        """
-        Verify that all specified devices are available in the queueserver.
-
-        Parameters
-        ----------
-        device_names : Sequence[str]
-            Names of devices to check.
-
-        Raises
-        ------
-        ValueError
-            If any device is not available.
-        """
-        res = self._rm.devices_allowed()
-        allowed = res["devices_allowed"]
-        for name in device_names:
-            if name not in allowed:
-                raise ValueError(f"Device '{name}' is not available in the queueserver environment")
-
-    def check_plan_available(self, plan_name: str) -> None:
-        """
-        Verify that a plan is available in the queueserver.
-
-        Parameters
-        ----------
-        plan_name : str
-            Name of the plan to check.
-
-        Raises
-        ------
-        ValueError
-            If the plan is not available.
-        """
-        res = self._rm.plans_allowed()
-        if plan_name not in res["plans_allowed"]:
-            raise ValueError(f"Plan '{plan_name}' is not available in the queueserver environment")
-
     def submit_plan(self, plan: BPlan) -> None:
         """
         Submit a plan to the queueserver queue.
@@ -467,12 +429,6 @@ class QueueserverOptimizationRunner:
         if self._current_future is not None and not self._current_future.done():
             raise RuntimeError("Optimization loop is already running.")
         self._client.check_environment()
-
-        # Collect device names from actuators and sensors
-        actuator_names = list(self._problem.actuators)
-        sensor_names = list(self._problem.sensors)
-        self._client.check_devices_available(actuator_names + sensor_names)
-        self._client.check_plan_available(self._plan_name)
 
     def _build_plan(self, suggestions: list[dict]) -> BPlan:
         """LOCKED: Build the plan to submit and update current state."""
