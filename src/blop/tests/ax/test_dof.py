@@ -25,6 +25,14 @@ def test_dof_name():
     assert choice_dof.parameter_name == "test_name"
 
 
+def test_dof_actuator_and_name():
+    """Queueserver expects actuator to be Python variable name, but Ax needs the ``device.name``"""
+    range_dof = RangeDOF(actuator="test.sub1", name="test_sub1", bounds=(0, 1), parameter_type="float", step_size=0.1)
+    assert range_dof.parameter_name == "test_sub1"
+    choice_dof = ChoiceDOF(actuator="test.sub2", name="test_sub2", values=[0, 1, 2, 3, 4, 5], parameter_type="int")
+    assert choice_dof.parameter_name == "test_sub2"
+
+
 def test_dof_invalid():
     movable = MovableSignal(name="test_movable")
     with pytest.raises(ValueError):
@@ -35,6 +43,9 @@ def test_dof_invalid():
 
     with pytest.raises(TypeError):
         DOF(actuator=movable, name="test_movable")  # type: ignore[arg-type]
+
+    with pytest.raises(ValueError):
+        RangeDOF(bounds=(0, 1), parameter_type="float")
 
 
 def test_range_dof():

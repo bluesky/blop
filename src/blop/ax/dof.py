@@ -25,7 +25,7 @@ class DOF(ABC):
     Attributes
     ----------
     name : str | None
-        The name of the DOF. Provide a name if the DOF is not an actuator.
+        The name of the DOF.
     actuator : Actuator | str | None
         The actuator or its name to use for the DOF. Provide an actuator if the DOF is controllable by Bluesky.
 
@@ -37,10 +37,13 @@ class DOF(ABC):
 
     Notes
     -----
-    Either ``name`` or ``actuator`` must be provided, but not both. If ``actuator`` is
-    provided, the DOF will be associated with a Bluesky-controllable device and will
-    automatically move during acquisition. If only ``name`` is provided, the DOF
-    represents a parameter that is controlled externally.
+    If ``actuator`` is an ``Actuator`` device instance, the DOF will be associated with a
+    Bluesky-controllable device and will automatically move during acquisition.
+    If only ``name`` is provided, the DOF represents a parameter that is controlled externally.
+    Both ``name`` and ``actuator`` can be provided, but only if both are strings. This is
+    necessary when using bluesky-queueserver which requires ``actuator`` to be
+    the Python variable name for the device instance and ``name`` is the ``device.name``.
+    When both ``actuator`` and ``name`` are specified, the Ax parameter name will be ``name``.
     """
 
     name: str | None = None
@@ -48,15 +51,17 @@ class DOF(ABC):
 
     def __post_init__(self) -> None:
         """Ensure name and actuator are not both specified."""
-        if not (bool(self.name) ^ bool(self.actuator)):
-            raise ValueError("Either name or actuator must be provided, but not both or neither.")
+        if self.name is None and self.actuator is None:
+            raise ValueError("Either name or actuator must be provided.")
+        if isinstance(self.actuator, Actuator) and self.name is not None:
+            raise ValueError("Either name or actuator must be provided, but not both.")
 
     @property
     def parameter_name(self) -> str:
         """The parameter name used internally by Ax."""
         if isinstance(self.actuator, Actuator):
             param_name = self.actuator.name
-        elif isinstance(self.actuator, str):
+        elif self.name is None and isinstance(self.actuator, str):
             param_name = self.actuator
         else:
             param_name = cast(str, self.name)
