@@ -14,7 +14,7 @@ a queueserver, rather than directly through a RunEngine.
 import logging
 import threading
 import uuid
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from concurrent.futures import Future
 from dataclasses import dataclass, field
 from typing import Any, Literal
