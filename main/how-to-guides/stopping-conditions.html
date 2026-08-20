@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Write a Custom Optimization Callback &#8212; blop 1.0.1.dev16 documentation</title>
+    <title>Set Stopping Conditions &#8212; blop 1.0.1.dev16 documentation</title>
   
   
   
@@ -48,7 +48,7 @@
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'how-to-guides/custom-callbacks';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'how-to-guides/stopping-conditions';</script>
     <script>
         DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://blueskyproject.io/blop/switcher.json';
@@ -61,8 +61,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/1.33.1/plotly.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Set DOF constraints" href="set-dof-constraints.html" />
-    <link rel="prev" title="Manual Point Injection" href="manual-suggestions.html" />
+    <link rel="next" title="Acquire a baseline reading (for relative outcome constraints)" href="acquire-baseline.html" />
+    <link rel="prev" title="Set outcome constraints" href="set-outcome-constraints.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="1.0.1.dev16" />
@@ -452,10 +452,10 @@
 <li class="toctree-l1"><a class="reference internal" href="attach-data-to-experiments.html">Attach external data to experiments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom-generation-strategies.html">Using custom generation strategies</a></li>
 <li class="toctree-l1"><a class="reference internal" href="manual-suggestions.html">Manual Point Injection</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Write a Custom Optimization Callback</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom-callbacks.html">Write a Custom Optimization Callback</a></li>
 <li class="toctree-l1"><a class="reference internal" href="set-dof-constraints.html">Set DOF constraints</a></li>
 <li class="toctree-l1"><a class="reference internal" href="set-outcome-constraints.html">Set outcome constraints</a></li>
-<li class="toctree-l1"><a class="reference internal" href="stopping-conditions.html">Set Stopping Conditions</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Set Stopping Conditions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acquire-baseline.html">Acquire a baseline reading (for relative outcome constraints)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="use-tiled.html">Tiled with Blop</a></li>
 </ul>
@@ -501,7 +501,7 @@
     
     <li class="breadcrumb-item"><a href="../how-to-guides.html" class="nav-link">How-to Guides</a></li>
     
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Write a Custom Optimization Callback</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Set Stopping Conditions</span></li>
   </ul>
 </nav>
 </div>
@@ -518,90 +518,41 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="write-a-custom-optimization-callback">
-<h1>Write a Custom Optimization Callback<a class="headerlink" href="#write-a-custom-optimization-callback" title="Link to this heading">#</a></h1>
-<p>This guide shows how to add a custom callback that records optimization
-outcomes while an agent runs.</p>
-<p>Use a callback when you want to observe optimization progress or send progress
-somewhere else, such as a file, dashboard, log service, or operator display. If
-you want background on how callbacks fit into Blop’s optimization workflow, see
-<a class="reference internal" href="../explanations/callbacks.html"><span class="doc">Optimization Callbacks</span></a>.</p>
-<section id="create-a-callback-class">
-<h2>Create a callback class<a class="headerlink" href="#create-a-callback-class" title="Link to this heading">#</a></h2>
-<p>Subclass <code class="docutils literal notranslate"><span class="pre">bluesky.callbacks.CallbackBase</span></code> and implement the document methods
-you need. A common pattern is to use <code class="docutils literal notranslate"><span class="pre">descriptor</span></code> to identify fields of
-interest and <code class="docutils literal notranslate"><span class="pre">event</span></code> to record their values.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackBase</span>
+  <section id="set-stopping-conditions">
+<h1>Set Stopping Conditions<a class="headerlink" href="#set-stopping-conditions" title="Link to this heading">#</a></h1>
+<p>This guide shows how to set stopping conditions for an optimization run for the Ax optimizer backend.
+These conditions can be a variety of methods such as meeting a certain toleration, reaching a maximum number of iterations, or exceeding a time limit</p>
+<section id="defining-stopping-conditions">
+<h2>Defining Stopping Conditions<a class="headerlink" href="#defining-stopping-conditions" title="Link to this heading">#</a></h2>
+<p>Ax has built-in stopping conditions, <a class="reference external" href="https://github.com/facebook/Ax/blob/6e711c86a162f8fc5173b0d5e18f0326c329bac7/ax/global_stopping/strategies/__init__.py">found here</a>.</p>
+<p>However, if you need a more customizable stopping condition, you can configure one following this format.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">ax.global_stopping.strategies.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseGlobalStoppingStrategy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ax.core.experiment</span><span class="w"> </span><span class="kn">import</span> <span class="n">Experiment</span>
 
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomStoppingStrategy</span><span class="p">(</span><span class="n">BaseGlobalStoppingStrategy</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">min_trials</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">inactive_when_pending_trials</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="c1"># Add any additional parameters you want to customize here</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">min_trials</span><span class="o">=</span><span class="n">min_trials</span><span class="p">,</span>
+            <span class="n">inactive_when_pending_trials</span><span class="o">=</span><span class="n">inactive_when_pending_trials</span>
+        <span class="p">)</span>
+        <span class="c1"># Initialize your custom parameters here</span>
 
-<span class="k">class</span><span class="w"> </span><span class="nc">OutcomeHistory</span><span class="p">(</span><span class="n">CallbackBase</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">outcome_keys</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">outcome_keys</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">name</span>
-            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data_key</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data_keys"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">data_key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"optimization-outcome"</span>
-        <span class="p">]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="p">{})</span>
-        <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome_keys</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="p">}</span>
-        <span class="k">if</span> <span class="n">row</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_should_stop_optimization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">experiment</span><span class="p">:</span> <span class="n">Experiment</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="c1"># Implement your custom stopping logic here</span>
+        <span class="k">if</span> <span class="n">your_condition_is_met</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">"stopping criteria met"</span>
+        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">"stopping criteria not met"</span>
 </pre></div>
 </div>
 </section>
-<section id="subscribe-the-callback">
-<h2>Subscribe the callback<a class="headerlink" href="#subscribe-the-callback" title="Link to this heading">#</a></h2>
-<p>Configure an agent, then create one callback instance and subscribe it before
-running the optimization.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blop.ax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">Objective</span><span class="p">,</span> <span class="n">RangeDOF</span>
-
-
-<span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
-    <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">signal</span><span class="p">],</span>
-    <span class="n">dofs</span><span class="o">=</span><span class="p">[</span><span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">)],</span>
-    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"signal"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
-    <span class="n">evaluation_function</span><span class="o">=</span><span class="n">evaluation_function</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">outcome_history</span> <span class="o">=</span> <span class="n">OutcomeHistory</span><span class="p">()</span>
-<span class="n">agent</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">outcome_history</span><span class="p">)</span>
-
-<span class="n">RE</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">iterations</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>After the run, inspect the data collected by the callback.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">outcome_history</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
-</pre></div>
-</div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>True
-</pre></div>
-</div>
-</section>
-<section id="keep-or-remove-the-default-logger">
-<h2>Keep or remove the default logger<a class="headerlink" href="#keep-or-remove-the-default-logger" title="Link to this heading">#</a></h2>
-<p>Agents include the default console logger unless you remove it. Keep it if you
-want normal console output alongside your custom callback.</p>
-<p>To run only your callback, clear the existing callbacks before subscribing.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">agent</span><span class="o">.</span><span class="n">callbacks</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
-<span class="n">agent</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">outcome_history</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>To remove a specific callback later, keep a reference to it and unsubscribe it.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">agent</span><span class="o">.</span><span class="n">unsubscribe</span><span class="p">(</span><span class="n">outcome_history</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="use-callback-data-carefully">
-<h2>Use callback data carefully<a class="headerlink" href="#use-callback-data-carefully" title="Link to this heading">#</a></h2>
-<p>Use callbacks for side effects: logging, notifications, dashboards, summaries,
-or lightweight record keeping. Do not use a callback to compute objective
-values, move hardware, or update the optimizer state. Put those tasks in the
-evaluation function, acquisition plan, or optimizer instead.</p>
+<section id="adding-stopping-conditions-to-the-agent">
+<h2>Adding Stopping Conditions to the Agent<a class="headerlink" href="#adding-stopping-conditions-to-the-agent" title="Link to this heading">#</a></h2>
+<p>The Agent can then be configured with an additional parameter, <cite>stopping_strategy</cite>, to use the custom stopping condition.</p>
 </section>
 </section>
 
@@ -616,20 +567,20 @@ evaluation function, acquisition plan, or optimizer instead.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="manual-suggestions.html"
+       href="set-outcome-constraints.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Manual Point Injection</p>
+        <p class="prev-next-title">Set outcome constraints</p>
       </div>
     </a>
     <a class="right-next"
-       href="set-dof-constraints.html"
+       href="acquire-baseline.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Set DOF constraints</p>
+        <p class="prev-next-title">Acquire a baseline reading (for relative outcome constraints)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -652,10 +603,8 @@ evaluation function, acquisition plan, or optimizer instead.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#create-a-callback-class">Create a callback class</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subscribe-the-callback">Subscribe the callback</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#keep-or-remove-the-default-logger">Keep or remove the default logger</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#use-callback-data-carefully">Use callback data carefully</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#defining-stopping-conditions">Defining Stopping Conditions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#adding-stopping-conditions-to-the-agent">Adding Stopping Conditions to the Agent</a></li>
 </ul>
   </nav></div>
 
@@ -663,7 +612,7 @@ evaluation function, acquisition plan, or optimizer instead.</p>
 
   
   <div class="tocsection editthispage">
-    <a href="https://github.com/bluesky/blop/edit/main/docs/how-to-guides/custom-callbacks.rst">
+    <a href="https://github.com/bluesky/blop/edit/main/docs/how-to-guides/stopping-conditions.rst">
       <i class="fa-solid fa-pencil"></i>
       
       
