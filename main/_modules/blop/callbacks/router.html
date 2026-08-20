@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.callbacks.router &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.callbacks.router &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.callbacks.router</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Router for filtering out non-optimization Bluesky runs.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Router for filtering out non-optimization Bluesky runs."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">event_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunRouter</span>
@@ -853,10 +853,10 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="OptimizationCallbackRouter">
 <a class="viewcode-back" href="../../../reference/callbacks.html#blop.callbacks.OptimizationCallbackRouter">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptimizationCallbackRouter</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Routes documents from optimization runs to a list of callbacks.</span>
+<span class="w">    </span><span class="sd">"""Routes documents from optimization runs to a list of callbacks.</span>
 
 <span class="sd">    Acts as a Bluesky callback that filters documents by ``run_key``,</span>
-<span class="sd">    forwarding only those from ``&quot;optimize&quot;`` or ``&quot;sample_suggestions&quot;``</span>
+<span class="sd">    forwarding only those from ``"optimize"`` or ``"sample_suggestions"``</span>
 <span class="sd">    runs to the registered callbacks.</span>
 
 <span class="sd">    The router holds a *reference* to the provided list, so external</span>
@@ -867,19 +867,19 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    callbacks : list[CallbackBase]</span>
 <span class="sd">        A mutable list of callback instances. The router reads from this</span>
 <span class="sd">        list at the start of each matching run.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callbacks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CallbackBase</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_router</span> <span class="o">=</span> <span class="n">RunRouter</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_factory</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span> <span class="o">=</span> <span class="n">callbacks</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_factory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span> <span class="ow">and</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;run_key&quot;</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">OPTIMIZE_RUN_KEY</span><span class="p">,</span> <span class="n">SAMPLE_SUGGESTIONS_RUN_KEY</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">"start"</span> <span class="ow">and</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"run_key"</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="n">OPTIMIZE_RUN_KEY</span><span class="p">,</span> <span class="n">SAMPLE_SUGGESTIONS_RUN_KEY</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">_PrimaryStreamFilter</span><span class="p">(</span><span class="n">cb</span><span class="p">)</span> <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">],</span> <span class="p">[]</span>
         <span class="k">return</span> <span class="p">[],</span> <span class="p">[]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pass the document along to the run router.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Pass the document along to the run router."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_run_router</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">doc</span><span class="p">)</span></div>
 
 </pre></div>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Write a Custom Optimization Callback &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>Write a Custom Optimization Callback &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../_static/documentation_options.js?v=84a20152"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Manual Point Injection" href="manual-suggestions.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -541,12 +541,12 @@ interest and <code class="docutils literal notranslate"><span class="pre">event<
     <span class="k">def</span><span class="w"> </span><span class="nf">descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outcome_keys</span> <span class="o">=</span> <span class="p">[</span>
             <span class="n">name</span>
-            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data_key</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_keys&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">data_key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;optimization-outcome&quot;</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data_key</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data_keys"</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">data_key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">)</span> <span class="o">==</span> <span class="s2">"optimization-outcome"</span>
         <span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">outcome_keys</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="p">}</span>
         <span class="k">if</span> <span class="n">row</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
@@ -562,8 +562,8 @@ running the optimization.</p>
 
 <span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
     <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">signal</span><span class="p">],</span>
-    <span class="n">dofs</span><span class="o">=</span><span class="p">[</span><span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)],</span>
-    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;signal&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
+    <span class="n">dofs</span><span class="o">=</span><span class="p">[</span><span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">)],</span>
+    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"signal"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
     <span class="n">evaluation_function</span><span class="o">=</span><span class="n">evaluation_function</span><span class="p">,</span>
 <span class="p">)</span>
 

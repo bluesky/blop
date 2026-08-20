@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.agent &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.ax.agent &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.ax.agent</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Agent interface for optimization with Ax as the backend.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Agent interface for optimization with Ax as the backend."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
@@ -876,11 +876,11 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="k">class</span><span class="w"> </span><span class="nc">_AxAgentMixin</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Mixin providing Ax-related functionality shared by agents.</span>
 
 <span class="sd">    Expects subclasses to define `self._optimizer` as an `AxOptimizer`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">_optimizer</span><span class="p">:</span> <span class="n">AxOptimizer</span>
 
@@ -902,7 +902,7 @@ window.runMermaid = runMermaid;</script>
 
     <span class="nd">@fixed_dofs</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">fixed_dofs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fixed_dofs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">DOF</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Fix degrees of freedom to a certain value for future optimizations.</span>
 
 <span class="sd">        Parameters</span>
@@ -910,7 +910,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        fixed_dofs : dict[DOF, Any] | None</span>
 <span class="sd">            A mapping of DOFs to the values they should be fixed to.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fixed_dofs</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">fixed_parameters</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">return</span>
@@ -918,11 +918,11 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">fixed_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">dof</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">fixed_dofs</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the next point(s) to evaluate in the search space.</span>
 
 <span class="sd">        Uses the Bayesian optimization algorithm to suggest promising points based</span>
-<span class="sd">        on all previously acquired data. Each suggestion includes an &quot;_id&quot; key for</span>
+<span class="sd">        on all previously acquired data. Each suggestion includes an "_id" key for</span>
 <span class="sd">        tracking.</span>
 
 <span class="sd">        Parameters</span>
@@ -935,23 +935,23 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        -------</span>
 <span class="sd">        list[dict]</span>
 <span class="sd">            A list of dictionaries, each containing a parameterization of a point to</span>
-<span class="sd">            evaluate next. Each dictionary includes an &quot;_id&quot; key for identification.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            evaluate next. Each dictionary includes an "_id" key for identification.</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">suggest</span><span class="p">(</span><span class="n">num_points</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">ingest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Ingest evaluation results into the optimizer.</span>
 
-<span class="sd">        Updates the optimizer&#39;s model with new data. Can ingest both suggested points</span>
-<span class="sd">        (with &quot;_id&quot; key) and external data (without &quot;_id&quot; key).</span>
+<span class="sd">        Updates the optimizer's model with new data. Can ingest both suggested points</span>
+<span class="sd">        (with "_id" key) and external data (without "_id" key).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        points : list[dict]</span>
 <span class="sd">            A list of dictionaries, each containing outcomes for a trial. For suggested</span>
-<span class="sd">            points, include the &quot;_id&quot; key. For external data, include DOF names and</span>
-<span class="sd">            objective values, and omit &quot;_id&quot;.</span>
+<span class="sd">            points, include the "_id" key. For external data, include DOF names and</span>
+<span class="sd">            objective values, and omit "_id".</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -959,11 +959,11 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        is only needed for custom workflows or when ingesting external data.</span>
 
 <span class="sd">        For complete examples, see :doc:`/how-to-guides/attach-data-to-experiments`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">get_best_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">TParameterization</span><span class="p">,</span> <span class="n">TOutcome</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get a list of the optimal points found during optimization.</span>
 
 <span class="sd">        For single-objective optimization, returns a single best point.</span>
@@ -980,16 +980,16 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        navigate_to_best : Plan stub to move actuators to a best point.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">get_best_points</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">plot_objective</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">x_dof_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">y_dof_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">objective_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AnalysisCardBase</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Plot the predicted objective as a function of two DOFs.</span>
 
-<span class="sd">        Creates a contour plot showing the model&#39;s prediction of an objective across</span>
+<span class="sd">        Creates a contour plot showing the model's prediction of an objective across</span>
 <span class="sd">        the space defined by two DOFs. Useful for visualizing the optimization landscape.</span>
 
 <span class="sd">        Parameters</span>
@@ -1001,9 +1001,9 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        objective_name : str</span>
 <span class="sd">            The name of the objective to plot.</span>
 <span class="sd">        *args : Any</span>
-<span class="sd">            Additional positional arguments passed to Ax&#39;s compute_analyses.</span>
+<span class="sd">            Additional positional arguments passed to Ax's compute_analyses.</span>
 <span class="sd">        **kwargs : Any</span>
-<span class="sd">            Additional keyword arguments passed to Ax&#39;s compute_analyses.</span>
+<span class="sd">            Additional keyword arguments passed to Ax's compute_analyses.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1014,7 +1014,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        --------</span>
 <span class="sd">        ax.analysis.ContourPlot : Pre-built analysis for plotting objectives.</span>
 <span class="sd">        ax.analysis.AnalysisCard : Contains the raw and computed data.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_client</span><span class="o">.</span><span class="n">compute_analyses</span><span class="p">(</span>
             <span class="p">[</span>
                 <span class="n">ContourPlot</span><span class="p">(</span>
@@ -1028,25 +1028,25 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save the agent&#39;s state to a JSON file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Save the agent's state to a JSON file."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">checkpoint</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">reconfigure_search_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dof_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">DOF</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">TParamValue</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update bounds or values of existing DOFs for future optimizations.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        dof_mappings : dict[DOF, tuple[float, float] | list[float] | list[int] | list[str] | list[bool]]</span>
 <span class="sd">            Mapping of DOFs to their new search space.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="o">.</span><span class="n">reconfigure_search_space</span><span class="p">({</span><span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">:</span> <span class="n">update</span> <span class="k">for</span> <span class="n">dof</span><span class="p">,</span> <span class="n">update</span> <span class="ow">in</span> <span class="n">dof_mappings</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
 
 
 <div class="viewcode-block" id="Agent">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Agent</span><span class="p">(</span><span class="n">_AxAgentMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    An interface that uses Ax as the backend for optimization and experiment tracking.</span>
 
 <span class="sd">    The Agent is the main entry point for setting up and running Bayesian optimization</span>
@@ -1072,7 +1072,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    outcome_constraints : Sequence[OutcomeConstraint] | None, optional</span>
 <span class="sd">        Constraints on outcomes to be satisfied during optimization.</span>
 <span class="sd">    checkpoint_path : str | None, optional</span>
-<span class="sd">        The path to the checkpoint file to save the optimizer&#39;s state to.</span>
+<span class="sd">        The path to the checkpoint file to save the optimizer's state to.</span>
 <span class="sd">    stopping_strategy : BaseGlobalStoppingStrategy | None, optional</span>
 <span class="sd">        A stopping strategy that decides when/if optimization should halt early.</span>
 <span class="sd">    **kwargs : Any</span>
@@ -1093,7 +1093,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    For complete working examples of creating and using an Agent, see the tutorial</span>
 <span class="sd">    documentation, particularly :doc:`/tutorials/simple-experiment`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -1111,7 +1111,7 @@ window.runMermaid = runMermaid;</script>
         <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span><span class="p">):</span>
             <span class="n">dof_actuator_strs</span> <span class="o">=</span> <span class="p">[</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">,</span> <span class="nb">str</span><span class="p">)]</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;DOFs with actuators must be `Actuator` instances, not strings. Got strings for: </span><span class="si">{</span><span class="n">dof_actuator_strs</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"DOFs with actuators must be `Actuator` instances, not strings. Got strings for: </span><span class="si">{</span><span class="n">dof_actuator_strs</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span> <span class="o">=</span> <span class="n">sensors</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">Actuator</span><span class="p">,</span> <span class="n">dof</span><span class="o">.</span><span class="n">actuator</span><span class="p">)</span> <span class="k">for</span> <span class="n">dof</span> <span class="ow">in</span> <span class="n">dofs</span> <span class="k">if</span> <span class="n">dof</span><span class="o">.</span><span class="n">actuator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
@@ -1142,9 +1142,9 @@ window.runMermaid = runMermaid;</script>
         <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">],</span>
         <span class="n">evaluation_function</span><span class="p">:</span> <span class="n">EvaluationFunction</span><span class="p">,</span>
         <span class="n">acquisition_plan</span><span class="p">:</span> <span class="n">AcquisitionPlan</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Agent&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Load an agent from the optimizer&#39;s checkpoint file.</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"Agent"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Load an agent from the optimizer's checkpoint file.</span>
 
 <span class="sd">        .. note::</span>
 
@@ -1157,14 +1157,14 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">            The checkpoint path to load the agent from.</span>
 <span class="sd">        actuators: Sequence[Actuator]</span>
 <span class="sd">            Objects that can be moved to control the beamline using the Bluesky RunEngine.</span>
-<span class="sd">            A subset of the actuators&#39; names must match the names of suggested parameterizations.</span>
+<span class="sd">            A subset of the actuators' names must match the names of suggested parameterizations.</span>
 <span class="sd">        sensors: Sequence[Sensor]</span>
 <span class="sd">            Objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.</span>
 <span class="sd">        evaluation_function: EvaluationFunction</span>
 <span class="sd">            A callable to evaluate data from a Bluesky run and produce outcomes.</span>
 <span class="sd">        acquisition_plan: AcquisitionPlan, optional</span>
 <span class="sd">            A Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">instance</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
         <span class="n">instance</span><span class="o">.</span><span class="n">_optimizer</span> <span class="o">=</span> <span class="n">AxOptimizer</span><span class="o">.</span><span class="n">from_checkpoint</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
         <span class="n">instance</span><span class="o">.</span><span class="n">_actuators</span> <span class="o">=</span> <span class="n">actuators</span>
@@ -1180,21 +1180,21 @@ window.runMermaid = runMermaid;</script>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CallbackBase</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The list of active optimization callbacks.</span>
+<span class="w">        </span><span class="sd">"""The list of active optimization callbacks.</span>
 
-<span class="sd">        Callbacks in this list receive documents from ``&quot;optimize&quot;`` and</span>
-<span class="sd">        ``&quot;sample_suggestions&quot;`` runs. The default list contains an</span>
+<span class="sd">        Callbacks in this list receive documents from ``"optimize"`` and</span>
+<span class="sd">        ``"sample_suggestions"`` runs. The default list contains an</span>
 <span class="sd">        :class:`~blop.callbacks.logger.OptimizationLogger`.</span>
 
 <span class="sd">        The list can be mutated directly, or use :meth:`subscribe` /</span>
 <span class="sd">        :meth:`unsubscribe` for convenience.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span>
 
 <div class="viewcode-block" id="Agent.subscribe">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.subscribe">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">CallbackBase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subscribe a callback to receive optimization run documents.</span>
+<span class="w">        </span><span class="sd">"""Subscribe a callback to receive optimization run documents.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1205,16 +1205,16 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ------</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If *callback* is already subscribed.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Callback </span><span class="si">{</span><span class="n">callback</span><span class="si">!r}</span><span class="s2"> is already subscribed.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Callback </span><span class="si">{</span><span class="n">callback</span><span class="si">!r}</span><span class="s2"> is already subscribed."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Agent.unsubscribe">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.unsubscribe">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">unsubscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">CallbackBase</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unsubscribe a previously subscribed callback.</span>
+<span class="w">        </span><span class="sd">"""Unsubscribe a previously subscribed callback.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1225,34 +1225,34 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ------</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If *callback* is not subscribed.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_callbacks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The sensors used for data acquisition.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The sensors used for data acquisition."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">actuators</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The actuators that control the degrees of freedom.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The actuators that control the degrees of freedom."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationFunction</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The function used to evaluate acquired data and produce outcomes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The function used to evaluate acquired data and produce outcomes."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">acquisition_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AcquisitionPlan</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The acquisition plan for acquiring data, or ``None`` if using the default.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The acquisition plan for acquiring data, or ``None`` if using the default."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span>
 
 <div class="viewcode-block" id="Agent.to_optimization_problem">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.to_optimization_problem">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_optimization_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationProblem</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Construct an optimization problem from the agent.</span>
 
 <span class="sd">        Creates an immutable :class:`blop.protocols.OptimizationProblem` that</span>
@@ -1268,7 +1268,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        --------</span>
 <span class="sd">        blop.protocols.OptimizationProblem : The optimization problem dataclass.</span>
 <span class="sd">        blop.plans.optimize : Uses the optimization problem to run optimization.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">OptimizationProblem</span><span class="p">(</span>
             <span class="n">optimizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="p">,</span>
             <span class="n">actuators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">actuators</span><span class="p">,</span>
@@ -1281,7 +1281,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="Agent.acquire_baseline">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.acquire_baseline">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">acquire_baseline</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameterization</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Acquire a baseline reading for reference.</span>
 
 <span class="sd">        Acquires data at a specific parameterization (or current positions) to establish</span>
@@ -1301,14 +1301,14 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        blop.plans.acquire_baseline : The underlying Bluesky plan.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">yield from</span> <span class="n">acquire_baseline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">(),</span> <span class="n">parameterization</span><span class="o">=</span><span class="n">parameterization</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Agent.optimize">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.optimize">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Run Bayesian optimization.</span>
 
 <span class="sd">        Performs iterative optimization by suggesting points, acquiring data, evaluating</span>
@@ -1341,7 +1341,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        of suggesting points, acquiring data, evaluating outcomes, and updating the model.</span>
 
 <span class="sd">        For complete examples, see :doc:`/tutorials/simple-experiment`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">optimize_plan</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">(),</span> <span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span> <span class="n">readable_cache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_readable_cache</span>
         <span class="p">)</span>
@@ -1357,7 +1357,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="Agent.sample_suggestions">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.sample_suggestions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">sample_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Evaluate specific parameter combinations.</span>
 
 <span class="sd">        Acquires data for given suggestions and ingests results. Supports both</span>
@@ -1366,18 +1366,18 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        suggestions : list[dict]</span>
-<span class="sd">            Either optimizer suggestions (with &quot;_id&quot;) or manual points (without &quot;_id&quot;).</span>
+<span class="sd">            Either optimizer suggestions (with "_id") or manual points (without "_id").</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        tuple[str, list[dict], list[dict]]</span>
-<span class="sd">            Bluesky run UID, suggestions with &quot;_id&quot;, and outcomes.</span>
+<span class="sd">            Bluesky run UID, suggestions with "_id", and outcomes.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        suggest : Get optimizer suggestions.</span>
 <span class="sd">        optimize : Run full optimization loop.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">sample_suggestions_plan</span> <span class="o">=</span> <span class="n">sample_suggestions</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">(),</span> <span class="n">suggestions</span><span class="o">=</span><span class="n">suggestions</span><span class="p">,</span> <span class="n">readable_cache</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_readable_cache</span>
         <span class="p">)</span>
@@ -1393,7 +1393,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="Agent.navigate_to_best">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.navigate_to_best">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">navigate_to_best</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameterization</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Move actuators to the best point found during optimization.</span>
 
 <span class="sd">        If no explicit parameterization is provided, queries the optimizer for its</span>
@@ -1403,7 +1403,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        parameterization : Mapping | None, optional</span>
-<span class="sd">            Explicit parameterization to navigate to. If None, queries the optimizer&#39;s</span>
+<span class="sd">            Explicit parameterization to navigate to. If None, queries the optimizer's</span>
 <span class="sd">            best point. For multi-objective problems, call ``get_best_points()``</span>
 <span class="sd">            to inspect the Pareto set and select one.</span>
 
@@ -1416,7 +1416,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        get_best_points : Query the optimizer for best points.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">optimization_problem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_optimization_problem</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="k">yield from</span> <span class="n">navigate_to_best</span><span class="p">(</span>

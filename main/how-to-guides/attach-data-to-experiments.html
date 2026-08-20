@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Attach external data to experiments &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>Attach external data to experiments &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../_static/documentation_options.js?v=84a20152"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="How to optimize with ophyd and ophyd-async devices" href="use-ophyd-devices.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -526,18 +526,18 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-    <span class="s2">&quot;movable1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
-    <span class="s2">&quot;movable2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
-    <span class="s2">&quot;movable3&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
-    <span class="s2">&quot;objective1&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
-    <span class="s2">&quot;objective2&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="s2">"movable1"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="s2">"movable2"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="s2">"movable3"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="s2">"objective1"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="s2">"objective2"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
 <span class="p">})</span>
 </pre></div>
 </div>
 </section>
 <section id="transform-your-data-to-the-correct-format">
 <h2>Transform your data to the correct format<a class="headerlink" href="#transform-your-data-to-the-correct-format" title="Link to this heading">#</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">"records"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
@@ -547,24 +547,24 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blop.ax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">RangeDOF</span><span class="p">,</span> <span class="n">Objective</span>
 
 <span class="n">dofs</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">movable1</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
-    <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">movable2</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
-    <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">movable3</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
+    <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">movable1</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
+    <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">movable2</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
+    <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">movable3</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
 <span class="p">]</span>
 
 <span class="n">objectives</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;objective1&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
-    <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;objective2&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"objective1"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+    <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"objective2"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
 <span class="p">]</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">evaluation_function</span><span class="p">(</span><span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Replace this with your own evaluation function.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Replace this with your own evaluation function."""</span>
     <span class="n">outcomes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">:</span>
         <span class="n">outcome</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;objective1&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
-            <span class="s2">&quot;objective2&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+            <span class="s2">"_id"</span><span class="p">:</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">],</span>
+            <span class="s2">"objective1"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">"objective2"</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
         <span class="p">}</span>
         <span class="n">outcomes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">outcomes</span>

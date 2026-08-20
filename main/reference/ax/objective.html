@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Ax Objectives &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>Ax Objectives &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Ax DOF Constraint" href="dof-constraint.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -547,11 +547,11 @@ evaluation function for this outcome.</p>
 <p class="rubric">Examples</p>
 <p>Define an objective to maximize beam intensity:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">blop.ax.objective</span><span class="w"> </span><span class="kn">import</span> <span class="n">Objective</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam_intensity&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"beam_intensity"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Define an objective to minimize beam width:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;beam_width&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">objective</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"beam_width"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="py attribute">
@@ -611,10 +611,10 @@ objectives via the keyword arguments for readability.</p>
 <p>Create a scalarized objective for minimizing a weighted sum:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">blop.ax.objective</span><span class="w"> </span><span class="kn">import</span> <span class="n">ScalarizedObjective</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">scalarized_obj</span> <span class="o">=</span> <span class="n">ScalarizedObjective</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">expression</span><span class="o">=</span><span class="s2">&quot;x + 2 * y&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">expression</span><span class="o">=</span><span class="s2">"x + 2 * y"</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">minimize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;objective1&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">y</span><span class="o">=</span><span class="s2">&quot;objective2&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">x</span><span class="o">=</span><span class="s2">"objective1"</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">y</span><span class="o">=</span><span class="s2">"objective2"</span><span class="p">,</span>
 <span class="gp">... </span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">scalarized_obj</span><span class="p">)</span>
 <span class="go">-(objective1 + 2 * objective2)</span>

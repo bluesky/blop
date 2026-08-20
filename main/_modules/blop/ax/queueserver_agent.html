@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.queueserver_agent &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.ax.queueserver_agent &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.ax.queueserver_agent</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Agent interface for asynchronous optimization using Bluesky Queueserver and Ax.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Agent interface for asynchronous optimization using Bluesky Queueserver and Ax."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">Future</span>
@@ -852,7 +852,7 @@ window.runMermaid = runMermaid;</script>
     <span class="kn">import</span><span class="w"> </span><span class="nn">bluesky_queueserver_api.zmq</span>
 <span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
     <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
-        <span class="s2">&quot;The queueserver integration requires additional dependencies. Install them with: pip install blop[queueserver]&quot;</span>
+        <span class="s2">"The queueserver integration requires additional dependencies. Install them with: pip install blop[queueserver]"</span>
     <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.callbacks.zmq</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteDispatcher</span>
 
@@ -871,7 +871,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="QueueserverAgent">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">QueueserverAgent</span><span class="p">(</span><span class="n">_AxAgentMixin</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    An asynchronous interface that uses Ax as the backend for optimization and experiment tracking.</span>
 
 <span class="sd">    Uses the bluesky-queueserver-api for scheduling plan execution.</span>
@@ -905,7 +905,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    outcome_constraints : Sequence[OutcomeConstraint] | None, optional</span>
 <span class="sd">        Constraints on outcomes to be satisfied during optimization.</span>
 <span class="sd">    checkpoint_path : str | None, optional</span>
-<span class="sd">        The path to the checkpoint file to save the optimizer&#39;s state to.</span>
+<span class="sd">        The path to the checkpoint file to save the optimizer's state to.</span>
 <span class="sd">    **kwargs : Any</span>
 <span class="sd">        Additional keyword arguments to configure the Ax experiment.</span>
 
@@ -917,7 +917,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    blop.ax.objective.Objective : For defining objectives.</span>
 <span class="sd">    blop.ax.optimizer.AxOptimizer : The optimizer used internally.</span>
 <span class="sd">    blop.queueserver.QueueserverOptimizationRunner : Runner that handles interaction with bluesky-queueserver.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -962,40 +962,40 @@ window.runMermaid = runMermaid;</script>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">evaluation_function</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EvaluationFunction</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluation function mapping acquired data to outcomes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Evaluation function mapping acquired data to outcomes."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluation_function</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">actuators</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set of actuator names used during acquisition.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set of actuator names used during acquisition."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">sensors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set of sensor names used during acquisition.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set of sensor names used during acquisition."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensors</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">acquisition_plan</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Acquisition plan name used during acquisition.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Acquisition plan name used during acquisition."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_acquisition_plan</span>
 
 <div class="viewcode-block" id="QueueserverAgent.stop">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.stop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the queueserver runner.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Stop the queueserver runner."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runner</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">current_iteration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The current iteration of the optimization.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The current iteration of the optimization."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runner</span><span class="o">.</span><span class="n">current_iteration</span>
 
 <div class="viewcode-block" id="QueueserverAgent.to_optimization_problem">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_optimization_problem</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QueueserverOptimizationProblem</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the agent state to an optimization problem.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Convert the agent state to an optimization problem."""</span>
         <span class="k">return</span> <span class="n">QueueserverOptimizationProblem</span><span class="p">(</span>
             <span class="n">optimizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimizer</span><span class="p">,</span>
             <span class="n">actuators</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_actuators</span><span class="p">,</span>
@@ -1011,7 +1011,7 @@ window.runMermaid = runMermaid;</script>
     <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Future</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Start the optimization loop.</span>
 
 <span class="sd">        Validates the queueserver state, then begins the suggest -&gt; acquire -&gt; ingest</span>
@@ -1043,14 +1043,14 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">            If the queueserver environment is not ready.</span>
 <span class="sd">        ValueError</span>
 <span class="sd">            If required devices or plans are not available.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">iterations</span><span class="o">=</span><span class="n">iterations</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="n">n_points</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="o">=</span><span class="n">checkpoint_interval</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="QueueserverAgent.submit_suggestions">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.queueserver_agent.QueueserverAgent.submit_suggestions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">submit_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Future</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Evaluate specific parameter combinations.</span>
 
 <span class="sd">        Acquires data for given suggestions and ingests results. Supports both</span>
@@ -1059,7 +1059,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        suggestions : list[dict]</span>
-<span class="sd">            Either optimizer suggestions (with &quot;_id&quot;) or manual points (without &quot;_id&quot;).</span>
+<span class="sd">            Either optimizer suggestions (with "_id") or manual points (without "_id").</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1070,7 +1070,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
 <span class="sd">        run : Run the full optimization loop.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runner</span><span class="o">.</span><span class="n">submit_suggestions</span><span class="p">(</span><span class="n">suggestions</span><span class="p">)</span></div>
 </div>
 

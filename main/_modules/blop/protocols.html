@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.protocols &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.protocols &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.protocols</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Protocols that bridge between optimizer backends and Bluesky.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Protocols that bridge between optimizer backends and Bluesky."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
@@ -855,58 +855,58 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.MovableHasName">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">MovableHasName</span><span class="p">(</span><span class="n">Movable</span><span class="p">,</span> <span class="n">HasName</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A movable that has a name.</span>
 
 <span class="sd">    We use this instead of `bluesky.protocols.NamedMovable` since</span>
 <span class="sd">    we do not want to require `HasHints` on the movable.</span>
 
 <span class="sd">    A `Movable` and `HasName` is sufficient. `HasHints` should be optional.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="o">...</span></div>
 
 
 
-<span class="n">ID_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;_id&quot;</span>
+<span class="n">ID_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"_id"</span>
 <span class="n">Actuator</span> <span class="o">=</span> <span class="n">MovableHasName</span> <span class="o">|</span> <span class="n">Flyable</span>
 <span class="n">Sensor</span> <span class="o">=</span> <span class="n">Readable</span> <span class="o">|</span> <span class="n">EventCollectable</span> <span class="o">|</span> <span class="n">EventPageCollectable</span>
 
-<span class="n">TActuator</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TActuator&quot;</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Actuator generic type&quot;&quot;&quot;</span>
-<span class="n">TSensor</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TSensor&quot;</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Sensor generic type&quot;&quot;&quot;</span>
-<span class="n">TPlan</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;TPlan&quot;</span><span class="p">)</span>
-<span class="sd">&quot;&quot;&quot;Plan generic type&quot;&quot;&quot;</span>
+<span class="n">TActuator</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"TActuator"</span><span class="p">)</span>
+<span class="sd">"""Actuator generic type"""</span>
+<span class="n">TSensor</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"TSensor"</span><span class="p">)</span>
+<span class="sd">"""Sensor generic type"""</span>
+<span class="n">TPlan</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">"TPlan"</span><span class="p">)</span>
+<span class="sd">"""Plan generic type"""</span>
 
 
 <div class="viewcode-block" id="CanRegisterSuggestions">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.CanRegisterSuggestions">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CanRegisterSuggestions</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A protocol for optimizers that can register suggestions.</span>
 
-<span class="sd">    This allows them to add an &quot;_id&quot; key to the suggestions dynamically and ensure</span>
+<span class="sd">    This allows them to add an "_id" key to the suggestions dynamically and ensure</span>
 <span class="sd">    that the suggestions are unique.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="CanRegisterSuggestions.register_suggestions">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.CanRegisterSuggestions.register_suggestions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">register_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Register the suggestions with the optimizer.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        suggestions: list[dict]</span>
-<span class="sd">            The suggestions to register. The &quot;_id&quot; key is optional and will be overwritten if present.</span>
+<span class="sd">            The suggestions to register. The "_id" key is optional and will be overwritten if present.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list[dict]</span>
-<span class="sd">            The original suggestions with an &quot;_id&quot; key added.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            The original suggestions with an "_id" key added.</span>
+<span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>
 
@@ -916,24 +916,24 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.TrialFaultAware">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">TrialFaultAware</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A protocol to accept information about trial failures of the optimization loop.</span>
 
 <span class="sd">    Used to invalidate or register early stop on data for the optimizer, or do necesary</span>
 <span class="sd">    cleanup of processes not directly tied to the run engine</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="TrialFaultAware.register_failures">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.TrialFaultAware.register_failures">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">register_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Register the failed suggestions with the optimizer.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        suggestions: list[dict]</span>
 <span class="sd">            The suggestions to fail. Ids must be present.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>
 
@@ -941,21 +941,21 @@ window.runMermaid = runMermaid;</script>
 
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">SupportsStoppingCriteria</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A protocol for optimizers that can evaluate stopping criteria.</span>
 
 <span class="sd">    This allows optimization plans to terminate early through tolerance, max_iterations etc.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Evaluate whether optimization should terminate early.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        tuple[bool, str | None]</span>
 <span class="sd">            (stop_now, reason). If stop_now is True, optimization should stop. If reason is provided, it will be logged.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="o">...</span>
 
 
@@ -963,17 +963,17 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Checkpointable">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Checkpointable</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A protocol for objects that can can write state to persistent storage.</span>
 
 <span class="sd">    Implementers configure storage at construction time (e.g., a file path, databse URI).</span>
 <span class="sd">    The checkpoint method then saves or updates to that pre-configured location.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Checkpointable.checkpoint">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Checkpointable.checkpoint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the object&#39;s state to persistent storage.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Write the object's state to persistent storage."""</span>
         <span class="o">...</span></div>
 </div>
 
@@ -983,7 +983,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Optimizer</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A minimal optimizer interface for optimization.</span>
 
 <span class="sd">    This protocol defines the interface for optimizers in Blop. Most users will use</span>
@@ -994,15 +994,15 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    --------</span>
 <span class="sd">    blop.ax.optimizer.AxOptimizer : Built-in Ax-based optimizer implementation.</span>
 <span class="sd">    blop.ax.Agent : High-level interface that uses AxOptimizer internally.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="Optimizer.suggest">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer.suggest">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Suggest a set of points in the input space, to be evaulated next.</span>
 
-<span class="sd">        The &quot;_id&quot; key is optional and can be used to identify suggested trials for later evaluation</span>
+<span class="sd">        The "_id" key is optional and can be used to identify suggested trials for later evaluation</span>
 <span class="sd">        and ingestion.</span>
 
 <span class="sd">        Parameters</span>
@@ -1014,32 +1014,32 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        -------</span>
 <span class="sd">        list[dict]</span>
 <span class="sd">            A list of dictionaries, each containing a parameterization of a point to evaluate next.</span>
-<span class="sd">            Each dictionary must contain a unique &quot;_id&quot; key to identify each parameterization.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            Each dictionary must contain a unique "_id" key to identify each parameterization.</span>
+<span class="sd">        """</span>
         <span class="o">...</span></div>
 
 
 <div class="viewcode-block" id="Optimizer.ingest">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer.ingest">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">ingest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Ingest a set of points into the experiment. Either from previously suggested points or from an external source.</span>
 
-<span class="sd">        The &quot;_id&quot; key is optional and can be used to identify points from previously suggested trials or to identify</span>
-<span class="sd">        the point as a &quot;baseline&quot; trial.</span>
+<span class="sd">        The "_id" key is optional and can be used to identify points from previously suggested trials or to identify</span>
+<span class="sd">        the point as a "baseline" trial.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        points : list[dict]</span>
 <span class="sd">            A list of dictionaries, each containing the outcomes of each suggested parameterization.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="o">...</span></div>
 
 
 <div class="viewcode-block" id="Optimizer.get_best_points">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer.get_best_points">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_best_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get a list of the optimal points found during optimization.</span>
 
 <span class="sd">        For single-objective optimization, returns a single best point.</span>
@@ -1049,10 +1049,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        -------</span>
 <span class="sd">        list[tuple[Any, Mapping, Mapping]]</span>
 <span class="sd">            Each element in the list is a tuple of:</span>
-<span class="sd">              - &quot;_id&quot; of the suggestion</span>
+<span class="sd">              - "_id" of the suggestion</span>
 <span class="sd">              - suggested parameters</span>
 <span class="sd">              - measured outcomes</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>
 
@@ -1062,7 +1062,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.EvaluationFunction">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">EvaluationFunction</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A protocol for transforming acquired data into measurable outcomes.</span>
 
 <span class="sd">    This protocol defines how to extract and compute optimization objectives from</span>
@@ -1083,12 +1083,12 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    --------</span>
 <span class="sd">    See the tutorial documentation for complete examples of evaluation functions:</span>
 <span class="sd">    :doc:`/tutorials/simple-experiment`</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="EvaluationFunction.__call__">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.EvaluationFunction.__call__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Evaluate the data from a Bluesky run and produce outcomes.</span>
 
 <span class="sd">        Parameters</span>
@@ -1097,14 +1097,14 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">            The unique identifier of the Bluesky run to evaluate.</span>
 <span class="sd">        suggestions: list[dict]</span>
 <span class="sd">            A list of dictionaries, each containing the parameterization of a point to evaluate.</span>
-<span class="sd">            The &quot;_id&quot; key is optional and can be used to identify each suggestion.</span>
+<span class="sd">            The "_id" key is optional and can be used to identify each suggestion.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list[dict]</span>
 <span class="sd">            A list of dictionaries containing the outcomes of the run, one for each suggested parameterization.</span>
-<span class="sd">            The &quot;_id&quot; key is optional and can be used to identify each outcome.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            The "_id" key is optional and can be used to identify each outcome.</span>
+<span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>
 
@@ -1114,7 +1114,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.AcquisitionPlan">[docs]</a>
 <span class="nd">@runtime_checkable</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">AcquisitionPlan</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A protocol for custom data acquisition plans.</span>
 
 <span class="sd">    This protocol defines how to acquire data from the beamline. Most users will use</span>
@@ -1132,7 +1132,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    The acquisition plan is a Bluesky plan that should move the actuators to each</span>
 <span class="sd">    suggested position and acquire data from the sensors. It must return the UID</span>
 <span class="sd">    of the Bluesky run so that the evaluation function can retrieve the data.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
 <div class="viewcode-block" id="AcquisitionPlan.__call__">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.AcquisitionPlan.__call__">[docs]</a>
@@ -1144,7 +1144,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">md</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Acquire data for optimization.</span>
 
 <span class="sd">        This should be a Bluesky plan that moves the actuators to each of their suggested positions</span>
@@ -1154,8 +1154,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ----------</span>
 <span class="sd">        suggestions: list[dict]</span>
 <span class="sd">            A list of dictionaries, each containing the parameterization of a point to evaluate.</span>
-<span class="sd">            The &quot;_id&quot; key is optional and can be used to identify each suggestion. It is suggested</span>
-<span class="sd">            to add &quot;_id&quot; values to the run metadata for later identification of the acquired data.</span>
+<span class="sd">            The "_id" key is optional and can be used to identify each suggestion. It is suggested</span>
+<span class="sd">            to add "_id" values to the run metadata for later identification of the acquired data.</span>
 <span class="sd">        actuators: Sequence[Actuator]</span>
 <span class="sd">            The actuators to move to their suggested positions.</span>
 <span class="sd">        sensors: Sequence[Sensor], optional</span>
@@ -1167,7 +1167,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            The unique identifier of the Bluesky run.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>
 
@@ -1177,7 +1177,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.BaseOptimizationProblem">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">BaseOptimizationProblem</span><span class="p">(</span><span class="n">Generic</span><span class="p">[</span><span class="n">TActuator</span><span class="p">,</span> <span class="n">TSensor</span><span class="p">,</span> <span class="n">TPlan</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for optimization problem definitions.</span>
+<span class="w">    </span><span class="sd">"""Base class for optimization problem definitions.</span>
 
 <span class="sd">    Provides the common structure shared by all optimization problem types.</span>
 <span class="sd">    Users should use the concrete subclasses :class:`OptimizationProblem` or</span>
@@ -1187,7 +1187,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    --------</span>
 <span class="sd">    OptimizationProblem : Concrete problem type for standard usage.</span>
 <span class="sd">    QueueserverOptimizationProblem : Concrete problem type for queue server usage.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span>
     <span class="n">actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">TActuator</span><span class="p">]</span>
@@ -1201,7 +1201,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.OptimizationProblem">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptimizationProblem</span><span class="p">(</span><span class="n">BaseOptimizationProblem</span><span class="p">[</span><span class="n">Actuator</span><span class="p">,</span> <span class="n">Sensor</span><span class="p">,</span> <span class="n">AcquisitionPlan</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    An optimization problem to solve. Immutable once initialized.</span>
 
 <span class="sd">    This dataclass encapsulates all components needed for optimization into a single</span>
@@ -1214,7 +1214,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Suggests points to evaluate and ingests outcomes to inform the optimization.</span>
 <span class="sd">    actuators: Sequence[Actuator]</span>
 <span class="sd">        Objects that can be moved to control the beamline using the Bluesky RunEngine.</span>
-<span class="sd">        A subset of the actuators&#39; names must match the names of suggested parameterizations.</span>
+<span class="sd">        A subset of the actuators' names must match the names of suggested parameterizations.</span>
 <span class="sd">    sensors: Sequence[Sensor]</span>
 <span class="sd">        Objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.</span>
 <span class="sd">    evaluation_function: EvaluationFunction</span>
@@ -1226,7 +1226,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    --------</span>
 <span class="sd">    blop.ax.Agent.to_optimization_problem : Creates an OptimizationProblem from an Agent.</span>
 <span class="sd">    blop.plans.optimize : Bluesky plan that uses an OptimizationProblem.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="o">...</span></div>
 
@@ -1236,7 +1236,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.QueueserverOptimizationProblem">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">QueueserverOptimizationProblem</span><span class="p">(</span><span class="n">BaseOptimizationProblem</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    An optimization problem to solve. Immutable once initialized.</span>
 
 <span class="sd">    This dataclass encapsulates all components needed for optimization into a single</span>
@@ -1251,7 +1251,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Suggests points to evaluate and ingests outcomes to inform the optimization.</span>
 <span class="sd">    actuators: Sequence[str]</span>
 <span class="sd">        Names of objects that can be moved to control the beamline using the Bluesky RunEngine.</span>
-<span class="sd">        A subset of the actuators&#39; names must match the names of suggested parameterizations.</span>
+<span class="sd">        A subset of the actuators' names must match the names of suggested parameterizations.</span>
 <span class="sd">    sensors: Sequence[str]</span>
 <span class="sd">        Names of objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.</span>
 <span class="sd">    evaluation_function: EvaluationFunction</span>
@@ -1267,7 +1267,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem :</span>
 <span class="sd">        Creates a QueueserverOptimizationProblem from an agent.</span>
 <span class="sd">    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">acquisition_plan_kwargs</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.optimizer &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.ax.optimizer &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.ax.optimizer</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;An optimizer protocol implementation for Ax.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""An optimizer protocol implementation for Ax."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
@@ -858,7 +858,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AxOptimizer">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">AxOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">Checkpointable</span><span class="p">,</span> <span class="n">CanRegisterSuggestions</span><span class="p">,</span> <span class="n">TrialFaultAware</span><span class="p">,</span> <span class="n">SupportsStoppingCriteria</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    An optimizer that uses Ax as the backend for optimization and experiment tracking.</span>
 
 <span class="sd">    This is the built-in implementation of the :class:`blop.protocols.Optimizer` protocol.</span>
@@ -874,7 +874,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    outcome_constraints : Sequence[str] | None, optional</span>
 <span class="sd">        The outcome constraints to apply to the optimization.</span>
 <span class="sd">    checkpoint_path : str | None, optional</span>
-<span class="sd">        The path to the checkpoint file to save the optimizer&#39;s state to.</span>
+<span class="sd">        The path to the checkpoint file to save the optimizer's state to.</span>
 <span class="sd">    stopping_strategy : BaseGlobalStoppingStrategy | None, optional</span>
 <span class="sd">        A stopping strategy that decides when/if optimization should halt early.</span>
 <span class="sd">    client_kwargs : dict[str, Any] | None, optional</span>
@@ -886,7 +886,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    --------</span>
 <span class="sd">    blop.ax.Agent : High-level interface that uses AxOptimizer internally.</span>
 <span class="sd">    blop.protocols.Optimizer : The protocol this class implements.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -917,7 +917,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AxOptimizer.should_stop">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.should_stop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">should_stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Evaluate whether optimization should terminate early.</span>
 
 <span class="sd">        Returns ``(False, None)`` as default when no stopping strategy was provided.</span>
@@ -927,7 +927,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        tuple[bool, str | None]</span>
 <span class="sd">            ``(stop_now, reason)``. If ``stop_now`` is ``True``, optimization halts.</span>
 <span class="sd">            ``reason`` is logged when provided.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stopping_strategy</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stopping_strategy</span><span class="p">,</span> <span class="n">BaseGlobalStoppingStrategy</span><span class="p">):</span>
@@ -938,8 +938,8 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AxOptimizer.from_checkpoint">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.from_checkpoint">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_checkpoint</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;AxOptimizer&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_checkpoint</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"AxOptimizer"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Load an optimizer from a checkpoint file.</span>
 
 <span class="sd">        Parameters</span>
@@ -951,7 +951,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        -------</span>
 <span class="sd">        AxOptimizer</span>
 <span class="sd">            An instance of the optimizer class, initialized from the checkpoint.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">client</span> <span class="o">=</span> <span class="n">Client</span><span class="o">.</span><span class="n">load_from_json_file</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
         <span class="n">instance</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
         <span class="n">instance</span><span class="o">.</span><span class="n">_parameter_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">_experiment</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
@@ -964,22 +964,22 @@ window.runMermaid = runMermaid;</script>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The file path for saving and restoring optimizer state, or ``None`` if disabled.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The file path for saving and restoring optimizer state, or ``None`` if disabled."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkpoint_path</span>
 
     <span class="nd">@checkpoint_path</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set file path for saving and restoring optimizer state, or ``None`` if disabled.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Set file path for saving and restoring optimizer state, or ``None`` if disabled."""</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_checkpoint_path</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ax_client</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Client</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The underlying Ax ``Client`` used for experiment management.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The underlying Ax ``Client`` used for experiment management."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">fixed_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parameters held fixed during optimization, or ``None`` if all parameters are free.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Parameters held fixed during optimization, or ``None`` if all parameters are free."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_parameters</span>
 
     <span class="nd">@fixed_parameters</span><span class="o">.</span><span class="n">setter</span>
@@ -991,17 +991,17 @@ window.runMermaid = runMermaid;</script>
         <span class="n">unknown_parameter_names</span> <span class="o">=</span> <span class="n">fixed_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">unknown_parameter_names</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Unknown parameter(s): </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown_parameter_names</span><span class="p">)</span><span class="si">}</span><span class="s2">, expected: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_names</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">"Unknown parameter(s): </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">unknown_parameter_names</span><span class="p">)</span><span class="si">}</span><span class="s2">, expected: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_parameter_names</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fixed_parameters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">fixed_parameters</span><span class="p">)</span>
 
 <div class="viewcode-block" id="AxOptimizer.suggest">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.suggest">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get the next point(s) to evaluate in the search space.</span>
 
-<span class="sd">        Uses Ax&#39;s Bayesian optimization to suggest promising points based on the</span>
+<span class="sd">        Uses Ax's Bayesian optimization to suggest promising points based on the</span>
 <span class="sd">        current model and acquisition function.</span>
 
 <span class="sd">        Parameters</span>
@@ -1013,8 +1013,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        -------</span>
 <span class="sd">        list[dict]</span>
 <span class="sd">            A list of dictionaries, each containing a parameterization of a point to</span>
-<span class="sd">            evaluate next. Each dictionary includes an &quot;_id&quot; key for tracking.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            evaluate next. Each dictionary includes an "_id" key for tracking.</span>
+<span class="sd">        """</span>
         <span class="k">if</span> <span class="n">num_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">num_points</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">next_trials</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">get_next_trials</span><span class="p">(</span><span class="n">max_trials</span><span class="o">=</span><span class="n">num_points</span><span class="p">,</span> <span class="n">fixed_parameters</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_fixed_parameters</span><span class="p">)</span>
@@ -1030,7 +1030,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AxOptimizer.get_best_points">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.get_best_points">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_best_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">TParameterization</span><span class="p">,</span> <span class="n">TOutcome</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Get a list of the optimal points found during optimization.</span>
 
 <span class="sd">        For single-objective optimization, returns a single best point.</span>
@@ -1047,11 +1047,11 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        ValueError</span>
-<span class="sd">            If the Ax client&#39;s optimization has not been configured yet.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            If the Ax client's optimization has not been configured yet.</span>
+<span class="sd">        """</span>
         <span class="n">opt_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_experiment</span><span class="o">.</span><span class="n">optimization_config</span>
         <span class="k">if</span> <span class="n">opt_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Somehow your optimization has not been configured yet...check `ax_client`.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Somehow your optimization has not been configured yet...check `ax_client`."</span><span class="p">)</span>
         <span class="n">is_multi_objective</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">opt_config</span><span class="p">,</span> <span class="n">MultiObjectiveOptimizationConfig</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">is_multi_objective</span><span class="p">:</span>
@@ -1063,7 +1063,7 @@ window.runMermaid = runMermaid;</script>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_split_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">point</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">dict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Split a point into parameters and outcomes.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Split a point into parameters and outcomes."""</span>
         <span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">outcomes</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">point</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1078,29 +1078,29 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AxOptimizer.ingest">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.ingest">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">ingest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Ingest evaluation results into the optimizer.</span>
 
-<span class="sd">        Updates Ax&#39;s experiment with new data, which will be used to train the model</span>
+<span class="sd">        Updates Ax's experiment with new data, which will be used to train the model</span>
 <span class="sd">        for future suggestions. Handles both suggested points and external data.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        points : list[dict]</span>
 <span class="sd">            A list of dictionaries, each containing outcomes for a trial. For suggested</span>
-<span class="sd">            points (from :meth:`suggest`), include the &quot;_id&quot; key. For external data,</span>
-<span class="sd">            include parameter names and objective values, and omit &quot;_id&quot;.</span>
+<span class="sd">            points (from :meth:`suggest`), include the "_id" key. For external data,</span>
+<span class="sd">            include parameter names and objective values, and omit "_id".</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        Points with ``&quot;_id&quot;: &quot;baseline&quot;`` are treated as baseline trials for reference.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        Points with ``"_id": "baseline"`` are treated as baseline trials for reference.</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">point</span> <span class="ow">in</span> <span class="n">points</span><span class="p">:</span>
             <span class="n">trial_idx</span> <span class="o">=</span> <span class="n">point</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ID_KEY</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="n">parameters</span><span class="p">,</span> <span class="n">outcomes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_point</span><span class="p">(</span><span class="n">point</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">trial_idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">trial_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">attach_trial</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">trial_idx</span> <span class="o">==</span> <span class="s2">&quot;baseline&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">trial_idx</span> <span class="o">==</span> <span class="s2">"baseline"</span><span class="p">:</span>
                 <span class="n">trial_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">attach_baseline</span><span class="p">(</span><span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">complete_trial</span><span class="p">(</span><span class="n">trial_index</span><span class="o">=</span><span class="n">trial_idx</span><span class="p">,</span> <span class="n">raw_data</span><span class="o">=</span><span class="n">outcomes</span><span class="p">)</span></div>
 
@@ -1108,23 +1108,23 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AxOptimizer.register_suggestions">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.register_suggestions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">register_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Register manual suggestions with the Ax experiment.</span>
 
-<span class="sd">        Attaches trials to the experiment and returns the suggestions with &quot;_id&quot; keys</span>
+<span class="sd">        Attaches trials to the experiment and returns the suggestions with "_id" keys</span>
 <span class="sd">        added for tracking. This enables manual point injection alongside optimizer-driven</span>
 <span class="sd">        suggestions.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        suggestions : list[dict]</span>
-<span class="sd">            Parameter combinations to register. The &quot;_id&quot; key will be overwritten if present.</span>
+<span class="sd">            Parameter combinations to register. The "_id" key will be overwritten if present.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        list[dict]</span>
-<span class="sd">            The same suggestions with &quot;_id&quot; keys added.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            The same suggestions with "_id" keys added.</span>
+<span class="sd">        """</span>
         <span class="n">registered</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">:</span>
             <span class="c1"># Extract parameters (ignore _id if present)</span>
@@ -1143,7 +1143,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AxOptimizer.register_failures">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.register_failures">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">register_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Register suggestions as failures.</span>
 
 <span class="sd">        Inherited from the trialfaultaware class to make sure either the Ax optimizer knows to</span>
@@ -1153,7 +1153,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ----------</span>
 <span class="sd">        suggestions : list[dict]</span>
 <span class="sd">            the trial id key must be present to pass back to the optimizer</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">mark_trial_failed</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="n">ID_KEY</span><span class="p">])</span></div>
 
@@ -1161,9 +1161,9 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AxOptimizer.checkpoint">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.checkpoint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Save the optimizer&#39;s state to JSON file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Save the optimizer's state to JSON file."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_path</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Checkpoint path is not set. Please set a checkpoint path when initializing the optimizer.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Checkpoint path is not set. Please set a checkpoint path when initializing the optimizer."</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">save_to_json_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">checkpoint_path</span><span class="p">)</span></div>
 
 
@@ -1174,34 +1174,34 @@ window.runMermaid = runMermaid;</script>
         <span class="n">original_range_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
         <span class="n">original_choice_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TParamValue</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Validate and apply a single parameter update, storing the original value for rollback in case of failure.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        TypeError</span>
 <span class="sd">            If the provided value does not match the expected type for the parameter.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">parameter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_experiment</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">parameter_name</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">RangeParameter</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">RangeParameter</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> only accepts tuples of length 2, but got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">RangeParameter</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> only accepts tuples of length 2, but got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">original_range_values</span><span class="p">[</span><span class="n">parameter_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">parameter</span><span class="o">.</span><span class="n">lower</span><span class="p">,</span> <span class="n">parameter</span><span class="o">.</span><span class="n">upper</span><span class="p">)</span>
             <span class="n">parameter</span><span class="o">.</span><span class="n">update_range</span><span class="p">(</span><span class="o">*</span><span class="n">value</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">ChoiceParameter</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ChoiceParameter</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> only accepts list of items, but got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">ChoiceParameter</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> only accepts list of items, but got: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
             <span class="n">original_choice_values</span><span class="p">[</span><span class="n">parameter_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">values</span>
             <span class="n">parameter</span><span class="o">.</span><span class="n">set_values</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected RangeParameter or ChoiceParameter, but got </span><span class="si">{</span><span class="n">parameter</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Expected RangeParameter or ChoiceParameter, but got </span><span class="si">{</span><span class="n">parameter</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_rollback_parameter_updates</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">original_range_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
         <span class="n">original_choice_values</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TParamValue</span><span class="p">]],</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Rollback original parameter state after a failed update.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Rollback original parameter state after a failed update."""</span>
         <span class="k">for</span> <span class="n">parameter_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">original_range_values</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">parameter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">_experiment</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">parameter_name</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameter</span><span class="p">,</span> <span class="n">RangeParameter</span><span class="p">):</span>
@@ -1214,14 +1214,14 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="AxOptimizer.reconfigure_search_space">
 <a class="viewcode-back" href="../../../reference/ax/optimizer.html#blop.ax.optimizer.AxOptimizer.reconfigure_search_space">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reconfigure_search_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameter_mappings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">TParamValue</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Update the bounds or values of existing parameters in the underlying experiment.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        parameter_mappings : dict[str, tuple[float, float] | list[TParamValue]]</span>
 <span class="sd">            Mapping of parameter names to (lower, upper) bounds or a list of values depending on the parameter type.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">original_range_values</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">original_choice_values</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">try</span><span class="p">:</span>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Queueserver &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>Queueserver &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../_static/documentation_options.js?v=84a20152"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Callbacks" href="callbacks.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -615,46 +615,6 @@ The API may change in future releases without a deprecation period.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="blop.queueserver.QueueserverClient.check_devices_available">
-<span class="sig-name descname"><span class="pre">check_devices_available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/queueserver.html#QueueserverClient.check_devices_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.queueserver.QueueserverClient.check_devices_available" title="Link to this definition">#</a></dt>
-<dd><p>Verify that all specified devices are available in the queueserver.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>device_names</strong><span class="classifier">Sequence[str]</span></dt><dd><p>Names of devices to check.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>ValueError</dt><dd><p>If any device is not available.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="blop.queueserver.QueueserverClient.check_plan_available">
-<span class="sig-name descname"><span class="pre">check_plan_available</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/queueserver.html#QueueserverClient.check_plan_available"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.queueserver.QueueserverClient.check_plan_available" title="Link to this definition">#</a></dt>
-<dd><p>Verify that a plan is available in the queueserver.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>plan_name</strong><span class="classifier">str</span></dt><dd><p>Name of the plan to check.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>ValueError</dt><dd><p>If the plan is not available.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="blop.queueserver.QueueserverClient.submit_plan">
 <span class="sig-name descname"><span class="pre">submit_plan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plan</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/queueserver.html#QueueserverClient.submit_plan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.queueserver.QueueserverClient.submit_plan" title="Link to this definition">#</a></dt>
 <dd><p>Submit a plan to the queueserver queue.</p>
@@ -876,8 +836,6 @@ many iterations completed before the stop.</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#queueserverclient">QueueserverClient</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.queueserver.QueueserverClient"><code class="docutils literal notranslate"><span class="pre">QueueserverClient</span></code></a><ul class="nav section-nav flex-column">
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.queueserver.QueueserverClient.check_environment"><code class="docutils literal notranslate"><span class="pre">QueueserverClient.check_environment()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.queueserver.QueueserverClient.check_devices_available"><code class="docutils literal notranslate"><span class="pre">QueueserverClient.check_devices_available()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.queueserver.QueueserverClient.check_plan_available"><code class="docutils literal notranslate"><span class="pre">QueueserverClient.check_plan_available()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.queueserver.QueueserverClient.submit_plan"><code class="docutils literal notranslate"><span class="pre">QueueserverClient.submit_plan()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.queueserver.QueueserverClient.start_listener"><code class="docutils literal notranslate"><span class="pre">QueueserverClient.start_listener()</span></code></a></li>
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.queueserver.QueueserverClient.stop_listener"><code class="docutils literal notranslate"><span class="pre">QueueserverClient.stop_listener()</span></code></a></li>

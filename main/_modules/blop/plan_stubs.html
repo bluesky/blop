@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.plan_stubs &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.plan_stubs &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.plan_stubs</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Bluesky plan stubs for optimization.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Bluesky plan stubs for optimization."""</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
@@ -854,8 +854,8 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">ID_KEY</span><span class="p">,</span> <span class="n">Actuator</span><span class="p">,</span> <span class="n">Optimizer</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">InferredReadable</span><span class="p">,</span> <span class="n">Source</span>
 
-<span class="n">_BLUESKY_UID_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;bluesky_uid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;bluesky_uid&quot;</span>
-<span class="n">_SUGGESTION_IDS_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;suggestion_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;suggestion_ids&quot;</span>
+<span class="n">_BLUESKY_UID_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"bluesky_uid"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"bluesky_uid"</span>
+<span class="n">_SUGGESTION_IDS_KEY</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"suggestion_ids"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"suggestion_ids"</span>
 
 
 <div class="viewcode-block" id="read_step">
@@ -864,7 +864,7 @@ window.runMermaid = runMermaid;</script>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_step</span><span class="p">(</span>
     <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">outcomes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">readable_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">InferredReadable</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plan stub to read the suggestions and outcomes of a single optimization step.</span>
+<span class="w">    </span><span class="sd">"""Plan stub to read the suggestions and outcomes of a single optimization step.</span>
 
 <span class="sd">    If fewer suggestions are returned than n_points arrays are padded to n_points length</span>
 <span class="sd">    with np.nan to ensure consistent shapes for event-model specification.</span>
@@ -881,7 +881,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Expected number of suggestions. Arrays will be padded to this length if needed.</span>
 <span class="sd">    readable_cache : dict[str, InferredReadable]</span>
 <span class="sd">        Cache of InferredReadable objects to reuse across iterations.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="c1"># Group by ID_KEY to get proper suggestion/outcome order</span>
     <span class="n">suggestion_by_id</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">outcome_by_id</span> <span class="o">=</span> <span class="p">{}</span>
@@ -896,8 +896,8 @@ window.runMermaid = runMermaid;</script>
     <span class="n">sids</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span> <span class="k">for</span> <span class="n">sid</span> <span class="ow">in</span> <span class="n">suggestion_by_id</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span>
     <span class="k">if</span> <span class="n">sids</span> <span class="o">!=</span> <span class="nb">set</span><span class="p">(</span><span class="n">outcome_by_id</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;The suggestions and outcomes must contain the same IDs. Got suggestions: &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">suggestion_by_id</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2"> and outcomes: </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">outcome_by_id</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">"The suggestions and outcomes must contain the same IDs. Got suggestions: "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">suggestion_by_id</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2"> and outcomes: </span><span class="si">{</span><span class="nb">set</span><span class="p">(</span><span class="n">outcome_by_id</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
 
     <span class="c1"># Flatten the suggestions and outcomes into a single dictionary of lists</span>
@@ -922,7 +922,7 @@ window.runMermaid = runMermaid;</script>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">outcomes_flat</span><span class="p">:</span>
             <span class="n">outcomes_flat</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">-</span> <span class="n">actual_n</span><span class="p">))</span>
         <span class="c1"># Pad suggestion IDs with empty string to maintain string dtype</span>
-        <span class="n">sorted_sids</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">-</span> <span class="n">actual_n</span><span class="p">))</span>
+        <span class="n">sorted_sids</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">""</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_points</span> <span class="o">-</span> <span class="n">actual_n</span><span class="p">))</span>
 
     <span class="c1"># Create or update the InferredReadables for the suggestion_ids, step uid, suggestions, and outcomes</span>
     <span class="k">if</span> <span class="n">_SUGGESTION_IDS_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">readable_cache</span><span class="p">:</span>
@@ -961,7 +961,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">optimizer</span><span class="p">:</span> <span class="n">Optimizer</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">parameterization</span><span class="p">:</span> <span class="n">Mapping</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Move actuators to the best point found during optimization.</span>
 
 <span class="sd">    If no explicit parameterization is provided, queries the optimizer for its</span>
@@ -975,7 +975,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    optimizer : Optimizer | None, optional</span>
 <span class="sd">        The optimizer to query for the best point.</span>
 <span class="sd">    parameterization : Mapping | None, optional</span>
-<span class="sd">        Explicit parameterization to navigate to. If None, queries the optimizer&#39;s</span>
+<span class="sd">        Explicit parameterization to navigate to. If None, queries the optimizer's</span>
 <span class="sd">        best point. For multi-objective problems, call ``optimizer.get_best_points()``</span>
 <span class="sd">        to inspect the Pareto set and select one.</span>
 
@@ -986,16 +986,16 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    ValueError</span>
 <span class="sd">        If the optimizer returns multiple Pareto-optimal points and no</span>
 <span class="sd">        explicit ``parameterization`` is provided.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">parameterization</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">optimizer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Either pass an explicit parameterization or use an optimizer.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"Either pass an explicit parameterization or use an optimizer."</span><span class="p">)</span>
         <span class="n">best_points</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">get_best_points</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">best_points</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;The optimizer returned </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">best_points</span><span class="p">)</span><span class="si">}</span><span class="s2"> Pareto-optimal points. &quot;</span>
-                <span class="s2">&quot;Please call optimizer.get_best_points() to inspect them and pass your &quot;</span>
-                <span class="s2">&quot;chosen parameterization explicitly via the &#39;parameterization&#39; argument.&quot;</span>
+                <span class="sa">f</span><span class="s2">"The optimizer returned </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">best_points</span><span class="p">)</span><span class="si">}</span><span class="s2"> Pareto-optimal points. "</span>
+                <span class="s2">"Please call optimizer.get_best_points() to inspect them and pass your "</span>
+                <span class="s2">"chosen parameterization explicitly via the 'parameterization' argument."</span>
             <span class="p">)</span>
         <span class="n">_</span><span class="p">,</span> <span class="n">parameterization</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">best_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 

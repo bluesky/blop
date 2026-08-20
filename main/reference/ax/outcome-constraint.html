@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Ax Outcome Constraint &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>Ax Outcome Constraint &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Ax Optimizer" href="optimizer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -552,8 +552,8 @@ measured outcomes rather than the input parameters.</p>
 <p class="rubric">Examples</p>
 <p>Constrain an objective to be below a threshold:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">blop.ax.objective</span><span class="w"> </span><span class="kn">import</span> <span class="n">Objective</span><span class="p">,</span> <span class="n">OutcomeConstraint</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">temp_obj</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;temperature&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">constraint</span> <span class="o">=</span> <span class="n">OutcomeConstraint</span><span class="p">(</span><span class="s2">&quot;temp &lt;= 100&quot;</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="n">temp_obj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">temp_obj</span> <span class="o">=</span> <span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"temperature"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">constraint</span> <span class="o">=</span> <span class="n">OutcomeConstraint</span><span class="p">(</span><span class="s2">"temp &lt;= 100"</span><span class="p">,</span> <span class="n">temp</span><span class="o">=</span><span class="n">temp_obj</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
 <span class="go">temperature &lt;= 100</span>
 </pre></div>

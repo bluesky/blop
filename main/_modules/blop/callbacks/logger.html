@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.callbacks.logger &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.callbacks.logger &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.callbacks.logger</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Logging callback for Bluesky optimization runs.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Logging callback for Bluesky optimization runs."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
@@ -858,36 +858,36 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunningStats</span>
 
 <span class="c1"># Styling constants</span>
-<span class="n">_PARAM_STYLE</span> <span class="o">=</span> <span class="s2">&quot;cyan&quot;</span>
-<span class="n">_OUTCOME_STYLE</span> <span class="o">=</span> <span class="s2">&quot;green&quot;</span>
-<span class="n">_HEADER_STYLE</span> <span class="o">=</span> <span class="s2">&quot;bold&quot;</span>
-<span class="n">_DIM_STYLE</span> <span class="o">=</span> <span class="s2">&quot;dim&quot;</span>
-<span class="n">_ERROR_STYLE</span> <span class="o">=</span> <span class="s2">&quot;bold red&quot;</span>
-<span class="n">_ITERATION_RULE_STYLE</span> <span class="o">=</span> <span class="s2">&quot;blue&quot;</span>
+<span class="n">_PARAM_STYLE</span> <span class="o">=</span> <span class="s2">"cyan"</span>
+<span class="n">_OUTCOME_STYLE</span> <span class="o">=</span> <span class="s2">"green"</span>
+<span class="n">_HEADER_STYLE</span> <span class="o">=</span> <span class="s2">"bold"</span>
+<span class="n">_DIM_STYLE</span> <span class="o">=</span> <span class="s2">"dim"</span>
+<span class="n">_ERROR_STYLE</span> <span class="o">=</span> <span class="s2">"bold red"</span>
+<span class="n">_ITERATION_RULE_STYLE</span> <span class="o">=</span> <span class="s2">"blue"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_format_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a numeric or other value for display.</span>
+<span class="w">    </span><span class="sd">"""Format a numeric or other value for display.</span>
 
 <span class="sd">    Uses 6 significant figures for floats, passes through everything else.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">math</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">"</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_format_stat</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Format a statistic value, returning &#39;--&#39; for NaN.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Format a statistic value, returning '--' for NaN."""</span>
     <span class="k">if</span> <span class="n">math</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">math</span><span class="o">.</span><span class="n">isinf</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;--&quot;</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="s2">"--"</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">"</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_to_list</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coerce a value into a list, handling scalars, numpy arrays, and iterables.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;tolist&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Coerce a value into a list, handling scalars, numpy arrays, and iterables."""</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">"tolist"</span><span class="p">):</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">result</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">result</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
@@ -896,14 +896,14 @@ window.runMermaid = runMermaid;</script>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if a value is numeric (int or float).&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Check if a value is numeric (int or float)."""</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="OptimizationLogger">
 <a class="viewcode-back" href="../../../reference/callbacks.html#blop.callbacks.logger.OptimizationLogger">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OptimizationLogger</span><span class="p">(</span><span class="n">CallbackBase</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;A Bluesky callback for displaying optimization progress to the console.</span>
+<span class="w">    </span><span class="sd">"""A Bluesky callback for displaying optimization progress to the console.</span>
 
 <span class="sd">    This callback provides structured, styled console output during</span>
 <span class="sd">    optimization runs using the ``rich`` library. It listens for documents</span>
@@ -922,7 +922,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    When ``n_points &gt; 1``, each iteration is displayed as a multi-row table</span>
 <span class="sd">    showing the batch of points suggested together by the optimizer, with</span>
 <span class="sd">    NaN-padded entries (from incomplete batches) filtered out.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">console</span><span class="p">:</span> <span class="n">Console</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -937,51 +937,51 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="OptimizationLogger.start">
 <a class="viewcode-back" href="../../../reference/callbacks.html#blop.callbacks.logger.OptimizationLogger.start">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">RunStart</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Process the start document from the Bluesky run.</span>
 
 <span class="sd">        Logs the optimization setup observed from metadata.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">iterations</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;iterations&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">n_points</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;n_points&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;optimizer&quot;</span><span class="p">,</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">)</span>
-        <span class="n">actuators</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;actuators&quot;</span><span class="p">,</span> <span class="p">[])</span>
-        <span class="n">sensors</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sensors&quot;</span><span class="p">,</span> <span class="p">[])</span>
-        <span class="n">run_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;uid&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">iterations</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"iterations"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">n_points</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"n_points"</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"optimizer"</span><span class="p">,</span> <span class="s2">"Unknown"</span><span class="p">)</span>
+        <span class="n">actuators</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"actuators"</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">sensors</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sensors"</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">run_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"uid"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">iterations</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">+</span> <span class="n">iterations</span>
 
         <span class="c1"># Build the header content</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="n">Text</span><span class="p">()</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Optimizer  &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">optimizer</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_HEADER_STYLE</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Actuators  &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">actuators</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">actuators</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;N/A&#39;</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Sensors    &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sensors</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">sensors</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;N/A&#39;</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Iterations &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Optimizer  "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">optimizer</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_HEADER_STYLE</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Actuators  "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">actuators</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">actuators</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'N/A'</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Sensors    "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sensors</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">sensors</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'N/A'</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Iterations "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2"> more (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2"> completed, &quot;</span><span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2"> total)&quot;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2"> more (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2"> completed, "</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2"> total)"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">iterations</span> <span class="k">else</span> <span class="s2">&quot;?&quot;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">iterations</span> <span class="k">else</span> <span class="s2">"?"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">n_points</span> <span class="ow">and</span> <span class="n">n_points</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  &quot;</span><span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Points/iter &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n_points</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  "</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Points/iter "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">n_points</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">run_uid</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Run UID    &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Run UID    "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">run_uid</span><span class="p">)</span>
 
         <span class="n">panel</span> <span class="o">=</span> <span class="n">Panel</span><span class="p">(</span>
             <span class="n">lines</span><span class="p">,</span>
-            <span class="n">title</span><span class="o">=</span><span class="s2">&quot;[bold]Optimization[/bold]&quot;</span><span class="p">,</span>
-            <span class="n">border_style</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="s2">"[bold]Optimization[/bold]"</span><span class="p">,</span>
+            <span class="n">border_style</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span>
             <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
@@ -991,18 +991,18 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="OptimizationLogger.descriptor">
 <a class="viewcode-back" href="../../../reference/callbacks.html#blop.callbacks.logger.OptimizationLogger.descriptor">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">descriptor</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">EventDescriptor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cache data keys and group by their source.&quot;&quot;&quot;</span>
-        <span class="n">data_keys</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data_keys&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="w">        </span><span class="sd">"""Cache data keys and group by their source."""</span>
+        <span class="n">data_keys</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data_keys"</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">data_keys_by_source</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Source</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">data_key</span> <span class="ow">in</span> <span class="n">data_keys</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">data_keys_by_source</span><span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">Source</span><span class="p">,</span> <span class="n">data_key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="n">Source</span><span class="o">.</span><span class="n">OTHER</span><span class="p">))]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">data_keys_by_source</span><span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">Source</span><span class="p">,</span> <span class="n">data_key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">,</span> <span class="n">Source</span><span class="o">.</span><span class="n">OTHER</span><span class="p">))]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">keys</span> <span class="ow">in</span> <span class="n">data_keys_by_source</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_keys</span> <span class="o">=</span> <span class="n">data_keys</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span> <span class="n">valid_indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update running statistics for each key with the valid values from this event.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Update running statistics for each key with the valid values from this event."""</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">valid_indices</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_is_numeric</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">idx</span><span class="p">]):</span>
@@ -1013,12 +1013,12 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="OptimizationLogger.event">
 <a class="viewcode-back" href="../../../reference/callbacks.html#blop.callbacks.logger.OptimizationLogger.event">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Event</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Process an event document from a Bluesky run.</span>
 
 <span class="sd">        Logs what occurred in this event along with running stats.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="p">{})</span>
+<span class="sd">        """</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">doc</span>
 
@@ -1032,19 +1032,19 @@ window.runMermaid = runMermaid;</script>
         <span class="n">outcome_columns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">outcome_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="p">}</span>
 
         <span class="c1"># Extract suggestion IDs and acquisition UID</span>
-        <span class="n">suggestion_ids</span> <span class="o">=</span> <span class="n">_to_list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;suggestion_ids&quot;</span><span class="p">,</span> <span class="p">[]))</span>
-        <span class="n">acquire_uid</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;bluesky_uid&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-        <span class="c1"># Scalar string comes through as-is; ensure it&#39;s a plain string</span>
+        <span class="n">suggestion_ids</span> <span class="o">=</span> <span class="n">_to_list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"suggestion_ids"</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">acquire_uid</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"bluesky_uid"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="c1"># Scalar string comes through as-is; ensure it's a plain string</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">acquire_uid</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">acquire_uid</span> <span class="o">=</span> <span class="n">acquire_uid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">acquire_uid</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">acquire_uid</span> <span class="o">=</span> <span class="n">acquire_uid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">acquire_uid</span> <span class="k">else</span> <span class="s2">""</span>
 
         <span class="n">n_total</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
             <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="o">*</span><span class="n">param_columns</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="o">*</span><span class="n">outcome_columns</span><span class="o">.</span><span class="n">values</span><span class="p">()]),</span>
             <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="c1"># Filter out NaN-padded entries: suggestion_ids padded with &quot;&quot; indicate padding</span>
+        <span class="c1"># Filter out NaN-padded entries: suggestion_ids padded with "" indicate padding</span>
         <span class="k">if</span> <span class="n">suggestion_ids</span><span class="p">:</span>
-            <span class="n">valid_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">suggestion_ids</span><span class="p">)</span> <span class="k">if</span> <span class="n">sid</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+            <span class="n">valid_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">suggestion_ids</span><span class="p">)</span> <span class="k">if</span> <span class="n">sid</span> <span class="o">!=</span> <span class="s2">""</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">valid_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_total</span><span class="p">))</span>
         <span class="n">n_valid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_indices</span><span class="p">)</span> <span class="k">if</span> <span class="n">valid_indices</span> <span class="k">else</span> <span class="n">n_total</span>
@@ -1054,15 +1054,15 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_stats</span><span class="p">(</span><span class="n">outcome_columns</span><span class="p">,</span> <span class="n">valid_indices</span><span class="p">)</span>
 
         <span class="c1"># Iteration header rule</span>
-        <span class="n">iter_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Iteration </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">iter_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Iteration </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">if</span> <span class="n">n_valid</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">iter_label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;  (</span><span class="si">{</span><span class="n">n_valid</span><span class="si">}</span><span class="s2"> points)&quot;</span>
+            <span class="n">iter_label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"  (</span><span class="si">{</span><span class="n">n_valid</span><span class="si">}</span><span class="s2"> points)"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">iter_label</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_ITERATION_RULE_STYLE</span><span class="p">)</span>
 
         <span class="c1"># Show acquisition UID for this iteration</span>
         <span class="k">if</span> <span class="n">acquire_uid</span><span class="p">:</span>
             <span class="n">uid_line</span> <span class="o">=</span> <span class="n">Text</span><span class="p">()</span>
-            <span class="n">uid_line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  Acquire UID  &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+            <span class="n">uid_line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  Acquire UID  "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
             <span class="n">uid_line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">acquire_uid</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">uid_line</span><span class="p">)</span>
 
@@ -1076,31 +1076,31 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
 
         <span class="c1"># Iteration and suggestion ID columns (always shown)</span>
-        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Event&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Suggestion ID&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Event"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Suggestion ID"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameter_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">param_columns</span><span class="p">:</span>
-                <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_PARAM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_PARAM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">outcome_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">outcome_columns</span><span class="p">:</span>
-                <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_OUTCOME_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_OUTCOME_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># Populate rows</span>
         <span class="k">for</span> <span class="n">row_idx</span><span class="p">,</span> <span class="n">data_idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">valid_indices</span><span class="p">):</span>
             <span class="n">row</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">row_idx</span><span class="p">))</span>
             <span class="c1"># Suggestion ID for this point</span>
-            <span class="n">sid</span> <span class="o">=</span> <span class="n">suggestion_ids</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">suggestion_ids</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">sid</span> <span class="o">=</span> <span class="n">suggestion_ids</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">suggestion_ids</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span>
             <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameter_keys</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">param_columns</span><span class="p">:</span>
                     <span class="n">vals</span> <span class="o">=</span> <span class="n">param_columns</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_value</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_value</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">outcome_keys</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">outcome_columns</span><span class="p">:</span>
                     <span class="n">vals</span> <span class="o">=</span> <span class="n">outcome_columns</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_value</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_value</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span><span class="p">))</span>
             <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
@@ -1113,19 +1113,19 @@ window.runMermaid = runMermaid;</script>
         <span class="n">trackable_outcomes</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">outcome_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">trackable_outcomes</span> <span class="ow">and</span> <span class="n">outcome_point_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">summary</span> <span class="o">=</span> <span class="n">Text</span><span class="p">()</span>
-            <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  &quot;</span><span class="p">)</span>
+            <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  "</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trackable_outcomes</span><span class="p">):</span>
                 <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">  "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
                 <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_OUTCOME_STYLE</span><span class="p">)</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  min: &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  min: "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
                 <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_stat</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">min</span><span class="p">))</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  max: &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  max: "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
                 <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_stat</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  mean: &quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  mean: "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
                 <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_stat</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">mean</span><span class="p">))</span>
-            <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  (</span><span class="si">{</span><span class="n">outcome_point_count</span><span class="si">}</span><span class="s2"> pts sampled)&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+            <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">  (</span><span class="si">{</span><span class="n">outcome_point_count</span><span class="si">}</span><span class="s2"> pts sampled)"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">doc</span></div>
@@ -1134,13 +1134,13 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="OptimizationLogger.stop">
 <a class="viewcode-back" href="../../../reference/callbacks.html#blop.callbacks.logger.OptimizationLogger.stop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">RunStop</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Handle the stop document of a Bluesky run.</span>
 
 <span class="sd">        Prints summary statistics of what has been observed so far.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">exit_status</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;exit_status&quot;</span><span class="p">,</span> <span class="s2">&quot;success&quot;</span><span class="p">)</span>
-        <span class="n">reason</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reason&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">exit_status</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"exit_status"</span><span class="p">,</span> <span class="s2">"success"</span><span class="p">)</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"reason"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
         <span class="n">parameter_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Source</span><span class="o">.</span><span class="n">PARAMETER</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">outcome_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Source</span><span class="o">.</span><span class="n">OUTCOME</span><span class="p">,</span> <span class="p">[])</span>
@@ -1150,27 +1150,27 @@ window.runMermaid = runMermaid;</script>
         <span class="k">if</span> <span class="n">trackable_keys</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
             <span class="n">summary_table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
-                <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Summary Statistics&quot;</span><span class="p">,</span>
-                <span class="n">title_style</span><span class="o">=</span><span class="s2">&quot;bold&quot;</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="s2">"Summary Statistics"</span><span class="p">,</span>
+                <span class="n">title_style</span><span class="o">=</span><span class="s2">"bold"</span><span class="p">,</span>
                 <span class="n">show_header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">header_style</span><span class="o">=</span><span class="n">_HEADER_STYLE</span><span class="p">,</span>
                 <span class="n">border_style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span>
                 <span class="n">pad_edge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
             <span class="p">)</span>
-            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Name&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Type&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Min&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Max&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Mean&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Std&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;Count&quot;</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Name"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Type"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Min"</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Max"</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Mean"</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Std"</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">summary_table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Count"</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">trackable_keys</span><span class="p">:</span>
                 <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                 <span class="n">is_param</span> <span class="o">=</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameter_keys</span>
                 <span class="n">name_style</span> <span class="o">=</span> <span class="n">_PARAM_STYLE</span> <span class="k">if</span> <span class="n">is_param</span> <span class="k">else</span> <span class="n">_OUTCOME_STYLE</span>
-                <span class="n">type_label</span> <span class="o">=</span> <span class="s2">&quot;param&quot;</span> <span class="k">if</span> <span class="n">is_param</span> <span class="k">else</span> <span class="s2">&quot;outcome&quot;</span>
+                <span class="n">type_label</span> <span class="o">=</span> <span class="s2">"param"</span> <span class="k">if</span> <span class="n">is_param</span> <span class="k">else</span> <span class="s2">"outcome"</span>
 
                 <span class="n">summary_table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span>
                     <span class="n">Text</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">name_style</span><span class="p">),</span>
@@ -1184,18 +1184,18 @@ window.runMermaid = runMermaid;</script>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">summary_table</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">exit_status</span> <span class="o">==</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="s2">&quot;[bold]Optimization Complete[/bold]&quot;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">exit_status</span> <span class="o">==</span> <span class="s2">&quot;abort&quot;</span><span class="p">:</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;[bold]Optimization Aborted[/bold]&quot;</span>
+        <span class="k">if</span> <span class="n">exit_status</span> <span class="o">==</span> <span class="s2">"success"</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="s2">"[bold]Optimization Complete[/bold]"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"green"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">exit_status</span> <span class="o">==</span> <span class="s2">"abort"</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="s2">"[bold]Optimization Aborted[/bold]"</span>
             <span class="k">if</span> <span class="n">reason</span><span class="p">:</span>
-                <span class="n">label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;  (</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="n">label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"  (</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">)"</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_ERROR_STYLE</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[bold]Optimization Stopped[/bold]  (</span><span class="si">{</span><span class="n">exit_status</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"[bold]Optimization Stopped[/bold]  (</span><span class="si">{</span><span class="n">exit_status</span><span class="si">}</span><span class="s2">)"</span>
             <span class="k">if</span> <span class="n">reason</span><span class="p">:</span>
-                <span class="n">label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;yellow&quot;</span><span class="p">)</span>
+                <span class="n">label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"yellow"</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">()</span></div>
 </div>

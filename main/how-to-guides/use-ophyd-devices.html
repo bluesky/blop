@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>How to optimize with ophyd and ophyd-async devices &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>How to optimize with ophyd and ophyd-async devices &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../_static/documentation_options.js?v=84a20152"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="How-to Guides" href="../how-to-guides.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -527,15 +527,15 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blop.ax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">RangeDOF</span><span class="p">,</span> <span class="n">Objective</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd</span><span class="w"> </span><span class="kn">import</span> <span class="n">Signal</span><span class="p">,</span> <span class="n">SignalRO</span>
 
-<span class="n">some_control_signal</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;some_control_signal&quot;</span><span class="p">)</span>
-<span class="n">some_readable_signal</span> <span class="o">=</span> <span class="n">SignalRO</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;some_readable_signal&quot;</span><span class="p">)</span>
-<span class="n">dof</span> <span class="o">=</span> <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">some_control_signal</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
+<span class="n">some_control_signal</span> <span class="o">=</span> <span class="n">Signal</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"some_control_signal"</span><span class="p">)</span>
+<span class="n">some_readable_signal</span> <span class="o">=</span> <span class="n">SignalRO</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"some_readable_signal"</span><span class="p">)</span>
+<span class="n">dof</span> <span class="o">=</span> <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">some_control_signal</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">)</span>
 
 <span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
     <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">some_readable_signal</span><span class="p">],</span>
     <span class="n">dofs</span><span class="o">=</span><span class="p">[</span><span class="n">dof</span><span class="p">],</span>
-    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;result&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
-    <span class="n">evaluation_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]}</span> <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">],</span>
+    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"result"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
+    <span class="n">evaluation_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"result"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">"_id"</span><span class="p">:</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">]}</span> <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -548,15 +548,15 @@
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">blop.ax</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span><span class="p">,</span> <span class="n">RangeDOF</span><span class="p">,</span> <span class="n">Objective</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">ophyd_async.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">soft_signal_rw</span><span class="p">,</span> <span class="n">soft_signal_r_and_setter</span>
 
-<span class="n">some_control_signal</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;some_control_signal&quot;</span><span class="p">)</span>
-<span class="n">some_readable_signal</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;some_readable_signal&quot;</span><span class="p">)</span>
-<span class="n">dof</span> <span class="o">=</span> <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">some_control_signal</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
+<span class="n">some_control_signal</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"some_control_signal"</span><span class="p">)</span>
+<span class="n">some_readable_signal</span> <span class="o">=</span> <span class="n">soft_signal_r_and_setter</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"some_readable_signal"</span><span class="p">)</span>
+<span class="n">dof</span> <span class="o">=</span> <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">some_control_signal</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">)</span>
 
 <span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
     <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">some_readable_signal</span><span class="p">],</span>
     <span class="n">dofs</span><span class="o">=</span><span class="p">[</span><span class="n">dof</span><span class="p">],</span>
-    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;result&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
-    <span class="n">evaluation_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]}</span> <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">],</span>
+    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"result"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
+    <span class="n">evaluation_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"result"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">"_id"</span><span class="p">:</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">]}</span> <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">],</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -573,24 +573,24 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">blop.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="n">AcquisitionPlan</span><span class="p">,</span> <span class="n">Actuator</span><span class="p">,</span> <span class="n">Sensor</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">custom_acquire</span><span class="p">(</span><span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">actuators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Actuator</span><span class="p">],</span> <span class="n">sensors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Sensor</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="k">assert</span> <span class="n">actuators</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;signal1&quot;</span>
-    <span class="k">assert</span> <span class="n">sensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;signal2&quot;</span>
+    <span class="k">assert</span> <span class="n">actuators</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"signal1"</span>
+    <span class="k">assert</span> <span class="n">sensors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">"signal2"</span>
     <span class="k">yield from</span> <span class="n">bps</span><span class="o">.</span><span class="n">null</span><span class="p">()</span>
-    <span class="k">return</span> <span class="s2">&quot;test-uid-123&quot;</span>
+    <span class="k">return</span> <span class="s2">"test-uid-123"</span>
 
 <span class="n">RE</span> <span class="o">=</span> <span class="n">RunEngine</span><span class="p">({})</span>
 
-<span class="n">signal1</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;signal1&quot;</span><span class="p">)</span>
-<span class="n">signal2</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;signal2&quot;</span><span class="p">)</span>
+<span class="n">signal1</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"signal1"</span><span class="p">)</span>
+<span class="n">signal2</span> <span class="o">=</span> <span class="n">soft_signal_rw</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"signal2"</span><span class="p">)</span>
 
-<span class="n">dof</span> <span class="o">=</span> <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">signal1</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
+<span class="n">dof</span> <span class="o">=</span> <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">signal1</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">)</span>
 
 <span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
     <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">signal2</span><span class="p">],</span>
     <span class="n">dofs</span><span class="o">=</span><span class="p">[</span><span class="n">dof</span><span class="p">],</span>
     <span class="n">acquisition_plan</span><span class="o">=</span><span class="n">custom_acquire</span><span class="p">,</span>
-    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;result&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
-    <span class="n">evaluation_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">&quot;_id&quot;</span><span class="p">]}</span> <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">],</span>
+    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"result"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
+    <span class="n">evaluation_function</span><span class="o">=</span><span class="k">lambda</span> <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="p">[{</span><span class="s2">"result"</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">"_id"</span><span class="p">:</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">]}</span> <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">],</span>
 <span class="p">)</span>
 
 <span class="n">RE</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">optimize</span><span class="p">())</span>

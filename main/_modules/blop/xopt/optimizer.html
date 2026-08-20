@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.xopt.optimizer &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.xopt.optimizer &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.xopt.optimizer</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Optimizer implementation using Xopt as the optimization backend.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Optimizer implementation using Xopt as the optimization backend."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
@@ -872,7 +872,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="XoptOptimizer">
 <a class="viewcode-back" href="../../../reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">XoptOptimizer</span><span class="p">(</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">Checkpointable</span><span class="p">,</span> <span class="n">CanRegisterSuggestions</span><span class="p">,</span> <span class="n">TrialFaultAware</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adapter that exposes an arbitrary Xopt generator through blop&#39;s Optimizer protocol.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""Adapter that exposes an arbitrary Xopt generator through blop's Optimizer protocol."""</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -892,19 +892,19 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="XoptOptimizer.from_checkpoint">
 <a class="viewcode-back" href="../../../reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.from_checkpoint">[docs]</a>
     <span class="nd">@classmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_checkpoint</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;XoptOptimizer&quot;</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load optimizer from a checkpoint.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_checkpoint</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">"XoptOptimizer"</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Load optimizer from a checkpoint."""</span>
         <span class="c1"># Restore all persistent adapter state from JSON payload.</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"r"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
             <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span>
 
         <span class="n">instance</span> <span class="o">=</span> <span class="nb">object</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
 
-        <span class="n">generator_class_name</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;generator&quot;</span><span class="p">][</span><span class="s2">&quot;class&quot;</span><span class="p">]</span>
-        <span class="n">generator_module_name</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;generator&quot;</span><span class="p">][</span><span class="s2">&quot;module&quot;</span><span class="p">]</span>
-        <span class="n">generator_state</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;generator&quot;</span><span class="p">][</span><span class="s2">&quot;state&quot;</span><span class="p">]</span>
-        <span class="n">generator_data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;generator&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">)</span>
+        <span class="n">generator_class_name</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">"generator"</span><span class="p">][</span><span class="s2">"class"</span><span class="p">]</span>
+        <span class="n">generator_module_name</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">"generator"</span><span class="p">][</span><span class="s2">"module"</span><span class="p">]</span>
+        <span class="n">generator_state</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">"generator"</span><span class="p">][</span><span class="s2">"state"</span><span class="p">]</span>
+        <span class="n">generator_data</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">"generator"</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"data"</span><span class="p">)</span>
 
         <span class="c1"># Dynamically import the generator class from its module.</span>
         <span class="n">generator_module</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">generator_module_name</span><span class="p">)</span>
@@ -914,25 +914,25 @@ window.runMermaid = runMermaid;</script>
             <span class="n">instance</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">generator_data</span><span class="p">)</span>
 
         <span class="n">instance</span><span class="o">.</span><span class="n">_checkpoint_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="n">instance</span><span class="o">.</span><span class="n">_next_id</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;next_id&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
-        <span class="n">instance</span><span class="o">.</span><span class="n">_params_by_id</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;params_by_id&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_next_id</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"next_id"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">instance</span><span class="o">.</span><span class="n">_params_by_id</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"params_by_id"</span><span class="p">,</span> <span class="p">{})</span>
         <span class="n">instance</span><span class="o">.</span><span class="n">_seed_state_from_existing_data</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">instance</span></div>
 
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Checkpoint path for saving optimizer state.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Checkpoint path for saving optimizer state."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkpoint_path</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">generator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The underlying Xopt generator instance.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The underlying Xopt generator instance."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">vocs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">VOCS</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Xopt VOCS structure.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Xopt VOCS structure."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">vocs</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_seed_state_from_existing_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -960,7 +960,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="XoptOptimizer.suggest">
 <a class="viewcode-back" href="../../../reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.suggest">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Suggested points to sample from the optimizer.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Suggested points to sample from the optimizer."""</span>
         <span class="c1"># Default to single-point suggestion when caller does not specify cardinality.</span>
         <span class="k">if</span> <span class="n">num_points</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">num_points</span> <span class="o">=</span> <span class="mi">1</span>
@@ -979,7 +979,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="XoptOptimizer.register_suggestions">
 <a class="viewcode-back" href="../../../reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.register_suggestions">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">register_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register external suggestions with the optimizer.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Register external suggestions with the optimizer."""</span>
         <span class="c1"># Attach stable blop trial IDs and cache suggested parameterizations by ID.</span>
         <span class="n">registered</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">:</span>
@@ -990,7 +990,7 @@ window.runMermaid = runMermaid;</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">_params_by_id</span><span class="p">[</span><span class="n">trial_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">params</span>
             <span class="n">registered</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">ID_KEY</span><span class="p">:</span> <span class="n">trial_id</span><span class="p">,</span> <span class="o">**</span><span class="n">suggestion</span><span class="p">})</span>
 
-        <span class="c1"># add the registered suggestions to the generator&#39;s data</span>
+        <span class="c1"># add the registered suggestions to the generator's data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">registered</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">registered</span></div>
@@ -999,7 +999,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="XoptOptimizer.ingest">
 <a class="viewcode-back" href="../../../reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.ingest">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">ingest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ingest outcomes into the optimizer.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Ingest outcomes into the optimizer."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">points</span><span class="p">:</span>
             <span class="k">return</span>
 
@@ -1050,7 +1050,7 @@ window.runMermaid = runMermaid;</script>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">,</span> <span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-        <span class="c1"># Append any new rows to the generator&#39;s data after in-place updates.</span>
+        <span class="c1"># Append any new rows to the generator's data after in-place updates.</span>
         <span class="k">if</span> <span class="n">rows_to_append</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">ingest</span><span class="p">(</span><span class="n">rows_to_append</span><span class="p">)</span></div>
 
@@ -1058,7 +1058,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="XoptOptimizer.register_failures">
 <a class="viewcode-back" href="../../../reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.register_failures">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">register_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register failures with the optimizer.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Register failures with the optimizer."""</span>
         <span class="c1"># Remove failed suggestions from pending parameter cache.</span>
         <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">:</span>
             <span class="n">trial_id</span> <span class="o">=</span> <span class="n">suggestion</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ID_KEY</span><span class="p">)</span>
@@ -1069,7 +1069,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="XoptOptimizer.get_best_points">
 <a class="viewcode-back" href="../../../reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.get_best_points">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_best_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Best points from the optimizer.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Best points from the optimizer."""</span>
         <span class="c1"># Return no points when no data has been ingested.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator_has_data</span><span class="p">():</span>
             <span class="k">return</span> <span class="p">[]</span>
@@ -1108,30 +1108,30 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="XoptOptimizer.checkpoint">
 <a class="viewcode-back" href="../../../reference/xopt/optimizer.html#blop.xopt.optimizer.XoptOptimizer.checkpoint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Dump serialized optimizer state to the configured checkpoint JSON file.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Dump serialized optimizer state to the configured checkpoint JSON file."""</span>
         <span class="c1"># Enforce explicit checkpoint path configuration before writing state.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_checkpoint_path</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Checkpoint path is not set. Please set a checkpoint path when initializing the optimizer.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Checkpoint path is not set. Please set a checkpoint path when initializing the optimizer."</span><span class="p">)</span>
 
         <span class="c1"># Persist generator and adapter bookkeeping to a single JSON artifact.</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;generator&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
-                <span class="s2">&quot;module&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
-                <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
-                <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;records&quot;</span><span class="p">)</span>
+            <span class="s2">"generator"</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">"class"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="s2">"module"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__module__</span><span class="p">,</span>
+                <span class="s2">"state"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+                <span class="s2">"data"</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">"records"</span><span class="p">)</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span>
                     <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generator</span><span class="o">.</span><span class="n">data</span>
                 <span class="p">),</span>
             <span class="p">},</span>
-            <span class="s2">&quot;next_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_id</span><span class="p">,</span>
-            <span class="s2">&quot;params_by_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params_by_id</span><span class="p">,</span>
+            <span class="s2">"next_id"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_id</span><span class="p">,</span>
+            <span class="s2">"params_by_id"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params_by_id</span><span class="p">,</span>
         <span class="p">}</span>
 
         <span class="c1"># Write the payload to the configured checkpoint path.</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_checkpoint_path</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"w"</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
             <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span></div>
 </div>
 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Manual Point Injection &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>Manual Point Injection &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../_static/documentation_options.js?v=84a20152"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Using custom generation strategies" href="custom-generation-strategies.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -529,17 +529,17 @@
 <span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
     <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">sensor</span><span class="p">],</span>
     <span class="n">dofs</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
-        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_y</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
+        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
+        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_y</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
     <span class="p">],</span>
-    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;signal&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
+    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"signal"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
     <span class="n">evaluation_function</span><span class="o">=</span><span class="n">evaluation_function</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># Define points of interest</span>
 <span class="n">manual_points</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="p">{</span><span class="s1">&#39;motor_x&#39;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">&#39;motor_y&#39;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>  <span class="c1"># Center region</span>
-    <span class="p">{</span><span class="s1">&#39;motor_x&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;motor_y&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>  <span class="c1"># Origin</span>
+    <span class="p">{</span><span class="s1">'motor_x'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s1">'motor_y'</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">},</span>  <span class="c1"># Center region</span>
+    <span class="p">{</span><span class="s1">'motor_x'</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">'motor_y'</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>  <span class="c1"># Origin</span>
 <span class="p">]</span>
 
 <span class="c1"># Evaluate them</span>
@@ -556,10 +556,10 @@
 <span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
     <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">sensor</span><span class="p">],</span>
     <span class="n">dofs</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
-        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_y</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
+        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
+        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_y</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
     <span class="p">],</span>
-    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;signal&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
+    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"signal"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
     <span class="n">evaluation_function</span><span class="o">=</span><span class="n">evaluation_function</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -567,7 +567,7 @@
 <span class="n">RE</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">iterations</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
 
 <span class="c1"># Try a manual point based on domain insight</span>
-<span class="n">manual_point</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;motor_x&#39;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">&#39;motor_y&#39;</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">}]</span>
+<span class="n">manual_point</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">'motor_x'</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span> <span class="s1">'motor_y'</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">}]</span>
 <span class="n">RE</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">sample_suggestions</span><span class="p">(</span><span class="n">manual_point</span><span class="p">))</span>
 
 <span class="c1"># Continue optimization</span>
@@ -584,10 +584,10 @@
 <span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
     <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">sensor</span><span class="p">],</span>
     <span class="n">dofs</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
-        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_y</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
+        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
+        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_y</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
     <span class="p">],</span>
-    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;signal&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
+    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"signal"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
     <span class="n">evaluation_function</span><span class="o">=</span><span class="n">evaluation_function</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -595,20 +595,20 @@
 <span class="n">suggestions</span> <span class="o">=</span> <span class="n">agent</span><span class="o">.</span><span class="n">suggest</span><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
 
 <span class="c1"># Review and filter</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reviewing suggestions:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Reviewing suggestions:"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">:</span>
-    <span class="n">trial_id</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;_id&#39;</span><span class="p">]</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;motor_x&#39;</span><span class="p">]</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;motor_y&#39;</span><span class="p">]</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Trial </span><span class="si">{</span><span class="n">trial_id</span><span class="si">}</span><span class="s2">: x=</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, y=</span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">trial_id</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">'_id'</span><span class="p">]</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">'motor_x'</span><span class="p">]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="s1">'motor_y'</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Trial </span><span class="si">{</span><span class="n">trial_id</span><span class="si">}</span><span class="s2">: x=</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, y=</span><span class="si">{</span><span class="n">y</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Only run approved suggestions</span>
-<span class="n">approved</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">suggestions</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s1">&#39;motor_x&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">]</span>
+<span class="n">approved</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">suggestions</span> <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="s1">'motor_x'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mf">5.0</span><span class="p">]</span>
 
 <span class="k">if</span> <span class="n">approved</span><span class="p">:</span>
     <span class="n">RE</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">sample_suggestions</span><span class="p">(</span><span class="n">approved</span><span class="p">))</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No suggestions approved&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"No suggestions approved"</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Reviewing suggestions:
@@ -625,10 +625,10 @@
 <span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
     <span class="n">sensors</span><span class="o">=</span><span class="p">[</span><span class="n">sensor</span><span class="p">],</span>
     <span class="n">dofs</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
-        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_y</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">&quot;float&quot;</span><span class="p">),</span>
+        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_x</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
+        <span class="n">RangeDOF</span><span class="p">(</span><span class="n">actuator</span><span class="o">=</span><span class="n">motor_y</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">parameter_type</span><span class="o">=</span><span class="s2">"float"</span><span class="p">),</span>
     <span class="p">],</span>
-    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;signal&quot;</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
+    <span class="n">objectives</span><span class="o">=</span><span class="p">[</span><span class="n">Objective</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"signal"</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span><span class="p">)],</span>
     <span class="n">evaluation_function</span><span class="o">=</span><span class="n">evaluation_function</span><span class="p">,</span>
 <span class="p">)</span>
 
@@ -643,8 +643,8 @@
     <span class="k">if</span> <span class="n">cycle</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="c1"># After first cycle, check boundaries</span>
         <span class="n">boundary_points</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="p">{</span><span class="s1">&#39;motor_x&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="s1">&#39;motor_y&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
-            <span class="p">{</span><span class="s1">&#39;motor_x&#39;</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span> <span class="s1">&#39;motor_y&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">'motor_x'</span><span class="p">:</span> <span class="o">-</span><span class="mf">10.0</span><span class="p">,</span> <span class="s1">'motor_y'</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
+            <span class="p">{</span><span class="s1">'motor_x'</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span> <span class="s1">'motor_y'</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">},</span>
         <span class="p">]</span>
         <span class="n">RE</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">sample_suggestions</span><span class="p">(</span><span class="n">boundary_points</span><span class="p">))</span>
 </pre></div>

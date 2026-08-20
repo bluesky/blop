@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.dof &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.ax.dof &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.ax.dof</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Wrapper dataclasses for parameter specification in Ax.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Wrapper dataclasses for parameter specification in Ax."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
@@ -859,7 +859,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../reference/ax/dof.html#blop.ax.dof.DOF">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">DOF</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Base class for a degree of freedom (DOF) to optimize.</span>
 
 <span class="sd">    A DOF represents a controllable input parameter in the optimization problem.</span>
@@ -886,19 +886,19 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    provided, the DOF will be associated with a Bluesky-controllable device and will</span>
 <span class="sd">    automatically move during acquisition. If only ``name`` is provided, the DOF</span>
 <span class="sd">    represents a parameter that is controlled externally.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">actuator</span><span class="p">:</span> <span class="n">Actuator</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ensure name and actuator are not both specified.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Ensure name and actuator are not both specified."""</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">^</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actuator</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either name or actuator must be provided, but not both or neither.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Either name or actuator must be provided, but not both or neither."</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">parameter_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;The parameter name used internally by Ax.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""The parameter name used internally by Ax."""</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actuator</span><span class="p">,</span> <span class="n">Actuator</span><span class="p">):</span>
             <span class="n">param_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actuator</span><span class="o">.</span><span class="n">name</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actuator</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -911,7 +911,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../reference/ax/dof.html#blop.ax.dof.DOF.to_ax_parameter_config">[docs]</a>
     <span class="nd">@abstractmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_ax_parameter_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RangeParameterConfig</span> <span class="o">|</span> <span class="n">ChoiceParameterConfig</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the data class to Ax configuration.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Convert the data class to Ax configuration."""</span>
         <span class="o">...</span></div>
 </div>
 
@@ -921,7 +921,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../reference/ax/dof.html#blop.ax.dof.RangeDOF">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">RangeDOF</span><span class="p">(</span><span class="n">DOF</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A degree of freedom that is a continuous range.</span>
 
 <span class="sd">    Use this class for continuous parameters that can take any value within</span>
@@ -931,44 +931,44 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    ----------</span>
 <span class="sd">    bounds : tuple[float, float]</span>
 <span class="sd">        The search domain of the DOF as (lower_bound, upper_bound).</span>
-<span class="sd">    parameter_type : Literal[&quot;float&quot;, &quot;int&quot;]</span>
-<span class="sd">        The data type of the DOF. Use &quot;float&quot; for continuous values or &quot;int&quot; for integer values.</span>
+<span class="sd">    parameter_type : Literal["float", "int"]</span>
+<span class="sd">        The data type of the DOF. Use "float" for continuous values or "int" for integer values.</span>
 <span class="sd">    step_size : float | None, optional</span>
 <span class="sd">        The step size of the DOF. If provided, the optimizer will only suggest values</span>
 <span class="sd">        at multiples of this step size.</span>
-<span class="sd">    scaling : Literal[&quot;linear&quot;, &quot;log&quot;] | None, optional</span>
-<span class="sd">        The scaling of the DOF. Use &quot;log&quot; for parameters that span orders of magnitude.</span>
+<span class="sd">    scaling : Literal["linear", "log"] | None, optional</span>
+<span class="sd">        The scaling of the DOF. Use "log" for parameters that span orders of magnitude.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    Define a continuous DOF with a name (for non-actuator parameters):</span>
 
 <span class="sd">    &gt;&gt;&gt; from blop.ax.dof import RangeDOF</span>
-<span class="sd">    &gt;&gt;&gt; dof = RangeDOF(name=&quot;voltage&quot;, bounds=(-10.0, 10.0), parameter_type=&quot;float&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; dof = RangeDOF(name="voltage", bounds=(-10.0, 10.0), parameter_type="float")</span>
 
 <span class="sd">    Define an integer DOF with a step size:</span>
 
-<span class="sd">    &gt;&gt;&gt; dof = RangeDOF(name=&quot;num_exposures&quot;, bounds=(1, 100), parameter_type=&quot;int&quot;, step_size=1)</span>
+<span class="sd">    &gt;&gt;&gt; dof = RangeDOF(name="num_exposures", bounds=(1, 100), parameter_type="int", step_size=1)</span>
 
 <span class="sd">    For examples with actuators, see :doc:`/tutorials/simple-experiment`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">bounds</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
-    <span class="n">parameter_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="s2">&quot;int&quot;</span><span class="p">]</span>
+    <span class="n">parameter_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"float"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">]</span>
     <span class="n">step_size</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">scaling</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">scaling</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"linear"</span><span class="p">,</span> <span class="s2">"log"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="RangeDOF.to_ax_parameter_config">
 <a class="viewcode-back" href="../../../reference/ax/dof.html#blop.ax.dof.RangeDOF.to_ax_parameter_config">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_ax_parameter_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RangeParameterConfig</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert the DOF to the Ax parameter configuration equivalent.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        RangeParameterConfig</span>
 <span class="sd">            The Ax parameter configuration for this DOF.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">RangeParameterConfig</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">,</span>
             <span class="n">bounds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bounds</span><span class="p">,</span>
@@ -984,7 +984,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../reference/ax/dof.html#blop.ax.dof.ChoiceDOF">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">eq</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">ChoiceDOF</span><span class="p">(</span><span class="n">DOF</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A degree of freedom that is a discrete choice.</span>
 
 <span class="sd">    Use this class for categorical or ordinal parameters that can only take on</span>
@@ -995,11 +995,11 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    ----------</span>
 <span class="sd">    values : list[float] | list[int] | list[str] | list[bool]</span>
 <span class="sd">        The possible discrete values of the DOF.</span>
-<span class="sd">    parameter_type : Literal[&quot;float&quot;, &quot;int&quot;, &quot;str&quot;, &quot;bool&quot;]</span>
+<span class="sd">    parameter_type : Literal["float", "int", "str", "bool"]</span>
 <span class="sd">        The data type of the DOF.</span>
 <span class="sd">    is_ordered : bool | None, optional</span>
 <span class="sd">        Whether the values are ordered. If not provided, it will be inferred from the values.</span>
-<span class="sd">        Set to True for ordinal parameters (e.g., [&quot;low&quot;, &quot;medium&quot;, &quot;high&quot;]).</span>
+<span class="sd">        Set to True for ordinal parameters (e.g., ["low", "medium", "high"]).</span>
 <span class="sd">    dependent_parameters : Mapping[TParameterValue, Sequence[str]] | None, optional</span>
 <span class="sd">        Specify which other DOFs are active dependent on specific values of this DOF.</span>
 
@@ -1008,29 +1008,29 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    Define a choice DOF for selecting a filter:</span>
 
 <span class="sd">    &gt;&gt;&gt; from blop.ax.dof import ChoiceDOF</span>
-<span class="sd">    &gt;&gt;&gt; dof = ChoiceDOF(name=&quot;filter&quot;, values=[&quot;none&quot;, &quot;Al&quot;, &quot;Si&quot;], parameter_type=&quot;str&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; dof = ChoiceDOF(name="filter", values=["none", "Al", "Si"], parameter_type="str")</span>
 
 <span class="sd">    Define an ordered choice DOF:</span>
 
-<span class="sd">    &gt;&gt;&gt; dof = ChoiceDOF(name=&quot;power&quot;, values=[1, 2, 5, 10], parameter_type=&quot;int&quot;, is_ordered=True)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; dof = ChoiceDOF(name="power", values=[1, 2, 5, 10], parameter_type="int", is_ordered=True)</span>
+<span class="sd">    """</span>
 
     <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span>
-    <span class="n">parameter_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;float&quot;</span><span class="p">,</span> <span class="s2">&quot;int&quot;</span><span class="p">,</span> <span class="s2">&quot;str&quot;</span><span class="p">,</span> <span class="s2">&quot;bool&quot;</span><span class="p">]</span>
+    <span class="n">parameter_type</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"float"</span><span class="p">,</span> <span class="s2">"int"</span><span class="p">,</span> <span class="s2">"str"</span><span class="p">,</span> <span class="s2">"bool"</span><span class="p">]</span>
     <span class="n">is_ordered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">dependent_parameters</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="n">TParameterValue</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="ChoiceDOF.to_ax_parameter_config">
 <a class="viewcode-back" href="../../../reference/ax/dof.html#blop.ax.dof.ChoiceDOF.to_ax_parameter_config">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">to_ax_parameter_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ChoiceParameterConfig</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert the DOF to the Ax parameter configuration equivalent.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        ChoiceParameterConfig</span>
 <span class="sd">            The Ax parameter configuration for this DOF.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="k">return</span> <span class="n">ChoiceParameterConfig</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">,</span>
             <span class="n">values</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
@@ -1045,7 +1045,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="DOFConstraint">
 <a class="viewcode-back" href="../../../reference/ax/dof-constraint.html#blop.ax.dof.DOFConstraint">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">DOFConstraint</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A constraint on DOFs to refine the search space.</span>
 
 <span class="sd">    Use DOF constraints to exclude regions of the search space that are invalid,</span>
@@ -1063,7 +1063,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The variable names used in the constraint expression (e.g., &quot;x&quot;, &quot;y&quot;) are</span>
+<span class="sd">    The variable names used in the constraint expression (e.g., "x", "y") are</span>
 <span class="sd">    arbitrary and do not need to match the DOF parameter names. They are mapped</span>
 <span class="sd">    to DOFs via the keyword arguments for readability.</span>
 
@@ -1072,10 +1072,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    Define a constraint that ensures the sum of two DOFs is less than a value:</span>
 
 <span class="sd">    &gt;&gt;&gt; from blop.ax.dof import DOFConstraint, RangeDOF</span>
-<span class="sd">    &gt;&gt;&gt; x_dof = RangeDOF(name=&quot;x&quot;, bounds=(0, 10), parameter_type=&quot;float&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; y_dof = RangeDOF(name=&quot;y&quot;, bounds=(0, 10), parameter_type=&quot;float&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; constraint = DOFConstraint(&quot;x + y &lt;= 12&quot;, x=x_dof, y=y_dof)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; x_dof = RangeDOF(name="x", bounds=(0, 10), parameter_type="float")</span>
+<span class="sd">    &gt;&gt;&gt; y_dof = RangeDOF(name="y", bounds=(0, 10), parameter_type="float")</span>
+<span class="sd">    &gt;&gt;&gt; constraint = DOFConstraint("x + y &lt;= 12", x=x_dof, y=y_dof)</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">dofs</span><span class="p">:</span> <span class="n">DOF</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span> <span class="o">=</span> <span class="n">constraint</span>
@@ -1085,10 +1085,10 @@ window.runMermaid = runMermaid;</script>
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_dofs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dofs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;DOFConstraint requires at least one DOF to be specified.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;Use keyword arguments to map template variables to DOFs:</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;  DOFConstraint(&#39;x + y &lt;= 12&#39;, x=dof_x, y=dof_y)</span><span class="se">\n\n</span><span class="s2">&quot;</span>
-                <span class="s2">&quot;The variable names (x, y) are your choice and make the constraint readable.&quot;</span>
+                <span class="s2">"DOFConstraint requires at least one DOF to be specified.</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"Use keyword arguments to map template variables to DOFs:</span><span class="se">\n</span><span class="s2">"</span>
+                <span class="s2">"  DOFConstraint('x + y &lt;= 12', x=dof_x, y=dof_y)</span><span class="se">\n\n</span><span class="s2">"</span>
+                <span class="s2">"The variable names (x, y) are your choice and make the constraint readable."</span>
             <span class="p">)</span>
         <span class="n">invalidated</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DOF</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dof</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dofs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1097,34 +1097,34 @@ window.runMermaid = runMermaid;</script>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalidated</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="s2">&quot;The following DOFs did not have matching names in the constraint &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">dof</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">invalidated</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="s2">"The following DOFs did not have matching names in the constraint "</span>
+                <span class="sa">f</span><span class="s2">"'</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="si">}</span><span class="s2">': </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span><span class="si">}</span><span class="s1">'</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">dof</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">invalidated</span><span class="p">])</span><span class="si">}</span><span class="s2">"</span>
             <span class="p">)</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ax_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert the constraint to a string that can be used by Ax.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            The constraint expression with DOF names substituted.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dofs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="n">template</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">b</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\\</span><span class="s2">b&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">template</span><span class="p">)</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\\</span><span class="s2">b</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\\</span><span class="s2">b"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="se">{{</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">}}</span><span class="s2">"</span><span class="p">,</span> <span class="n">template</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">dof</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dofs</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax parameter constraint as a string.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Ax parameter constraint as a string."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_constraint</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax parameter constraint representation.&quot;&quot;&quot;</span>
-        <span class="n">dofs_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dof</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dofs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;DOFConstraint(&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">dofs_str</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+<span class="w">        </span><span class="sd">"""Ax parameter constraint representation."""</span>
+        <span class="n">dofs_str</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">dof</span><span class="o">.</span><span class="n">parameter_name</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">dof</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dofs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"DOFConstraint('</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="si">}</span><span class="s2">', </span><span class="si">{</span><span class="n">dofs_str</span><span class="si">}</span><span class="s2">)"</span></div>
 
 </pre></div>
 

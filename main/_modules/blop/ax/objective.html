@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.objective &#8212; blop 1.0.1.dev13 documentation</title>
+    <title>blop.ax.objective &#8212; blop 1.0.1.dev14 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
 
-    <script src="../../../_static/documentation_options.js?v=4f2b919f"></script>
+    <script src="../../../_static/documentation_options.js?v=84a20152"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev13" />
+  <meta name="docsearch:version" content="1.0.1.dev14" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -841,7 +841,7 @@ window.runMermaid = runMermaid;</script>
                 <article class="bd-article">
                   
   <h1>Source code for blop.ax.objective</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;Wrapper for specifying objectives in Ax.&quot;&quot;&quot;</span>
+<span></span><span class="sd">"""Wrapper for specifying objectives in Ax."""</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
@@ -854,7 +854,7 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../reference/ax/objective.html#blop.ax.objective.Objective">[docs]</a>
 <span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">Objective</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    An objective to optimize.</span>
 
 <span class="sd">    An objective represents a measurable outcome that you want to optimize.</span>
@@ -875,34 +875,34 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    Define an objective to maximize beam intensity:</span>
 
 <span class="sd">    &gt;&gt;&gt; from blop.ax.objective import Objective</span>
-<span class="sd">    &gt;&gt;&gt; objective = Objective(name=&quot;beam_intensity&quot;, minimize=False)</span>
+<span class="sd">    &gt;&gt;&gt; objective = Objective(name="beam_intensity", minimize=False)</span>
 
 <span class="sd">    Define an objective to minimize beam width:</span>
 
-<span class="sd">    &gt;&gt;&gt; objective = Objective(name=&quot;beam_width&quot;, minimize=True)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; objective = Objective(name="beam_width", minimize=True)</span>
+<span class="sd">    """</span>
 
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ax_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert the objective to a string that can be used by Ax.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            The expression with the objective name, negated if minimizing.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
+<span class="sd">        """</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">minimize</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span></div>
 
 
 
 <div class="viewcode-block" id="ScalarizedObjective">
 <a class="viewcode-back" href="../../../reference/ax/objective.html#blop.ax.objective.ScalarizedObjective">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ScalarizedObjective</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A scalarized objective is a weighted sum of other objectives.</span>
 
 <span class="sd">    Use this to combine multiple objectives into a single optimization target</span>
@@ -920,7 +920,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The variable names used in the expression (e.g., &quot;intensity&quot;, &quot;width&quot;) are</span>
+<span class="sd">    The variable names used in the expression (e.g., "intensity", "width") are</span>
 <span class="sd">    arbitrary and do not need to match the objective names. They are mapped to</span>
 <span class="sd">    objectives via the keyword arguments for readability.</span>
 
@@ -930,14 +930,14 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    &gt;&gt;&gt; from blop.ax.objective import ScalarizedObjective</span>
 <span class="sd">    &gt;&gt;&gt; scalarized_obj = ScalarizedObjective(</span>
-<span class="sd">    ...     expression=&quot;x + 2 * y&quot;,</span>
+<span class="sd">    ...     expression="x + 2 * y",</span>
 <span class="sd">    ...     minimize=True,</span>
-<span class="sd">    ...     x=&quot;objective1&quot;,</span>
-<span class="sd">    ...     y=&quot;objective2&quot;,</span>
+<span class="sd">    ...     x="objective1",</span>
+<span class="sd">    ...     y="objective2",</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; print(scalarized_obj)</span>
 <span class="sd">    -(objective1 + 2 * objective2)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expression</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="o">**</span><span class="n">objective_names</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span> <span class="o">=</span> <span class="n">expression</span>
@@ -945,38 +945,38 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_minimize</span> <span class="o">=</span> <span class="n">minimize</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objective_names</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;ScalarizedObjective requires at least one objective.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"ScalarizedObjective requires at least one objective."</span><span class="p">)</span>
 
         <span class="n">invalidated</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objective_names</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">invalidated</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Objectives </span><span class="si">{</span><span class="n">invalidated</span><span class="si">}</span><span class="s2"> not found in expression &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Objectives </span><span class="si">{</span><span class="n">invalidated</span><span class="si">}</span><span class="s2"> not found in expression '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ax_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert the scalarized objective to a string that can be used by Ax.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            The expression with objective names substituted, negated if minimizing.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_expression</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_objective_names</span><span class="p">:</span>
-            <span class="n">template</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">b</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\\</span><span class="s2">b&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">template</span><span class="p">)</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\\</span><span class="s2">b</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\\</span><span class="s2">b"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="se">{{</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">}}</span><span class="s2">"</span><span class="p">,</span> <span class="n">template</span><span class="p">)</span>
 
         <span class="n">objective_str</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_objective_names</span><span class="p">)</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-(</span><span class="si">{</span><span class="n">objective_str</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimize</span> <span class="k">else</span> <span class="n">objective_str</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"-(</span><span class="si">{</span><span class="n">objective_str</span><span class="si">}</span><span class="s2">)"</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_minimize</span> <span class="k">else</span> <span class="n">objective_str</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax scalarized objective representation.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Ax scalarized objective representation."""</span>
         <span class="k">return</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;ScalarizedObjective(&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="si">}</span><span class="s2">&#39;, minimize=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimize</span><span class="si">}</span><span class="s2">, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">&#39;</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">_objective_names</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span><span class="si">}</span><span class="s2">)&quot;</span>
+            <span class="sa">f</span><span class="s2">"ScalarizedObjective('</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_expression</span><span class="si">}</span><span class="s2">', minimize=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_minimize</span><span class="si">}</span><span class="s2">, "</span>
+            <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s1">=</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s1">'</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">_objective_names</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span><span class="si">}</span><span class="s2">)"</span>
         <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax scalarized form of an objective as a string.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Ax scalarized form of an objective as a string."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_expression</span></div>
 
 
@@ -984,7 +984,7 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="OutcomeConstraint">
 <a class="viewcode-back" href="../../../reference/ax/outcome-constraint.html#blop.ax.objective.OutcomeConstraint">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">OutcomeConstraint</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    A constraint on an outcome of a suggestion.</span>
 
 <span class="sd">    Outcome constraints guide the optimizer to prefer solutions that satisfy certain</span>
@@ -1003,7 +1003,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The variable names used in the constraint expression (e.g., &quot;temp&quot;, &quot;i&quot;, &quot;w&quot;)</span>
+<span class="sd">    The variable names used in the constraint expression (e.g., "temp", "i", "w")</span>
 <span class="sd">    are arbitrary and do not need to match the objective names. They are mapped</span>
 <span class="sd">    to objectives via the keyword arguments for readability.</span>
 
@@ -1015,13 +1015,13 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    Constrain an objective to be below a threshold:</span>
 
 <span class="sd">    &gt;&gt;&gt; from blop.ax.objective import Objective, OutcomeConstraint</span>
-<span class="sd">    &gt;&gt;&gt; temp_obj = Objective(name=&quot;temperature&quot;, minimize=True)</span>
-<span class="sd">    &gt;&gt;&gt; constraint = OutcomeConstraint(&quot;temp &lt;= 100&quot;, temp=temp_obj)</span>
+<span class="sd">    &gt;&gt;&gt; temp_obj = Objective(name="temperature", minimize=True)</span>
+<span class="sd">    &gt;&gt;&gt; constraint = OutcomeConstraint("temp &lt;= 100", temp=temp_obj)</span>
 <span class="sd">    &gt;&gt;&gt; print(constraint)</span>
 <span class="sd">    temperature &lt;= 100</span>
 
 <span class="sd">    For complete examples with multiple constraints, see :doc:`/how-to-guides/set-outcome-constraints`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">constraint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">outcomes</span><span class="p">:</span> <span class="n">Objective</span> <span class="o">|</span> <span class="n">IMetric</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span> <span class="o">=</span> <span class="n">constraint</span>
@@ -1030,44 +1030,44 @@ window.runMermaid = runMermaid;</script>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_outcomes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcomes</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;OutcomeConstraint requires at least one outcome.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"OutcomeConstraint requires at least one outcome."</span><span class="p">)</span>
 
         <span class="n">invalidated</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcomes</span> <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">invalidated</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Outcomes </span><span class="si">{</span><span class="n">invalidated</span><span class="si">}</span><span class="s2"> not found in constraint &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Outcomes </span><span class="si">{</span><span class="n">invalidated</span><span class="si">}</span><span class="s2"> not found in constraint '</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="si">}</span><span class="s2">'."</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">ax_constraint</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Convert the constraint to a string that can be used by Ax.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        str</span>
 <span class="sd">            The constraint expression with objective names substituted.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
         <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcomes</span><span class="p">:</span>
-            <span class="n">template</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">b</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\\</span><span class="s2">b&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">template</span><span class="p">)</span>
+            <span class="n">template</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\\</span><span class="s2">b</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">\\</span><span class="s2">b"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="se">{{</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="se">}}</span><span class="s2">"</span><span class="p">,</span> <span class="n">template</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">outcome</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcomes</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax outcome constraint representation.&quot;&quot;&quot;</span>
-        <span class="n">outcomes_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcomes</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;OutcomeConstraint(&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="si">}</span><span class="s2">&#39;, </span><span class="si">{</span><span class="n">outcomes_str</span><span class="si">}</span><span class="s2">)&quot;</span>
+<span class="w">        </span><span class="sd">"""Ax outcome constraint representation."""</span>
+        <span class="n">outcomes_str</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">v</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">"</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcomes</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">"OutcomeConstraint('</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_constraint</span><span class="si">}</span><span class="s2">', </span><span class="si">{</span><span class="n">outcomes_str</span><span class="si">}</span><span class="s2">)"</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Ax outcome constraint as a string.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""Ax outcome constraint as a string."""</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax_constraint</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">to_ax_objective_str</span><span class="p">(</span><span class="n">objectives</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Objective</span><span class="p">]</span> <span class="o">|</span> <span class="n">ScalarizedObjective</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convert a list of objectives to a string that can be used by Ax.</span>
 
-<span class="sd">    This is a utility function used internally to format objectives for Ax&#39;s API.</span>
+<span class="sd">    This is a utility function used internally to format objectives for Ax's API.</span>
 <span class="sd">    Minimized objectives are prefixed with a minus sign.</span>
 
 <span class="sd">    Parameters</span>
@@ -1084,21 +1084,21 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from blop.ax.objective import Objective, to_ax_objective_str</span>
 <span class="sd">    &gt;&gt;&gt; objectives = [</span>
-<span class="sd">    ...     Objective(name=&quot;intensity&quot;, minimize=False),</span>
-<span class="sd">    ...     Objective(name=&quot;width&quot;, minimize=True)</span>
+<span class="sd">    ...     Objective(name="intensity", minimize=False),</span>
+<span class="sd">    ...     Objective(name="width", minimize=True)</span>
 <span class="sd">    ... ]</span>
 <span class="sd">    &gt;&gt;&gt; to_ax_objective_str(objectives)</span>
-<span class="sd">    &#39;intensity, -width&#39;</span>
+<span class="sd">    'intensity, -width'</span>
 
 <span class="sd">    &gt;&gt;&gt; from blop.ax.objective import ScalarizedObjective, to_ax_objective_str</span>
-<span class="sd">    &gt;&gt;&gt; objective = ScalarizedObjective(expression=&quot;2 * x + 3 * y&quot;, minimize=False, x=&quot;obj1&quot;, y=&quot;obj2&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; objective = ScalarizedObjective(expression="2 * x + 3 * y", minimize=False, x="obj1", y="obj2")</span>
 <span class="sd">    &gt;&gt;&gt; to_ax_objective_str(objective)</span>
 <span class="sd">    2 * obj1 + 3 * obj2</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="n">objectives</span><span class="o">.</span><span class="n">ax_expression</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">objectives</span><span class="p">,</span> <span class="n">ScalarizedObjective</span><span class="p">)</span>
-        <span class="k">else</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">o</span><span class="o">.</span><span class="n">ax_expression</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">objectives</span><span class="p">])</span>
+        <span class="k">else</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">o</span><span class="o">.</span><span class="n">ax_expression</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">objectives</span><span class="p">])</span>
     <span class="p">)</span>
 </pre></div>
 
