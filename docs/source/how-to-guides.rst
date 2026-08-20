@@ -11,5 +11,6 @@ How-to Guides
    how-to-guides/custom-callbacks.rst
    how-to-guides/set-dof-constraints.rst
    how-to-guides/set-outcome-constraints.rst
+   how-to-guides/stopping-conditions.rst
    how-to-guides/acquire-baseline.rst
    how-to-guides/use-tiled.rst
