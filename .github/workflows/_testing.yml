@@ -37,7 +37,7 @@ jobs:
       - name: Run unit tests
         run: |
           if [ "${{ matrix.python-version }}" = "py313-cpu" ]; then
-            pixi run -e ${{ matrix.python-version }} pytest --cov=blop --cov-report=xml --cov-report=term src/blop/tests
+            pixi run -e ${{ matrix.python-version }} pytest --cov=blop --cov-report=xml --cov-report=term src/blop/tests --ignore=src/blop/tests/integration -m "not integration"
           else
             pixi run tests
           fi

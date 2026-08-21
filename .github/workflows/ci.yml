@@ -16,6 +16,10 @@ jobs:
     if: github.event_name == 'schedule'
     uses: ./.github/workflows/_testing.yml
 
+  integration-tests:
+    if: github.event_name == 'schedule'
+    uses: ./.github/workflows/_integration.yml
+
   check:
     uses: ./.github/workflows/_check.yml
    
