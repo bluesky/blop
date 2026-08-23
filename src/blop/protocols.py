@@ -198,8 +198,8 @@ class EvaluationFunction(Protocol):
     Notes
     -----
     The evaluation function is called after data acquisition to compute outcomes
-    from a completed Bluesky run UID. Use :class:`InRunEvaluationFunction` for
-    :func:`blop.plans.optimize_in_run`, which evaluates documents inside an already-open run.
+    from a completed Bluesky run UID. Use :class:`RunEvaluationFunction` for
+    :func:`blop.plans.optimize_in_run` and :func:`blop.plans.optimize_tiled_stream`.
 
     Examples
     --------
@@ -228,25 +228,61 @@ class EvaluationFunction(Protocol):
         ...
 
 
+@runtime_checkable
+class RunDataResolver(Protocol):
+    """A protocol for reading run data from a backing store."""
+
+    run_uid: str
+
+    def wait_for_run(self) -> Any:
+        """Wait for and return the run container."""
+        ...
+
+    def wait_for_stream(self, stream: str) -> Any:
+        """Wait for and return a stream container."""
+        ...
+
+    def wait_for_table_rows(self, stream: str, rows: int) -> Any:
+        """Wait for and return a stream table with at least ``rows`` rows."""
+        ...
+
+    def count_table_rows(self, stream: str) -> int:
+        """Return the current number of rows in a stream table."""
+        ...
+
+    def read(self, path: str, *, stream_slice: slice | None = None) -> Any:
+        """Read and materialize a run-relative path."""
+        ...
+
+
 @dataclass(frozen=True)
-class InRunDataReference:
-    """In-memory Bluesky documents for one in-run optimization evaluation batch.
+class RunDataReference:
+    """Data reference for one optimization evaluation batch.
 
     Attributes
     ----------
     run_uid : str
         UID of the enclosing optimization run.
     start_doc : Mapping[str, Any]
-        Shallow copy of the enclosing optimization run's start document.
+        Shallow copy of the enclosing optimization run's start document. Populated by callback mode and may be empty
+        in Tiled mode until metadata is available through ``resolver``.
     descriptors : Mapping[str, Mapping[str, Any]]
-        Shallow copies of descriptors seen so far in the enclosing run, keyed by descriptor UID.
+        Shallow copies of descriptors seen so far in the enclosing run, keyed by descriptor UID. Populated by callback
+        mode and allowed to be empty in Tiled mode.
     events : tuple[Mapping[str, Any], ...]
         Acquisition event documents observed for this evaluation batch before the configured primary stream reaches
-        ``n_points``. This may include non-primary streams emitted before evaluation.
+        ``n_points``. Populated by callback mode and allowed to be empty in Tiled mode.
     documents : tuple[tuple[str, Mapping[str, Any]], ...]
-        Descriptor and event document pairs observed for the active acquisition batch before evaluation.
+        Descriptor and event document pairs observed for the active acquisition batch before evaluation. Populated by
+        callback mode and allowed to be empty in Tiled mode.
     stream_slices : Mapping[str, slice]
-        Zero-based half-open event ranges for each stream name in ``events``.
+        Zero-based half-open event ranges for each stream in the selected evaluation batch.
+    primary_stream : str
+        Stream name whose rows determine when evaluation should run.
+    source : Literal["callback", "tiled"]
+        Backend that produced this reference.
+    resolver : RunDataResolver | None
+        Resolver used for backend data access. Required for Tiled-mode data access.
     """
 
     run_uid: str
@@ -255,14 +291,17 @@ class InRunDataReference:
     events: tuple[Mapping[str, Any], ...]
     documents: tuple[tuple[str, Mapping[str, Any]], ...]
     stream_slices: Mapping[str, slice]
+    primary_stream: str = "primary"
+    source: Literal["callback", "tiled"] = "callback"
+    resolver: RunDataResolver | None = None
 
 
 @runtime_checkable
-class InRunEvaluationFunction(Protocol):
-    """A protocol for evaluating documents collected inside an optimization run."""
+class RunEvaluationFunction(Protocol):
+    """A protocol for evaluating data collected inside an optimization run."""
 
-    def __call__(self, reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
-        """Evaluate an in-run data reference and produce one outcome per suggestion."""
+    def __call__(self, reference: RunDataReference, suggestions: list[dict]) -> list[dict]:
+        """Evaluate a run data reference and produce one outcome per suggestion."""
         ...
 
 

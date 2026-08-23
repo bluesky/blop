@@ -9,10 +9,10 @@ from blop.plans import acquire_baseline, default_acquire, optimize, optimize_in_
 from blop.protocols import (
     AcquisitionPlan,
     EvaluationFunction,
-    InRunDataReference,
-    InRunEvaluationFunction,
     OptimizationProblem,
     Optimizer,
+    RunDataReference,
+    RunEvaluationFunction,
     SupportsStoppingCriteria,
     TrialFaultAware,
 )
@@ -337,13 +337,13 @@ def test_optimize_in_run_uses_reference_and_strips_default_child_run(RE):
         evaluation_function=uid_evaluator,
     )
 
-    def evaluation_function(reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
-        assert isinstance(reference, InRunDataReference)
+    def evaluation_function(reference: RunDataReference, suggestions: list[dict]) -> list[dict]:
+        assert isinstance(reference, RunDataReference)
         assert reference.run_uid == reference.start_doc["uid"]
         assert len(reference.events) == 1
         return [{"objective": reference.events[0]["data"]["objective"], "_id": suggestions[0]["_id"]}]
 
-    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    in_run_evaluation_function: RunEvaluationFunction = evaluation_function
     callback, documents = _collect_documents()
     RE.subscribe(callback)
     try:
@@ -378,7 +378,7 @@ def test_optimize_in_run_strips_explicit_open_and_close_run_messages(RE):
     optimizer = MagicMock(spec=Optimizer)
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
     evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": 0}])
-    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    in_run_evaluation_function: RunEvaluationFunction = evaluation_function
     optimization_problem = OptimizationProblem(
         optimizer=optimizer,
         actuators=[MovableSignal("x1", initial_value=-1.0)],
@@ -407,11 +407,11 @@ def test_optimize_in_run_evaluates_at_n_points_event_offset(RE):
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
     captured_references = []
 
-    def evaluation_function(reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
+    def evaluation_function(reference: RunDataReference, suggestions: list[dict]) -> list[dict]:
         captured_references.append(reference)
         return [{"objective": reference.events[-1]["data"]["objective"], "_id": suggestions[0]["_id"]}]
 
-    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    in_run_evaluation_function: RunEvaluationFunction = evaluation_function
     optimization_problem = OptimizationProblem(
         optimizer=optimizer,
         actuators=[MovableSignal("x1", initial_value=-1.0)],
@@ -451,11 +451,11 @@ def test_optimize_in_run_uses_configured_primary_stream_for_event_offset(RE):
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
     captured_references = []
 
-    def evaluation_function(reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
+    def evaluation_function(reference: RunDataReference, suggestions: list[dict]) -> list[dict]:
         captured_references.append(reference)
         return [{"objective": reference.events[2]["data"]["objective"], "_id": suggestions[0]["_id"]}]
 
-    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    in_run_evaluation_function: RunEvaluationFunction = evaluation_function
     optimization_problem = OptimizationProblem(
         optimizer=optimizer,
         actuators=[MovableSignal("x1", initial_value=-1.0)],
@@ -495,7 +495,7 @@ def test_optimize_in_run_requires_enough_events(RE):
     optimizer = MagicMock(spec=Optimizer)
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
     evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": 0}])
-    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    in_run_evaluation_function: RunEvaluationFunction = evaluation_function
     optimization_problem = OptimizationProblem(
         optimizer=optimizer,
         actuators=[MovableSignal("x1", initial_value=-1.0)],

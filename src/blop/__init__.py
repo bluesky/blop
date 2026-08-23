@@ -1,6 +1,14 @@
 """A bridge between optimization algorithms and Bluesky."""
 
-from .plans import acquire_baseline, default_acquire, optimize, optimize_in_run, optimize_step, sample_suggestions
+from .plans import (
+    acquire_baseline,
+    default_acquire,
+    optimize,
+    optimize_in_run,
+    optimize_step,
+    optimize_tiled_stream,
+    sample_suggestions,
+)
 
 try:
     from ._version import __version__
@@ -13,6 +21,7 @@ __all__ = [
     "default_acquire",
     "optimize",
     "optimize_in_run",
+    "optimize_tiled_stream",
     "optimize_step",
     "sample_suggestions",
 ]
