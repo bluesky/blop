@@ -17,7 +17,12 @@ _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
 
 @plan
 def read_step(
-    uid: str, suggestions: list[dict], outcomes: list[dict], n_points: int, readable_cache: dict[str, InferredReadable]
+    uid: str,
+    suggestions: list[dict],
+    outcomes: list[dict],
+    n_points: int,
+    readable_cache: dict[str, InferredReadable],
+    stream_name: str = "primary",
 ) -> MsgGenerator[None]:
     """Plan stub to read the suggestions and outcomes of a single optimization step.
 
@@ -36,6 +41,8 @@ def read_step(
         Expected number of suggestions. Arrays will be padded to this length if needed.
     readable_cache : dict[str, InferredReadable]
         Cache of InferredReadable objects to reuse across iterations.
+    stream_name : str, optional
+        Event stream name for the optimization tracking event.
     """
     # Group by ID_KEY to get proper suggestion/outcome order
     suggestion_by_id = {}
@@ -104,7 +111,7 @@ def read_step(
             readable_cache[name].update(value)
 
     # Read and save to produce a single event
-    yield from bps.trigger_and_read(list(readable_cache.values()))
+    yield from bps.trigger_and_read(list(readable_cache.values()), name=stream_name)
 
 
 @plan

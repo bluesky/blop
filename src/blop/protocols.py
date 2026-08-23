@@ -198,8 +198,8 @@ class EvaluationFunction(Protocol):
     Notes
     -----
     The evaluation function is called after data acquisition to compute outcomes
-    from the acquired data. It should extract relevant data from the Bluesky run
-    and compute objective values and metrics for each suggestion.
+    from a completed Bluesky run UID. Use :class:`InRunEvaluationFunction` for
+    :func:`blop.plans.optimize_in_run`, which evaluates documents inside an already-open run.
 
     Examples
     --------
@@ -225,6 +225,44 @@ class EvaluationFunction(Protocol):
             A list of dictionaries containing the outcomes of the run, one for each suggested parameterization.
             The "_id" key is optional and can be used to identify each outcome.
         """
+        ...
+
+
+@dataclass(frozen=True)
+class InRunDataReference:
+    """In-memory Bluesky documents for one in-run optimization evaluation batch.
+
+    Attributes
+    ----------
+    run_uid : str
+        UID of the enclosing optimization run.
+    start_doc : Mapping[str, Any]
+        Shallow copy of the enclosing optimization run's start document.
+    descriptors : Mapping[str, Mapping[str, Any]]
+        Shallow copies of descriptors seen so far in the enclosing run, keyed by descriptor UID.
+    events : tuple[Mapping[str, Any], ...]
+        Acquisition event documents observed for this evaluation batch before the configured primary stream reaches
+        ``n_points``. This may include non-primary streams emitted before evaluation.
+    documents : tuple[tuple[str, Mapping[str, Any]], ...]
+        Descriptor and event document pairs observed for the active acquisition batch before evaluation.
+    stream_slices : Mapping[str, slice]
+        Zero-based half-open event ranges for each stream name in ``events``.
+    """
+
+    run_uid: str
+    start_doc: Mapping[str, Any]
+    descriptors: Mapping[str, Mapping[str, Any]]
+    events: tuple[Mapping[str, Any], ...]
+    documents: tuple[tuple[str, Mapping[str, Any]], ...]
+    stream_slices: Mapping[str, slice]
+
+
+@runtime_checkable
+class InRunEvaluationFunction(Protocol):
+    """A protocol for evaluating documents collected inside an optimization run."""
+
+    def __call__(self, reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
+        """Evaluate an in-run data reference and produce one outcome per suggestion."""
         ...
 
 
@@ -315,6 +353,11 @@ class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionP
     immutable structure. It is typically created via :meth:`blop.ax.Agent.to_optimization_problem`
     and used with optimization plans like :func:`blop.plans.optimize`.
 
+    See Also
+    --------
+    blop.ax.Agent.to_optimization_problem : Creates an OptimizationProblem from an Agent.
+    blop.plans.optimize : Bluesky plan that uses an OptimizationProblem.
+
     Attributes
     ----------
     optimizer: Optimizer
@@ -328,11 +371,6 @@ class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionP
         A callable to evaluate data from a Bluesky run and produce outcomes.
     acquisition_plan: AcquisitionPlan, optional
         A Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.
-
-    See Also
-    --------
-    blop.ax.Agent.to_optimization_problem : Creates an OptimizationProblem from an Agent.
-    blop.plans.optimize : Bluesky plan that uses an OptimizationProblem.
     """
 
     ...
@@ -348,6 +386,12 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
     :meth:`blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem`
     and used with bluesky-queueserver-api. Actuators, sensors, and the acquisition plan are referenced
     by their names, since their instances live on a remote server.
+
+    See Also
+    --------
+    blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem :
+        Creates a QueueserverOptimizationProblem from an agent.
+    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.
 
     Attributes
     ----------
@@ -365,12 +409,6 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
         The plan must match the arguments of :class:`AcquisitionPlan`.
     acquisition_plan_kwargs: Mapping[str, Any], optional
         Additional plan arguments to pass to the Bluesky plan.
-
-    See Also
-    --------
-    blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem :
-        Creates a QueueserverOptimizationProblem from an agent.
-    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.
     """
 
     acquisition_plan_kwargs: Mapping[str, Any] | None = None
