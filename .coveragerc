@@ -8,6 +8,9 @@ omit =
     # ignore _version.py and versioneer.py
     .*version.*
     *_version.py
+    # ignore test modules
+    src/blop/tests/**
+    */blop/tests/**
 
 exclude_lines =
     if __name__ == '__main__':
