@@ -5,10 +5,12 @@ import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import plan
 
-from blop.plans import acquire_baseline, default_acquire, optimize, optimize_step
+from blop.plans import acquire_baseline, default_acquire, optimize, optimize_in_run, optimize_step
 from blop.protocols import (
     AcquisitionPlan,
     EvaluationFunction,
+    InRunDataReference,
+    InRunEvaluationFunction,
     OptimizationProblem,
     Optimizer,
     SupportsStoppingCriteria,
@@ -50,6 +52,15 @@ def _custom_identifier_acquisition_plan(suggestions, actuators, sensors, *args, 
     return _CUSTOM_ACQUISITION_IDENTIFIER
 
 
+def _three_event_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+    """Acquisition plan that emits three primary events inside the current run."""
+    for _ in range(3):
+        for actuator in actuators:
+            if actuator.name in suggestions[0]:
+                yield from bps.mv(actuator, suggestions[0][actuator.name])
+        yield from bps.trigger_and_read(sensors or [])
+
+
 def _collect_optimize_events():
     """Return a callback and list that collect event docs from the outer optimize run."""
     events = []
@@ -66,6 +77,26 @@ def _collect_optimize_events():
             events.append(doc)
 
     return callback, events
+
+
+def _collect_documents():
+    """Return a callback and list that collect all RunEngine documents."""
+    documents = []
+
+    def callback(name, doc):
+        documents.append((name, dict(doc)))
+
+    return callback, documents
+
+
+def _events_by_stream(documents):
+    """Group event documents by descriptor stream name."""
+    descriptors = {doc["uid"]: doc["name"] for name, doc in documents if name == "descriptor"}
+    events = {}
+    for name, doc in documents:
+        if name == "event":
+            events.setdefault(descriptors[doc["descriptor"]], []).append(doc)
+    return events
 
 
 @pytest.fixture(scope="function")
@@ -315,6 +346,193 @@ def test_optimize_with_non_checkpointable_optimizer(RE):
     )
     with pytest.raises(ValueError, match="optimizer is not checkpointable"):
         RE(optimize(optimization_problem, iterations=5, n_points=2, checkpoint_interval=1))
+
+
+def test_optimize_in_run_uses_reference_and_strips_default_child_run(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    uid_evaluator = MagicMock(spec=EvaluationFunction)
+    movable = MovableSignal("x1", initial_value=-1.0)
+    readable = ReadableSignal("objective")
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[movable],
+        sensors=[readable],
+        evaluation_function=uid_evaluator,
+    )
+
+    def evaluation_function(reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
+        assert isinstance(reference, InRunDataReference)
+        assert reference.run_uid == reference.start_doc["uid"]
+        assert len(reference.events) == 1
+        return [{"objective": reference.events[0]["data"]["objective"], "_id": suggestions[0]["_id"]}]
+
+    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    callback, documents = _collect_documents()
+    RE.subscribe(callback)
+    try:
+        uids = RE(optimize_in_run(optimization_problem, in_run_evaluation_function))
+    finally:
+        RE.unsubscribe(callback)
+
+    optimizer.ingest.assert_called_once_with([{"objective": 0.0, "_id": 0}])
+    uid_evaluator.assert_not_called()
+    start_docs = [doc for name, doc in documents if name == "start"]
+    assert len(start_docs) == 1
+    assert start_docs[0]["run_key"] == "optimize_in_run"
+    assert all(doc.get("run_key") != "default_acquire" for doc in start_docs)
+    assert len(uids) == 1
+    events_by_stream = _events_by_stream(documents)
+    assert len(events_by_stream["primary"]) == 1
+    assert len(events_by_stream["optimization"]) == 1
+    optimization_data = events_by_stream["optimization"][0]["data"]
+    assert optimization_data["suggestion_ids"] == "0"
+    assert optimization_data["bluesky_uid"] == uids[0]
+    assert optimization_data["x1"] == 0.0
+    assert optimization_data["objective"] == 0.0
+
+
+def test_optimize_in_run_strips_explicit_open_and_close_run_messages(RE):
+    @plan
+    def acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+        yield from bps.open_run(md={"run_key": "child"})
+        yield from bps.trigger_and_read(sensors or [])
+        yield from bps.close_run()
+
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": 0}])
+    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=MagicMock(spec=EvaluationFunction),
+        acquisition_plan=acquisition_plan,
+    )
+
+    callback, documents = _collect_documents()
+    RE.subscribe(callback)
+    try:
+        RE(optimize_in_run(optimization_problem, in_run_evaluation_function))
+    finally:
+        RE.unsubscribe(callback)
+
+    start_docs = [doc for name, doc in documents if name == "start"]
+    assert len(start_docs) == 1
+    assert start_docs[0]["run_key"] == "optimize_in_run"
+    assert all(doc.get("run_key") != "child" for doc in start_docs)
+    evaluation_function.assert_called_once()
+    optimizer.ingest.assert_called_once_with([{"objective": 0.0, "_id": 0}])
+
+
+def test_optimize_in_run_evaluates_at_n_points_event_offset(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    captured_references = []
+
+    def evaluation_function(reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
+        captured_references.append(reference)
+        return [{"objective": reference.events[-1]["data"]["objective"], "_id": suggestions[0]["_id"]}]
+
+    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=MagicMock(spec=EvaluationFunction),
+        acquisition_plan=_three_event_acquisition_plan,
+    )
+
+    callback, documents = _collect_documents()
+    RE.subscribe(callback)
+    try:
+        RE(optimize_in_run(optimization_problem, in_run_evaluation_function, n_points=2))
+    finally:
+        RE.unsubscribe(callback)
+
+    assert len(captured_references) == 1
+    reference = captured_references[0]
+    assert len(reference.events) == 2
+    assert reference.stream_slices == {"primary": slice(0, 2)}
+    events_by_stream = _events_by_stream(documents)
+    assert len(events_by_stream["primary"]) == 3
+    assert len(events_by_stream["optimization"]) == 1
+    assert tuple(events_by_stream["primary"][:2]) == reference.events
+
+
+def test_optimize_in_run_uses_configured_primary_stream_for_event_offset(RE):
+    @plan
+    def acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+        sensors_by_name = {sensor.name: sensor for sensor in sensors or []}
+        yield from bps.trigger_and_read([sensors_by_name["objective"]], name="primary")
+        yield from bps.trigger_and_read([sensors_by_name["monitor"]], name="monitor")
+        yield from bps.trigger_and_read([sensors_by_name["objective"]], name="primary")
+        yield from bps.trigger_and_read([sensors_by_name["monitor"]], name="monitor")
+        yield from bps.trigger_and_read([sensors_by_name["objective"]], name="primary")
+
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    captured_references = []
+
+    def evaluation_function(reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
+        captured_references.append(reference)
+        return [{"objective": reference.events[2]["data"]["objective"], "_id": suggestions[0]["_id"]}]
+
+    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective"), ReadableSignal("monitor")],
+        evaluation_function=MagicMock(spec=EvaluationFunction),
+        acquisition_plan=acquisition_plan,
+    )
+
+    callback, documents = _collect_documents()
+    RE.subscribe(callback)
+    try:
+        RE(optimize_in_run(optimization_problem, in_run_evaluation_function, n_points=2, primary_stream="monitor"))
+    finally:
+        RE.unsubscribe(callback)
+
+    assert len(captured_references) == 1
+    reference = captured_references[0]
+    descriptor_names = {doc["uid"]: doc["name"] for doc in reference.descriptors.values()}
+    assert [descriptor_names[event["descriptor"]] for event in reference.events] == [
+        "primary",
+        "monitor",
+        "primary",
+        "monitor",
+    ]
+    assert reference.stream_slices == {"primary": slice(0, 2), "monitor": slice(0, 2)}
+    events_by_stream = _events_by_stream(documents)
+    assert len(events_by_stream["primary"]) == 3
+    assert len(events_by_stream["monitor"]) == 2
+    assert len(events_by_stream["optimization"]) == 1
+
+
+def test_optimize_in_run_requires_enough_events(RE):
+    @plan
+    def acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+        yield from bps.trigger_and_read(sensors or [])
+
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": 0}])
+    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=MagicMock(spec=EvaluationFunction),
+        acquisition_plan=acquisition_plan,
+    )
+
+    with pytest.raises(RuntimeError, match="produced 1 'primary' event documents, but n_points=2"):
+        RE(optimize_in_run(optimization_problem, in_run_evaluation_function, n_points=2))
+
+    evaluation_function.assert_not_called()
+    optimizer.ingest.assert_not_called()
 
 
 def test_optimize_step_default(RE):

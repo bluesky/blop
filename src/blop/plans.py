@@ -7,15 +7,21 @@ from typing import Any, Literal, cast
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import bluesky.preprocessors as bpp
+from bluesky.callbacks import CallbackBase
 from bluesky.protocols import Readable
 from bluesky.utils import MsgGenerator, plan
+from event_model import Event
 
 from .plan_stubs import read_step
 from .protocols import (
     ID_KEY,
     Actuator,
     CanRegisterSuggestions,
+    EvaluationFunction,
+    InRunDataReference,
+    InRunEvaluationFunction,
     OptimizationProblem,
+    Optimizer,
     Sensor,
     SupportsStoppingCriteria,
     TrialFaultAware,
@@ -27,6 +33,8 @@ logger = logging.getLogger(__name__)
 _DEFAULT_ACQUIRE_RUN_KEY: Literal["default_acquire"] = "default_acquire"
 SAMPLE_SUGGESTIONS_RUN_KEY: Literal["sample_suggestions"] = "sample_suggestions"
 OPTIMIZE_RUN_KEY: Literal["optimize"] = "optimize"
+OPTIMIZE_IN_RUN_KEY: Literal["optimize_in_run"] = "optimize_in_run"
+OPTIMIZE_IN_RUN_TRACKING_STREAM: Literal["optimization"] = "optimization"
 
 
 def _unpack_for_list_scan(suggestions: Sequence[Mapping], actuators: Sequence[Actuator]) -> list[Any]:
@@ -109,6 +117,24 @@ def default_acquire(
     )
 
 
+def _validate_suggestions_have_ids(suggestions: list[dict]) -> None:
+    """Ensure every suggestion can be matched to an evaluated outcome."""
+    if any(ID_KEY not in suggestion for suggestion in suggestions):
+        raise ValueError(
+            f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes. Please review your "
+            f"optimizer implementation. Got suggestions: {suggestions}"
+        )
+
+
+def _validate_outcomes_have_ids(outcomes: list[dict], suggestions: list[dict]) -> None:
+    """Ensure every outcome can be matched to an optimizer suggestion."""
+    if any(ID_KEY not in outcome for outcome in outcomes):
+        raise ValueError(
+            f"All outcomes must contain an '{ID_KEY}' key that matches with the suggestions. Please review your "
+            f"evaluation function. Got suggestions: {suggestions} and outcomes: {outcomes}"
+        )
+
+
 @plan
 def optimize_step(
     optimization_problem: OptimizationProblem,
@@ -138,11 +164,7 @@ def optimize_step(
     optimizer = optimization_problem.optimizer
     actuators = optimization_problem.actuators
     suggestions = optimizer.suggest(n_points)
-    if any(ID_KEY not in suggestion for suggestion in suggestions):
-        raise ValueError(
-            f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes. Please review your "
-            f"optimizer implementation. Got suggestions: {suggestions}"
-        )
+    _validate_suggestions_have_ids(suggestions)
     try:
         uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, *args, **kwargs)
     except Exception:
@@ -150,15 +172,148 @@ def optimize_step(
             optimizer.register_failures(suggestions)
         raise
 
-    outcomes = optimization_problem.evaluation_function(uid, suggestions)
-    if any(ID_KEY not in outcome for outcome in outcomes):
-        raise ValueError(
-            f"All outcomes must contain an '{ID_KEY}' key that matches with the suggestions. Please review your "
-            f"evaluation function. Got suggestions: {suggestions} and outcomes: {outcomes}"
-        )
+    evaluation_function: EvaluationFunction = optimization_problem.evaluation_function
+    outcomes = evaluation_function(uid, suggestions)
+    _validate_outcomes_have_ids(outcomes, suggestions)
     optimizer.ingest(outcomes)
 
     return uid, suggestions, outcomes
+
+
+class _InRunEvaluationCallback(CallbackBase):
+    """Evaluate in-run acquisition events when an optimization batch is complete."""
+
+    def __init__(
+        self, evaluation_function: InRunEvaluationFunction, optimizer: Optimizer, n_points: int, primary_stream: str
+    ) -> None:
+        self._evaluation_function = evaluation_function
+        self._optimizer = optimizer
+        self._n_points = n_points
+        self._primary_stream = primary_stream
+        self._start_doc: Mapping[str, Any] | None = None
+        self._descriptors: dict[str, Mapping[str, Any]] = {}
+        self._active = False
+        self._suggestions: list[dict] = []
+        self._documents: list[tuple[str, Mapping[str, Any]]] = []
+        self._events: list[Mapping[str, Any]] = []
+        self._primary_event_count = 0
+        self._outcomes: list[dict] | None = None
+        self._reference: InRunDataReference | None = None
+        self._exception: BaseException | None = None
+
+    def begin(self, suggestions: list[dict]) -> None:
+        """Start collecting documents for a new in-run evaluation batch."""
+        self._active = True
+        self._suggestions = suggestions
+        self._documents = []
+        self._events = []
+        self._primary_event_count = 0
+        self._outcomes = None
+        self._reference = None
+        self._exception = None
+
+    def complete(self) -> tuple[InRunDataReference, list[dict]]:
+        """Return the evaluated batch or raise the stored acquisition/evaluation error."""
+        if self._exception is not None:
+            raise self._exception
+        if self._reference is None or self._outcomes is None:
+            self._active = False
+            raise RuntimeError(
+                f"In-run acquisition produced {self._primary_event_count} {self._primary_stream!r} event documents, "
+                f"but n_points={self._n_points} were required for evaluation."
+            )
+        self._active = False
+        return self._reference, self._outcomes
+
+    @property
+    def evaluated(self) -> bool:
+        """Whether the active batch has already been evaluated."""
+        return self._outcomes is not None
+
+    @property
+    def failed(self) -> bool:
+        """Whether callback evaluation failed and stored an exception."""
+        return self._exception is not None
+
+    def start(self, doc: Mapping[str, Any]) -> None:
+        """Store the first enclosing optimization start document."""
+        if self._start_doc is None:
+            self._start_doc = dict(doc)
+
+    def descriptor(self, doc: Mapping[str, Any]) -> None:
+        """Store every descriptor and keep active-batch descriptor documents."""
+        copied_doc = dict(doc)
+        self._descriptors[str(copied_doc["uid"])] = copied_doc
+        if self._active:
+            self._documents.append(("descriptor", copied_doc))
+
+    def event(self, doc: Event) -> Event:
+        """Collect active-batch events and evaluate at the configured event offset."""
+        if not self._active or self._outcomes is not None:
+            return doc
+
+        copied_doc = dict(doc)
+        self._events.append(copied_doc)
+        self._documents.append(("event", copied_doc))
+        try:
+            stream_name = self._stream_name(copied_doc)
+        except BaseException as err:
+            self._exception = err
+            self._active = False
+            return doc
+        if stream_name != self._primary_stream:
+            return doc
+
+        self._primary_event_count += 1
+        if self._primary_event_count != self._n_points:
+            return doc
+
+        try:
+            reference = self._build_reference()
+            outcomes = self._evaluation_function(reference, self._suggestions)
+            _validate_outcomes_have_ids(outcomes, self._suggestions)
+            self._optimizer.ingest(outcomes)
+        except BaseException as err:
+            self._exception = err
+            self._active = False
+            return doc
+
+        self._reference = reference
+        self._outcomes = outcomes
+        self._active = False
+        return doc
+
+    def _build_reference(self) -> InRunDataReference:
+        if self._start_doc is None:
+            raise RuntimeError(
+                "In-run evaluation cannot build a reference before the optimization run start document is observed."
+            )
+
+        events = tuple(self._events)
+        stream_bounds: dict[str, tuple[int, int]] = {}
+        for event in events:
+            descriptor = self._descriptors[str(event["descriptor"])]
+            stream_name = str(descriptor["name"])
+            start = int(event["seq_num"]) - 1
+            stop = int(event["seq_num"])
+            if stream_name in stream_bounds:
+                previous_start, previous_stop = stream_bounds[stream_name]
+                stream_bounds[stream_name] = (min(previous_start, start), max(previous_stop, stop))
+            else:
+                stream_bounds[stream_name] = (start, stop)
+
+        return InRunDataReference(
+            run_uid=str(self._start_doc["uid"]),
+            start_doc=self._start_doc,
+            descriptors=dict(self._descriptors),
+            events=events,
+            documents=tuple(self._documents),
+            stream_slices={stream_name: slice(start, stop) for stream_name, (start, stop) in stream_bounds.items()},
+        )
+
+    def _stream_name(self, event: Mapping[str, Any]) -> str:
+        descriptor = self._descriptors[str(event["descriptor"])]
+        return str(descriptor["name"])
 
 
 @plan
@@ -234,6 +389,109 @@ def optimize(
 
     # Start the optimization run
     return (yield from _optimize())
+
+
+@plan
+def optimize_in_run(
+    optimization_problem: OptimizationProblem,
+    evaluation_function: InRunEvaluationFunction,
+    iterations: int = 1,
+    n_points: int = 1,
+    checkpoint_interval: int | None = None,
+    primary_stream: str = "primary",
+    readable_cache: dict[str, InferredReadable] | None = None,
+    **kwargs: Any,
+) -> MsgGenerator[None]:
+    """Solve an optimization problem by evaluating acquisition documents inside one run.
+
+    Parameters
+    ----------
+    optimization_problem : OptimizationProblem
+        The optimization problem to solve.
+    evaluation_function : InRunEvaluationFunction
+        Callable that transforms in-run Bluesky documents and suggestions into outcomes.
+    iterations : int, optional
+        The number of optimization iterations to run.
+    n_points : int, optional
+        The number of primary-stream acquisition events required before evaluating each iteration.
+    checkpoint_interval : int | None, optional
+        The number of iterations between optimizer checkpoints. If None, checkpoints
+        will not be saved. Optimizer must implement the
+        :class:`blop.protocols.Checkpointable` protocol.
+    primary_stream : str, optional
+        Acquisition stream name whose events count toward ``n_points``.
+    readable_cache: dict[str, InferredReadable] | None = None
+        Cache of readable objects to store the suggestions and outcomes as optimization events.
+        If None, a new cache will be created.
+    **kwargs : Any
+        Additional keyword arguments to pass to the acquisition plan.
+    """
+    _md = collect_optimization_metadata(optimization_problem)
+    _md.update(
+        {
+            "plan_name": "optimize_in_run",
+            "iterations": iterations,
+            "n_points": n_points,
+            "checkpoint_interval": checkpoint_interval,
+            "run_key": OPTIMIZE_IN_RUN_KEY,
+            "primary_stream": primary_stream,
+            "optimization_stream": OPTIMIZE_IN_RUN_TRACKING_STREAM,
+        }
+    )
+    readable_cache = readable_cache or {}
+
+    optimizer = optimization_problem.optimizer
+    actuators = optimization_problem.actuators
+    acquisition_plan = optimization_problem.acquisition_plan or default_acquire
+    callback = _InRunEvaluationCallback(evaluation_function, optimizer, n_points, primary_stream)
+
+    def _use_optimize_in_run_key(msg: Any) -> Any:
+        if msg.run is None:
+            return msg
+        return msg._replace(run=OPTIMIZE_IN_RUN_KEY)
+
+    @bpp.set_run_key_decorator(OPTIMIZE_IN_RUN_KEY)
+    @bpp.run_decorator(md=_md)
+    def _optimize_in_run() -> MsgGenerator[None]:
+        for i in range(iterations):
+            suggestions = optimizer.suggest(n_points)
+            _validate_suggestions_have_ids(suggestions)
+            callback.begin(suggestions)
+            try:
+                yield from bpp.msg_mutator(
+                    bpp.stub_wrapper(acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)),
+                    _use_optimize_in_run_key,
+                )
+            except Exception:
+                if callback.failed:
+                    callback.complete()
+                if callback.evaluated:
+                    raise
+                if isinstance(optimizer, TrialFaultAware):
+                    optimizer.register_failures(suggestions)
+                raise
+
+            reference, outcomes = callback.complete()
+
+            yield from read_step(
+                reference.run_uid,
+                suggestions,
+                outcomes,
+                n_points,
+                readable_cache,
+                stream_name=OPTIMIZE_IN_RUN_TRACKING_STREAM,
+            )
+
+            if isinstance(optimizer, SupportsStoppingCriteria):
+                stop_now, stop_reason = optimizer.should_stop()
+                if stop_now:
+                    reason = stop_reason if stop_reason is not None else "No reason provided"
+                    logger.info(f"Global stopping triggered at iteration {i + 1}: {reason}")
+                    return
+
+            _maybe_checkpoint(optimizer, checkpoint_interval, i)
+
+    return (yield from bpp.subs_wrapper(_optimize_in_run(), callback))
 
 
 @plan
