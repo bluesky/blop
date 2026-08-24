@@ -1,11 +1,12 @@
 """Protocols that bridge between optimizer backends and Bluesky."""
 
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Hashable, Mapping, MutableMapping, MutableSequence, Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
 from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, HasName, Movable, Readable
 from bluesky.utils import MsgGenerator, plan
+from event_model import Event, EventDescriptor
 
 
 @runtime_checkable
@@ -229,42 +230,26 @@ class EvaluationFunction(Protocol):
         ...
 
 
-@dataclass(frozen=True)
-class InRunDataReference:
-    """In-memory Bluesky documents for one in-run optimization evaluation batch.
+@dataclass
+class DocumentCache:
+    """In-memory Bluesky event documents for one in-run optimization evaluation batch.
 
     Attributes
     ----------
     run_uid : str
         UID of the enclosing optimization run.
-    start_doc : Mapping[str, Any]
-        Shallow copy of the enclosing optimization run's start document.
     descriptors : Mapping[str, Mapping[str, Any]]
         Shallow copies of descriptors seen so far in the enclosing run, keyed by descriptor UID.
-    events : tuple[Mapping[str, Any], ...]
-        Acquisition event documents observed for this evaluation batch before the configured primary stream reaches
-        ``n_points``. This may include non-primary streams emitted before evaluation.
-    documents : tuple[tuple[str, Mapping[str, Any]], ...]
-        Descriptor and event document pairs observed for the active acquisition batch before evaluation.
-    stream_slices : Mapping[str, slice]
-        Zero-based half-open event ranges for each stream name in ``events``.
+    events : MutableMapping[str, MutableSequence[Event]]
+        Shallow copies of event documents seen so far in the enclosing run, keyed by event UID.
+    suggested_events : MutableSequence[tuple[Any, str]]
+        Pairing of the *active* suggestions and their event UID.
     """
 
     run_uid: str
-    start_doc: Mapping[str, Any]
-    descriptors: Mapping[str, Mapping[str, Any]]
-    events: tuple[Mapping[str, Any], ...]
-    documents: tuple[tuple[str, Mapping[str, Any]], ...]
-    stream_slices: Mapping[str, slice]
-
-
-@runtime_checkable
-class InRunEvaluationFunction(Protocol):
-    """A protocol for evaluating documents collected inside an optimization run."""
-
-    def __call__(self, reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
-        """Evaluate an in-run data reference and produce one outcome per suggestion."""
-        ...
+    descriptors: MutableMapping[str, EventDescriptor]
+    events: MutableMapping[str, Event]
+    suggested_events: MutableSequence[tuple[Any, str]]
 
 
 @runtime_checkable
