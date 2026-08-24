@@ -26,7 +26,7 @@ blop-sim = { path = "sim", editable = true }
 
 [feature.dev-cpu.tasks]
 check = "pre-commit run --all-files"
-tests = "pytest src/blop/tests"
+tests = "pytest src/blop/tests --ignore=src/blop/tests/integration -m 'not integration'"
 
 [feature.docs.dependencies]
 graphviz = ">=14.1.2,<15"
@@ -40,10 +40,12 @@ myst-nb = "*"
 furo = "*"
 jupytext = "*"
 pydata-sphinx-theme = "*"
-tiled = { version = ">=0.2.0", extras = ["all"] }
-bluesky-tiled-plugins = "*"
 ophyd-async = "*"
 opencv-python = "*"
+
+[feature.integration.pypi-dependencies]
+tiled = { version = ">=0.2.0", extras = ["all"] }
+bluesky-tiled-plugins = "*"
 
 [feature.py311.dependencies]
 python = "3.11.*"
@@ -53,6 +55,9 @@ python = "3.12.*"
 
 [feature.py313.dependencies]
 python = "3.13.*"
+
+[feature.integration.tasks]
+integration-tests = "pytest src/blop/tests/integration -m integration"
 
 [feature.docs.tasks]
 start-queueserver = "docker compose -f docs/source/tutorials/queueserver/docker-compose.yml up -d --build --wait"
@@ -69,7 +74,8 @@ convert-tutorials-to-ipynb = "jupytext --to notebook docs/source/tutorials/*.md"
 [environments]
 dev = ["dev"]
 dev-cpu = ["dev-cpu"]
-docs = ["dev-cpu", "docs"]
+integration = ["dev-cpu", "integration"]
+docs = ["dev-cpu", "docs", "integration"]
 py311-cpu = ["dev-cpu", "py311"]
 py312-cpu = ["dev-cpu", "py312"]
 py313-cpu = ["dev-cpu", "py313"]

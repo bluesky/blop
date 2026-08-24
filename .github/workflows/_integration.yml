@@ -1,0 +1,31 @@
+name: Integration Tests
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run_integration_tests:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v5
+
+      - name: Install pixi and activate environment
+        uses: prefix-dev/setup-pixi@82d477f15f3a381dbcc8adc1206ce643fe110fb7
+        with:
+          pixi-version: v0.60.0
+          environments: integration
+          cache: false
+          activate-environment: integration
+
+      - name: Run integration tests
+        run: pixi run -e integration integration-tests
