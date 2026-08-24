@@ -1,7 +1,7 @@
 """Core Scipy optimizer porting scipy algorithms."""
 
 from collections import OrderedDict
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import dataclass
 from threading import Event, Thread
@@ -122,7 +122,7 @@ class InteractiveOptimizer(Optimizer):
         """Lifetime threads when using with."""
         self.close()
 
-    def suggest(self, num_points: int | None = None) -> list[dict]:
+    def suggest(self, num_points: int | None = None) -> Sequence[Mapping]:
         """
         Provide a set of points in the input space, to be evaulated next.
 
@@ -136,7 +136,7 @@ class InteractiveOptimizer(Optimizer):
 
         Returns
         -------
-        list[dict]
+        Sequence[Mapping]
             A list of dictionaries, each containing a parameterization of a point to evaluate next.
             Each dictionary must contain a unique "_id" key to identify each parameterization.
         """
@@ -164,7 +164,7 @@ class InteractiveOptimizer(Optimizer):
             suggestions.append(suggestion)
         return suggestions
 
-    def ingest(self, points: list[dict]) -> None:
+    def ingest(self, points: Sequence[Mapping]) -> None:
         """
         Ingest a set of points into the experiment. Either from previously suggested points or from an external source.
 
@@ -172,7 +172,7 @@ class InteractiveOptimizer(Optimizer):
 
         Parameters
         ----------
-        points : list[dict]
+        points : Sequence[Mapping]
             A list of dictionaries, each containing the outcomes of each suggested parameterization.
         """
         for res in points:

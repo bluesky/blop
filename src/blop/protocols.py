@@ -256,7 +256,7 @@ class AcquisitionPlan(Protocol):
         suggestions: Sequence[Mapping],
         actuators: Sequence[Actuator],
         sensors: Sequence[Sensor] | None = None,
-        md: Mapping[Hashable, Any] | None = None,
+        md: Mapping[str, Any] | None = None,
     ) -> MsgGenerator[Hashable]:
         """
         Acquire data for optimization.
@@ -276,7 +276,7 @@ class AcquisitionPlan(Protocol):
             The actuators to move to their suggested positions.
         sensors: Sequence[Sensor], optional
             The sensors that produce data to evaluate.
-        md : Mapping[Hashable, Any] | None, optional
+        md : Mapping[str, Any] | None, optional
             Metadata to attach to the start document
 
         Returns

@@ -1,7 +1,7 @@
 """Bluesky plan stubs for optimization."""
 
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Hashable, Mapping, Sequence
 from typing import Any, Literal
 
 import bluesky.plan_stubs as bps
@@ -17,7 +17,11 @@ _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
 
 @plan
 def read_step(
-    uid: str, suggestions: list[dict], outcomes: list[dict], n_points: int, readable_cache: dict[str, InferredReadable]
+    uid: Hashable,
+    suggestions: Sequence[Mapping],
+    outcomes: Sequence[Mapping],
+    n_points: int,
+    readable_cache: dict[str, InferredReadable],
 ) -> MsgGenerator[None]:
     """Plan stub to read the suggestions and outcomes of a single optimization step.
 
@@ -26,11 +30,11 @@ def read_step(
 
     Parameters
     ----------
-    uid : str
+    uid : Hashable
         The Bluesky run UID from the acquisition plan.
-    suggestions : list[dict]
+    suggestions : Sequence[Mapping]
         List of suggestion dictionaries, each containing an ID_KEY.
-    outcomes : list[dict]
+    outcomes : Sequence[Mapping]
         List of outcome dictionaries, each containing an ID_KEY matching suggestions.
     n_points : int
         Expected number of suggestions. Arrays will be padded to this length if needed.
@@ -41,11 +45,11 @@ def read_step(
     suggestion_by_id = {}
     outcome_by_id = {}
     for suggestion in suggestions:
-        suggestion_copy = suggestion.copy()
+        suggestion_copy = dict(suggestion)
         key = str(suggestion_copy.pop(ID_KEY))
         suggestion_by_id[key] = suggestion_copy
     for outcome in outcomes:
-        outcome_copy = outcome.copy()
+        outcome_copy = dict(outcome)
         key = str(outcome_copy.pop(ID_KEY))
         outcome_by_id[key] = outcome_copy
     sids = {str(sid) for sid in suggestion_by_id.keys()}

@@ -1,7 +1,7 @@
 """Bluesky plans for optimization."""
 
 import logging
-from collections.abc import Sequence
+from collections.abc import Hashable, Mapping, Sequence
 from typing import Any, Literal, cast
 
 import bluesky.plan_stubs as bps
@@ -29,7 +29,7 @@ SAMPLE_SUGGESTIONS_RUN_KEY: Literal["sample_suggestions"] = "sample_suggestions"
 OPTIMIZE_RUN_KEY: Literal["optimize"] = "optimize"
 
 
-def _unpack_for_list_scan(suggestions: list[dict], actuators: Sequence[Actuator]) -> list[Any]:
+def _unpack_for_list_scan(suggestions: Sequence[Mapping], actuators: Sequence[Actuator]) -> list[Any]:
     """Unpack the actuators and inputs into Bluesky list_scan plan arguments."""
     actuators_and_inputs = {actuator: [suggestion[actuator.name] for suggestion in suggestions] for actuator in actuators}
     unpacked_list = []
@@ -42,7 +42,7 @@ def _unpack_for_list_scan(suggestions: list[dict], actuators: Sequence[Actuator]
 
 @plan
 def default_acquire(
-    suggestions: list[dict],
+    suggestions: Sequence[Mapping],
     actuators: Sequence[Actuator],
     sensors: Sequence[Sensor] | None = None,
     *,
@@ -57,7 +57,7 @@ def default_acquire(
 
     Parameters
     ----------
-    suggestions: list[dict]
+    suggestions: Sequence[Mapping]
         A list of dictionaries, each containing the parameterization of a point to evaluate.
         The "_id" key is optional and can be used to identify each suggestion. It is suggested
         to add "_id" values to the run metadata for later identification of the acquired data.
@@ -115,7 +115,7 @@ def optimize_step(
     n_points: int = 1,
     *args: Any,
     **kwargs: Any,
-) -> MsgGenerator[tuple[str, list[dict], list[dict]]]:
+) -> MsgGenerator[tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]]:
     """
     Single step of the optimization loop.
 
@@ -128,7 +128,7 @@ def optimize_step(
 
     Returns
     -------
-    tuple[str, list[dict], list[dict]]
+    tuple[str, Sequence[Mapping], Sequence[Mapping]]
         A tuple containing the uid, suggestions, and outcomes of the step.
     """
     if optimization_problem.acquisition_plan is None:
@@ -239,10 +239,10 @@ def optimize(
 @plan
 def sample_suggestions(
     optimization_problem: OptimizationProblem,
-    suggestions: list[dict],
+    suggestions: Sequence[Mapping],
     readable_cache: dict[str, InferredReadable] | None = None,
     **kwargs: Any,
-) -> MsgGenerator[tuple[str, list[dict], list[dict]]]:
+) -> MsgGenerator[tuple[str, Sequence[Mapping], Sequence[Mapping]]]:
     """
     Evaluate specific parameter combinations.
 
@@ -254,7 +254,7 @@ def sample_suggestions(
     ----------
     optimization_problem : OptimizationProblem
         The optimization problem.
-    suggestions : list[dict]
+    suggestions : Sequence[Mapping]
         Parameter combinations to evaluate. Can be:
 
         - Optimizer suggestions (with "_id" keys from suggest())
@@ -269,9 +269,9 @@ def sample_suggestions(
     -------
     uid : str
         Bluesky run UID.
-    suggestions : list[dict]
+    suggestions : Sequence[Mapping]
         Suggestions with "_id" keys.
-    outcomes : list[dict]
+    outcomes : Sequence[Mapping]
         Evaluated outcomes.
 
     Raises
@@ -308,7 +308,7 @@ def sample_suggestions(
 
     @bpp.set_run_key_decorator(SAMPLE_SUGGESTIONS_RUN_KEY)
     @bpp.run_decorator(md=_md)
-    def _inner_sample_suggestions() -> MsgGenerator[tuple[str, list[dict], list[dict]]]:
+    def _inner_sample_suggestions() -> MsgGenerator[tuple[str, Sequence[Mapping], Sequence[Mapping]]]:
 
         # Acquire data, evaluate, and ingest outcomes
         if optimization_problem.acquisition_plan is None:

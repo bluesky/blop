@@ -1,7 +1,7 @@
 """A set of useful helper utilities."""
 
 import time
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from enum import StrEnum
 from typing import Any
 
@@ -156,7 +156,7 @@ def _get_route_index(points: np.ndarray, starting_point: np.ndarray | None = Non
     return index
 
 
-def route_suggestions(suggestions: list[dict], starting_position: dict | None = None):
+def route_suggestions(suggestions: Sequence[Mapping], starting_position: dict | None = None):
     """Route suggestions using networkx TSP solver."""
     if len(suggestions) == 1:
         return suggestions

@@ -1,6 +1,6 @@
 """An optimizer protocol implementation for Ax."""
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from ax import ChoiceParameterConfig, Client, RangeParameterConfig, TOutcome, TParameterization
@@ -144,7 +144,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
             )
         self._fixed_parameters = dict(fixed_parameters)
 
-    def suggest(self, num_points: int | None = None) -> list[dict]:
+    def suggest(self, num_points: int | None = None) -> Sequence[Mapping]:
         """
         Get the next point(s) to evaluate in the search space.
 
@@ -158,7 +158,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
         Returns
         -------
-        list[dict]
+        Sequence[Mapping]
             A list of dictionaries, each containing a parameterization of a point to
             evaluate next. Each dictionary includes an "_id" key for tracking.
         """
@@ -173,7 +173,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
             for trial_index, parameterization in next_trials.items()
         ]
 
-    def get_best_points(self) -> list[tuple[int, TParameterization, TOutcome]]:
+    def get_best_points(self) -> Sequence[tuple[int, TParameterization, TOutcome]]:
         """
         Get a list of the optimal points found during optimization.
 
@@ -182,7 +182,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
         Returns
         -------
-        list[tuple[int, TParameterization, TOutcome]]
+        Sequence[tuple[int, TParameterization, TOutcome]]
             Each element in the list is a tuple of:
               - trial index (int)
               - parameter values (dict)
@@ -218,7 +218,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
                 outcomes[k] = v
         return parameters, outcomes
 
-    def ingest(self, points: list[dict]) -> None:
+    def ingest(self, points: Sequence[Mapping]) -> None:
         """
         Ingest evaluation results into the optimizer.
 
@@ -227,7 +227,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
         Parameters
         ----------
-        points : list[dict]
+        points : Sequence[Mapping]
             A list of dictionaries, each containing outcomes for a trial. For suggested
             points (from :meth:`suggest`), include the "_id" key. For external data,
             include parameter names and objective values, and omit "_id".
@@ -245,7 +245,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
                 trial_idx = self._client.attach_baseline(parameters=parameters)
             self._client.complete_trial(trial_index=trial_idx, raw_data=outcomes)
 
-    def register_suggestions(self, suggestions: list[dict]) -> list[dict]:
+    def register_suggestions(self, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """
         Register manual suggestions with the Ax experiment.
 
@@ -255,12 +255,12 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
         Parameters
         ----------
-        suggestions : list[dict]
+        suggestions : Sequence[Mapping]
             Parameter combinations to register. The "_id" key will be overwritten if present.
 
         Returns
         -------
-        list[dict]
+        Sequence[Mapping]
             The same suggestions with "_id" keys added.
         """
         registered = []
@@ -277,7 +277,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
         return registered
 
-    def register_failures(self, suggestions) -> None:
+    def register_failures(self, suggestions: Sequence[Mapping]) -> None:
         """
         Register suggestions as failures.
 
@@ -286,7 +286,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
 
         Parameters
         ----------
-        suggestions : list[dict]
+        suggestions : Sequence[Mapping]
             the trial id key must be present to pass back to the optimizer
         """
         for s in suggestions:
