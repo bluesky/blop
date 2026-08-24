@@ -184,16 +184,10 @@ class _InRunEvaluationCallback(CallbackBase):
 
     def __init__(
         self,
-        evaluation_function: EvaluationFunction,
-        optimizer: Optimizer,
-        primary_stream: str,
         document_cache: DocumentCache | None = None,
     ) -> None:
         # Persistent arguments
         self._document_cache = document_cache
-        self._evaluation_function = evaluation_function
-        self._optimizer = optimizer
-        self._primary_stream = primary_stream
 
         # State tracking
         self._streams_observed: dict[str, str] = {}
@@ -260,21 +254,6 @@ class _InRunEvaluationCallback(CallbackBase):
                 active_suggestion_idx = self._active_event_count - 1
                 suggestion_id = self._active_suggestions[active_suggestion_idx][ID_KEY]
                 self._document_cache.suggested_events.append((suggestion_id, event_uid))
-
-            # Evaluate and ingest the active batch
-            if self._active_event_count == len(self._active_suggestions):
-                # NOTE: We assume that the configured evaluation function can fetch the data from
-                # a configured cache or some external API given the Bluesky run UID.
-                outcomes = self._evaluation_function(self.run_uid, self._active_suggestions)
-                _validate_outcomes_have_ids(outcomes, self._active_suggestions)
-                self._optimizer.ingest(outcomes)
-                self._outcomes = outcomes
-
-                # Clear active state
-                self._active_suggestions = None
-                self._active_event_count = 0
-                if self._document_cache is not None:
-                    self._document_cache.suggested_events.clear()
 
         return doc
 
@@ -423,21 +402,25 @@ def optimize_in_run(
         for i in range(iterations):
             suggestions = optimizer.suggest(n_points)
             _validate_suggestions_have_ids(suggestions)
+            callback.set_ordered_suggestions(suggestions)
             try:
-                yield from bpp.msg_mutator(
+                uid = yield from bpp.msg_mutator(
                     bpp.stub_wrapper(acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)),
                     _use_optimize_in_run_key,
                 )
+                outcomes = optimization_problem.evaluation_function(uid, suggestions)
             except Exception:
                 if isinstance(optimizer, TrialFaultAware):
                     # TODO: Is it possible to be more fine-grained than this?
+                    # Some suggestions may have been acquired/evaluated without issue.
                     optimizer.register_failures(suggestions)
                 raise
 
+            optimizer.ingest(outcomes)
             yield from read_step(
                 callback.run_uid,
                 suggestions,
-                callback.outcomes,
+                outcomes,
                 n_points,
                 readable_cache,
                 stream_name=OPTIMIZE_IN_RUN_TRACKING_STREAM,

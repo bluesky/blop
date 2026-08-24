@@ -9,8 +9,6 @@ from blop.plans import acquire_baseline, default_acquire, optimize, optimize_in_
 from blop.protocols import (
     AcquisitionPlan,
     EvaluationFunction,
-    InRunDataReference,
-    InRunEvaluationFunction,
     OptimizationProblem,
     Optimizer,
     SupportsStoppingCriteria,
@@ -348,39 +346,37 @@ def test_optimize_with_non_checkpointable_optimizer(RE):
         RE(optimize(optimization_problem, iterations=5, n_points=2, checkpoint_interval=1))
 
 
-def test_optimize_in_run_uses_reference_and_strips_default_child_run(RE):
+def test_optimize_in_run_defaults(RE):
     optimizer = MagicMock(spec=Optimizer)
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
-    uid_evaluator = MagicMock(spec=EvaluationFunction)
     movable = MovableSignal("x1", initial_value=-1.0)
     readable = ReadableSignal("objective")
+
+    callback, documents = _collect_documents()
+    RE.subscribe(callback)
+
+    def evaluation_function(uid: str, suggestions: list[dict]) -> list[dict]:
+        start_doc = [doc for doc in documents if doc[0] == "start"][0]
+        assert uid == start_doc["uid"]
+        assert suggestions == [{"x1": 0.0, "_id": 0}]
+        return [{"objective": 0.0, "_id": 0}]
+
     optimization_problem = OptimizationProblem(
         optimizer=optimizer,
         actuators=[movable],
         sensors=[readable],
-        evaluation_function=uid_evaluator,
+        evaluation_function=evaluation_function,
     )
 
-    def evaluation_function(reference: InRunDataReference, suggestions: list[dict]) -> list[dict]:
-        assert isinstance(reference, InRunDataReference)
-        assert reference.run_uid == reference.start_doc["uid"]
-        assert len(reference.events) == 1
-        return [{"objective": reference.events[0]["data"]["objective"], "_id": suggestions[0]["_id"]}]
-
-    in_run_evaluation_function: InRunEvaluationFunction = evaluation_function
-    callback, documents = _collect_documents()
-    RE.subscribe(callback)
     try:
-        uids = RE(optimize_in_run(optimization_problem, in_run_evaluation_function))
+        uids = RE(optimize_in_run(optimization_problem))
     finally:
         RE.unsubscribe(callback)
 
     optimizer.ingest.assert_called_once_with([{"objective": 0.0, "_id": 0}])
-    uid_evaluator.assert_not_called()
     start_docs = [doc for name, doc in documents if name == "start"]
     assert len(start_docs) == 1
     assert start_docs[0]["run_key"] == "optimize_in_run"
-    assert all(doc.get("run_key") != "default_acquire" for doc in start_docs)
     assert len(uids) == 1
     events_by_stream = _events_by_stream(documents)
     assert len(events_by_stream["primary"]) == 1
