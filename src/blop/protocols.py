@@ -1,6 +1,6 @@
 """Protocols that bridge between optimizer backends and Bluesky."""
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Hashable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
@@ -43,7 +43,7 @@ class CanRegisterSuggestions(Protocol):
     that the suggestions are unique.
     """
 
-    def register_suggestions(self, suggestions: list[dict]) -> list[dict]:
+    def register_suggestions(self, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """
         Register the suggestions with the optimizer.
 
@@ -69,13 +69,13 @@ class TrialFaultAware(Protocol):
     cleanup of processes not directly tied to the run engine
     """
 
-    def register_failures(self, suggestions: list[dict]) -> None:
+    def register_failures(self, suggestions: Sequence[Mapping]) -> None:
         """
         Register the failed suggestions with the optimizer.
 
         Parameters
         ----------
-        suggestions: list[dict]
+        suggestions: Sequence[Mapping]
             The suggestions to fail. Ids must be present.
         """
         ...
@@ -130,7 +130,7 @@ class Optimizer(Protocol):
     blop.ax.Agent : High-level interface that uses AxOptimizer internally.
     """
 
-    def suggest(self, num_points: int | None = None) -> list[dict]:
+    def suggest(self, num_points: int | None = None) -> Sequence[Mapping]:
         """
         Suggest a set of points in the input space, to be evaulated next.
 
@@ -144,13 +144,13 @@ class Optimizer(Protocol):
 
         Returns
         -------
-        list[dict]
+        Sequence[Mapping]
             A list of dictionaries, each containing a parameterization of a point to evaluate next.
             Each dictionary must contain a unique "_id" key to identify each parameterization.
         """
         ...
 
-    def ingest(self, points: list[dict]) -> None:
+    def ingest(self, points: Sequence[Mapping]) -> None:
         """
         Ingest a set of points into the experiment. Either from previously suggested points or from an external source.
 
@@ -159,12 +159,12 @@ class Optimizer(Protocol):
 
         Parameters
         ----------
-        points : list[dict]
+        points : Sequence[Mapping]
             A list of dictionaries, each containing the outcomes of each suggested parameterization.
         """
         ...
 
-    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
+    def get_best_points(self) -> Sequence[tuple[Any, Mapping, Mapping]]:
         """
         Get a list of the optimal points found during optimization.
 
@@ -207,21 +207,21 @@ class EvaluationFunction(Protocol):
     :doc:`/tutorials/simple-experiment`
     """
 
-    def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
+    def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """
-        Evaluate the data from a Bluesky run and produce outcomes.
+        Evaluate the acquired data and produce outcomes.
 
         Parameters
         ----------
-        uid: str
-            The unique identifier of the Bluesky run to evaluate.
-        suggestions: list[dict]
+        uid: Hashable
+            The unique identifier used to fetch acquired data to evaluate.
+        suggestions: Sequence[Mapping]
             A list of dictionaries, each containing the parameterization of a point to evaluate.
             The "_id" key is optional and can be used to identify each suggestion.
 
         Returns
         -------
-        list[dict]
+        Sequence[Mapping]
             A list of dictionaries containing the outcomes of the run, one for each suggested parameterization.
             The "_id" key is optional and can be used to identify each outcome.
         """
@@ -246,27 +246,29 @@ class AcquisitionPlan(Protocol):
     Notes
     -----
     The acquisition plan is a Bluesky plan that should move the actuators to each
-    suggested position and acquire data from the sensors. It must return the UID
-    of the Bluesky run so that the evaluation function can retrieve the data.
+    suggested position and acquire data from the sensors. It is responsible for
+    returning an identifier that makes fetching the acquired data feasible.
     """
 
     @plan
     def __call__(
         self,
-        suggestions: list[dict],
+        suggestions: Sequence[Mapping],
         actuators: Sequence[Actuator],
         sensors: Sequence[Sensor] | None = None,
-        md: dict[str, Any] | None = None,
-    ) -> MsgGenerator[str]:
+        md: Mapping[Hashable, Any] | None = None,
+    ) -> MsgGenerator[Hashable]:
         """
         Acquire data for optimization.
 
         This should be a Bluesky plan that moves the actuators to each of their suggested positions
-        and acquires data from the sensors.
+        and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition
+        but it is the responsibility of the implementer to ensure fetching the data during
+        evaluation is feasible.
 
         Parameters
         ----------
-        suggestions: list[dict]
+        suggestions: Sequence[Mapping]
             A list of dictionaries, each containing the parameterization of a point to evaluate.
             The "_id" key is optional and can be used to identify each suggestion. It is suggested
             to add "_id" values to the run metadata for later identification of the acquired data.
@@ -274,13 +276,13 @@ class AcquisitionPlan(Protocol):
             The actuators to move to their suggested positions.
         sensors: Sequence[Sensor], optional
             The sensors that produce data to evaluate.
-        md : dict[str, Any] | None, optional
+        md : Mapping[Hashable, Any] | None, optional
             Metadata to attach to the start document
 
         Returns
         -------
-        str
-            The unique identifier of the Bluesky run.
+        Hashable
+            The unique identifier used to fetch data for evaluation.
         """
         ...
 
