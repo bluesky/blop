@@ -1,12 +1,11 @@
 """Protocols that bridge between optimizer backends and Bluesky."""
 
-from collections.abc import Hashable, Mapping, MutableMapping, MutableSequence, Sequence
+from collections.abc import Hashable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
 from bluesky.protocols import EventCollectable, EventPageCollectable, Flyable, HasName, Movable, Readable
 from bluesky.utils import MsgGenerator, plan
-from event_model import Event, EventDescriptor
 
 
 @runtime_checkable
@@ -136,7 +135,8 @@ class Optimizer(Protocol):
         Suggest a set of points in the input space, to be evaulated next.
 
         The "_id" key is optional and can be used to identify suggested trials for later evaluation
-        and ingestion.
+        and ingestion. When optimization plans require IDs, each "_id" value must be unique within
+        the batch and hashable.
 
         Parameters
         ----------
@@ -147,7 +147,7 @@ class Optimizer(Protocol):
         -------
         Sequence[Mapping]
             A sequence of mappings, each containing a parameterization of a point to evaluate next.
-            Each mapping must contain a unique "_id" key to identify each parameterization.
+            Each mapping must contain a unique, hashable "_id" key to identify each parameterization.
         """
         ...
 
@@ -216,16 +216,16 @@ class EvaluationFunction(Protocol):
         ----------
         uid: Hashable
             The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,
-            a tuple of event UIDs, or another hashable lookup key.
+            a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.
         suggestions: Sequence[Mapping]
-            A sequence of mappings, each containing the parameterization of a point to evaluate.
-            The "_id" key is optional and can be used to identify each suggestion.
+            A sequence of mappings, each containing the optimizer-provided parameterization of a point to evaluate.
+            This sequence is not guaranteed to be in acquisition order. Match data and outcomes by "_id".
 
         Returns
         -------
         Sequence[Mapping]
             A sequence of mappings containing the outcomes of the acquisition, one for each suggested parameterization.
-            The "_id" key is optional and can be used to identify each outcome.
+            The "_id" key is optional and can be used to identify each outcome; when present, it must match a suggestion ID.
         """
         ...
 
@@ -237,12 +237,14 @@ class AcquisitionPlan(Protocol):
 
     This protocol defines how to acquire data from the beamline. Most users will use
     the default :func:`blop.plans.default_acquire` plan, which performs a list scan
-    over the suggested points. Custom implementations are only needed for specialized
-    acquisition strategies (e.g., fly scans, complex detector configurations).
+    in its own Bluesky run, or :func:`blop.plans.default_in_run_acquire`, which performs
+    a list scan inside an already-open optimization run. Custom implementations are only
+    needed for specialized acquisition strategies (e.g., fly scans, complex detector configurations).
 
     See Also
     --------
-    blop.plans.default_acquire : Default acquisition plan implementation.
+    blop.plans.default_acquire : Default run-owning acquisition plan implementation.
+    blop.plans.default_in_run_acquire : Default in-run acquisition plan implementation.
     blop.ax.Agent : Accepts an optional acquisition plan during initialization.
 
     Notes
@@ -264,16 +266,16 @@ class AcquisitionPlan(Protocol):
         Acquire data for optimization.
 
         This should be a Bluesky plan that moves the actuators to each of their suggested positions
-        and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition
-        but it is the responsibility of the implementer to ensure fetching the data during
-        evaluation is feasible.
+        and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition,
+        but it is the responsibility of the implementer to return an identifier that lets the matching
+        evaluation function correlate acquired data with suggestion IDs.
 
         Parameters
         ----------
         suggestions: Sequence[Mapping]
             A sequence of mappings, each containing the parameterization of a point to evaluate.
-            The "_id" key is optional and can be used to identify each suggestion. It is suggested
-            to add "_id" values to the run metadata for later identification of the acquired data.
+            The "_id" key is optional and can be used to identify each suggestion. When present, "_id"
+            values used by Blop optimization plans must be unique within a batch and hashable.
         actuators: Sequence[Actuator]
             The actuators to move to their suggested positions.
         sensors: Sequence[Sensor], optional
@@ -284,8 +286,8 @@ class AcquisitionPlan(Protocol):
         Returns
         -------
         Hashable
-            The identifier passed unchanged to the evaluation function. Examples include a Bluesky run UID
-            or a tuple of event UIDs.
+            The identifier passed unchanged to the evaluation function. Examples include a Bluesky run UID,
+            a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.
         """
         ...
 
@@ -320,11 +322,6 @@ class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionP
     immutable structure. It is typically created via :meth:`blop.ax.Agent.to_optimization_problem`
     and used with optimization plans like :func:`blop.plans.optimize`.
 
-    See Also
-    --------
-    blop.ax.Agent.to_optimization_problem : Creates an OptimizationProblem from an Agent.
-    blop.plans.optimize : Bluesky plan that uses an OptimizationProblem.
-
     Attributes
     ----------
     optimizer: Optimizer
@@ -338,6 +335,11 @@ class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionP
         A callable that uses an acquisition identifier to retrieve acquired data and produce outcomes.
     acquisition_plan: AcquisitionPlan, optional
         A Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.
+
+    See Also
+    --------
+    blop.ax.Agent.to_optimization_problem : Creates an OptimizationProblem from an Agent.
+    blop.plans.optimize : Bluesky plan that uses an OptimizationProblem.
     """
 
     ...
@@ -353,12 +355,6 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
     :meth:`blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem`
     and used with bluesky-queueserver-api. Actuators, sensors, and the acquisition plan are referenced
     by their names, since their instances live on a remote server.
-
-    See Also
-    --------
-    blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem :
-        Creates a QueueserverOptimizationProblem from an agent.
-    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.
 
     Attributes
     ----------
@@ -376,6 +372,12 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
         The plan must match the arguments of :class:`AcquisitionPlan`.
     acquisition_plan_kwargs: Mapping[str, Any], optional
         Additional plan arguments to pass to the Bluesky plan.
+
+    See Also
+    --------
+    blop.ax.queueserver_agent.QueueserverAgent.to_optimization_problem :
+        Creates a QueueserverOptimizationProblem from an agent.
+    blop.queueserver.QueueserverOptimizationRunner : Runs the optimization loop using the bluesky-queueserver-api.
     """
 
     acquisition_plan_kwargs: Mapping[str, Any] | None = None

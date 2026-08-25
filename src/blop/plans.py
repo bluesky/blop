@@ -1,16 +1,14 @@
 """Bluesky plans for optimization."""
 
 import logging
-from collections.abc import Hashable, Mapping, MutableSequence, Sequence
+from collections.abc import Hashable, Mapping, Sequence
 from typing import Any, Literal, cast
 
 import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import bluesky.preprocessors as bpp
-from bluesky.callbacks import CallbackBase
 from bluesky.protocols import Readable
 from bluesky.utils import MsgGenerator, plan
-# from event_model import Event, EventDescriptor
 
 from .plan_stubs import read_step
 from .protocols import (
@@ -114,6 +112,20 @@ def default_acquire(
     )
 
 
+def _validate_ids_are_unique_and_hashable(records: Sequence[Mapping], label: str) -> None:
+    """Ensure record IDs can be used as opaque identity values."""
+    record_ids = []
+    for record in records:
+        record_id = record[ID_KEY]
+        try:
+            hash(record_id)
+        except TypeError as err:
+            raise TypeError(f"All {label} must contain hashable '{ID_KEY}' values. Got {record_id!r}.") from err
+        record_ids.append(record_id)
+    if len(record_ids) != len(set(record_ids)):
+        raise ValueError(f"All {label} must contain unique '{ID_KEY}' values. Got {record_ids!r}.")
+
+
 def _validate_suggestions_have_ids(suggestions: Sequence[Mapping]) -> None:
     """Ensure every suggestion can be matched to an evaluated outcome."""
     if any(ID_KEY not in suggestion for suggestion in suggestions):
@@ -121,6 +133,7 @@ def _validate_suggestions_have_ids(suggestions: Sequence[Mapping]) -> None:
             f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes. Please review your "
             f"optimizer implementation. Got suggestions: {suggestions}"
         )
+    _validate_ids_are_unique_and_hashable(suggestions, "suggestions")
 
 
 def _validate_outcomes_have_ids(outcomes: Sequence[Mapping], suggestions: Sequence[Mapping]) -> None:
@@ -130,6 +143,33 @@ def _validate_outcomes_have_ids(outcomes: Sequence[Mapping], suggestions: Sequen
             f"All outcomes must contain an '{ID_KEY}' key that matches with the suggestions. Please review your "
             f"evaluation function. Got suggestions: {suggestions} and outcomes: {outcomes}"
         )
+    _validate_ids_are_unique_and_hashable(outcomes, "outcomes")
+    suggestion_ids = {suggestion[ID_KEY] for suggestion in suggestions}
+    outcome_ids = {outcome[ID_KEY] for outcome in outcomes}
+    if suggestion_ids != outcome_ids:
+        raise ValueError(
+            "The suggestions and outcomes must contain the same IDs. Got suggestions: "
+            f"{suggestion_ids} and outcomes: {outcome_ids}"
+        )
+
+
+def _suggestion_ids(suggestions: Sequence[Mapping]) -> tuple[Hashable, ...]:
+    """Return suggestion IDs as a hashable acquisition identifier."""
+    return tuple(cast(Hashable, suggestion[ID_KEY]) for suggestion in suggestions)
+
+
+def _reject_run_control_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
+    """Reject child-run lifecycle messages inside the optimize_in_run acquisition step."""
+
+    def _reject(msg: Any) -> Any:
+        if msg.command in {"open_run", "close_run", "stage", "unstage"}:
+            raise ValueError(
+                "Custom optimize_in_run acquisition plans must not issue "
+                f"{msg.command!r}; they run inside Blop's enclosing optimization run."
+            )
+        return msg
+
+    return (yield from bpp.msg_mutator(plan, _reject))
 
 
 @plan
@@ -175,22 +215,6 @@ def optimize_step(
     optimizer.ingest(outcomes)
 
     return uid, suggestions, outcomes
-
-
-class _DocumentCollector(CallbackBase):
-    """Collect event-model documents from a Bluesky run."""
-
-    def __init__(
-        self,
-        document_cache: MutableSequence,
-    ) -> None:
-        self._document_cache = document_cache
-
-    def __call__(self, name: str, doc: dict, validate: bool = False) -> tuple[str, dict]:
-        if validate:
-            raise NotImplementedError("No document validation is implemented.")
-        self._document_cache.append((name, doc))
-        return (name, doc)
 
 
 @plan
@@ -268,33 +292,49 @@ def optimize(
     return (yield from _optimize())
 
 
-def acquire_stub(
+@plan
+def default_in_run_acquire(
     suggestions: Sequence[Mapping],
     actuators: Sequence[Actuator],
-    sensors: Sequence[Sensor] | None,
+    sensors: Sequence[Sensor] | None = None,
     *,
     per_step: bp.PerStep | None = None,
+    **kwargs: Any,
 ) -> MsgGenerator[tuple[Hashable, ...]]:
-    """
-    Acquire data from suggestions and cache event-model documents in the shared store.
+    """Acquire suggestions inside an already-open Bluesky run.
+
+    This plan moves through the suggestions, optionally reordering them for efficient motion,
+    and executes a Bluesky list scan without opening a child run.
 
     Parameters
     ----------
-    suggestions
-    actuators
-    sensors
-    per_step
+    suggestions : Sequence[Mapping]
+        Suggested parameterizations to execute. Each suggestion must contain a hashable ``_id``.
+    actuators : Sequence[Actuator]
+        Actuators to move to the suggested positions.
+    sensors : Sequence[Sensor] | None, optional
+        Sensors that produce data to evaluate. Non-readable sensors are ignored.
+    per_step : bp.PerStep | None, optional
+        Bluesky list-scan step hook. Custom hooks may emit any number of events into any streams.
+    **kwargs : Any
+        Additional keyword arguments to pass to :func:`bluesky.plans.list_scan`.
 
     Returns
     -------
-    tuple[Any, ...]
-        Suggestion IDs in the order they were evaluated, possibly re-ordered from the original sequence.
+    tuple[Hashable, ...]
+        Suggestion IDs in the order the suggestions were executed.
+
+        This identifier intentionally does not encode stream names, event UIDs, event counts, or
+        per-stream offsets. Custom ``per_step`` hooks may emit any number of events into any number
+        of streams. The matching evaluation function is responsible for interpreting those documents
+        and correlating them with these ordered suggestion IDs.
 
     Yields
     ------
     Msg
-        Bluesky messages
+        Bluesky messages.
     """
+    _validate_suggestions_have_ids(suggestions)
     if sensors is None:
         sensors = []
     readables = [s for s in sensors if isinstance(s, Readable)]
@@ -308,6 +348,7 @@ def acquire_stub(
             current_position = None
         suggestions = route_suggestions(suggestions, starting_position=current_position)
 
+    suggestion_ids = _suggestion_ids(suggestions)
     plan_args = _unpack_for_list_scan(suggestions, actuators)
     # TODO: fix argument type in bluesky.plans.list_scan
     yield from bpp.stub_wrapper(
@@ -315,10 +356,11 @@ def acquire_stub(
             readables,
             *plan_args,  # type: ignore[arg-type]
             per_step=per_step,
+            **kwargs,
         ),
     )
 
-    return tuple(s[ID_KEY] for s in suggestions)
+    return suggestion_ids
 
 
 @plan
@@ -339,7 +381,7 @@ def optimize_in_run(
     iterations : int, optional
         The number of optimization iterations to run.
     n_points : int, optional
-        The number of primary-stream acquisition events required before evaluating each iteration.
+        The number of points to suggest per iteration.
     checkpoint_interval : int | None, optional
         The number of iterations between optimizer checkpoints. If None, checkpoints
         will not be saved. Optimizer must implement the
@@ -365,13 +407,7 @@ def optimize_in_run(
 
     optimizer = optimization_problem.optimizer
     actuators = optimization_problem.actuators
-    acquisition_plan = optimization_problem.acquisition_plan
-    if acquisition_plan is None:
-        raise RuntimeError("Must specify an acquisition plan to use 'opitmize_in_run'")
-    # if document_cache is not None:
-    #     callback = _DocumentCollector(document_cache)
-    # else:
-    #     callback = None
+    acquisition_plan = optimization_problem.acquisition_plan or default_in_run_acquire
 
     @bpp.set_run_key_decorator(OPTIMIZE_IN_RUN_KEY)
     @bpp.run_decorator(md=_md)
@@ -380,8 +416,11 @@ def optimize_in_run(
             suggestions = optimizer.suggest(n_points)
             _validate_suggestions_have_ids(suggestions)
             try:
-                uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)
-                outcomes = optimization_problem.evaluation_function(cast(Hashable, uid), suggestions)
+                uid = yield from _reject_run_control_messages(
+                    acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)
+                )
+                outcomes = optimization_problem.evaluation_function(uid, suggestions)
+                _validate_outcomes_have_ids(outcomes, suggestions)
             except Exception:
                 if isinstance(optimizer, TrialFaultAware):
                     # TODO: Is it possible to be more fine-grained than this?
@@ -407,9 +446,6 @@ def optimize_in_run(
                     return
 
             _maybe_checkpoint(optimizer, checkpoint_interval, i)
-
-    # if callback is not None:
-    #     return (yield from bpp.subs_wrapper(_optimize_in_run(), callback))
 
     return (yield from _optimize_in_run())
 
