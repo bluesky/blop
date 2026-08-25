@@ -46,4 +46,4 @@ This protocol design allows you to pick and choose only the components you care 
 
 Blop provides built-in optimizers for common beamline optimization use cases, such as Bayesian optimization with `Ax <https://ax.dev>`_.
 
-Similarly, Blop provides :func:`blop.plans.default_acquire` for run-owning acquisitions and :func:`blop.plans.default_in_run_acquire` for acquisition inside one optimization run.
+Similarly, Blop provides :func:`blop.plans.default_acquire` for run-owning acquisitions and :func:`blop.plan_stubs.list_scan_in_run` for acquisition inside one optimization run.

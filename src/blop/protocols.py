@@ -237,14 +237,14 @@ class AcquisitionPlan(Protocol):
 
     This protocol defines how to acquire data from the beamline. Most users will use
     the default :func:`blop.plans.default_acquire` plan, which performs a list scan
-    in its own Bluesky run, or :func:`blop.plans.default_in_run_acquire`, which performs
+    in its own Bluesky run, or :func:`blop.plan_stubs.list_scan_in_run`, which performs
     a list scan inside an already-open optimization run. Custom implementations are only
     needed for specialized acquisition strategies (e.g., fly scans, complex detector configurations).
 
     See Also
     --------
     blop.plans.default_acquire : Default run-owning acquisition plan implementation.
-    blop.plans.default_in_run_acquire : Default in-run acquisition plan implementation.
+    blop.plan_stubs.list_scan_in_run : Default in-run acquisition plan implementation.
     blop.ax.Agent : Accepts an optional acquisition plan during initialization.
 
     Notes

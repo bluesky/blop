@@ -9,8 +9,6 @@ Plans
 
 .. autofunction:: blop.plans.default_acquire
 
-.. autofunction:: blop.plans.default_in_run_acquire
-
 .. autofunction:: blop.plans.acquire_baseline
 
 .. autofunction:: blop.plans.sample_suggestions
