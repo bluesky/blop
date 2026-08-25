@@ -2,17 +2,33 @@
 
 from collections import defaultdict
 from collections.abc import Hashable, Mapping, MutableMapping, Sequence
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import MsgGenerator, plan
+from numpy.typing import ArrayLike
 
 from .protocols import ID_KEY, Actuator, Optimizer
 from .utils import InferredReadable, Source
 
 _BLUESKY_UID_KEY: Literal["bluesky_uid"] = "bluesky_uid"
 _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
+
+
+def _is_array_like_identifier(uid: Hashable) -> bool:
+    try:
+        numpy_array = np.array(uid)
+    except (TypeError, ValueError):
+        return False
+    return numpy_array.dtype != object
+
+
+def _acquisition_identifier_value(uid: Hashable) -> ArrayLike:
+    """Convert a hashable acquisition identifier to an event-readable value."""
+    if _is_array_like_identifier(uid):
+        return cast(ArrayLike, uid)
+    return repr(uid)
 
 
 @plan
@@ -90,14 +106,14 @@ def read_step(
         )
     else:
         readable_cache[_SUGGESTION_IDS_KEY].update(sorted_sids)
-    # FIXME: Need to figure out how to handle Hashable type here, maybe only support
-    # for a stricter type? Hashable may be too broad here.
+    # Need to normalize the value here since `Hashable` is very broad
+    normalized_uid = _acquisition_identifier_value(uid)
     if _BLUESKY_UID_KEY not in readable_cache:
         readable_cache[_BLUESKY_UID_KEY] = InferredReadable(
-            _BLUESKY_UID_KEY, source=Source.ACQUISITION_UID, initial_value=uid
+            _BLUESKY_UID_KEY, source=Source.ACQUISITION_UID, initial_value=normalized_uid
         )
     else:
-        readable_cache[_BLUESKY_UID_KEY].update(uid)
+        readable_cache[_BLUESKY_UID_KEY].update(normalized_uid)
     for name, value in suggestions_flat.items():
         if name not in readable_cache:
             readable_cache[name] = InferredReadable(name, source=Source.PARAMETER, initial_value=value)
