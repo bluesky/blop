@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.plans &#8212; blop 1.0.1.dev18 documentation</title>
+    <title>blop.plans &#8212; blop 1.0.1.dev19 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=5b4028fa"></script>
+    <script src="../../_static/documentation_options.js?v=ff38ace3"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev18" />
+  <meta name="docsearch:version" content="1.0.1.dev19" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -993,12 +993,12 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">uid</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">acquisition_plan</span><span class="p">(</span><span class="n">suggestions</span><span class="p">,</span> <span class="n">actuators</span><span class="p">,</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">sensors</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">outcomes</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">evaluation_function</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">TrialFaultAware</span><span class="p">):</span>
             <span class="n">optimizer</span><span class="o">.</span><span class="n">register_failures</span><span class="p">(</span><span class="n">suggestions</span><span class="p">)</span>
         <span class="k">raise</span>
 
-    <span class="n">outcomes</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">evaluation_function</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">ID_KEY</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">outcome</span> <span class="k">for</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="n">outcomes</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">"All outcomes must contain an '</span><span class="si">{</span><span class="n">ID_KEY</span><span class="si">}</span><span class="s2">' key that matches with the suggestions. Please review your "</span>
