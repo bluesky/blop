@@ -4,13 +4,12 @@ import logging
 from collections.abc import Hashable, Mapping, Sequence
 from typing import Any, Literal, cast
 
-import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import bluesky.preprocessors as bpp
 from bluesky.protocols import Readable
 from bluesky.utils import MsgGenerator, plan
 
-from .plan_stubs import read_step
+from .plan_stubs import list_scan_in_run, read_step, seq_read
 from .protocols import (
     ID_KEY,
     Actuator,
@@ -21,7 +20,16 @@ from .protocols import (
     SupportsStoppingCriteria,
     TrialFaultAware,
 )
-from .utils import InferredReadable, _maybe_checkpoint, collect_optimization_metadata, route_suggestions
+from .utils import (
+    InferredReadable,
+    _maybe_checkpoint,
+    _reject_child_run_messages,
+    _unpack_for_list_scan,
+    _validate_outcomes,
+    _validate_suggestions,
+    collect_optimization_metadata,
+    route_suggestions,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -30,17 +38,6 @@ SAMPLE_SUGGESTIONS_RUN_KEY: Literal["sample_suggestions"] = "sample_suggestions"
 OPTIMIZE_RUN_KEY: Literal["optimize"] = "optimize"
 OPTIMIZE_IN_RUN_KEY: Literal["optimize_in_run"] = "optimize_in_run"
 OPTIMIZE_IN_RUN_TRACKING_STREAM: Literal["optimization"] = "optimization"
-
-
-def _unpack_for_list_scan(suggestions: Sequence[Mapping], actuators: Sequence[Actuator]) -> list[Any]:
-    """Unpack the actuators and inputs into Bluesky list_scan plan arguments."""
-    actuators_and_inputs = {actuator: [suggestion[actuator.name] for suggestion in suggestions] for actuator in actuators}
-    unpacked_list = []
-    for actuator, values in actuators_and_inputs.items():
-        unpacked_list.append(actuator)
-        unpacked_list.append(values)
-
-    return unpacked_list
 
 
 @plan
@@ -110,77 +107,6 @@ def default_acquire(
             _DEFAULT_ACQUIRE_RUN_KEY,
         )
     )
-
-
-def _validate_ids_are_unique_and_hashable(records: Sequence[Mapping], label: str) -> None:
-    """Ensure record IDs can be used as opaque identity values."""
-    record_ids = []
-    for record in records:
-        record_id = record[ID_KEY]
-        try:
-            hash(record_id)
-        except TypeError as err:
-            raise TypeError(f"All {label} must contain hashable '{ID_KEY}' values. Got {record_id!r}.") from err
-        record_ids.append(record_id)
-    if len(record_ids) != len(set(record_ids)):
-        raise ValueError(f"All {label} must contain unique '{ID_KEY}' values. Got {record_ids!r}.")
-
-
-def _validate_suggestions(suggestions: Sequence[Mapping]) -> None:
-    """Ensure every suggestion can be matched to an evaluated outcome."""
-    if any(ID_KEY not in suggestion for suggestion in suggestions):
-        raise ValueError(
-            f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes. Please review your "
-            f"optimizer implementation. Got suggestions: {suggestions}"
-        )
-    _validate_ids_are_unique_and_hashable(suggestions, "suggestions")
-
-
-def _validate_outcomes(outcomes: Sequence[Mapping], suggestions: Sequence[Mapping]) -> None:
-    """Ensure every outcome can be matched to an optimizer suggestion."""
-    if any(ID_KEY not in outcome for outcome in outcomes):
-        raise ValueError(
-            f"All outcomes must contain an '{ID_KEY}' key that matches with the suggestions. Please review your "
-            f"evaluation function. Got suggestions: {suggestions} and outcomes: {outcomes}"
-        )
-    _validate_ids_are_unique_and_hashable(outcomes, "outcomes")
-    suggestion_ids = {suggestion[ID_KEY] for suggestion in suggestions}
-    outcome_ids = {outcome[ID_KEY] for outcome in outcomes}
-    if suggestion_ids != outcome_ids:
-        raise ValueError(
-            "The suggestions and outcomes must contain the same IDs. Got suggestions: "
-            f"{suggestion_ids} and outcomes: {outcome_ids}"
-        )
-
-
-def _suggestion_ids(suggestions: Sequence[Mapping]) -> tuple[Hashable, ...]:
-    """Return suggestion IDs as a hashable acquisition identifier."""
-    return tuple(cast(Hashable, suggestion[ID_KEY]) for suggestion in suggestions)
-
-
-def _drop_run_control_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
-    """Drop child-run messages while preserving hardware lifecycle messages."""
-
-    def _drop(msg: Any) -> Any | None:
-        if msg.command in {"open_run", "close_run"}:
-            return None
-        return msg
-
-    return (yield from bpp.msg_mutator(plan, _drop))
-
-
-def _reject_child_run_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
-    """Reject child-run messages inside the optimize_in_run acquisition step."""
-
-    def _reject(msg: Any) -> Any:
-        if msg.command in {"open_run", "close_run"}:
-            raise ValueError(
-                "Custom optimize_in_run acquisition plans must not issue "
-                f"{msg.command!r}; they run inside Blop's enclosing optimization run."
-            )
-        return msg
-
-    return (yield from bpp.msg_mutator(plan, _reject))
 
 
 @plan
@@ -304,78 +230,6 @@ def optimize(
 
 
 @plan
-def default_in_run_acquire(
-    suggestions: Sequence[Mapping],
-    actuators: Sequence[Actuator],
-    sensors: Sequence[Sensor] | None = None,
-    *,
-    per_step: bp.PerStep | None = None,
-    **kwargs: Any,
-) -> MsgGenerator[tuple[Hashable, ...]]:
-    """Acquire suggestions inside an already-open Bluesky run.
-
-    This plan moves through the suggestions, optionally reordering them for efficient motion,
-    and executes a Bluesky list scan without opening a child run. The list scan's stage and
-    unstage messages are preserved.
-
-    Parameters
-    ----------
-    suggestions : Sequence[Mapping]
-        Suggested parameterizations to execute. Each suggestion must contain a hashable ``_id``.
-    actuators : Sequence[Actuator]
-        Actuators to move to the suggested positions.
-    sensors : Sequence[Sensor] | None, optional
-        Sensors that produce data to evaluate. Non-readable sensors are ignored.
-    per_step : bp.PerStep | None, optional
-        Bluesky list-scan step hook. Custom hooks may emit any number of events into any streams.
-    **kwargs : Any
-        Additional keyword arguments to pass to :func:`bluesky.plans.list_scan`.
-
-    Returns
-    -------
-    tuple[Hashable, ...]
-        Suggestion IDs in the order the suggestions were executed.
-
-        This identifier intentionally does not encode stream names, event UIDs, event counts, or
-        per-stream offsets. Custom ``per_step`` hooks may emit any number of events into any number
-        of streams. The matching evaluation function is responsible for interpreting those documents
-        and correlating them with these ordered suggestion IDs.
-
-    Yields
-    ------
-    Msg
-        Bluesky messages.
-    """
-    _validate_suggestions(suggestions)
-    if sensors is None:
-        sensors = []
-    readables = [s for s in sensors if isinstance(s, Readable)]
-    if len(readables) != len(sensors):
-        logger.warning(f"Some sensors are not readable and will be ignored. Using only the readable sensors: {readables}")
-
-    if len(suggestions) > 1:
-        if all(isinstance(actuator, Readable) for actuator in actuators):
-            current_position = yield from seq_read(cast(Sequence[Readable], actuators))
-        else:
-            current_position = None
-        suggestions = route_suggestions(suggestions, starting_position=current_position)
-
-    suggestion_ids = _suggestion_ids(suggestions)
-    plan_args = _unpack_for_list_scan(suggestions, actuators)
-    # TODO: fix argument type in bluesky.plans.list_scan
-    yield from _drop_run_control_messages(
-        bp.list_scan(
-            readables,
-            *plan_args,  # type: ignore[arg-type]
-            per_step=per_step,
-            **kwargs,
-        )
-    )
-
-    return suggestion_ids
-
-
-@plan
 def optimize_in_run(
     optimization_problem: OptimizationProblem,
     iterations: int = 1,
@@ -419,7 +273,7 @@ def optimize_in_run(
 
     optimizer = optimization_problem.optimizer
     actuators = optimization_problem.actuators
-    acquisition_plan = optimization_problem.acquisition_plan or default_in_run_acquire
+    acquisition_plan = optimization_problem.acquisition_plan or list_scan_in_run
 
     @bpp.set_run_key_decorator(OPTIMIZE_IN_RUN_KEY)
     @bpp.run_decorator(md=_md)
@@ -553,27 +407,6 @@ def sample_suggestions(
         return uid, suggestions, outcomes
 
     return (yield from _inner_sample_suggestions())
-
-
-@plan
-def seq_read(readables: Sequence[Readable], **kwargs: Any) -> MsgGenerator[dict[str, Any]]:
-    """
-    Read the current values of the given readables.
-
-    Parameters
-    ----------
-    readables : Sequence[Readable]
-        The readables to read.
-
-    Returns
-    -------
-    dict[str, Any]
-        A dictionary of the readable names and their current values.
-    """
-    results = {}
-    for readable in readables:
-        results[readable.name] = yield from bps.rd(readable, **kwargs)
-    return results
 
 
 def acquire_baseline(
