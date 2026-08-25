@@ -1,3 +1,4 @@
+import functools
 from unittest.mock import MagicMock, patch
 
 import bluesky.plan_stubs as bps
@@ -5,7 +6,14 @@ import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import plan
 
-from blop.plans import acquire_baseline, default_acquire, optimize, optimize_in_run, optimize_step
+from blop.plans import (
+    acquire_baseline,
+    acquire_stub,
+    default_acquire,
+    optimize,
+    optimize_in_run,
+    optimize_step,
+)
 from blop.protocols import (
     AcquisitionPlan,
     EvaluationFunction,
@@ -344,6 +352,49 @@ def test_optimize_with_non_checkpointable_optimizer(RE):
     )
     with pytest.raises(ValueError, match="optimizer is not checkpointable"):
         RE(optimize(optimization_problem, iterations=5, n_points=2, checkpoint_interval=1))
+
+
+def test_optimize_in_run(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    movable = MovableSignal("x1", initial_value=-1.0)
+    readable = ReadableSignal("objective")
+
+    callback, documents = _collect_documents()
+    RE.subscribe(callback)
+
+    def evaluation_function(uid: str, suggestions: list[dict]) -> list[dict]:
+        start_doc = [doc for doc in documents if doc[0] == "start"][0]
+        assert start_doc is not None
+        assert suggestions == [{"x1": 0.0, "_id": 0}]
+        return [{"objective": 0.0, "_id": 0}]
+
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[movable],
+        sensors=[readable],
+        evaluation_function=evaluation_function,
+        acquisition_plan=acquire_stub,
+    )
+
+    try:
+        uids = RE(optimize_in_run(optimization_problem))
+    finally:
+        RE.unsubscribe(callback)
+
+    optimizer.ingest.assert_called_once_with([{"objective": 0.0, "_id": 0}])
+    start_docs = [doc for name, doc in documents if name == "start"]
+    assert len(start_docs) == 1
+    assert start_docs[0]["run_key"] == "optimize_in_run"
+    assert len(uids) == 1
+    events_by_stream = _events_by_stream(documents)
+    assert len(events_by_stream["primary"]) == 1
+    assert len(events_by_stream["optimization"]) == 1
+    optimization_data = events_by_stream["optimization"][0]["data"]
+    assert optimization_data["suggestion_ids"] == "0"
+    assert optimization_data["acquisition_uid"] == 0
+    assert optimization_data["x1"] == 0.0
+    assert optimization_data["objective"] == 0.0
 
 
 def test_optimize_in_run_defaults(RE):

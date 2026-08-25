@@ -10,7 +10,7 @@ import bluesky.preprocessors as bpp
 from bluesky.callbacks import CallbackBase
 from bluesky.protocols import Readable
 from bluesky.utils import MsgGenerator, plan
-from event_model import Event, EventDescriptor
+# from event_model import Event, EventDescriptor
 
 from .plan_stubs import read_step
 from .protocols import (
@@ -18,9 +18,7 @@ from .protocols import (
     Actuator,
     CanRegisterSuggestions,
     EvaluationFunction,
-    DocumentCache,
     OptimizationProblem,
-    Optimizer,
     Sensor,
     SupportsStoppingCriteria,
     TrialFaultAware,
@@ -270,13 +268,65 @@ def optimize(
     return (yield from _optimize())
 
 
+def acquire_stub(
+    suggestions: Sequence[Mapping],
+    actuators: Sequence[Actuator],
+    sensors: Sequence[Sensor] | None,
+    *,
+    per_step: bp.PerStep | None = None,
+) -> MsgGenerator[tuple[Any, ...]]:
+    """
+    Acquire data from suggestions and cache event-model documents in the shared store.
+
+    Parameters
+    ----------
+    suggestions
+    actuators
+    sensors
+    per_step
+
+    Returns
+    -------
+    tuple[Any, ...]
+        Suggestion IDs in the order they were evaluated, possibly re-ordered from the original sequence.
+
+    Yields
+    ------
+    Msg
+        Bluesky messages
+    """
+    if sensors is None:
+        sensors = []
+    readables = [s for s in sensors if isinstance(s, Readable)]
+    if len(readables) != len(sensors):
+        logger.warning(f"Some sensors are not readable and will be ignored. Using only the readable sensors: {readables}")
+
+    if len(suggestions) > 1:
+        if all(isinstance(actuator, Readable) for actuator in actuators):
+            current_position = yield from seq_read(cast(Sequence[Readable], actuators))
+        else:
+            current_position = None
+        suggestions = route_suggestions(suggestions, starting_position=current_position)
+
+    plan_args = _unpack_for_list_scan(suggestions, actuators)
+    # TODO: fix argument type in bluesky.plans.list_scan
+    yield from bpp.stub_wrapper(
+        bp.list_scan(
+            readables,
+            *plan_args,  # type: ignore[arg-type]
+            per_step=per_step,
+        ),
+    )
+
+    return tuple(s[ID_KEY] for s in suggestions)
+
+
 @plan
 def optimize_in_run(
     optimization_problem: OptimizationProblem,
     iterations: int = 1,
     n_points: int = 1,
     checkpoint_interval: int | None = None,
-    document_cache: MutableSequence | None = None,
     readable_cache: dict[str, InferredReadable] | None = None,
     **kwargs: Any,
 ) -> MsgGenerator[None]:
@@ -294,9 +344,6 @@ def optimize_in_run(
         The number of iterations between optimizer checkpoints. If None, checkpoints
         will not be saved. Optimizer must implement the
         :class:`blop.protocols.Checkpointable` protocol.
-    document_cache : MutableSequence | None, optional
-        A shared document cache that will be filled with event-model documents from the
-        acquisition plan during the Bluesky run.
     readable_cache: dict[str, InferredReadable] | None = None
         Cache of readable objects to store the suggestions and outcomes as optimization events.
         If None, a new cache will be created.
@@ -318,16 +365,13 @@ def optimize_in_run(
 
     optimizer = optimization_problem.optimizer
     actuators = optimization_problem.actuators
-    acquisition_plan = optimization_problem.acquisition_plan or default_acquire
-    if document_cache is not None:
-        callback = _DocumentCollector(document_cache)
-    else:
-        callback = None
-
-    def _use_optimize_in_run_key(msg: Any) -> Any:
-        if msg.run is None:
-            return msg
-        return msg._replace(run=OPTIMIZE_IN_RUN_KEY)
+    acquisition_plan = optimization_problem.acquisition_plan
+    if acquisition_plan is None:
+        raise RuntimeError("Must specify an acquisition plan to use 'opitmize_in_run'")
+    # if document_cache is not None:
+    #     callback = _DocumentCollector(document_cache)
+    # else:
+    #     callback = None
 
     @bpp.set_run_key_decorator(OPTIMIZE_IN_RUN_KEY)
     @bpp.run_decorator(md=_md)
@@ -336,11 +380,8 @@ def optimize_in_run(
             suggestions = optimizer.suggest(n_points)
             _validate_suggestions_have_ids(suggestions)
             try:
-                uid = yield from bpp.msg_mutator(
-                    bpp.stub_wrapper(acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)),
-                    _use_optimize_in_run_key,
-                )
-                outcomes = optimization_problem.evaluation_function(uid, suggestions)
+                uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)
+                outcomes = optimization_problem.evaluation_function(cast(Hashable, uid), suggestions)
             except Exception:
                 if isinstance(optimizer, TrialFaultAware):
                     # TODO: Is it possible to be more fine-grained than this?
@@ -367,8 +408,9 @@ def optimize_in_run(
 
             _maybe_checkpoint(optimizer, checkpoint_interval, i)
 
-    if callback is not None:
-        return (yield from bpp.subs_wrapper(_optimize_in_run(), callback))
+    # if callback is not None:
+    #     return (yield from bpp.subs_wrapper(_optimize_in_run(), callback))
+
     return (yield from _optimize_in_run())
 
 
