@@ -95,13 +95,12 @@ def _drop_run_control_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Has
 
 
 def _reject_child_run_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
-    """Reject child-run messages inside the optimize_in_run acquisition step."""
+    """Reject child-run messages inside the plan."""
 
     def _reject(msg: Any) -> Any:
         if msg.command in {"open_run", "close_run"}:
             raise ValueError(
-                "Custom optimize_in_run acquisition plans must not issue "
-                f"{msg.command!r}; they run inside Blop's enclosing optimization run."
+                f"Custom acquisition plans must not issue {msg.command!r}; they run inside a Bluesky run already."
             )
         return msg
 
