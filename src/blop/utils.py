@@ -134,30 +134,53 @@ class InferredReadable(Readable, HasHints, HasParent):
         }
 
 
-def _get_route_index(points: np.ndarray, starting_point: np.ndarray | None = None):
-    if starting_point is not None:
-        points = np.concatenate([starting_point[None], points], axis=0)
+def _validate_route_index(index: Sequence[int], num_points: int) -> list[int]:
+    """Validate that a route visits every suggestion once."""
+    route = list(index)
+    counts: dict[int, int] = {}
+    for point_index in route:
+        counts[point_index] = counts.get(point_index, 0) + 1
 
-    G = nx.DiGraph()
+    expected = set(range(num_points))
+    seen = set(counts)
+    if seen != expected or len(route) != num_points:
+        missing = sorted(expected - seen)
+        duplicates = sorted(point_index for point_index, count in counts.items() if count > 1)
+        raise RuntimeError(
+            "TSP solver returned an invalid route. "
+            f"Missing point indices {missing!r}; duplicate point indices {duplicates!r}; route {route!r}."
+        )
+
+    return route
+
+
+def _get_route_index(points: np.ndarray, starting_point: np.ndarray | None = None) -> list[int]:
+    num_suggestions = len(points)
+    if num_suggestions < 2:
+        return list(range(num_suggestions))
+
+    graph = nx.DiGraph()
     for i, i_point in enumerate(points):
         for j, j_point in enumerate(points):
-            if j <= i:
+            if i == j:
                 continue
             d = np.sqrt(np.sum(np.square(i_point - j_point)))
-            G.add_edge(i, j, weight=d)
-            G.add_edge(j, i, weight=d if i > 0 else 1e2 * d)
+            graph.add_edge(i, j, weight=d)
 
-    index = nx.approximation.traveling_salesman_problem(
-        G, cycle=False, method=nx.approximation.simulated_annealing_tsp, init_cycle="greedy"
-    )
+    anchor_node = num_suggestions
+    for i, point in enumerate(points):
+        d = 0.0 if starting_point is None else np.sqrt(np.sum(np.square(starting_point - point)))
+        graph.add_edge(anchor_node, i, weight=d)
+        graph.add_edge(i, anchor_node, weight=0.0)
 
-    if starting_point is not None:
-        index = [i - 1 for i in index if i > 0]
-    return index
+    cycle = nx.approximation.simulated_annealing_tsp(graph, init_cycle="greedy", source=anchor_node, seed=0)
+    index = list(cycle[1:-1])
+
+    return _validate_route_index(index, num_suggestions)
 
 
 def route_suggestions(suggestions: Sequence[Mapping], starting_position: dict | None = None):
-    """Route suggestions using networkx TSP solver."""
+    """Route suggestions through a shortest open path over routed dimensions."""
     if len(suggestions) == 1:
         return suggestions
 
