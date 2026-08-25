@@ -20,10 +20,10 @@ Data Flow
 
 The data flow for a typical optimization workflow is as follows:
 
-1. The optimizer suggests a set of points to evaluate.
-2. The acquisition plan is used to acquire data from the beamline.
-3. The evaluation function is used to transform the acquired data into outcomes.
-4. The outcomes are ingested by the optimizer to inform future suggestions.
+1. The optimizer suggests a sequence of mappings describing points to evaluate.
+2. The acquisition plan acquires data and returns a hashable acquisition identifier.
+3. Blop passes that identifier unchanged to the evaluation function, which transforms the acquired data into a sequence of outcome mappings.
+4. The optimizer ingests the outcomes to inform future suggestions.
 
 .. image:: ../_static/protocol-data-flow.png
    :alt: Data Flow Diagram

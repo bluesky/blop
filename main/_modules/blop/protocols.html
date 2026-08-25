@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.protocols &#8212; blop 1.0.1.dev17 documentation</title>
+    <title>blop.protocols &#8212; blop 1.0.1.dev18 documentation</title>
   
   
   
@@ -26,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -37,12 +37,12 @@
     <link rel="stylesheet" type="text/css" href="../../_static/css/styles.css?v=a24eef6b" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=b35a8b38"></script>
+    <script src="../../_static/documentation_options.js?v=5b4028fa"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -405,7 +405,7 @@ window.addEventListener("load", load);
 window.runMermaid = runMermaid;</script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/blop/protocols';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.21.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://blueskyproject.io/blop/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev17" />
+  <meta name="docsearch:version" content="1.0.1.dev18" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -843,7 +843,7 @@ window.runMermaid = runMermaid;</script>
   <h1>Source code for blop.protocols</h1><div class="highlight"><pre>
 <span></span><span class="sd">"""Protocols that bridge between optimizer backends and Bluesky."""</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Generic</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">runtime_checkable</span>
 
@@ -893,19 +893,19 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="CanRegisterSuggestions.register_suggestions">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.CanRegisterSuggestions.register_suggestions">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">register_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_suggestions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Register the suggestions with the optimizer.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        suggestions: list[dict]</span>
+<span class="sd">        suggestions: Sequence[Mapping]</span>
 <span class="sd">            The suggestions to register. The "_id" key is optional and will be overwritten if present.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list[dict]</span>
-<span class="sd">            The original suggestions with an "_id" key added.</span>
+<span class="sd">        Sequence[Mapping]</span>
+<span class="sd">            The suggestions with an "_id" key added.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>
@@ -925,13 +925,13 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="TrialFaultAware.register_failures">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.TrialFaultAware.register_failures">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">register_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_failures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Register the failed suggestions with the optimizer.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        suggestions: list[dict]</span>
+<span class="sd">        suggestions: Sequence[Mapping]</span>
 <span class="sd">            The suggestions to fail. Ids must be present.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
@@ -998,7 +998,7 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="Optimizer.suggest">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer.suggest">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">suggest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Suggest a set of points in the input space, to be evaulated next.</span>
 
@@ -1012,16 +1012,16 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list[dict]</span>
-<span class="sd">            A list of dictionaries, each containing a parameterization of a point to evaluate next.</span>
-<span class="sd">            Each dictionary must contain a unique "_id" key to identify each parameterization.</span>
+<span class="sd">        Sequence[Mapping]</span>
+<span class="sd">            A sequence of mappings, each containing a parameterization of a point to evaluate next.</span>
+<span class="sd">            Each mapping must contain a unique "_id" key to identify each parameterization.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
 
 
 <div class="viewcode-block" id="Optimizer.ingest">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer.ingest">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">ingest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ingest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">points</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Ingest a set of points into the experiment. Either from previously suggested points or from an external source.</span>
 
@@ -1030,25 +1030,25 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        points : list[dict]</span>
-<span class="sd">            A list of dictionaries, each containing the outcomes of each suggested parameterization.</span>
+<span class="sd">        points : Sequence[Mapping]</span>
+<span class="sd">            A sequence of mappings containing the outcomes of the evaluated parameterizations.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
 
 
 <div class="viewcode-block" id="Optimizer.get_best_points">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.Optimizer.get_best_points">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_best_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_best_points</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Get a list of the optimal points found during optimization.</span>
+<span class="sd">        Get a sequence of the optimal points found during optimization.</span>
 
 <span class="sd">        For single-objective optimization, returns a single best point.</span>
 <span class="sd">        For multi-objective optimization, returns the Pareto-optimal set.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list[tuple[Any, Mapping, Mapping]]</span>
-<span class="sd">            Each element in the list is a tuple of:</span>
+<span class="sd">        Sequence[tuple[Any, Mapping, Mapping]]</span>
+<span class="sd">            Each element is a tuple of:</span>
 <span class="sd">              - "_id" of the suggestion</span>
 <span class="sd">              - suggested parameters</span>
 <span class="sd">              - measured outcomes</span>
@@ -1075,9 +1075,9 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    The evaluation function is called after data acquisition to compute outcomes</span>
-<span class="sd">    from the acquired data. It should extract relevant data from the Bluesky run</span>
-<span class="sd">    and compute objective values and metrics for each suggestion.</span>
+<span class="sd">    The evaluation function is called after data acquisition to compute outcomes.</span>
+<span class="sd">    It uses the acquisition identifier returned by the acquisition plan to retrieve</span>
+<span class="sd">    the relevant data and computes objective values and metrics for each suggestion.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -1087,22 +1087,23 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="EvaluationFunction.__call__">
 <a class="viewcode-back" href="../../reference/protocols.html#blop.protocols.EvaluationFunction.__call__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
-<span class="sd">        Evaluate the data from a Bluesky run and produce outcomes.</span>
+<span class="sd">        Evaluate the acquired data and produce outcomes.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        uid: str</span>
-<span class="sd">            The unique identifier of the Bluesky run to evaluate.</span>
-<span class="sd">        suggestions: list[dict]</span>
-<span class="sd">            A list of dictionaries, each containing the parameterization of a point to evaluate.</span>
+<span class="sd">        uid: Hashable</span>
+<span class="sd">            The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,</span>
+<span class="sd">            a tuple of event UIDs, or another hashable lookup key.</span>
+<span class="sd">        suggestions: Sequence[Mapping]</span>
+<span class="sd">            A sequence of mappings, each containing the parameterization of a point to evaluate.</span>
 <span class="sd">            The "_id" key is optional and can be used to identify each suggestion.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        list[dict]</span>
-<span class="sd">            A list of dictionaries containing the outcomes of the run, one for each suggested parameterization.</span>
+<span class="sd">        Sequence[Mapping]</span>
+<span class="sd">            A sequence of mappings containing the outcomes of the acquisition, one for each suggested parameterization.</span>
 <span class="sd">            The "_id" key is optional and can be used to identify each outcome.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
@@ -1130,8 +1131,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    The acquisition plan is a Bluesky plan that should move the actuators to each</span>
-<span class="sd">    suggested position and acquire data from the sensors. It must return the UID</span>
-<span class="sd">    of the Bluesky run so that the evaluation function can retrieve the data.</span>
+<span class="sd">    suggested position, acquire data from the sensors, and return a hashable</span>
+<span class="sd">    identifier that the evaluation function can use to retrieve the acquired data.</span>
 <span class="sd">    """</span>
 
 <div class="viewcode-block" id="AcquisitionPlan.__call__">
@@ -1139,34 +1140,37 @@ window.runMermaid = runMermaid;</script>
     <span class="nd">@plan</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+        <span class="n">suggestions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">],</span>
         <span class="n">actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">],</span>
         <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">md</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="n">md</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="n">Hashable</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Acquire data for optimization.</span>
 
 <span class="sd">        This should be a Bluesky plan that moves the actuators to each of their suggested positions</span>
-<span class="sd">        and acquires data from the sensors.</span>
+<span class="sd">        and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition</span>
+<span class="sd">        but it is the responsibility of the implementer to ensure fetching the data during</span>
+<span class="sd">        evaluation is feasible.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        suggestions: list[dict]</span>
-<span class="sd">            A list of dictionaries, each containing the parameterization of a point to evaluate.</span>
+<span class="sd">        suggestions: Sequence[Mapping]</span>
+<span class="sd">            A sequence of mappings, each containing the parameterization of a point to evaluate.</span>
 <span class="sd">            The "_id" key is optional and can be used to identify each suggestion. It is suggested</span>
 <span class="sd">            to add "_id" values to the run metadata for later identification of the acquired data.</span>
 <span class="sd">        actuators: Sequence[Actuator]</span>
 <span class="sd">            The actuators to move to their suggested positions.</span>
 <span class="sd">        sensors: Sequence[Sensor], optional</span>
 <span class="sd">            The sensors that produce data to evaluate.</span>
-<span class="sd">        md : dict[str, Any] | None, optional</span>
+<span class="sd">        md : Mapping[str, Any] | None, optional</span>
 <span class="sd">            Metadata to attach to the start document</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        str</span>
-<span class="sd">            The unique identifier of the Bluesky run.</span>
+<span class="sd">        Hashable</span>
+<span class="sd">            The identifier passed unchanged to the evaluation function. Examples include a Bluesky run UID</span>
+<span class="sd">            or a tuple of event UIDs.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>
@@ -1218,7 +1222,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    sensors: Sequence[Sensor]</span>
 <span class="sd">        Objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.</span>
 <span class="sd">    evaluation_function: EvaluationFunction</span>
-<span class="sd">        A callable to evaluate data from a Bluesky run and produce outcomes.</span>
+<span class="sd">        A callable that uses an acquisition identifier to retrieve acquired data and produce outcomes.</span>
 <span class="sd">    acquisition_plan: AcquisitionPlan, optional</span>
 <span class="sd">        A Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.</span>
 
@@ -1255,7 +1259,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    sensors: Sequence[str]</span>
 <span class="sd">        Names of objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.</span>
 <span class="sd">    evaluation_function: EvaluationFunction</span>
-<span class="sd">        A callable to evaluate data from a Bluesky run and produce outcomes.</span>
+<span class="sd">        A callable that uses an acquisition identifier to retrieve acquired data and produce outcomes.</span>
 <span class="sd">    acquisition_plan: str, optional</span>
 <span class="sd">        The name of a Bluesky plan to acquire data. If not provided, a default plan name will be used.</span>
 <span class="sd">        The plan must match the arguments of :class:`AcquisitionPlan`.</span>
@@ -1300,8 +1304,8 @@ window.runMermaid = runMermaid;</script>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1335,7 +1339,7 @@ window.runMermaid = runMermaid;</script>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

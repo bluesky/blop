@@ -25,28 +25,37 @@ association between optimizer suggestions and the acquired data within the
 chosen storage or event system (typically stashing the suggestions in proper 
 order in storage or tagging the run markdown).
 
+The plan must return a hashable acquisition identifier. Blop passes that value
+unchanged to the evaluation function. A Bluesky run UID is the usual identifier,
+but a tuple of event UIDs can identify acquisitions performed within one run.
+
 A simple example that optimizes in a subspace while executing measurements in
 the full physical coordinate system is shown below. 
 
 .. code-block:: python
 
+    from collections.abc import Hashable, Mapping, Sequence
+    from typing import Any
+
+    from bluesky.utils import MsgGenerator
+
     class SubspaceAcquisition(AcquisitionPlan):
 
         def __call__(
             self,
-            suggestions: list[dict],
+            suggestions: Sequence[Mapping],
             actuators: Sequence[Actuator],
             sensors: Sequence[Sensor] | None = None,
-            md: dict[str, Any] | None = None,
-        ) -> MsgGenerator[str]:
+            md: Mapping[str, Any] | None = None,
+        ) -> MsgGenerator[Hashable]:
 
             coords = [subspace_to_real(s) for s in suggestions]
-            yield from default_acquire(
+            return (yield from default_acquire(
                 coords,
                 actuators,
                 sensors=sensors,
                 md=md,
-            )
+            ))
 
 Wrapping the default acquire function is completely acceptable for coordinate to 
 coordinate schemes to keep default acquire's convenience. Just remember that 

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Asynchronous Optimization with Bluesky Queueserver &#8212; blop 1.0.1.dev17 documentation</title>
+    <title>Asynchronous Optimization with Bluesky Queueserver &#8212; blop 1.0.1.dev18 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -38,12 +38,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/styles.css?v=a24eef6b" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=b35a8b38"></script>
+    <script src="../_static/documentation_options.js?v=5b4028fa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -406,7 +406,7 @@ window.addEventListener("load", load);
 window.runMermaid = runMermaid;</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/queueserver';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.21.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://blueskyproject.io/blop/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -421,7 +421,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="prev" title="Your first Scipy optimization with Blop" href="gradient-optimization.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev17" />
+  <meta name="docsearch:version" content="1.0.1.dev18" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -1086,7 +1086,7 @@ Worker environment exists: True
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 08-24 13:56:46] ax.storage.sqa_store.with_db_settings_base: Ax SQL storage initialized with SQLAlchemy 2.0.52
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 08-25 17:55:41] ax.storage.sqa_store.with_db_settings_base: Ax SQL storage initialized with SQLAlchemy 2.0.52
 </pre></div>
 </div>
 </div>
@@ -1094,16 +1094,13 @@ Worker environment exists: True
 </section>
 <section id="writing-the-evaluation-function">
 <h2>Writing the Evaluation Function<a class="headerlink" href="#writing-the-evaluation-function" title="Link to this heading">#</a></h2>
-<p>The evaluation function is called each time a plan completes. It reads data from Tiled and computes the objective values. The function receives:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">uid</span></code>: the Bluesky run UID (use this to look up data in Tiled)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">suggestions</span></code>: the list of parameter dicts that were evaluated</p></li>
-</ul>
-<p>It must return a list of outcome dicts, each containing the objective value(s) and an <code class="docutils literal notranslate"><span class="pre">_id</span></code> matching the suggestion.</p>
+<p>The evaluation function is called each time a plan completes. Its general contract accepts a hashable acquisition identifier and a sequence of suggestion mappings, and returns a sequence of outcome mappings. The queueserver runner uses the Bluesky run UID as its acquisition identifier, so this evaluator validates that it received a string before looking up the run in Tiled. Each outcome must contain the objective value(s) and an <code class="docutils literal notranslate"><span class="pre">_id</span></code> matching the suggestion.</p>
 <p>Because the agent and the ZMQ-Tiled bridge are separate subscribers to the same ZMQ stream, there is a race condition: the agent may receive the stop document before the bridge has finished writing data to Tiled. The evaluation function should poll Tiled until both the run and the detector data are available.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tiled.client.container</span><span class="w"> </span><span class="kn">import</span> <span class="n">Container</span>
 
 
@@ -1141,7 +1138,9 @@ Worker environment exists: True
             <span class="s2">"The ZMQ-Tiled bridge may still be writing the run."</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"HimmelblauEvaluation requires a Bluesky run UID string, got </span><span class="si">{</span><span class="n">uid</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for_run</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
 
         <span class="c1"># Read the detector values from the primary data stream</span>
@@ -1204,8 +1203,8 @@ message prefix.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 08-24 13:56:46] ax.api.client: GenerationStrategy(name='Center+Sobol+MBM:fast', nodes=[CenterGenerationNode(next_node_name='Sobol', use_existing_trials_for_initialization=True), GenerationNode(name='Sobol', generator_specs=[GeneratorSpec(generator_enum=Sobol, generator_key_override=None)], transition_criteria=[MinTrials(transition_to='MBM'), MinTrials(transition_to='MBM')], suggested_experiment_status=ExperimentStatus.INITIALIZATION, pausing_criteria=[MaxTrialsAwaitingData(threshold=5)]), GenerationNode(name='MBM', generator_specs=[GeneratorSpec(generator_enum=BoTorch, generator_key_override=None)], transition_criteria=None, suggested_experiment_status=ExperimentStatus.OPTIMIZATION, pausing_criteria=None)]) chosen based on user input and problem structure.
-[INFO 08-24 13:56:46] ax.api.client: Generated new trial 0 with parameters {'motor1': 0.0, 'motor2': 0.0} using GenerationNode CenterOfSearchSpace.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 08-25 17:55:41] ax.api.client: GenerationStrategy(name='Center+Sobol+MBM:fast', nodes=[CenterGenerationNode(next_node_name='Sobol', use_existing_trials_for_initialization=True), GenerationNode(name='Sobol', generator_specs=[GeneratorSpec(generator_enum=Sobol, generator_key_override=None)], transition_criteria=[MinTrials(transition_to='MBM'), MinTrials(transition_to='MBM')], suggested_experiment_status=ExperimentStatus.INITIALIZATION, pausing_criteria=[MaxTrialsAwaitingData(threshold=5)]), GenerationNode(name='MBM', generator_specs=[GeneratorSpec(generator_enum=BoTorch, generator_key_override=None)], transition_criteria=None, suggested_experiment_status=ExperimentStatus.OPTIMIZATION, pausing_criteria=None)]) chosen based on user input and problem structure.
+[INFO 08-25 17:55:41] ax.api.client: Generated new trial 0 with parameters {'motor1': 0.0, 'motor2': 0.0} using GenerationNode CenterOfSearchSpace.
 </pre></div>
 </div>
 </div>
@@ -1230,37 +1229,37 @@ message prefix.</p>
 Points per iteration : 1
 Total acquisitions   : 10
 Run UIDs:
-  7df2d668-971c-4303-906a-c2c2831b3247
-  3e9544ec-1e42-4a24-941a-d5bf34f28c55
-  911fcc33-5703-4c82-81ce-a6662be8d837
-  ceefa9b6-6bb1-4b1e-9c8b-7e0c1b9f2775
-  ff5bf33d-a22c-43d6-a551-0b189d63d188
-  2edc4b61-2f3c-4374-b5a0-c218b184232d
-  9d3664c0-4de7-45ca-83a2-e3cdefcd57d1
-  d6f62c45-2567-453c-8518-f8ab57f6b526
-  8f63b9d1-7db4-4814-9236-4f9030166cac
-  62789ec1-2529-4859-9fa7-98031b418ce8
+  71198c02-7ddb-47b0-81b9-bfaed73d1a12
+  029bfa6e-e438-425f-b8ca-0465f0aa67f3
+  3a9d8ba6-e47b-4309-857f-352594617ac4
+  455613ba-1442-4847-bcb4-33ecf50b2df4
+  8090db98-35a6-40dd-be26-e8b7fd1bb094
+  91519b6f-298a-4383-bccf-cf7e3c694183
+  c9e5891a-ab50-49ec-892e-65e999730fc7
+  91bf9c16-f65f-4f53-b20b-8b5852567031
+  1e085fb9-7f6d-4516-b4de-7d67fa6d2449
+  d3f94a7d-16ae-4fba-8155-9a43f1323c66
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 08-24 13:56:48] ax.api.client: Trial 0 marked COMPLETED.
-[INFO 08-24 13:56:48] ax.api.client: Generated new trial 1 with parameters {'motor1': 2.471553, 'motor2': -0.755969} using GenerationNode Sobol.
-[INFO 08-24 13:56:48] ax.api.client: Trial 1 marked COMPLETED.
-[INFO 08-24 13:56:48] ax.api.client: Generated new trial 2 with parameters {'motor1': -1.171192, 'motor2': 3.285026} using GenerationNode Sobol.
-[INFO 08-24 13:56:49] ax.api.client: Trial 2 marked COMPLETED.
-[INFO 08-24 13:56:49] ax.api.client: Generated new trial 3 with parameters {'motor1': -3.167579, 'motor2': -2.586179} using GenerationNode Sobol.
-[INFO 08-24 13:56:50] ax.api.client: Trial 3 marked COMPLETED.
-[INFO 08-24 13:56:50] ax.api.client: Generated new trial 4 with parameters {'motor1': 4.517992, 'motor2': 0.213341} using GenerationNode Sobol.
-[INFO 08-24 13:56:50] ax.api.client: Trial 4 marked COMPLETED.
-[INFO 08-24 13:56:51] ax.api.client: Generated new trial 5 with parameters {'motor1': -3.999396, 'motor2': -3.235151} using GenerationNode MBM.
-[INFO 08-24 13:56:52] ax.api.client: Trial 5 marked COMPLETED.
-[INFO 08-24 13:56:53] ax.api.client: Generated new trial 6 with parameters {'motor1': -3.544407, 'motor2': -4.462419} using GenerationNode MBM.
-[INFO 08-24 13:56:53] ax.api.client: Trial 6 marked COMPLETED.
-[INFO 08-24 13:56:55] ax.api.client: Generated new trial 7 with parameters {'motor1': -4.513783, 'motor2': -2.763189} using GenerationNode MBM.
-[INFO 08-24 13:56:56] ax.api.client: Trial 7 marked COMPLETED.
-[INFO 08-24 13:56:57] ax.api.client: Generated new trial 8 with parameters {'motor1': -3.399347, 'motor2': -3.212692} using GenerationNode MBM.
-[INFO 08-24 13:56:58] ax.api.client: Trial 8 marked COMPLETED.
-[INFO 08-24 13:57:00] ax.api.client: Generated new trial 9 with parameters {'motor1': -4.73361, 'motor2': -3.728163} using GenerationNode MBM.
-[INFO 08-24 13:57:01] ax.api.client: Trial 9 marked COMPLETED.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 08-25 17:55:42] ax.api.client: Trial 0 marked COMPLETED.
+[INFO 08-25 17:55:42] ax.api.client: Generated new trial 1 with parameters {'motor1': -1.084597, 'motor2': -2.153057} using GenerationNode Sobol.
+[INFO 08-25 17:55:43] ax.api.client: Trial 1 marked COMPLETED.
+[INFO 08-25 17:55:43] ax.api.client: Generated new trial 2 with parameters {'motor1': 0.253034, 'motor2': 2.70579} using GenerationNode Sobol.
+[INFO 08-25 17:55:44] ax.api.client: Trial 2 marked COMPLETED.
+[INFO 08-25 17:55:44] ax.api.client: Generated new trial 3 with parameters {'motor1': 4.800604, 'motor2': -4.83018} using GenerationNode Sobol.
+[INFO 08-25 17:55:44] ax.api.client: Trial 3 marked COMPLETED.
+[INFO 08-25 17:55:44] ax.api.client: Generated new trial 4 with parameters {'motor1': -4.037394, 'motor2': 0.390319} using GenerationNode Sobol.
+[INFO 08-25 17:55:45] ax.api.client: Trial 4 marked COMPLETED.
+[INFO 08-25 17:55:46] ax.api.client: Generated new trial 5 with parameters {'motor1': -5.0, 'motor2': 3.191765} using GenerationNode MBM.
+[INFO 08-25 17:55:46] ax.api.client: Trial 5 marked COMPLETED.
+[INFO 08-25 17:55:47] ax.api.client: Generated new trial 6 with parameters {'motor1': 0.157405, 'motor2': 5.0} using GenerationNode MBM.
+[INFO 08-25 17:55:47] ax.api.client: Trial 6 marked COMPLETED.
+[INFO 08-25 17:55:48] ax.api.client: Generated new trial 7 with parameters {'motor1': 0.921721, 'motor2': 1.936613} using GenerationNode MBM.
+[INFO 08-25 17:55:49] ax.api.client: Trial 7 marked COMPLETED.
+[INFO 08-25 17:55:49] ax.api.client: Generated new trial 8 with parameters {'motor1': -0.849287, 'motor2': 1.985066} using GenerationNode MBM.
+[INFO 08-25 17:55:50] ax.api.client: Trial 8 marked COMPLETED.
+[INFO 08-25 17:55:51] ax.api.client: Generated new trial 9 with parameters {'motor1': 3.31293, 'motor2': 2.741244} using GenerationNode MBM.
+[INFO 08-25 17:55:51] ax.api.client: Trial 9 marked COMPLETED.
 </pre></div>
 </div>
 </div>
@@ -1320,9 +1319,9 @@ Run UIDs:
       <td>1_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>47.550578</td>
-      <td>2.471553</td>
-      <td>-0.755969</td>
+      <td>155.336711</td>
+      <td>-1.084597</td>
+      <td>-2.153057</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1330,9 +1329,9 @@ Run UIDs:
       <td>2_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>47.102690</td>
-      <td>-1.171192</td>
-      <td>3.285026</td>
+      <td>68.065781</td>
+      <td>0.253034</td>
+      <td>2.705790</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1340,9 +1339,9 @@ Run UIDs:
       <td>3_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>24.726347</td>
-      <td>-3.167579</td>
-      <td>-2.586179</td>
+      <td>498.594579</td>
+      <td>4.800604</td>
+      <td>-4.830180</td>
     </tr>
     <tr>
       <th>4</th>
@@ -1350,9 +1349,9 @@ Run UIDs:
       <td>4_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>98.588542</td>
-      <td>4.517992</td>
-      <td>0.213341</td>
+      <td>150.870157</td>
+      <td>-4.037394</td>
+      <td>0.390319</td>
     </tr>
     <tr>
       <th>5</th>
@@ -1360,9 +1359,9 @@ Run UIDs:
       <td>5_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>3.381957</td>
-      <td>-3.999396</td>
-      <td>-3.235151</td>
+      <td>298.842434</td>
+      <td>-5.000000</td>
+      <td>3.191765</td>
     </tr>
     <tr>
       <th>6</th>
@@ -1370,9 +1369,9 @@ Run UIDs:
       <td>6_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>96.181642</td>
-      <td>-3.544407</td>
-      <td>-4.462419</td>
+      <td>365.394647</td>
+      <td>0.157405</td>
+      <td>5.000000</td>
     </tr>
     <tr>
       <th>7</th>
@@ -1380,9 +1379,9 @@ Run UIDs:
       <td>7_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>58.749254</td>
-      <td>-4.513783</td>
-      <td>-2.763189</td>
+      <td>72.885493</td>
+      <td>0.921721</td>
+      <td>1.936613</td>
     </tr>
     <tr>
       <th>8</th>
@@ -1390,9 +1389,9 @@ Run UIDs:
       <td>8_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>7.066432</td>
-      <td>-3.399347</td>
-      <td>-3.212692</td>
+      <td>84.063278</td>
+      <td>-0.849287</td>
+      <td>1.985066</td>
     </tr>
     <tr>
       <th>9</th>
@@ -1400,9 +1399,9 @@ Run UIDs:
       <td>9_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>63.655307</td>
-      <td>-4.733610</td>
-      <td>-3.728163</td>
+      <td>22.029347</td>
+      <td>3.312930</td>
+      <td>2.741244</td>
     </tr>
   </tbody>
 </table>
@@ -1545,8 +1544,8 @@ docker<span class="w"> </span>compose<span class="w"> </span>down
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1580,7 +1579,7 @@ docker<span class="w"> </span>compose<span class="w"> </span>down
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

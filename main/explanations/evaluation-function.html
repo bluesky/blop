@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The Evaluation Function &#8212; blop 1.0.1.dev17 documentation</title>
+    <title>The Evaluation Function &#8212; blop 1.0.1.dev18 documentation</title>
   
   
   
@@ -27,8 +27,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=90905a2f556bf617f1a9" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -38,19 +38,19 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/styles.css?v=a24eef6b" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=b35a8b38"></script>
+    <script src="../_static/documentation_options.js?v=5b4028fa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../_static/copybutton.js?v=f281be69"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'explanations/evaluation-function';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.20.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.21.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://blueskyproject.io/blop/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -65,7 +65,7 @@
     <link rel="prev" title="Protocols for Optimization" href="protocols.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev17" />
+  <meta name="docsearch:version" content="1.0.1.dev18" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -517,14 +517,16 @@
 <h1>The Evaluation Function<a class="headerlink" href="#the-evaluation-function" title="Link to this heading">#</a></h1>
 <p>The evaluation function is the primary interface between <strong>blop</strong> and your experimental data analysis pipeline. It is responsible for retrieving
 experimental data, performing any required post-processing, and computing the objective values returned to the optimizer.</p>
-<p>Rather than prescribing a particular processing framework or directly managing data, <strong>blop</strong> adopts a UID-driven workflow that mirrors the event-based processing patterns
-commonly used at beamlines. This design allows existing data handling and analysis code to be reused with minimal modification, reducing the need to
-reimplement processing logic specifically for optimization.</p>
+<p>Rather than prescribing a particular processing framework or directly managing data, <strong>blop</strong> uses an identifier-driven workflow. The acquisition
+plan returns a hashable identifier, and Blop passes that same identifier to the evaluation function. This mirrors event-based processing patterns
+commonly used at beamlines while also supporting data acquired within a single Bluesky run.</p>
 <section id="anatomy-of-an-evaluation-function">
 <h2>Anatomy of an Evaluation Function<a class="headerlink" href="#anatomy-of-an-evaluation-function" title="Link to this heading">#</a></h2>
-<p>An evaluation function is simply a callable object that accepts a run UID, and a suggestion list and returns the objective values computed from the corresponding experimental data.</p>
+<p>An evaluation function is a callable that accepts a hashable acquisition identifier and a sequence of suggestion mappings, then returns a sequence of outcome mappings. The identifier may be a Bluesky run UID, a tuple of event UIDs, or another hashable key understood by the evaluator.</p>
 <p>A typical implementation is shown below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">GenericEvaluation</span><span class="p">(</span><span class="n">EvaluationFunction</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GenericEvaluation</span><span class="p">(</span><span class="n">EvaluationFunction</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Inheriting from EvaluationFunction is optional but provides</span>
 <span class="sd">    a useful typing protocol."""</span>
 
@@ -538,16 +540,15 @@ reimplement processing logic specifically for optimization.</p>
         <span class="c1">#   - Configuring optimization-specific parameters</span>
         <span class="c1">#       - (perhaps varying of exponents in loss combinations, selecting between L1 and L2 norm...)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">):</span>
-        <span class="c1"># Invoked by the RunEngine with the UID of an acquired run.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]:</span>
+        <span class="c1"># Invoked with the identifier returned by the acquisition plan.</span>
         <span class="c1">#</span>
         <span class="c1"># Typical responsibilities include:</span>
-        <span class="c1">#   - Retrieving data associated with the UID</span>
-        <span class="c1">#   - Iterating over individual suggestions in the run</span>
-        <span class="c1">#       - found in a run's start document under "blop_suggestions" when using default_aquire aquisition plan</span>
+        <span class="c1">#   - Retrieving the data associated with the identifier</span>
+        <span class="c1">#   - Iterating over individual suggestions in the acquisition</span>
+        <span class="c1">#       - found in a run's start document under "blop_suggestions" when using default_acquire</span>
         <span class="c1">#   - Constructing a per-suggestion analysis context</span>
-        <span class="c1">#   - Calling a lower-level objective function for each</span>
-        <span class="c1">#     sample or suggestion</span>
+        <span class="c1">#   - Calling a lower-level objective function for each sample or suggestion</span>
 </pre></div>
 </div>
 <p>Although the interface is intentionally minimal, separating setup from
@@ -556,8 +557,8 @@ execution is recommended.</p>
 <dt><code class="docutils literal notranslate"><span class="pre">__init__</span></code></dt><dd><p>Perform one-time initialization such as constructing storage clients,
 loading analysis resources, and configuring reusable analysis parameters.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">__call__</span></code></dt><dd><p>Retrieve the data associated with a run UID, iterate over the individual
-suggestions or samples, and orchestrate the analysis workflow.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">__call__</span></code></dt><dd><p>Retrieve the data associated with the acquisition identifier, iterate over the
+individual suggestions or samples, and orchestrate the analysis workflow.</p>
 </dd>
 </dl>
 <p>Where possible, keep the actual objective calculation in a separate function
@@ -647,8 +648,8 @@ retrieval code.</p>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=90905a2f556bf617f1a9"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=90905a2f556bf617f1a9"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -682,7 +683,7 @@ retrieval code.</p>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.20.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
 </p></div>
       
     </div>

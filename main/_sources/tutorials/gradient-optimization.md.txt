@@ -123,14 +123,18 @@ sensors = []
 
 ## Writing the evaluation function
 
-The **evaluation function** computes objective values from experimental data. After each run, Blop calls this function with the run's unique ID and the suggestions that were tried. It returns the computed objective values:
+The **evaluation function** computes objective values from experimental data. Blop passes it the hashable identifier returned by the acquisition plan and the suggestions that were tried. This tutorial uses the default acquisition plan, so the identifier is a Bluesky run UID.
 
 ```{code-cell} ipython3
+from collections.abc import Hashable, Mapping, Sequence
+
 class Himmelblau2DEvaluation:
     def __init__(self, tiled_client: Container):
         self.tiled_client = tiled_client
 
-    def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
+    def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
+        if not isinstance(uid, str):
+            raise TypeError(f"Himmelblau2DEvaluation requires a Bluesky run UID string, got {uid!r}")
         run = self.tiled_client[uid]
         outcomes = []
         reordered_suggestions = run.start["blop_suggestions"]

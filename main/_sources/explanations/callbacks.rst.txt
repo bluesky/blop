@@ -50,9 +50,13 @@ but the contents are optimization-focused.
     UIDs, and other values.
 
 ``event``
-    Per-step values such as ``suggestion_ids``, ``bluesky_uid``, parameter
+    Per-step values such as ``suggestion_ids``, ``acquisition_uid``, parameter
     values, and outcome values. For batched optimization, these values may be
     arrays.
+
+For ``acquisition_uid``, native array-like identifiers such as a tuple of event
+UIDs are stored directly. Other hashable identifiers are stored using their
+``repr``; the evaluation function still receives the original identifier.
 
 ``stop``
     Completion status and reason, useful for summaries or cleanup.
