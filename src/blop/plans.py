@@ -145,12 +145,12 @@ def optimize_step(
         )
     try:
         uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, *args, **kwargs)
+        outcomes = optimization_problem.evaluation_function(uid, suggestions)
     except Exception:
         if isinstance(optimizer, TrialFaultAware):
             optimizer.register_failures(suggestions)
         raise
 
-    outcomes = optimization_problem.evaluation_function(uid, suggestions)
     if any(ID_KEY not in outcome for outcome in outcomes):
         raise ValueError(
             f"All outcomes must contain an '{ID_KEY}' key that matches with the suggestions. Please review your "
