@@ -126,7 +126,7 @@ def _validate_ids_are_unique_and_hashable(records: Sequence[Mapping], label: str
         raise ValueError(f"All {label} must contain unique '{ID_KEY}' values. Got {record_ids!r}.")
 
 
-def _validate_suggestions_have_ids(suggestions: Sequence[Mapping]) -> None:
+def _validate_suggestions(suggestions: Sequence[Mapping]) -> None:
     """Ensure every suggestion can be matched to an evaluated outcome."""
     if any(ID_KEY not in suggestion for suggestion in suggestions):
         raise ValueError(
@@ -136,7 +136,7 @@ def _validate_suggestions_have_ids(suggestions: Sequence[Mapping]) -> None:
     _validate_ids_are_unique_and_hashable(suggestions, "suggestions")
 
 
-def _validate_outcomes_have_ids(outcomes: Sequence[Mapping], suggestions: Sequence[Mapping]) -> None:
+def _validate_outcomes(outcomes: Sequence[Mapping], suggestions: Sequence[Mapping]) -> None:
     """Ensure every outcome can be matched to an optimizer suggestion."""
     if any(ID_KEY not in outcome for outcome in outcomes):
         raise ValueError(
@@ -212,7 +212,7 @@ def optimize_step(
     optimizer = optimization_problem.optimizer
     actuators = optimization_problem.actuators
     suggestions = optimizer.suggest(n_points)
-    _validate_suggestions_have_ids(suggestions)
+    _validate_suggestions(suggestions)
     try:
         uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, *args, **kwargs)
     except Exception:
@@ -222,7 +222,7 @@ def optimize_step(
 
     evaluation_function: EvaluationFunction = optimization_problem.evaluation_function
     outcomes = evaluation_function(uid, suggestions)
-    _validate_outcomes_have_ids(outcomes, suggestions)
+    _validate_outcomes(outcomes, suggestions)
     optimizer.ingest(outcomes)
 
     return uid, suggestions, outcomes
@@ -346,7 +346,7 @@ def default_in_run_acquire(
     Msg
         Bluesky messages.
     """
-    _validate_suggestions_have_ids(suggestions)
+    _validate_suggestions(suggestions)
     if sensors is None:
         sensors = []
     readables = [s for s in sensors if isinstance(s, Readable)]
@@ -426,13 +426,13 @@ def optimize_in_run(
     def _optimize_in_run() -> MsgGenerator[None]:
         for i in range(iterations):
             suggestions = optimizer.suggest(n_points)
-            _validate_suggestions_have_ids(suggestions)
+            _validate_suggestions(suggestions)
             try:
                 uid = yield from _reject_child_run_messages(
                     acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)
                 )
                 outcomes = optimization_problem.evaluation_function(uid, suggestions)
-                _validate_outcomes_have_ids(outcomes, suggestions)
+                _validate_outcomes(outcomes, suggestions)
             except Exception:
                 if isinstance(optimizer, TrialFaultAware):
                     # TODO: Is it possible to be more fine-grained than this?
