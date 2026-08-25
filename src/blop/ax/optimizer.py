@@ -205,7 +205,7 @@ class AxOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaultA
             params, metrics, trial_index, _ = self._client.get_best_parameterization(use_model_predictions=False)
             return [(trial_index, params, metrics)]
 
-    def _split_point(self, point: dict) -> tuple[dict, dict]:
+    def _split_point(self, point: Mapping) -> tuple[dict, dict]:
         """Split a point into parameters and outcomes."""
         parameters = {}
         outcomes = {}

@@ -242,7 +242,7 @@ def sample_suggestions(
     suggestions: Sequence[Mapping],
     readable_cache: dict[str, InferredReadable] | None = None,
     **kwargs: Any,
-) -> MsgGenerator[tuple[str, Sequence[Mapping], Sequence[Mapping]]]:
+) -> MsgGenerator[tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]]:
     """
     Evaluate specific parameter combinations.
 
@@ -267,7 +267,7 @@ def sample_suggestions(
 
     Returns
     -------
-    uid : str
+    uid : Hashable
         Bluesky run UID.
     suggestions : Sequence[Mapping]
         Suggestions with "_id" keys.
@@ -308,7 +308,7 @@ def sample_suggestions(
 
     @bpp.set_run_key_decorator(SAMPLE_SUGGESTIONS_RUN_KEY)
     @bpp.run_decorator(md=_md)
-    def _inner_sample_suggestions() -> MsgGenerator[tuple[str, Sequence[Mapping], Sequence[Mapping]]]:
+    def _inner_sample_suggestions() -> MsgGenerator[tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]]:
 
         # Acquire data, evaluate, and ingest outcomes
         if optimization_problem.acquisition_plan is None:
@@ -352,7 +352,7 @@ def seq_read(readables: Sequence[Readable], **kwargs: Any) -> MsgGenerator[dict[
 
 def acquire_baseline(
     optimization_problem: OptimizationProblem,
-    parameterization: dict[str, Any] | None = None,
+    parameterization: Mapping[str, Any] | None = None,
     **kwargs: Any,
 ) -> MsgGenerator[None]:
     """
@@ -377,14 +377,15 @@ def acquire_baseline(
             raise ValueError(
                 "All actuators must also implement the Readable protocol to acquire a baseline from current positions."
             )
+    parameterization_copy = dict(parameterization)
     if ID_KEY not in parameterization:
-        parameterization[ID_KEY] = "baseline"
+        parameterization_copy[ID_KEY] = "baseline"
     optimizer = optimization_problem.optimizer
     if optimization_problem.acquisition_plan is None:
         acquisition_plan = default_acquire
     else:
         acquisition_plan = optimization_problem.acquisition_plan
-    uid = yield from acquisition_plan([parameterization], actuators, optimization_problem.sensors, **kwargs)
-    outcome = optimization_problem.evaluation_function(uid, [parameterization])[0]
-    data = {**outcome, **parameterization}
+    uid = yield from acquisition_plan([parameterization_copy], actuators, optimization_problem.sensors, **kwargs)
+    outcome = optimization_problem.evaluation_function(uid, [parameterization_copy])[0]
+    data = {**outcome, **parameterization_copy}
     optimizer.ingest([data])

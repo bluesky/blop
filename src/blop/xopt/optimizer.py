@@ -128,7 +128,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
     def register_suggestions(self, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """Register external suggestions with the optimizer."""
         # Attach stable blop trial IDs and cache suggested parameterizations by ID.
-        registered: Sequence[Mapping] = []
+        registered: list[dict] = []
         for suggestion in suggestions:
             trial_id = self._next_id
             self._next_id += 1

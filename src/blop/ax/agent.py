@@ -1,7 +1,7 @@
 """Agent interface for optimization with Ax as the backend."""
 
 import logging
-from collections.abc import Mapping, Sequence
+from collections.abc import Hashable, Mapping, Sequence
 from typing import Any, cast
 
 import bluesky.preprocessors as bpp
@@ -74,7 +74,7 @@ class _AxAgentMixin:
 
         self._optimizer.fixed_parameters = {dof.parameter_name: value for dof, value in fixed_dofs.items()}
 
-    def suggest(self, num_points: int = 1) -> list[dict]:
+    def suggest(self, num_points: int = 1) -> Sequence[Mapping]:
         """
         Get the next point(s) to evaluate in the search space.
 
@@ -90,13 +90,13 @@ class _AxAgentMixin:
 
         Returns
         -------
-        list[dict]
+        Sequence[Mapping]
             A list of dictionaries, each containing a parameterization of a point to
             evaluate next. Each dictionary includes an "_id" key for identification.
         """
         return self._optimizer.suggest(num_points)
 
-    def ingest(self, points: list[dict]) -> None:
+    def ingest(self, points: Sequence[Mapping]) -> None:
         """
         Ingest evaluation results into the optimizer.
 
@@ -105,7 +105,7 @@ class _AxAgentMixin:
 
         Parameters
         ----------
-        points : list[dict]
+        points : Sequence[Mapping]
             A list of dictionaries, each containing outcomes for a trial. For suggested
             points, include the "_id" key. For external data, include DOF names and
             objective values, and omit "_id".
@@ -119,7 +119,7 @@ class _AxAgentMixin:
         """
         self._optimizer.ingest(points)
 
-    def get_best_points(self) -> list[tuple[int, TParameterization, TOutcome]]:
+    def get_best_points(self) -> Sequence[tuple[int, TParameterization, TOutcome]]:
         """
         Get a list of the optimal points found during optimization.
 
@@ -128,7 +128,7 @@ class _AxAgentMixin:
 
         Returns
         -------
-        list[tuple[int, TParameterization, TOutcome]]
+        Sequence[tuple[int, TParameterization, TOutcome]]
             Each element in the list is a tuple of:
               - trial index (int)
               - parameter values (dict)
@@ -491,7 +491,9 @@ class Agent(_AxAgentMixin):
 
         yield from optimize_plan
 
-    def sample_suggestions(self, suggestions: list[dict]) -> MsgGenerator[tuple[str, list[dict], list[dict]]]:
+    def sample_suggestions(
+        self, suggestions: Sequence[Mapping]
+    ) -> MsgGenerator[tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]]:
         """
         Evaluate specific parameter combinations.
 
@@ -500,12 +502,12 @@ class Agent(_AxAgentMixin):
 
         Parameters
         ----------
-        suggestions : list[dict]
+        suggestions : Sequence[Mapping]
             Either optimizer suggestions (with "_id") or manual points (without "_id").
 
         Returns
         -------
-        tuple[str, list[dict], list[dict]]
+        tuple[str, Sequence[Mapping], Sequence[Mapping]]
             Bluesky run UID, suggestions with "_id", and outcomes.
 
         See Also

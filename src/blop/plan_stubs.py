@@ -1,7 +1,7 @@
 """Bluesky plan stubs for optimization."""
 
 from collections import defaultdict
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Hashable, Mapping, MutableMapping, Sequence
 from typing import Any, Literal
 
 import bluesky.plan_stubs as bps
@@ -21,7 +21,7 @@ def read_step(
     suggestions: Sequence[Mapping],
     outcomes: Sequence[Mapping],
     n_points: int,
-    readable_cache: dict[str, InferredReadable],
+    readable_cache: MutableMapping[str, InferredReadable],
 ) -> MsgGenerator[None]:
     """Plan stub to read the suggestions and outcomes of a single optimization step.
 
@@ -90,6 +90,8 @@ def read_step(
         )
     else:
         readable_cache[_SUGGESTION_IDS_KEY].update(sorted_sids)
+    # FIXME: Need to figure out how to handle Hashable type here, maybe only support
+    # for a stricter type? Hashable may be too broad here.
     if _BLUESKY_UID_KEY not in readable_cache:
         readable_cache[_BLUESKY_UID_KEY] = InferredReadable(
             _BLUESKY_UID_KEY, source=Source.ACQUISITION_UID, initial_value=uid
