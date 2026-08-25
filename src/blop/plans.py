@@ -274,7 +274,7 @@ def acquire_stub(
     sensors: Sequence[Sensor] | None,
     *,
     per_step: bp.PerStep | None = None,
-) -> MsgGenerator[tuple[Any, ...]]:
+) -> MsgGenerator[tuple[Hashable, ...]]:
     """
     Acquire data from suggestions and cache event-model documents in the shared store.
 
