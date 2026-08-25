@@ -154,12 +154,6 @@ def _validate_route_index(index: Sequence[int], num_points: int) -> list[int]:
     return route
 
 
-def _remove_longest_cycle_edge(cycle: Sequence[int], graph: nx.DiGraph) -> list[int]:
-    """Convert a Hamiltonian cycle into an open path by removing its longest edge."""
-    longest_edge_index = max(range(len(cycle) - 1), key=lambda index: graph[cycle[index]][cycle[index + 1]]["weight"])
-    return list(cycle[longest_edge_index + 1 : -1]) + list(cycle[: longest_edge_index + 1])
-
-
 def _get_route_index(points: np.ndarray, starting_point: np.ndarray | None = None) -> list[int]:
     num_suggestions = len(points)
     if num_suggestions < 2:
@@ -173,18 +167,14 @@ def _get_route_index(points: np.ndarray, starting_point: np.ndarray | None = Non
             d = np.sqrt(np.sum(np.square(i_point - j_point)))
             graph.add_edge(i, j, weight=d)
 
-    if starting_point is None:
-        cycle = nx.approximation.simulated_annealing_tsp(graph, init_cycle="greedy", seed=0)
-        index = _remove_longest_cycle_edge(cycle, graph)
-    else:
-        start_node = num_suggestions
-        for i, point in enumerate(points):
-            d = np.sqrt(np.sum(np.square(starting_point - point)))
-            graph.add_edge(start_node, i, weight=d)
-            graph.add_edge(i, start_node, weight=0.0)
+    anchor_node = num_suggestions
+    for i, point in enumerate(points):
+        d = 0.0 if starting_point is None else np.sqrt(np.sum(np.square(starting_point - point)))
+        graph.add_edge(anchor_node, i, weight=d)
+        graph.add_edge(i, anchor_node, weight=0.0)
 
-        cycle = nx.approximation.simulated_annealing_tsp(graph, init_cycle="greedy", source=start_node, seed=0)
-        index = list(cycle[1:-1])
+    cycle = nx.approximation.simulated_annealing_tsp(graph, init_cycle="greedy", source=anchor_node, seed=0)
+    index = list(cycle[1:-1])
 
     return _validate_route_index(index, num_suggestions)
 
