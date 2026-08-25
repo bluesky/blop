@@ -5,10 +5,10 @@ import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import plan
 
+from blop.plan_stubs import list_scan_in_run
 from blop.plans import (
     acquire_baseline,
     default_acquire,
-    default_in_run_acquire,
     optimize,
     optimize_in_run,
     optimize_step,
@@ -407,7 +407,7 @@ def test_optimize_in_run_defaults_to_ordered_suggestion_ids(RE):
     assert _as_list(optimization_data["acquisition_uid"]) == ["near", "far"]
 
 
-def test_default_in_run_acquire_allows_custom_per_step_streams(RE):
+def test_list_scan_in_run_allows_custom_per_step_streams(RE):
     def per_step(detectors, step, pos_cache):
         yield from bps.one_nd_step(detectors, step, pos_cache)
         yield from bps.trigger_and_read(detectors, name="monitor")
@@ -427,7 +427,7 @@ def test_default_in_run_acquire_allows_custom_per_step_streams(RE):
         actuators=[MovableSignal("x1", initial_value=-1.0)],
         sensors=[readable],
         evaluation_function=evaluation_function,
-        acquisition_plan=default_in_run_acquire,
+        acquisition_plan=list_scan_in_run,
     )
     callback, documents = _collect_documents()
     RE.subscribe(callback)
@@ -443,7 +443,7 @@ def test_default_in_run_acquire_allows_custom_per_step_streams(RE):
     assert len(events_by_stream["optimization"]) == 1
 
 
-def test_default_in_run_acquire_preserves_stage_lifecycle(RE):
+def test_list_scan_in_run_preserves_stage_lifecycle(RE):
     optimizer = MagicMock(spec=Optimizer)
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
     readable = StageableReadable("objective")
