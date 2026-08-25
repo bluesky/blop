@@ -522,6 +522,26 @@ def test_optimize_in_run_rejects_duplicate_suggestion_ids(RE):
     optimizer.ingest.assert_not_called()
 
 
+def test_optimize_in_run_registers_failures(RE):
+    class FaultAwareOptimizer(Optimizer, TrialFaultAware): ...
+
+    optimizer = MagicMock(spec=FaultAwareOptimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": "same"}, {"x1": 1.0, "_id": "same"}]
+    evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": "same"}])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+    )
+
+    with pytest.raises(ValueError, match="unique '_id'"):
+        RE(optimize_in_run(optimization_problem, n_points=2))
+
+    evaluation_function.assert_not_called()
+    optimizer.ingest.assert_not_called()
+
+
 def test_optimize_step_default(RE):
     optimizer = MagicMock(spec=Optimizer)
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
