@@ -1,7 +1,7 @@
 """Optimizer implementation using Xopt as the optimization backend."""
 
 import json
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from importlib import import_module
 from pathlib import Path
 from typing import Any
@@ -109,7 +109,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         data = self._generator.data
         return isinstance(data, pd.DataFrame) and not data.empty
 
-    def suggest(self, num_points: int | None = None) -> list[dict]:
+    def suggest(self, num_points: int | None = None) -> Sequence[Mapping]:
         """Suggested points to sample from the optimizer."""
         # Default to single-point suggestion when caller does not specify cardinality.
         if num_points is None:
@@ -125,7 +125,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             suggestions = self._generator.suggest(num_points)
         return self.register_suggestions(suggestions)
 
-    def register_suggestions(self, suggestions: list[dict]) -> list[dict]:
+    def register_suggestions(self, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """Register external suggestions with the optimizer."""
         # Attach stable blop trial IDs and cache suggested parameterizations by ID.
         registered: list[dict] = []
@@ -142,7 +142,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
 
         return registered
 
-    def ingest(self, points: list[dict]) -> None:
+    def ingest(self, points: Sequence[Mapping]) -> None:
         """Ingest outcomes into the optimizer."""
         if not points:
             return
@@ -198,7 +198,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
         if rows_to_append:
             self._generator.ingest(rows_to_append)
 
-    def register_failures(self, suggestions: list[dict]) -> None:
+    def register_failures(self, suggestions: Sequence[Mapping]) -> None:
         """Register failures with the optimizer."""
         # Remove failed suggestions from pending parameter cache.
         for suggestion in suggestions:
@@ -206,7 +206,7 @@ class XoptOptimizer(Optimizer, Checkpointable, CanRegisterSuggestions, TrialFaul
             if trial_id is not None:
                 self._params_by_id.pop(trial_id, None)
 
-    def get_best_points(self) -> list[tuple[int | str, Mapping, Mapping]]:
+    def get_best_points(self) -> Sequence[tuple[int | str, Mapping, Mapping]]:
         """Best points from the optimizer."""
         # Return no points when no data has been ingested.
         if not self._generator_has_data():

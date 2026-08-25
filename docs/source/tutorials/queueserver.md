@@ -203,16 +203,13 @@ sensors = ["himmel_det"]
 
 ## Writing the Evaluation Function
 
-The evaluation function is called each time a plan completes. It reads data from Tiled and computes the objective values. The function receives:
-
-- `uid`: the Bluesky run UID (use this to look up data in Tiled)
-- `suggestions`: the list of parameter dicts that were evaluated
-
-It must return a list of outcome dicts, each containing the objective value(s) and an `_id` matching the suggestion.
+The evaluation function is called each time a plan completes. Its general contract accepts a hashable acquisition identifier and a sequence of suggestion mappings, and returns a sequence of outcome mappings. The queueserver runner uses the Bluesky run UID as its acquisition identifier, so this evaluator validates that it received a string before looking up the run in Tiled. Each outcome must contain the objective value(s) and an `_id` matching the suggestion.
 
 Because the agent and the ZMQ-Tiled bridge are separate subscribers to the same ZMQ stream, there is a race condition: the agent may receive the stop document before the bridge has finished writing data to Tiled. The evaluation function should poll Tiled until both the run and the detector data are available.
 
 ```{code-cell} ipython3
+from collections.abc import Hashable, Mapping, Sequence
+
 import numpy as np
 from tiled.client.container import Container
 
@@ -251,7 +248,9 @@ class HimmelblauEvaluation:
             "The ZMQ-Tiled bridge may still be writing the run."
         )
 
-    def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
+    def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
+        if not isinstance(uid, str):
+            raise TypeError(f"HimmelblauEvaluation requires a Bluesky run UID string, got {uid!r}")
         run = self._wait_for_run(uid)
 
         # Read the detector values from the primary data stream

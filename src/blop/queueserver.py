@@ -14,7 +14,7 @@ a queueserver, rather than directly through a RunEngine.
 import logging
 import threading
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
 from concurrent.futures import Future
 from dataclasses import dataclass, field
 from typing import Any, Literal
@@ -213,7 +213,7 @@ class _OptimizationState:
     num_points: int = 1
     checkpoint_interval: int | None = None
     current_iteration: int = 0
-    current_suggestions: list[dict] = field(default_factory=list)
+    current_suggestions: Sequence[Mapping] = field(default_factory=list)
     current_uid: str | None = None
     uids: list[str] = field(default_factory=list)
 
@@ -337,7 +337,7 @@ class QueueserverOptimizationRunner:
             raise
         return future
 
-    def submit_suggestions(self, suggestions: list[dict]) -> Future[OptimizationResult]:
+    def submit_suggestions(self, suggestions: Sequence[Mapping]) -> Future[OptimizationResult]:
         """
         Manually submit suggestions to the queue.
 
@@ -345,7 +345,7 @@ class QueueserverOptimizationRunner:
 
         Parameters
         ----------
-        suggestions : list[dict]
+        suggestions : Sequence[Mapping]
             Parameter combinations to evaluate. Can be:
 
             - Optimizer suggestions (with "_id" keys from suggest())
@@ -415,7 +415,7 @@ class QueueserverOptimizationRunner:
         if self._current_future is not None and not self._current_future.done():
             self._current_future.set_exception(exc)
 
-    def _try_register_failures(self, suggestions: list[dict]) -> None:
+    def _try_register_failures(self, suggestions: Sequence[Mapping]) -> None:
         """Notify a TrialFaultAware optimizer of failed suggestions, if supported."""
         if suggestions and isinstance(self._problem.optimizer, TrialFaultAware):
             try:
@@ -430,7 +430,7 @@ class QueueserverOptimizationRunner:
             raise RuntimeError("Optimization loop is already running.")
         self._client.check_environment()
 
-    def _build_plan(self, suggestions: list[dict]) -> BPlan:
+    def _build_plan(self, suggestions: Sequence[Mapping]) -> BPlan:
         """LOCKED: Build the plan to submit and update current state."""
         if self._state is None:
             raise RuntimeError("_build_plan() called before run() or submit_suggestions()")

@@ -65,7 +65,9 @@
     motor_x = MovableSignal("motor_x")
     signal = ReadableSignal("signal")
 
-    def evaluation_function(uid: str, suggestions: list[dict]) -> list[dict]:
+    from collections.abc import Hashable, Mapping, Sequence
+
+    def evaluation_function(uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         outcomes = []
         for suggestion in suggestions:
             outcomes.append({

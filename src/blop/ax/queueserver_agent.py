@@ -193,7 +193,7 @@ class QueueserverAgent(_AxAgentMixin):
         """
         return self._runner.run(iterations=iterations, num_points=n_points, checkpoint_interval=checkpoint_interval)
 
-    def submit_suggestions(self, suggestions: list[dict]) -> Future[OptimizationResult]:
+    def submit_suggestions(self, suggestions: Sequence[Mapping]) -> Future[OptimizationResult]:
         """
         Evaluate specific parameter combinations.
 
@@ -202,7 +202,7 @@ class QueueserverAgent(_AxAgentMixin):
 
         Parameters
         ----------
-        suggestions : list[dict]
+        suggestions : Sequence[Mapping]
             Either optimizer suggestions (with "_id") or manual points (without "_id").
 
         Returns

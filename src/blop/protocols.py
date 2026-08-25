@@ -1,6 +1,6 @@
 """Protocols that bridge between optimizer backends and Bluesky."""
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Hashable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
@@ -43,19 +43,19 @@ class CanRegisterSuggestions(Protocol):
     that the suggestions are unique.
     """
 
-    def register_suggestions(self, suggestions: list[dict]) -> list[dict]:
+    def register_suggestions(self, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """
         Register the suggestions with the optimizer.
 
         Parameters
         ----------
-        suggestions: list[dict]
+        suggestions: Sequence[Mapping]
             The suggestions to register. The "_id" key is optional and will be overwritten if present.
 
         Returns
         -------
-        list[dict]
-            The original suggestions with an "_id" key added.
+        Sequence[Mapping]
+            The suggestions with an "_id" key added.
         """
         ...
 
@@ -69,13 +69,13 @@ class TrialFaultAware(Protocol):
     cleanup of processes not directly tied to the run engine
     """
 
-    def register_failures(self, suggestions: list[dict]) -> None:
+    def register_failures(self, suggestions: Sequence[Mapping]) -> None:
         """
         Register the failed suggestions with the optimizer.
 
         Parameters
         ----------
-        suggestions: list[dict]
+        suggestions: Sequence[Mapping]
             The suggestions to fail. Ids must be present.
         """
         ...
@@ -130,7 +130,7 @@ class Optimizer(Protocol):
     blop.ax.Agent : High-level interface that uses AxOptimizer internally.
     """
 
-    def suggest(self, num_points: int | None = None) -> list[dict]:
+    def suggest(self, num_points: int | None = None) -> Sequence[Mapping]:
         """
         Suggest a set of points in the input space, to be evaulated next.
 
@@ -144,13 +144,13 @@ class Optimizer(Protocol):
 
         Returns
         -------
-        list[dict]
-            A list of dictionaries, each containing a parameterization of a point to evaluate next.
-            Each dictionary must contain a unique "_id" key to identify each parameterization.
+        Sequence[Mapping]
+            A sequence of mappings, each containing a parameterization of a point to evaluate next.
+            Each mapping must contain a unique "_id" key to identify each parameterization.
         """
         ...
 
-    def ingest(self, points: list[dict]) -> None:
+    def ingest(self, points: Sequence[Mapping]) -> None:
         """
         Ingest a set of points into the experiment. Either from previously suggested points or from an external source.
 
@@ -159,22 +159,22 @@ class Optimizer(Protocol):
 
         Parameters
         ----------
-        points : list[dict]
-            A list of dictionaries, each containing the outcomes of each suggested parameterization.
+        points : Sequence[Mapping]
+            A sequence of mappings containing the outcomes of the evaluated parameterizations.
         """
         ...
 
-    def get_best_points(self) -> list[tuple[Any, Mapping, Mapping]]:
+    def get_best_points(self) -> Sequence[tuple[Any, Mapping, Mapping]]:
         """
-        Get a list of the optimal points found during optimization.
+        Get a sequence of the optimal points found during optimization.
 
         For single-objective optimization, returns a single best point.
         For multi-objective optimization, returns the Pareto-optimal set.
 
         Returns
         -------
-        list[tuple[Any, Mapping, Mapping]]
-            Each element in the list is a tuple of:
+        Sequence[tuple[Any, Mapping, Mapping]]
+            Each element is a tuple of:
               - "_id" of the suggestion
               - suggested parameters
               - measured outcomes
@@ -197,9 +197,9 @@ class EvaluationFunction(Protocol):
 
     Notes
     -----
-    The evaluation function is called after data acquisition to compute outcomes
-    from the acquired data. It should extract relevant data from the Bluesky run
-    and compute objective values and metrics for each suggestion.
+    The evaluation function is called after data acquisition to compute outcomes.
+    It uses the acquisition identifier returned by the acquisition plan to retrieve
+    the relevant data and computes objective values and metrics for each suggestion.
 
     Examples
     --------
@@ -207,22 +207,23 @@ class EvaluationFunction(Protocol):
     :doc:`/tutorials/simple-experiment`
     """
 
-    def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
+    def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """
-        Evaluate the data from a Bluesky run and produce outcomes.
+        Evaluate the acquired data and produce outcomes.
 
         Parameters
         ----------
-        uid: str
-            The unique identifier of the Bluesky run to evaluate.
-        suggestions: list[dict]
-            A list of dictionaries, each containing the parameterization of a point to evaluate.
+        uid: Hashable
+            The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,
+            a tuple of event UIDs, or another hashable lookup key.
+        suggestions: Sequence[Mapping]
+            A sequence of mappings, each containing the parameterization of a point to evaluate.
             The "_id" key is optional and can be used to identify each suggestion.
 
         Returns
         -------
-        list[dict]
-            A list of dictionaries containing the outcomes of the run, one for each suggested parameterization.
+        Sequence[Mapping]
+            A sequence of mappings containing the outcomes of the acquisition, one for each suggested parameterization.
             The "_id" key is optional and can be used to identify each outcome.
         """
         ...
@@ -246,41 +247,44 @@ class AcquisitionPlan(Protocol):
     Notes
     -----
     The acquisition plan is a Bluesky plan that should move the actuators to each
-    suggested position and acquire data from the sensors. It must return the UID
-    of the Bluesky run so that the evaluation function can retrieve the data.
+    suggested position, acquire data from the sensors, and return a hashable
+    identifier that the evaluation function can use to retrieve the acquired data.
     """
 
     @plan
     def __call__(
         self,
-        suggestions: list[dict],
+        suggestions: Sequence[Mapping],
         actuators: Sequence[Actuator],
         sensors: Sequence[Sensor] | None = None,
-        md: dict[str, Any] | None = None,
-    ) -> MsgGenerator[str]:
+        md: Mapping[str, Any] | None = None,
+    ) -> MsgGenerator[Hashable]:
         """
         Acquire data for optimization.
 
         This should be a Bluesky plan that moves the actuators to each of their suggested positions
-        and acquires data from the sensors.
+        and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition
+        but it is the responsibility of the implementer to ensure fetching the data during
+        evaluation is feasible.
 
         Parameters
         ----------
-        suggestions: list[dict]
-            A list of dictionaries, each containing the parameterization of a point to evaluate.
+        suggestions: Sequence[Mapping]
+            A sequence of mappings, each containing the parameterization of a point to evaluate.
             The "_id" key is optional and can be used to identify each suggestion. It is suggested
             to add "_id" values to the run metadata for later identification of the acquired data.
         actuators: Sequence[Actuator]
             The actuators to move to their suggested positions.
         sensors: Sequence[Sensor], optional
             The sensors that produce data to evaluate.
-        md : dict[str, Any] | None, optional
+        md : Mapping[str, Any] | None, optional
             Metadata to attach to the start document
 
         Returns
         -------
-        str
-            The unique identifier of the Bluesky run.
+        Hashable
+            The identifier passed unchanged to the evaluation function. Examples include a Bluesky run UID
+            or a tuple of event UIDs.
         """
         ...
 
@@ -325,7 +329,7 @@ class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionP
     sensors: Sequence[Sensor]
         Objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.
     evaluation_function: EvaluationFunction
-        A callable to evaluate data from a Bluesky run and produce outcomes.
+        A callable that uses an acquisition identifier to retrieve acquired data and produce outcomes.
     acquisition_plan: AcquisitionPlan, optional
         A Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.
 
@@ -359,7 +363,7 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
     sensors: Sequence[str]
         Names of objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.
     evaluation_function: EvaluationFunction
-        A callable to evaluate data from a Bluesky run and produce outcomes.
+        A callable that uses an acquisition identifier to retrieve acquired data and produce outcomes.
     acquisition_plan: str, optional
         The name of a Bluesky plan to acquire data. If not provided, a default plan name will be used.
         The plan must match the arguments of :class:`AcquisitionPlan`.

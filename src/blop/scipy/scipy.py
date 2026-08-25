@@ -208,7 +208,7 @@ class Scipy:
             acquisition_plan=self._acquisition_plan,
         )
 
-    def suggest(self, num_points: int = 1) -> list[dict]:
+    def suggest(self, num_points: int = 1) -> Sequence[Mapping]:
         """
         Get the next point(s) to evaluate in the search space.
 
@@ -224,13 +224,13 @@ class Scipy:
 
         Returns
         -------
-        list[dict]
-            A list of dictionaries, each containing a parameterization of a point to
-            evaluate next. Each dictionary includes an "_id" key for identification.
+        Sequence[Mapping]
+            A sequence of mappings, each containing a parameterization of a point to
+            evaluate next. Each mapping includes an "_id" key for identification.
         """
         return self.optimizer.suggest(num_points)
 
-    def ingest(self, points: list[dict]) -> None:
+    def ingest(self, points: Sequence[Mapping]) -> None:
         """
         Ingest evaluation results into the optimizer.
 
@@ -239,10 +239,10 @@ class Scipy:
 
         Parameters
         ----------
-        points : list[dict]
-            A list of dictionaries, each containing outcomes for a trial. For suggested
-            points, include the "_id" key. For external data, include DOF names and
-            objective values, and omit "_id".
+        points : Sequence[Mapping]
+            A sequence of mappings containing outcomes for a trial. For suggested points,
+            include the "_id" key. For external data, include DOF names and objective
+            values, and omit "_id".
 
         Notes
         -----

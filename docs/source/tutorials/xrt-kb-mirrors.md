@@ -141,9 +141,9 @@ Using a single objective with an outcome constraint gives us the best of both wo
 
 ## Writing an Evaluation Function
 
-The **evaluation function** is the bridge between raw experimental data and the optimizer. After each measurement, the optimizer needs to know how well that configuration performed. Our evaluation function:
+The **evaluation function** is the bridge between raw experimental data and the optimizer. After each measurement, the optimizer needs to know how well that configuration performed. The general interface receives a hashable acquisition identifier; this tutorial uses the default acquisition plan, so that identifier is a Bluesky run UID. Our evaluation function:
 
-1. Receives a run UID and the suggestions that were tested
+1. Validates the run UID and receives the suggestions that were tested
 1. Reads the beam images from Tiled
 1. Computes FWHM from the marginal beam profiles
 1. Returns outcome values for each suggestion
@@ -151,6 +151,8 @@ The **evaluation function** is the bridge between raw experimental data and the 
 We compute FWHM using **marginal profiles** — projecting the 2D image onto each axis by summing, then finding where the 1D profile crosses half its peak value. This approach is robust to noise and dead pixels (they get averaged out in the projection) and doesn't require curve fitting.
 
 ```{code-cell} ipython3
+from collections.abc import Hashable, Mapping, Sequence
+
 class DetectorEvaluation(EvaluationFunction):
     def __init__(self, tiled_client: Container):
         self.tiled_client = tiled_client
@@ -220,7 +222,9 @@ class DetectorEvaluation(EvaluationFunction):
 
         return float(fwhm), float(intensity)
 
-    def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
+    def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
+        if not isinstance(uid, str):
+            raise TypeError(f"DetectorEvaluation requires a Bluesky run UID string, got {uid!r}")
         outcomes = []
         run = self.tiled_client[uid]
 

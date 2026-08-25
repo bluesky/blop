@@ -25,6 +25,31 @@ def _test_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
     return "test-uid-123"
 
 
+@plan
+def _tuple_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+    """Acquisition plan that returns a tuple acquisition identifier."""
+    yield from bps.null()
+    return ("event-a", "event-b")
+
+
+class _CustomAcquisitionIdentifier:
+    def __hash__(self):
+        return 1
+
+    def __repr__(self):
+        return "CustomAcquisitionIdentifier()"
+
+
+_CUSTOM_ACQUISITION_IDENTIFIER = _CustomAcquisitionIdentifier()
+
+
+@plan
+def _custom_identifier_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+    """Acquisition plan that returns a custom hashable acquisition identifier."""
+    yield from bps.null()
+    return _CUSTOM_ACQUISITION_IDENTIFIER
+
+
 def _collect_optimize_events():
     """Return a callback and list that collect event docs from the outer optimize run."""
     events = []
@@ -74,12 +99,12 @@ def test_optimize(RE):
     assert len(events) == 1
     data = events[0]["data"]
     assert "suggestion_ids" in data
-    assert "bluesky_uid" in data
+    assert "acquisition_uid" in data
     assert "x1" in data
     assert "objective" in data
     assert data["x1"] == 0.0
     assert data["objective"] == 0.0
-    assert data["bluesky_uid"] and isinstance(data["bluesky_uid"], str)
+    assert data["acquisition_uid"] and isinstance(data["acquisition_uid"], str)
 
 
 def test_optimization_failure(RE):
@@ -140,7 +165,7 @@ def test_optimize_multiple(RE):
     for event in events:
         data = event["data"]
         assert "suggestion_ids" in data
-        assert "bluesky_uid" in data
+        assert "acquisition_uid" in data
         assert "x1" in data
         assert "objective" in data
         assert data["x1"] == 0.0
@@ -176,7 +201,7 @@ def test_optimize_multiple_with_n_points(RE):
     for event in events:
         data = event["data"]
         assert "suggestion_ids" in data
-        assert "bluesky_uid" in data
+        assert "acquisition_uid" in data
         assert "x1" in data
         assert "objective" in data
         sid = data["suggestion_ids"]
@@ -243,7 +268,7 @@ def test_optimize_complex_case(RE):
     for event in events:
         data = event["data"]
         assert "suggestion_ids" in data
-        assert "bluesky_uid" in data
+        assert "acquisition_uid" in data
         assert "x1" in data
         assert "x2" in data
         assert "x3" in data
@@ -255,7 +280,7 @@ def test_optimize_complex_case(RE):
         assert _to_list(data["objective1"]) == [0.0, 0.1]
         assert _to_list(data["objective2"]) == [0.1, 0.2]
         assert _to_list(data["suggestion_ids"]) == ["0", "1"]
-        assert data["bluesky_uid"] in uids
+        assert data["acquisition_uid"] in uids
 
 
 @pytest.mark.parametrize("checkpoint_interval", [0, 1, 2, 3])
@@ -335,15 +360,70 @@ def test_optimize_event_document_structure(RE):
 
     # Validate required fields from _read_step
     assert "suggestion_ids" in data
-    assert "bluesky_uid" in data
+    assert "acquisition_uid" in data
     assert "x1" in data
     assert "objective" in data
 
     # Validate predictable values from custom acquisition plan
-    assert data["bluesky_uid"] == "test-uid-123"
+    assert data["acquisition_uid"] == "test-uid-123"
     assert data["x1"] == 0.5
     assert data["objective"] == 1.25
     assert data["suggestion_ids"] == "0"
+
+
+def test_optimize_with_tuple_acquisition_identifier(RE):
+    """Pass tuple acquisition identifiers unchanged to evaluation and event data."""
+    suggestion = {"x1": 0.5, "_id": 0}
+    outcome = {"objective": 1.25, "_id": 0}
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [suggestion]
+    evaluation_function = MagicMock(spec=EvaluationFunction, return_value=[outcome])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=_tuple_acquisition_plan,
+    )
+
+    callback, events = _collect_optimize_events()
+    RE.subscribe(callback)
+    try:
+        RE(optimize(optimization_problem))
+    finally:
+        RE.unsubscribe(callback)
+
+    acquisition_identifier = ("event-a", "event-b")
+    evaluation_function.assert_called_once_with(acquisition_identifier, [suggestion])
+    assert len(events) == 1
+    assert events[0]["data"]["acquisition_uid"] == acquisition_identifier
+
+
+def test_optimize_with_custom_hashable_acquisition_identifier_uses_repr(RE):
+    """Store repr for hashable acquisition identifiers that are not native array-like values."""
+    suggestion = {"x1": 0.5, "_id": 0}
+    outcome = {"objective": 1.25, "_id": 0}
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [suggestion]
+    evaluation_function = MagicMock(spec=EvaluationFunction, return_value=[outcome])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=_custom_identifier_acquisition_plan,
+    )
+
+    callback, events = _collect_optimize_events()
+    RE.subscribe(callback)
+    try:
+        RE(optimize(optimization_problem))
+    finally:
+        RE.unsubscribe(callback)
+
+    evaluation_function.assert_called_once_with(_CUSTOM_ACQUISITION_IDENTIFIER, [suggestion])
+    assert len(events) == 1
+    assert events[0]["data"]["acquisition_uid"] == repr(_CUSTOM_ACQUISITION_IDENTIFIER)
 
 
 def test_optimize_step_custom_acquisition_plan(RE):

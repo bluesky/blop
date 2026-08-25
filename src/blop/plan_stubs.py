@@ -1,37 +1,60 @@
 """Bluesky plan stubs for optimization."""
 
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
-from typing import Any, Literal
+from collections.abc import Hashable, Mapping, MutableMapping, Sequence
+from typing import Any, Literal, cast
 
 import bluesky.plan_stubs as bps
 import numpy as np
 from bluesky.utils import MsgGenerator, plan
+from numpy.typing import ArrayLike
 
 from .protocols import ID_KEY, Actuator, Optimizer
 from .utils import InferredReadable, Source
 
-_BLUESKY_UID_KEY: Literal["bluesky_uid"] = "bluesky_uid"
+_ACQUISITION_UID_KEY: Literal["acquisition_uid"] = "acquisition_uid"
 _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
+
+
+def _is_array_like_identifier(uid: Hashable) -> bool:
+    try:
+        numpy_array = np.array(uid)
+    except (TypeError, ValueError):
+        return False
+    return numpy_array.dtype != object
+
+
+def _acquisition_identifier_value(uid: Hashable) -> ArrayLike:
+    """Convert a hashable acquisition identifier to an event-readable value."""
+    if _is_array_like_identifier(uid):
+        return cast(ArrayLike, uid)
+    return repr(uid)
 
 
 @plan
 def read_step(
-    uid: str, suggestions: list[dict], outcomes: list[dict], n_points: int, readable_cache: dict[str, InferredReadable]
+    uid: Hashable,
+    suggestions: Sequence[Mapping],
+    outcomes: Sequence[Mapping],
+    n_points: int,
+    readable_cache: MutableMapping[str, InferredReadable],
 ) -> MsgGenerator[None]:
     """Plan stub to read the suggestions and outcomes of a single optimization step.
 
     If fewer suggestions are returned than n_points arrays are padded to n_points length
     with np.nan to ensure consistent shapes for event-model specification.
 
+    The emitted ``acquisition_uid`` field retains native array-like identifiers.
+    Other hashable identifiers are represented by ``repr(uid)``.
+
     Parameters
     ----------
-    uid : str
-        The Bluesky run UID from the acquisition plan.
-    suggestions : list[dict]
-        List of suggestion dictionaries, each containing an ID_KEY.
-    outcomes : list[dict]
-        List of outcome dictionaries, each containing an ID_KEY matching suggestions.
+    uid : Hashable
+        The acquisition identifier returned by the acquisition plan.
+    suggestions : Sequence[Mapping]
+        Sequence of suggestion mappings, each containing an ID_KEY.
+    outcomes : Sequence[Mapping]
+        Sequence of outcome mappings, each containing an ID_KEY matching suggestions.
     n_points : int
         Expected number of suggestions. Arrays will be padded to this length if needed.
     readable_cache : dict[str, InferredReadable]
@@ -41,11 +64,11 @@ def read_step(
     suggestion_by_id = {}
     outcome_by_id = {}
     for suggestion in suggestions:
-        suggestion_copy = suggestion.copy()
+        suggestion_copy = dict(suggestion)
         key = str(suggestion_copy.pop(ID_KEY))
         suggestion_by_id[key] = suggestion_copy
     for outcome in outcomes:
-        outcome_copy = outcome.copy()
+        outcome_copy = dict(outcome)
         key = str(outcome_copy.pop(ID_KEY))
         outcome_by_id[key] = outcome_copy
     sids = {str(sid) for sid in suggestion_by_id.keys()}
@@ -86,12 +109,14 @@ def read_step(
         )
     else:
         readable_cache[_SUGGESTION_IDS_KEY].update(sorted_sids)
-    if _BLUESKY_UID_KEY not in readable_cache:
-        readable_cache[_BLUESKY_UID_KEY] = InferredReadable(
-            _BLUESKY_UID_KEY, source=Source.ACQUISITION_UID, initial_value=uid
+    # Need to normalize the value here since `Hashable` is very broad
+    normalized_uid = _acquisition_identifier_value(uid)
+    if _ACQUISITION_UID_KEY not in readable_cache:
+        readable_cache[_ACQUISITION_UID_KEY] = InferredReadable(
+            _ACQUISITION_UID_KEY, source=Source.ACQUISITION_UID, initial_value=normalized_uid
         )
     else:
-        readable_cache[_BLUESKY_UID_KEY].update(uid)
+        readable_cache[_ACQUISITION_UID_KEY].update(normalized_uid)
     for name, value in suggestions_flat.items():
         if name not in readable_cache:
             readable_cache[name] = InferredReadable(name, source=Source.PARAMETER, initial_value=value)
