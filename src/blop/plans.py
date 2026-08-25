@@ -158,11 +158,22 @@ def _suggestion_ids(suggestions: Sequence[Mapping]) -> tuple[Hashable, ...]:
     return tuple(cast(Hashable, suggestion[ID_KEY]) for suggestion in suggestions)
 
 
-def _reject_run_control_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
-    """Reject child-run lifecycle messages inside the optimize_in_run acquisition step."""
+def _drop_run_control_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
+    """Drop child-run messages while preserving hardware lifecycle messages."""
+
+    def _drop(msg: Any) -> Any | None:
+        if msg.command in {"open_run", "close_run"}:
+            return None
+        return msg
+
+    return (yield from bpp.msg_mutator(plan, _drop))
+
+
+def _reject_child_run_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
+    """Reject child-run messages inside the optimize_in_run acquisition step."""
 
     def _reject(msg: Any) -> Any:
-        if msg.command in {"open_run", "close_run", "stage", "unstage"}:
+        if msg.command in {"open_run", "close_run"}:
             raise ValueError(
                 "Custom optimize_in_run acquisition plans must not issue "
                 f"{msg.command!r}; they run inside Blop's enclosing optimization run."
@@ -304,7 +315,8 @@ def default_in_run_acquire(
     """Acquire suggestions inside an already-open Bluesky run.
 
     This plan moves through the suggestions, optionally reordering them for efficient motion,
-    and executes a Bluesky list scan without opening a child run.
+    and executes a Bluesky list scan without opening a child run. The list scan's stage and
+    unstage messages are preserved.
 
     Parameters
     ----------
@@ -351,13 +363,13 @@ def default_in_run_acquire(
     suggestion_ids = _suggestion_ids(suggestions)
     plan_args = _unpack_for_list_scan(suggestions, actuators)
     # TODO: fix argument type in bluesky.plans.list_scan
-    yield from bpp.stub_wrapper(
+    yield from _drop_run_control_messages(
         bp.list_scan(
             readables,
             *plan_args,  # type: ignore[arg-type]
             per_step=per_step,
             **kwargs,
-        ),
+        )
     )
 
     return suggestion_ids
@@ -416,7 +428,7 @@ def optimize_in_run(
             suggestions = optimizer.suggest(n_points)
             _validate_suggestions_have_ids(suggestions)
             try:
-                uid = yield from _reject_run_control_messages(
+                uid = yield from _reject_child_run_messages(
                     acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)
                 )
                 outcomes = optimization_problem.evaluation_function(uid, suggestions)

@@ -57,6 +57,21 @@ def _custom_identifier_acquisition_plan(suggestions, actuators, sensors, *args, 
     return _CUSTOM_ACQUISITION_IDENTIFIER
 
 
+class StageableReadable(ReadableSignal):
+    def __init__(self, name: str) -> None:
+        super().__init__(name)
+        self.stage_count = 0
+        self.unstage_count = 0
+
+    def stage(self):
+        self.stage_count += 1
+        return [self]
+
+    def unstage(self):
+        self.unstage_count += 1
+        return [self]
+
+
 def _collect_optimize_events():
     """Return a callback and list that collect event docs from the outer optimize run."""
     events = []
@@ -426,6 +441,23 @@ def test_default_in_run_acquire_allows_custom_per_step_streams(RE):
     assert len(events_by_stream["primary"]) == 2
     assert len(events_by_stream["monitor"]) == 4
     assert len(events_by_stream["optimization"]) == 1
+
+
+def test_default_in_run_acquire_preserves_stage_lifecycle(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    readable = StageableReadable("objective")
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[readable],
+        evaluation_function=MagicMock(return_value=[{"objective": 0.0, "_id": 0}]),
+    )
+
+    RE(optimize_in_run(optimization_problem))
+
+    assert readable.stage_count == 1
+    assert readable.unstage_count == 1
 
 
 def test_optimize_in_run_rejects_child_run_control(RE):
