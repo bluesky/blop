@@ -12,7 +12,7 @@ from numpy.typing import ArrayLike
 from .protocols import ID_KEY, Actuator, Optimizer
 from .utils import InferredReadable, Source
 
-_BLUESKY_UID_KEY: Literal["bluesky_uid"] = "bluesky_uid"
+_ACQUISITION_UID_KEY: Literal["acquisition_uid"] = "acquisition_uid"
 _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
 
 
@@ -47,7 +47,7 @@ def read_step(
     Parameters
     ----------
     uid : Hashable
-        The Bluesky run UID from the acquisition plan.
+        The acquisition identifier returned by the acquisition plan.
     suggestions : Sequence[Mapping]
         List of suggestion dictionaries, each containing an ID_KEY.
     outcomes : Sequence[Mapping]
@@ -108,12 +108,12 @@ def read_step(
         readable_cache[_SUGGESTION_IDS_KEY].update(sorted_sids)
     # Need to normalize the value here since `Hashable` is very broad
     normalized_uid = _acquisition_identifier_value(uid)
-    if _BLUESKY_UID_KEY not in readable_cache:
-        readable_cache[_BLUESKY_UID_KEY] = InferredReadable(
-            _BLUESKY_UID_KEY, source=Source.ACQUISITION_UID, initial_value=normalized_uid
+    if _ACQUISITION_UID_KEY not in readable_cache:
+        readable_cache[_ACQUISITION_UID_KEY] = InferredReadable(
+            _ACQUISITION_UID_KEY, source=Source.ACQUISITION_UID, initial_value=normalized_uid
         )
     else:
-        readable_cache[_BLUESKY_UID_KEY].update(normalized_uid)
+        readable_cache[_ACQUISITION_UID_KEY].update(normalized_uid)
     for name, value in suggestions_flat.items():
         if name not in readable_cache:
             readable_cache[name] = InferredReadable(name, source=Source.PARAMETER, initial_value=value)

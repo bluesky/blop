@@ -50,7 +50,7 @@ but the contents are optimization-focused.
     UIDs, and other values.
 
 ``event``
-    Per-step values such as ``suggestion_ids``, ``bluesky_uid``, parameter
+    Per-step values such as ``suggestion_ids``, ``acquisition_uid``, parameter
     values, and outcome values. For batched optimization, these values may be
     arrays.
 

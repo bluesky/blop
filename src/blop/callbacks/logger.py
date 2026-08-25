@@ -178,9 +178,9 @@ class OptimizationLogger(CallbackBase):
         param_columns: dict[str, list] = {k: _to_list(data[k]) for k in parameter_keys if k in data}
         outcome_columns: dict[str, list] = {k: _to_list(data[k]) for k in outcome_keys if k in data}
 
-        # Extract suggestion IDs and acquisition UID
+        # Extract suggestion IDs and acquisition identifier
         suggestion_ids = _to_list(data.get("suggestion_ids", []))
-        acquire_uid = data.get("bluesky_uid", "")
+        acquire_uid = data.get("acquisition_uid", "")
         # Scalar string comes through as-is; ensure it's a plain string
         if isinstance(acquire_uid, list):
             acquire_uid = acquire_uid[0] if acquire_uid else ""
