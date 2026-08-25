@@ -97,6 +97,8 @@ Configure an agent
 
 .. testcode::
 
+    from collections.abc import Hashable, Mapping, Sequence
+
     from blop.ax import Agent, RangeDOF, Objective
 
     dofs = [
@@ -108,7 +110,7 @@ Configure an agent
         Objective(name="objective1", minimize=False),
     ]
 
-    def evaluation_function(uid: str, suggestions: list[dict]) -> list[dict]:
+    def evaluation_function(uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """Replace this with your own evaluation function."""
         outcomes = []
         for suggestion in suggestions:

@@ -58,6 +58,9 @@ If you use a custom acquisition plan by implementing the :class:`blop.protocols.
 
 .. testcode::
 
+    from collections.abc import Hashable, Mapping, Sequence
+    from typing import Any
+
     import bluesky.plan_stubs as bps
     from bluesky.utils import MsgGenerator
     from bluesky.run_engine import RunEngine
@@ -66,8 +69,14 @@ If you use a custom acquisition plan by implementing the :class:`blop.protocols.
     from blop.ax import Agent, RangeDOF, Objective
     from blop.protocols import AcquisitionPlan, Actuator, Sensor
 
-    def custom_acquire(suggestions: list[dict], actuators: list[Actuator], sensors: list[Sensor]) -> MsgGenerator[str]:
+    def custom_acquire(
+        suggestions: Sequence[Mapping],
+        actuators: Sequence[Actuator],
+        sensors: Sequence[Sensor] | None = None,
+        md: Mapping[str, Any] | None = None,
+    ) -> MsgGenerator[Hashable]:
         assert actuators[0].name == "signal1"
+        assert sensors is not None
         assert sensors[0].name == "signal2"
         yield from bps.null()
         return "test-uid-123"

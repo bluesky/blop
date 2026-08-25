@@ -225,8 +225,8 @@ class Scipy:
         Returns
         -------
         Sequence[Mapping]
-            A list of dictionaries, each containing a parameterization of a point to
-            evaluate next. Each dictionary includes an "_id" key for identification.
+            A sequence of mappings, each containing a parameterization of a point to
+            evaluate next. Each mapping includes an "_id" key for identification.
         """
         return self.optimizer.suggest(num_points)
 
@@ -240,9 +240,9 @@ class Scipy:
         Parameters
         ----------
         points : Sequence[Mapping]
-            A list of dictionaries, each containing outcomes for a trial. For suggested
-            points, include the "_id" key. For external data, include DOF names and
-            objective values, and omit "_id".
+            A sequence of mappings containing outcomes for a trial. For suggested points,
+            include the "_id" key. For external data, include DOF names and objective
+            values, and omit "_id".
 
         Notes
         -----

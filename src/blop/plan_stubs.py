@@ -44,14 +44,17 @@ def read_step(
     If fewer suggestions are returned than n_points arrays are padded to n_points length
     with np.nan to ensure consistent shapes for event-model specification.
 
+    The emitted ``acquisition_uid`` field retains native array-like identifiers.
+    Other hashable identifiers are represented by ``repr(uid)``.
+
     Parameters
     ----------
     uid : Hashable
         The acquisition identifier returned by the acquisition plan.
     suggestions : Sequence[Mapping]
-        List of suggestion dictionaries, each containing an ID_KEY.
+        Sequence of suggestion mappings, each containing an ID_KEY.
     outcomes : Sequence[Mapping]
-        List of outcome dictionaries, each containing an ID_KEY matching suggestions.
+        Sequence of outcome mappings, each containing an ID_KEY matching suggestions.
     n_points : int
         Expected number of suggestions. Arrays will be padded to this length if needed.
     readable_cache : dict[str, InferredReadable]

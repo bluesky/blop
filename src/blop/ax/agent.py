@@ -91,8 +91,8 @@ class _AxAgentMixin:
         Returns
         -------
         Sequence[Mapping]
-            A list of dictionaries, each containing a parameterization of a point to
-            evaluate next. Each dictionary includes an "_id" key for identification.
+            A sequence of mappings, each containing a parameterization of a point to
+            evaluate next. Each mapping includes an "_id" key for identification.
         """
         return self._optimizer.suggest(num_points)
 
@@ -106,9 +106,9 @@ class _AxAgentMixin:
         Parameters
         ----------
         points : Sequence[Mapping]
-            A list of dictionaries, each containing outcomes for a trial. For suggested
-            points, include the "_id" key. For external data, include DOF names and
-            objective values, and omit "_id".
+            A sequence of mappings containing outcomes for a trial. For suggested points,
+            include the "_id" key. For external data, include DOF names and objective
+            values, and omit "_id".
 
         Notes
         -----
@@ -314,7 +314,7 @@ class Agent(_AxAgentMixin):
         sensors: Sequence[Sensor]
             Objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.
         evaluation_function: EvaluationFunction
-            A callable to evaluate data from a Bluesky run and produce outcomes.
+            A callable that uses an acquisition identifier to retrieve acquired data and produce outcomes.
         acquisition_plan: AcquisitionPlan, optional
             A Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.
         """
@@ -507,8 +507,8 @@ class Agent(_AxAgentMixin):
 
         Returns
         -------
-        tuple[str, Sequence[Mapping], Sequence[Mapping]]
-            Bluesky run UID, suggestions with "_id", and outcomes.
+        tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]
+            Acquisition identifier, suggestions with "_id", and outcomes.
 
         See Also
         --------

@@ -58,7 +58,7 @@ def default_acquire(
     Parameters
     ----------
     suggestions: Sequence[Mapping]
-        A list of dictionaries, each containing the parameterization of a point to evaluate.
+        A sequence of mappings, each containing the parameterization of a point to evaluate.
         The "_id" key is optional and can be used to identify each suggestion. It is suggested
         to add "_id" values to the run metadata for later identification of the acquired data.
     actuators: Sequence[Actuator]
@@ -128,8 +128,8 @@ def optimize_step(
 
     Returns
     -------
-    tuple[str, Sequence[Mapping], Sequence[Mapping]]
-        A tuple containing the uid, suggestions, and outcomes of the step.
+    tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]
+        The acquisition identifier, suggestions, and outcomes of the step.
     """
     if optimization_problem.acquisition_plan is None:
         acquisition_plan = default_acquire
@@ -268,7 +268,7 @@ def sample_suggestions(
     Returns
     -------
     uid : Hashable
-        Bluesky run UID.
+        The acquisition identifier returned by the acquisition plan.
     suggestions : Sequence[Mapping]
         Suggestions with "_id" keys.
     outcomes : Sequence[Mapping]

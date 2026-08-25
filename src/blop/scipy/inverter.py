@@ -137,8 +137,8 @@ class InteractiveOptimizer(Optimizer):
         Returns
         -------
         Sequence[Mapping]
-            A list of dictionaries, each containing a parameterization of a point to evaluate next.
-            Each dictionary must contain a unique "_id" key to identify each parameterization.
+            A sequence of mappings, each containing a parameterization of a point to evaluate next.
+            Each mapping must contain a unique "_id" key to identify each parameterization.
         """
         try:
             self.final = self.thread_monitor.result(timeout=0.01)
@@ -173,7 +173,7 @@ class InteractiveOptimizer(Optimizer):
         Parameters
         ----------
         points : Sequence[Mapping]
-            A list of dictionaries, each containing the outcomes of each suggested parameterization.
+            A sequence of mappings containing the outcomes of each suggested parameterization.
         """
         for res in points:
             y = res[self._objective.name]

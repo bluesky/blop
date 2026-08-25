@@ -84,6 +84,8 @@ Create DOFs and multiple objectives
 
 .. testcode::
 
+    from collections.abc import Hashable, Mapping, Sequence
+
     from blop.ax import RangeDOF, Objective
 
     motor_x = MovableSignal(name="motor_x")
@@ -102,7 +104,7 @@ Create DOFs and multiple objectives
         Objective(name="objective2", minimize=False),
     ]
 
-    def evaluation_function(uid: str, suggestions: list[dict]) -> list[dict]:
+    def evaluation_function(uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """Replace this with your own evaluation function."""
         outcomes = []
         for suggestion in suggestions:
