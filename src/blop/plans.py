@@ -1,7 +1,7 @@
 """Bluesky plans for optimization."""
 
 import logging
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Hashable, Mapping, MutableSequence, Sequence
 from typing import Any, Literal, cast
 
 import bluesky.plan_stubs as bps
@@ -116,7 +116,7 @@ def default_acquire(
     )
 
 
-def _validate_suggestions_have_ids(suggestions: list[dict]) -> None:
+def _validate_suggestions_have_ids(suggestions: Sequence[Mapping]) -> None:
     """Ensure every suggestion can be matched to an evaluated outcome."""
     if any(ID_KEY not in suggestion for suggestion in suggestions):
         raise ValueError(
@@ -125,7 +125,7 @@ def _validate_suggestions_have_ids(suggestions: list[dict]) -> None:
         )
 
 
-def _validate_outcomes_have_ids(outcomes: list[dict], suggestions: list[dict]) -> None:
+def _validate_outcomes_have_ids(outcomes: Sequence[Mapping], suggestions: Sequence[Mapping]) -> None:
     """Ensure every outcome can be matched to an optimizer suggestion."""
     if any(ID_KEY not in outcome for outcome in outcomes):
         raise ValueError(
@@ -179,83 +179,20 @@ def optimize_step(
     return uid, suggestions, outcomes
 
 
-class _InRunEvaluationCallback(CallbackBase):
-    """Evaluate in-run acquisition events when an optimization batch is complete."""
+class _DocumentCollector(CallbackBase):
+    """Collect event-model documents from a Bluesky run."""
 
     def __init__(
         self,
-        document_cache: DocumentCache | None = None,
+        document_cache: MutableSequence,
     ) -> None:
-        # Persistent arguments
         self._document_cache = document_cache
 
-        # State tracking
-        self._streams_observed: dict[str, str] = {}
-        self._uid = None
-        self._outcomes = None
-        self._active_suggestions = None
-        self._active_event_count = 0
-
-    @property
-    def run_uid(self) -> str:
-        if self._uid is None:
-            raise RuntimeError("No run is active.")
-        return self._uid
-
-    @property
-    def outcomes(self) -> list[dict]:
-        if self._outcomes is None:
-            raise RuntimeError("No outcomes are available yet.")
-        return self._outcomes
-
-    def set_ordered_suggestions(self, suggestions: list[dict]) -> None:
-        """Set the suggestions in the order that events will be emitted."""
-        self._active_suggestions = suggestions
-        self._active_event_count = 0
-
-    def start(self, doc: Mapping[str, Any]) -> None:
-        """Store the first enclosing optimization start document."""
-        if self._document_cache is not None:
-            self._document_cache.run_uid = doc["uid"]
-            self._document_cache.descriptors.clear()
-            self._document_cache.events.clear()
-            self._document_cache.suggested_events.clear()
-        # Reset state for new run
-        self._uid = doc["uid"]
-        self._active_event_count = 0
-        self._active_suggestions = None
-        self._streams_observed = {}
-        self._outcomes = None
-
-    def descriptor(self, doc: Mapping[str, Any]) -> None:
-        """Store every descriptor and keep active-batch descriptor documents."""
-        stream_uid = str(doc["uid"])
-        if self._document_cache is not None:
-            copied_doc = cast(EventDescriptor, dict(doc))
-            self._document_cache.descriptors[stream_uid] = copied_doc
-        self._streams_observed[stream_uid] = doc["name"]
-
-    def event(self, doc: Event) -> Event:
-        """Collect active-batch events and evaluate at the configured event offset."""
-        if self._active_suggestions is None:
-            raise RuntimeError(
-                "Missing call to 'set_ordered_suggestions' needed to register the active suggestions from the optimizer."
-            )
-        stream_name = self._streams_observed[doc["descriptor"]]
-        event_uid = doc["uid"]
-        if self._document_cache is not None:
-            copied_doc = cast(Event, dict(doc))
-            self._document_cache.events[event_uid] = copied_doc
-        if stream_name == self._primary_stream:
-            self._active_event_count += 1
-
-            # Cache the suggestion-event pair associated with this event
-            if self._document_cache is not None:
-                active_suggestion_idx = self._active_event_count - 1
-                suggestion_id = self._active_suggestions[active_suggestion_idx][ID_KEY]
-                self._document_cache.suggested_events.append((suggestion_id, event_uid))
-
-        return doc
+    def __call__(self, name: str, doc: dict, validate: bool = False) -> tuple[str, dict]:
+        if validate:
+            raise NotImplementedError("No document validation is implemented.")
+        self._document_cache.append((name, doc))
+        return (name, doc)
 
 
 @plan
@@ -339,8 +276,7 @@ def optimize_in_run(
     iterations: int = 1,
     n_points: int = 1,
     checkpoint_interval: int | None = None,
-    primary_stream: str = "primary",
-    document_cache: DocumentCache | None = None,
+    document_cache: MutableSequence | None = None,
     readable_cache: dict[str, InferredReadable] | None = None,
     **kwargs: Any,
 ) -> MsgGenerator[None]:
@@ -358,8 +294,9 @@ def optimize_in_run(
         The number of iterations between optimizer checkpoints. If None, checkpoints
         will not be saved. Optimizer must implement the
         :class:`blop.protocols.Checkpointable` protocol.
-    primary_stream: str, optional
-        Acquisition stream name whose events count toward ``n_points``.
+    document_cache : MutableSequence | None, optional
+        A shared document cache that will be filled with event-model documents from the
+        acquisition plan during the Bluesky run.
     readable_cache: dict[str, InferredReadable] | None = None
         Cache of readable objects to store the suggestions and outcomes as optimization events.
         If None, a new cache will be created.
@@ -374,7 +311,6 @@ def optimize_in_run(
             "n_points": n_points,
             "checkpoint_interval": checkpoint_interval,
             "run_key": OPTIMIZE_IN_RUN_KEY,
-            "primary_stream": primary_stream,
             "optimization_stream": OPTIMIZE_IN_RUN_TRACKING_STREAM,
         }
     )
@@ -383,26 +319,22 @@ def optimize_in_run(
     optimizer = optimization_problem.optimizer
     actuators = optimization_problem.actuators
     acquisition_plan = optimization_problem.acquisition_plan or default_acquire
-    callback = _InRunEvaluationCallback(
-        optimization_problem.evaluation_function,
-        optimizer,
-        primary_stream,
-        document_cache,
-    )
+    if document_cache is not None:
+        callback = _DocumentCollector(document_cache)
+    else:
+        callback = None
 
     def _use_optimize_in_run_key(msg: Any) -> Any:
         if msg.run is None:
             return msg
         return msg._replace(run=OPTIMIZE_IN_RUN_KEY)
 
-    @bpp.subs_decorator(callback)
     @bpp.set_run_key_decorator(OPTIMIZE_IN_RUN_KEY)
     @bpp.run_decorator(md=_md)
     def _optimize_in_run() -> MsgGenerator[None]:
         for i in range(iterations):
             suggestions = optimizer.suggest(n_points)
             _validate_suggestions_have_ids(suggestions)
-            callback.set_ordered_suggestions(suggestions)
             try:
                 uid = yield from bpp.msg_mutator(
                     bpp.stub_wrapper(acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)),
@@ -418,7 +350,7 @@ def optimize_in_run(
 
             optimizer.ingest(outcomes)
             yield from read_step(
-                callback.run_uid,
+                uid,
                 suggestions,
                 outcomes,
                 n_points,
@@ -435,6 +367,8 @@ def optimize_in_run(
 
             _maybe_checkpoint(optimizer, checkpoint_interval, i)
 
+    if callback is not None:
+        return (yield from bpp.subs_wrapper(_optimize_in_run(), callback))
     return (yield from _optimize_in_run())
 
 

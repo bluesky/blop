@@ -230,28 +230,6 @@ class EvaluationFunction(Protocol):
         ...
 
 
-@dataclass
-class DocumentCache:
-    """In-memory Bluesky event documents for one in-run optimization evaluation batch.
-
-    Attributes
-    ----------
-    run_uid : str
-        UID of the enclosing optimization run.
-    descriptors : Mapping[str, Mapping[str, Any]]
-        Shallow copies of descriptors seen so far in the enclosing run, keyed by descriptor UID.
-    events : MutableMapping[str, MutableSequence[Event]]
-        Shallow copies of event documents seen so far in the enclosing run, keyed by event UID.
-    suggested_events : MutableSequence[tuple[Any, str]]
-        Pairing of the *active* suggestions and their event UID.
-    """
-
-    run_uid: str
-    descriptors: MutableMapping[str, EventDescriptor]
-    events: MutableMapping[str, Event]
-    suggested_events: MutableSequence[tuple[Any, str]]
-
-
 @runtime_checkable
 class AcquisitionPlan(Protocol):
     """
