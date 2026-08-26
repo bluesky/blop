@@ -2,6 +2,68 @@
 Release History
 ===============
 
+v1.1.0 (2026-08-26)
+-------------------
+
+Features
+........
+* **SciPy backend**: The new ``blop.scipy`` namespace provides Bluesky-compatible
+  wrappers for SciPy's local minimization, SHGO, and dual annealing routines
+  (`#339 <https://github.com/bluesky/blop/pull/339>`_).
+* **Global stopping criteria**: The new ``SupportsStoppingCriteria`` protocol allows an
+  optimizer to stop an optimization run early. ``Agent`` and ``AxOptimizer`` now accept
+  an Ax global stopping strategy directly
+  (`#337 <https://github.com/bluesky/blop/pull/337>`_,
+  `#338 <https://github.com/bluesky/blop/pull/338>`_,
+  `#341 <https://github.com/bluesky/blop/pull/341>`_).
+* **Queueserver checkpointing**: ``QueueserverAgent.run()`` and
+  ``QueueserverOptimizationRunner.run()`` now accept ``checkpoint_interval``. The checkpoint
+  path can also be set on an existing ``Agent`` or ``AxOptimizer``
+  (`#327 <https://github.com/bluesky/blop/pull/327>`_,
+  `#328 <https://github.com/bluesky/blop/pull/328>`_).
+* **Flexible string actuators**: Ax DOFs backed by a queueserver device string can now specify
+  a separate ``name``, supporting components whose queueserver path and device name differ
+  (`#346 <https://github.com/bluesky/blop/pull/346>`_).
+* **Generalized XRT simulations**: ``blop-sim`` can now construct arbitrary XRT beamlines from
+  XML descriptions and infer Bluesky-compatible motors and detectors
+  (`#317 <https://github.com/bluesky/blop/pull/317>`_).
+
+Compatibility Notes
+...................
+* **Optimization event identifier renamed**: The ``bluesky_uid`` field in optimization event
+  documents is now ``acquisition_uid``. Acquisition plans may return any hashable identifier,
+  rather than only a Bluesky run UID
+  (`#350 <https://github.com/bluesky/blop/pull/350>`_).
+* **Protocol signatures generalized**: Core protocol methods now use ``Sequence`` and
+  ``Mapping`` instead of concrete ``list`` and ``dict`` types, and evaluation functions receive
+  a ``Hashable`` acquisition identifier. Runtime behavior remains compatible, but custom
+  protocol implementations may need their annotations updated to satisfy static type checkers
+  (`#350 <https://github.com/bluesky/blop/pull/350>`_).
+
+Bug Fixes
+.........
+* Evaluation failures are now registered with fault-aware optimizers before the original
+  exception is re-raised, preventing failed suggestions from remaining pending
+  (`#355 <https://github.com/bluesky/blop/pull/355>`_).
+* Suggestion routing now guarantees that every suggested point is visited exactly once, fixing
+  edge cases that produced cycles and duplicate visits
+  (`#356 <https://github.com/bluesky/blop/pull/356>`_).
+* Queueserver submission now uses the manager's native autostart API and relies on its
+  allowed-device and allowed-plan validation, allowing remote errors to propagate correctly
+  (`#326 <https://github.com/bluesky/blop/pull/326>`_,
+  `#344 <https://github.com/bluesky/blop/pull/344>`_).
+
+Documentation and Development
+.............................
+* Added a how-to guide for configuring built-in and custom Ax stopping conditions
+  (`#342 <https://github.com/bluesky/blop/pull/342>`_).
+* Added a contributor guide and documented the project's review and merge policy
+  (`#331 <https://github.com/bluesky/blop/pull/331>`_).
+* Added a dedicated integration test suite and CI workflow for complete optimization runs
+  (`#349 <https://github.com/bluesky/blop/pull/349>`_).
+
+`Full Changelog <https://github.com/bluesky/blop/compare/v1.0.0...v1.1.0>`__
+
 v1.0.0 (2026-07-16)
 -------------------
 
