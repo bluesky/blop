@@ -85,7 +85,6 @@ def default_acquire(
     if len(readables) != len(sensors):
         logger.warning(f"Some sensors are not readable and will be ignored. Using only the readable sensors: {readables}")
 
-    print(f"IN default_acquire before re-ordering: {suggestions}")
     if len(suggestions) > 1:
         if all(isinstance(actuator, Readable) for actuator in actuators):
             current_position = yield from seq_read(cast(Sequence[Readable], actuators))
@@ -93,7 +92,6 @@ def default_acquire(
             current_position = None
         suggestions = route_suggestions(suggestions, starting_position=current_position)
 
-    print(f"IN default_acquire after re-ordering: {suggestions}")
     md = {"blop_suggestions": suggestions, "run_key": _DEFAULT_ACQUIRE_RUN_KEY}
     plan_args = _unpack_for_list_scan(suggestions, actuators)
     return (
