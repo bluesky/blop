@@ -143,13 +143,13 @@ def optimize_step(
     _validate_suggestions(suggestions)
     try:
         uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, *args, **kwargs)
+        evaluation_function: EvaluationFunction = optimization_problem.evaluation_function
+        outcomes = evaluation_function(uid, suggestions)
     except Exception:
         if isinstance(optimizer, TrialFaultAware):
             optimizer.register_failures(suggestions)
         raise
 
-    evaluation_function: EvaluationFunction = optimization_problem.evaluation_function
-    outcomes = evaluation_function(uid, suggestions)
     _validate_outcomes(outcomes, suggestions)
     optimizer.ingest(outcomes)
 

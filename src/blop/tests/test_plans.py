@@ -182,6 +182,28 @@ def test_optimization_failure(RE):
     assert evaluation_function.call_count == 0
 
 
+def test_evaluation_failure_registers_suggestions(RE):
+    class Alpha(Optimizer, TrialFaultAware): ...
+
+    suggestions = [{"x1": 0.0, "_id": 0}]
+    optimizer = MagicMock(spec=Alpha)
+    optimizer.suggest.return_value = suggestions
+    evaluation_function = MagicMock(spec=EvaluationFunction, side_effect=RuntimeError("evaluation failed"))
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=_test_acquisition_plan,
+    )
+
+    with pytest.raises(RuntimeError, match="evaluation failed"):
+        RE(optimize_step(optimization_problem))
+
+    optimizer.register_failures.assert_called_once_with(suggestions)
+    optimizer.ingest.assert_not_called()
+
+
 def test_optimize_multiple(RE):
     optimizer = MagicMock(spec=Optimizer)
     optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
