@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.plans &#8212; blop 1.0.1.dev23 documentation</title>
+    <title>blop.plans &#8212; blop 1.1.1.dev1 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=e27be153"></script>
+    <script src="../../_static/documentation_options.js?v=277d0e0d"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.0.1.dev23" />
+  <meta name="docsearch:version" content="1.1.1.dev1" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -890,6 +890,7 @@ window.runMermaid = runMermaid;</script>
     <span class="n">suggestions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">],</span>
     <span class="n">actuators</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Actuator</span><span class="p">],</span>
     <span class="n">sensors</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Sensor</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">md</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">per_step</span><span class="p">:</span> <span class="n">bp</span><span class="o">.</span><span class="n">PerStep</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
@@ -897,7 +898,7 @@ window.runMermaid = runMermaid;</script>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Acquire data for optimization. Simply a list scan.</span>
 
-<span class="sd">    Includes a default metadata key "blop_suggestion_ids" which can be used to identify</span>
+<span class="sd">    Includes a default metadata key "blop_suggestions" which can be used to identify</span>
 <span class="sd">    the suggestions that were acquired for each step of the scan.</span>
 
 <span class="sd">    Parameters</span>
@@ -910,6 +911,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        The actuators to move and the inputs to move them to.</span>
 <span class="sd">    sensors: Sequence[Sensor]</span>
 <span class="sd">        The sensors that produce data to evaluate.</span>
+<span class="sd">    md : Mapping[str, Any] | None, optional</span>
+<span class="sd">        Metadata to attach to the start document.</span>
 <span class="sd">    per_step: bp.PerStep | None, optional</span>
 <span class="sd">        The plan to execute for each step of the scan.</span>
 <span class="sd">    **kwargs: Any</span>
@@ -937,7 +940,8 @@ window.runMermaid = runMermaid;</script>
             <span class="n">current_position</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">suggestions</span> <span class="o">=</span> <span class="n">route_suggestions</span><span class="p">(</span><span class="n">suggestions</span><span class="p">,</span> <span class="n">starting_position</span><span class="o">=</span><span class="n">current_position</span><span class="p">)</span>
 
-    <span class="n">md</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"blop_suggestions"</span><span class="p">:</span> <span class="n">suggestions</span><span class="p">,</span> <span class="s2">"run_key"</span><span class="p">:</span> <span class="n">_DEFAULT_ACQUIRE_RUN_KEY</span><span class="p">}</span>
+    <span class="n">run_md</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">md</span> <span class="ow">or</span> <span class="p">{})</span>
+    <span class="n">run_md</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"blop_suggestions"</span><span class="p">:</span> <span class="n">suggestions</span><span class="p">,</span> <span class="s2">"run_key"</span><span class="p">:</span> <span class="n">_DEFAULT_ACQUIRE_RUN_KEY</span><span class="p">})</span>
     <span class="n">plan_args</span> <span class="o">=</span> <span class="n">_unpack_for_list_scan</span><span class="p">(</span><span class="n">suggestions</span><span class="p">,</span> <span class="n">actuators</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span>
         <span class="c1"># TODO: fix argument type in bluesky.plans.list_scan</span>
@@ -946,7 +950,7 @@ window.runMermaid = runMermaid;</script>
                 <span class="n">readables</span><span class="p">,</span>
                 <span class="o">*</span><span class="n">plan_args</span><span class="p">,</span>  <span class="c1"># type: ignore[arg-type]</span>
                 <span class="n">per_step</span><span class="o">=</span><span class="n">per_step</span><span class="p">,</span>
-                <span class="n">md</span><span class="o">=</span><span class="n">md</span><span class="p">,</span>
+                <span class="n">md</span><span class="o">=</span><span class="n">run_md</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="n">_DEFAULT_ACQUIRE_RUN_KEY</span><span class="p">,</span>
