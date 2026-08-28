@@ -45,6 +45,7 @@ def default_acquire(
     suggestions: Sequence[Mapping],
     actuators: Sequence[Actuator],
     sensors: Sequence[Sensor] | None = None,
+    md: Mapping[str, Any] | None = None,
     *,
     per_step: bp.PerStep | None = None,
     **kwargs: Any,
@@ -52,7 +53,7 @@ def default_acquire(
     """
     Acquire data for optimization. Simply a list scan.
 
-    Includes a default metadata key "blop_suggestion_ids" which can be used to identify
+    Includes a default metadata key "blop_suggestions" which can be used to identify
     the suggestions that were acquired for each step of the scan.
 
     Parameters
@@ -65,6 +66,8 @@ def default_acquire(
         The actuators to move and the inputs to move them to.
     sensors: Sequence[Sensor]
         The sensors that produce data to evaluate.
+    md : Mapping[str, Any] | None, optional
+        Metadata to attach to the start document.
     per_step: bp.PerStep | None, optional
         The plan to execute for each step of the scan.
     **kwargs: Any
@@ -92,7 +95,8 @@ def default_acquire(
             current_position = None
         suggestions = route_suggestions(suggestions, starting_position=current_position)
 
-    md = {"blop_suggestions": suggestions, "run_key": _DEFAULT_ACQUIRE_RUN_KEY}
+    run_md = dict(md or {})
+    run_md.update({"blop_suggestions": suggestions, "run_key": _DEFAULT_ACQUIRE_RUN_KEY})
     plan_args = _unpack_for_list_scan(suggestions, actuators)
     return (
         # TODO: fix argument type in bluesky.plans.list_scan
@@ -101,7 +105,7 @@ def default_acquire(
                 readables,
                 *plan_args,  # type: ignore[arg-type]
                 per_step=per_step,
-                md=md,
+                md=run_md,
                 **kwargs,
             ),
             _DEFAULT_ACQUIRE_RUN_KEY,
