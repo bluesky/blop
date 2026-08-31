@@ -22,6 +22,7 @@ def test_inferred_readable_scalar_string():
     r = InferredReadable("ids", Source.OTHER, ["0"])
     assert r.read()["ids"]["value"] == "0"
     assert r.describe()["ids"]["dtype"] == "string"
+    assert r.describe()["ids"]["dtype_numpy"] == "<U36"
 
 
 def test_inferred_readable_array():
