@@ -18,6 +18,7 @@ The package uses a component-based architecture with individual devices:
 
   - `SimpleBackend`: Mathematical Gaussian beam simulation
   - `XRTBackend`: Full ray-tracing simulation using XRT
+  - `XRTBIOXASBackend`: Simulation of the BioXAS Main beamline from the Canadian Light Source with XRT
 
 - **Devices**: Individual ophyd-async devices
 
@@ -27,3 +28,4 @@ The package uses a component-based architecture with individual devices:
   - Backend-specific (available in submodules):
     - `blop_sim.devices.simple.KBMirror`: KB mirror with jack positions (for SimpleBackend)
     - `blop_sim.devices.xrt.KBMirror`: KB mirror with curvature radius (for XRTBackend)
+    - `blop_sim.devices.xrt_bioxas.DBHR`: A DBHM with extraPitch and extraRoll (for XRTBIOXASBackend)

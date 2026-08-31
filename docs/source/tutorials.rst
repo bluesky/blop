@@ -9,3 +9,4 @@ Tutorials
    tutorials/queueserver.md
    tutorials/xrt-demo.md
    tutorials/xrt-kb-mirrors.md
+   tutorials/xrt-bioxas.md
