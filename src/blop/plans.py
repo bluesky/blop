@@ -2,6 +2,7 @@
 
 import logging
 from collections.abc import Hashable, Mapping, Sequence
+from itertools import count
 from typing import Any, Literal, cast
 
 import bluesky.plan_stubs as bps
@@ -168,7 +169,7 @@ def optimize_step(
 @plan
 def optimize(
     optimization_problem: OptimizationProblem,
-    iterations: int = 1,
+    iterations: int | None = 1,
     n_points: int = 1,
     checkpoint_interval: int | None = None,
     readable_cache: dict[str, InferredReadable] | None = None,
@@ -181,8 +182,10 @@ def optimize(
     ----------
     optimization_problem : OptimizationProblem
         The optimization problem to solve.
-    iterations : int, optional
-        The number of optimization iterations to run.
+    iterations : int | None, optional
+        The maximum number of optimization iterations to run. If None, run until
+        the optimizer's stopping criterion is met. An optimizer implementing
+        :class:`blop.protocols.SupportsStoppingCriteria` is required when None.
     n_points : int, optional
         The number of points to suggest per iteration.
     checkpoint_interval : int | None, optional
@@ -195,12 +198,22 @@ def optimize(
     **kwargs : Any
         Additional keyword arguments to pass to the :func:`optimize_step` plan.
 
+    Raises
+    ------
+    ValueError
+        If ``iterations`` is None and the optimizer does not implement
+        :class:`blop.protocols.SupportsStoppingCriteria`.
+
     See Also
     --------
     blop.protocols.OptimizationProblem : The problem to solve.
     blop.protocols.Checkpointable : The protocol for checkpointable objects.
     optimize_step : The plan to execute a single step of the optimization.
     """
+    optimizer = optimization_problem.optimizer
+    if iterations is None and not isinstance(optimizer, SupportsStoppingCriteria):
+        raise ValueError("iterations=None requires an optimizer that implements SupportsStoppingCriteria")
+
     # Cache to track readables created from suggestions and outcomes
     readable_cache = readable_cache or {}
 
@@ -219,12 +232,13 @@ def optimize(
     @bpp.set_run_key_decorator(OPTIMIZE_RUN_KEY)
     @bpp.run_decorator(md=_md)
     def _optimize() -> MsgGenerator[None]:
-        for i in range(iterations):
+        iteration_indices = count() if iterations is None else range(iterations)
+        for i in iteration_indices:
             # Perform a single step of the optimization
             uid, suggestions, outcomes = yield from optimize_step(optimization_problem, n_points, **kwargs)
 
-            if isinstance(optimization_problem.optimizer, SupportsStoppingCriteria):
-                stop_now, stop_reason = optimization_problem.optimizer.should_stop()
+            if isinstance(optimizer, SupportsStoppingCriteria):
+                stop_now, stop_reason = optimizer.should_stop()
                 if stop_now:
                     reason = stop_reason if stop_reason is not None else "No reason provided"
                     logger.info(f"Global stopping triggered at iteration {i + 1}: {reason}")
@@ -234,7 +248,7 @@ def optimize(
             yield from read_step(uid, suggestions, outcomes, n_points, readable_cache)
 
             # Possibly take a checkpoint of the optimizer state
-            _maybe_checkpoint(optimization_problem.optimizer, checkpoint_interval, i)
+            _maybe_checkpoint(optimizer, checkpoint_interval, i)
 
     # Start the optimization run
     return (yield from _optimize())

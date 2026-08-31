@@ -137,6 +137,16 @@ def test_event_scalar_data(logger, console):
     console.rule.assert_called_once()
 
 
+def test_event_without_iteration_limit_omits_total(logger, console):
+    """An unbounded optimization should not display a misleading total."""
+    logger.start(_make_start(iterations=None))
+    _setup_descriptor(logger)
+
+    logger.event(_make_event(data={"x": 1.5, "y": 3.14}))
+
+    console.rule.assert_called_once_with("Iteration 1", style="blue")
+
+
 def test_event_batch_data(logger, console):
     """Array-valued data (n_points > 1) should be handled without error."""
     _setup_descriptor(logger)

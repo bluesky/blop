@@ -40,3 +40,19 @@ Adding Stopping Conditions to the Agent
 ---------------------------------------
 
 The Agent can then be configured with an additional parameter, `stopping_strategy`, to use the custom stopping condition.
+
+To run until the stopping condition is met, pass ``iterations=None`` to
+:meth:`blop.ax.Agent.optimize`. Only use an unbounded run when the agent has a
+stopping strategy configured; otherwise the optimization has no termination
+condition.
+
+.. code-block:: python
+
+    agent = Agent(
+        ...,
+        stopping_strategy=CustomStoppingStrategy(),
+    )
+    RE(agent.optimize(iterations=None))
+
+A finite ``iterations`` value remains a maximum: the stopping strategy may end
+the run before that limit is reached.
