@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.ax.agent &#8212; blop 1.1.1.dev1 documentation</title>
+    <title>blop.ax.agent &#8212; blop 1.1.1.dev2 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../../_static/documentation_options.js?v=277d0e0d"></script>
+    <script src="../../../_static/documentation_options.js?v=10858467"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev1" />
+  <meta name="docsearch:version" content="1.1.1.dev2" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -1307,7 +1307,7 @@ window.runMermaid = runMermaid;</script>
 
 <div class="viewcode-block" id="Agent.optimize">
 <a class="viewcode-back" href="../../../reference/ax/agent.html#blop.ax.Agent.optimize">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Run Bayesian optimization.</span>
 
@@ -1317,9 +1317,10 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        iterations : int, optional</span>
-<span class="sd">            The number of optimization iterations to run. Default is 1. Each iteration</span>
-<span class="sd">            suggests, evaluates, and learns from n_points.</span>
+<span class="sd">        iterations : int | None, optional</span>
+<span class="sd">            The maximum number of optimization iterations to run. If None, run until</span>
+<span class="sd">            the configured stopping strategy's criterion is met. Default is 1. Each</span>
+<span class="sd">            iteration suggests, evaluates, and learns from n_points.</span>
 <span class="sd">        n_points : int, optional</span>
 <span class="sd">            The number of points to evaluate per iteration. Default is 1. Higher values</span>
 <span class="sd">            enable batch optimization but may reduce optimization efficiency per iteration.</span>
@@ -1328,6 +1329,11 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ------</span>
 <span class="sd">        Msg</span>
 <span class="sd">            Bluesky messages for the run engine.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If ``iterations`` is None and the optimizer does not support stopping criteria.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>

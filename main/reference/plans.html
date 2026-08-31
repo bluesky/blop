@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Plans &#8212; blop 1.1.1.dev1 documentation</title>
+    <title>Plans &#8212; blop 1.1.1.dev2 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=277d0e0d"></script>
+    <script src="../_static/documentation_options.js?v=10858467"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Xopt Optimizer" href="xopt/optimizer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev1" />
+  <meta name="docsearch:version" content="1.1.1.dev2" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -531,7 +531,9 @@
 <dd class="field-odd"><dl class="simple">
 <dt><strong>optimization_problem</strong><span class="classifier">OptimizationProblem</span></dt><dd><p>The optimization problem to solve.</p>
 </dd>
-<dt><strong>iterations</strong><span class="classifier">int, optional</span></dt><dd><p>The number of optimization iterations to run.</p>
+<dt><strong>iterations</strong><span class="classifier">int | None, optional</span></dt><dd><p>The maximum number of optimization iterations to run. If None, run until
+the optimizer’s stopping criterion is met. An optimizer implementing
+<code class="xref py py-class docutils literal notranslate"><span class="pre">blop.protocols.SupportsStoppingCriteria</span></code> is required when None.</p>
 </dd>
 <dt><strong>n_points</strong><span class="classifier">int, optional</span></dt><dd><p>The number of points to suggest per iteration.</p>
 </dd>
@@ -543,6 +545,13 @@ will not be saved. Optimizer must implement the
 If None, a new cache will be created.</p>
 </dd>
 <dt><strong>**kwargs</strong><span class="classifier">Any</span></dt><dd><p>Additional keyword arguments to pass to the <a class="reference internal" href="#blop.plans.optimize_step" title="blop.plans.optimize_step"><code class="xref py py-func docutils literal notranslate"><span class="pre">optimize_step()</span></code></a> plan.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ValueError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">iterations</span></code> is None and the optimizer does not implement
+<code class="xref py py-class docutils literal notranslate"><span class="pre">blop.protocols.SupportsStoppingCriteria</span></code>.</p>
 </dd>
 </dl>
 </dd>

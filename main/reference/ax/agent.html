@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Ax Agent &#8212; blop 1.1.1.dev1 documentation</title>
+    <title>Ax Agent &#8212; blop 1.1.1.dev2 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=277d0e0d"></script>
+    <script src="../../_static/documentation_options.js?v=10858467"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="API Reference" href="../../reference.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev1" />
+  <meta name="docsearch:version" content="1.1.1.dev2" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -748,8 +748,9 @@ with an agent.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>iterations</strong><span class="classifier">int, optional</span></dt><dd><p>The number of optimization iterations to run. Default is 1. Each iteration
-suggests, evaluates, and learns from n_points.</p>
+<dt><strong>iterations</strong><span class="classifier">int | None, optional</span></dt><dd><p>The maximum number of optimization iterations to run. If None, run until
+the configured stopping strategy’s criterion is met. Default is 1. Each
+iteration suggests, evaluates, and learns from n_points.</p>
 </dd>
 <dt><strong>n_points</strong><span class="classifier">int, optional</span></dt><dd><p>The number of points to evaluate per iteration. Default is 1. Higher values
 enable batch optimization but may reduce optimization efficiency per iteration.</p>
@@ -759,6 +760,12 @@ enable batch optimization but may reduce optimization efficiency per iteration.<
 <dt class="field-even">Yields<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt>Msg</dt><dd><p>Bluesky messages for the run engine.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>ValueError</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">iterations</span></code> is None and the optimizer does not support stopping criteria.</p>
 </dd>
 </dl>
 </dd>

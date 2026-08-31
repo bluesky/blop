@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.plans &#8212; blop 1.1.1.dev1 documentation</title>
+    <title>blop.plans &#8212; blop 1.1.1.dev2 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=277d0e0d"></script>
+    <script src="../../_static/documentation_options.js?v=10858467"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev1" />
+  <meta name="docsearch:version" content="1.1.1.dev2" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -845,6 +845,7 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">count</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">bluesky.plan_stubs</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">bps</span>
@@ -1019,7 +1020,7 @@ window.runMermaid = runMermaid;</script>
 <span class="nd">@plan</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">optimize</span><span class="p">(</span>
     <span class="n">optimization_problem</span><span class="p">:</span> <span class="n">OptimizationProblem</span><span class="p">,</span>
-    <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">n_points</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="n">checkpoint_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">readable_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">InferredReadable</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1032,8 +1033,10 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    ----------</span>
 <span class="sd">    optimization_problem : OptimizationProblem</span>
 <span class="sd">        The optimization problem to solve.</span>
-<span class="sd">    iterations : int, optional</span>
-<span class="sd">        The number of optimization iterations to run.</span>
+<span class="sd">    iterations : int | None, optional</span>
+<span class="sd">        The maximum number of optimization iterations to run. If None, run until</span>
+<span class="sd">        the optimizer's stopping criterion is met. An optimizer implementing</span>
+<span class="sd">        :class:`blop.protocols.SupportsStoppingCriteria` is required when None.</span>
 <span class="sd">    n_points : int, optional</span>
 <span class="sd">        The number of points to suggest per iteration.</span>
 <span class="sd">    checkpoint_interval : int | None, optional</span>
@@ -1046,12 +1049,22 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    **kwargs : Any</span>
 <span class="sd">        Additional keyword arguments to pass to the :func:`optimize_step` plan.</span>
 
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If ``iterations`` is None and the optimizer does not implement</span>
+<span class="sd">        :class:`blop.protocols.SupportsStoppingCriteria`.</span>
+
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
 <span class="sd">    blop.protocols.OptimizationProblem : The problem to solve.</span>
 <span class="sd">    blop.protocols.Checkpointable : The protocol for checkpointable objects.</span>
 <span class="sd">    optimize_step : The plan to execute a single step of the optimization.</span>
 <span class="sd">    """</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span>
+    <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">SupportsStoppingCriteria</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"iterations=None requires an optimizer that implements SupportsStoppingCriteria"</span><span class="p">)</span>
+
     <span class="c1"># Cache to track readables created from suggestions and outcomes</span>
     <span class="n">readable_cache</span> <span class="o">=</span> <span class="n">readable_cache</span> <span class="ow">or</span> <span class="p">{}</span>
 
@@ -1070,12 +1083,13 @@ window.runMermaid = runMermaid;</script>
     <span class="nd">@bpp</span><span class="o">.</span><span class="n">set_run_key_decorator</span><span class="p">(</span><span class="n">OPTIMIZE_RUN_KEY</span><span class="p">)</span>
     <span class="nd">@bpp</span><span class="o">.</span><span class="n">run_decorator</span><span class="p">(</span><span class="n">md</span><span class="o">=</span><span class="n">_md</span><span class="p">)</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_optimize</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">MsgGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">]:</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">):</span>
+        <span class="n">iteration_indices</span> <span class="o">=</span> <span class="n">count</span><span class="p">()</span> <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">range</span><span class="p">(</span><span class="n">iterations</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">iteration_indices</span><span class="p">:</span>
             <span class="c1"># Perform a single step of the optimization</span>
             <span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">,</span> <span class="n">outcomes</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">optimize_step</span><span class="p">(</span><span class="n">optimization_problem</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">SupportsStoppingCriteria</span><span class="p">):</span>
-                <span class="n">stop_now</span><span class="p">,</span> <span class="n">stop_reason</span> <span class="o">=</span> <span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">should_stop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">SupportsStoppingCriteria</span><span class="p">):</span>
+                <span class="n">stop_now</span><span class="p">,</span> <span class="n">stop_reason</span> <span class="o">=</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">should_stop</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">stop_now</span><span class="p">:</span>
                     <span class="n">reason</span> <span class="o">=</span> <span class="n">stop_reason</span> <span class="k">if</span> <span class="n">stop_reason</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">"No reason provided"</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Global stopping triggered at iteration </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -1085,7 +1099,7 @@ window.runMermaid = runMermaid;</script>
             <span class="k">yield from</span> <span class="n">read_step</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">,</span> <span class="n">outcomes</span><span class="p">,</span> <span class="n">n_points</span><span class="p">,</span> <span class="n">readable_cache</span><span class="p">)</span>
 
             <span class="c1"># Possibly take a checkpoint of the optimizer state</span>
-            <span class="n">_maybe_checkpoint</span><span class="p">(</span><span class="n">optimization_problem</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">_maybe_checkpoint</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
 
     <span class="c1"># Start the optimization run</span>
     <span class="k">return</span> <span class="p">(</span><span class="k">yield from</span> <span class="n">_optimize</span><span class="p">())</span></div>

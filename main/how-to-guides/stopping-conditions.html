@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Set Stopping Conditions &#8212; blop 1.1.1.dev1 documentation</title>
+    <title>Set Stopping Conditions &#8212; blop 1.1.1.dev2 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=277d0e0d"></script>
+    <script src="../_static/documentation_options.js?v=10858467"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Set outcome constraints" href="set-outcome-constraints.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev1" />
+  <meta name="docsearch:version" content="1.1.1.dev2" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -553,6 +553,19 @@ These conditions can be a variety of methods such as meeting a certain toleratio
 <section id="adding-stopping-conditions-to-the-agent">
 <h2>Adding Stopping Conditions to the Agent<a class="headerlink" href="#adding-stopping-conditions-to-the-agent" title="Link to this heading">#</a></h2>
 <p>The Agent can then be configured with an additional parameter, <cite>stopping_strategy</cite>, to use the custom stopping condition.</p>
+<p>To run until the stopping condition is met, pass <code class="docutils literal notranslate"><span class="pre">iterations=None</span></code> to
+<a class="reference internal" href="../reference/ax/agent.html#blop.ax.Agent.optimize" title="blop.ax.Agent.optimize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">blop.ax.Agent.optimize()</span></code></a>. Only use an unbounded run when the agent has a
+stopping strategy configured; otherwise the optimization has no termination
+condition.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">agent</span> <span class="o">=</span> <span class="n">Agent</span><span class="p">(</span>
+    <span class="o">...</span><span class="p">,</span>
+    <span class="n">stopping_strategy</span><span class="o">=</span><span class="n">CustomStoppingStrategy</span><span class="p">(),</span>
+<span class="p">)</span>
+<span class="n">RE</span><span class="p">(</span><span class="n">agent</span><span class="o">.</span><span class="n">optimize</span><span class="p">(</span><span class="n">iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>A finite <code class="docutils literal notranslate"><span class="pre">iterations</span></code> value remains a maximum: the stopping strategy may end
+the run before that limit is reached.</p>
 </section>
 </section>
 

@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.callbacks.logger &#8212; blop 1.1.1.dev1 documentation</title>
+    <title>blop.callbacks.logger &#8212; blop 1.1.1.dev2 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../../_static/documentation_options.js?v=277d0e0d"></script>
+    <script src="../../../_static/documentation_options.js?v=10858467"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -418,7 +418,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev1" />
+  <meta name="docsearch:version" content="1.1.1.dev2" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -930,7 +930,7 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_console</span> <span class="o">=</span> <span class="n">console</span> <span class="ow">or</span> <span class="n">Console</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_keys</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Source</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RunningStats</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -949,8 +949,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">sensors</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sensors"</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">run_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"uid"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">iterations</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">+</span> <span class="n">iterations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">+</span> <span class="n">iterations</span>
 
         <span class="c1"># Build the header content</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="n">Text</span><span class="p">()</span>
@@ -962,11 +961,15 @@ window.runMermaid = runMermaid;</script>
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sensors</span><span class="p">)</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">sensors</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'N/A'</span><span class="si">}</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Iterations "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Until stopping criterion"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">" (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2"> completed)"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2"> more (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2"> completed, "</span><span class="p">)</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2"> total)"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2">"</span> <span class="k">if</span> <span class="n">iterations</span> <span class="k">else</span> <span class="s2">"?"</span><span class="p">)</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">n_points</span> <span class="ow">and</span> <span class="n">n_points</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  "</span><span class="p">)</span>
@@ -1054,7 +1057,9 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_stats</span><span class="p">(</span><span class="n">outcome_columns</span><span class="p">,</span> <span class="n">valid_indices</span><span class="p">)</span>
 
         <span class="c1"># Iteration header rule</span>
-        <span class="n">iter_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Iteration </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">iter_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Iteration </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2">"</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">iter_label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" / </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2">"</span>
         <span class="k">if</span> <span class="n">n_valid</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">iter_label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"  (</span><span class="si">{</span><span class="n">n_valid</span><span class="si">}</span><span class="s2"> points)"</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">iter_label</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_ITERATION_RULE_STYLE</span><span class="p">)</span>
