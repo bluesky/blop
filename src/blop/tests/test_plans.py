@@ -612,6 +612,47 @@ def test_acquire_baseline_from_current(RE):
     assert evaluation_function.call_count == 1
 
 
+def test_optimize_without_iteration_limit_stops_at_criterion(RE):
+    """Run until the configured stopping criterion is met when no iteration limit is set."""
+
+    class StoppingOptimizer(Optimizer, SupportsStoppingCriteria): ...
+
+    optimizer = MagicMock(spec=StoppingOptimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    optimizer.should_stop.side_effect = [
+        (False, None),
+        (False, None),
+        (True, "converged"),
+    ]
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1")],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=MagicMock(spec=EvaluationFunction, return_value=[{"objective": 0.0, "_id": 0}]),
+    )
+
+    RE(optimize(optimization_problem, iterations=None))
+
+    assert optimizer.suggest.call_count == 3
+    assert optimizer.should_stop.call_count == 3
+
+
+def test_optimize_without_iteration_limit_requires_stopping_criteria(RE):
+    """Reject an unbounded optimization that has no stopping criterion."""
+    optimizer = MagicMock(spec=Optimizer)
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1")],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=MagicMock(spec=EvaluationFunction),
+    )
+
+    with pytest.raises(ValueError, match="iterations=None requires an optimizer that implements SupportsStoppingCriteria"):
+        RE(optimize(optimization_problem, iterations=None))
+
+    optimizer.suggest.assert_not_called()
+
+
 def test_optimize_max_number_of_iterations_before_stop(RE):
     """Tests that the optimization stops at a set number of iterations"""
 

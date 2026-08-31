@@ -85,7 +85,7 @@ class OptimizationLogger(CallbackBase):
         self._console = console or Console()
         self._data_keys: dict = {}
         self._sorted_data_keys_by_source: dict[Source, list[str]] = {}
-        self._total_iterations = 0
+        self._total_iterations: int | None = 0
         self._current_iteration = 0
         self._stats: dict[str, RunningStats] = {}
 
@@ -102,8 +102,7 @@ class OptimizationLogger(CallbackBase):
         sensors = doc.get("sensors", [])
         run_uid = doc.get("uid", "")
 
-        if iterations:
-            self._total_iterations = self._current_iteration + iterations
+        self._total_iterations = None if iterations is None else self._current_iteration + iterations
 
         # Build the header content
         lines = Text()
@@ -115,11 +114,15 @@ class OptimizationLogger(CallbackBase):
         lines.append(f"{', '.join(sensors) if sensors else 'N/A'}\n")
         lines.append("Iterations ", style=_DIM_STYLE)
 
-        if self._current_iteration > 0:
+        if iterations is None:
+            lines.append("Until stopping criterion")
+            if self._current_iteration > 0:
+                lines.append(f" ({self._current_iteration} completed)")
+        elif self._current_iteration > 0:
             lines.append(f"{iterations} more ({self._current_iteration} completed, ")
             lines.append(f"{self._total_iterations} total)")
         else:
-            lines.append(f"{iterations}" if iterations else "?")
+            lines.append(f"{iterations}")
 
         if n_points and n_points > 1:
             lines.append("  ")
@@ -201,7 +204,9 @@ class OptimizationLogger(CallbackBase):
         self._update_stats(outcome_columns, valid_indices)
 
         # Iteration header rule
-        iter_label = f"Iteration {self._current_iteration} / {self._total_iterations}"
+        iter_label = f"Iteration {self._current_iteration}"
+        if self._total_iterations is not None:
+            iter_label += f" / {self._total_iterations}"
         if n_valid > 1:
             iter_label += f"  ({n_valid} points)"
         self._console.rule(iter_label, style=_ITERATION_RULE_STYLE)
