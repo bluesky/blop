@@ -129,20 +129,20 @@ class Himmelblau2DEvaluation():
             raise TypeError(f"Himmelblau2DEvaluation requires a Bluesky run UID string, got {uid!r}")
         run = self.tiled_client[uid]
         outcomes = []
-        reordered_suggestions = run.start["blop_suggestions"]
+        acquisition_order = run.start["blop_acquisition_order"]
+        suggestions_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
         x1_data = run["primary/x1"].read()
         x2_data = run["primary/x2"].read()
 
-        print("[Himmelblau] evaluating suggestions: ", [s["_id"] for s in suggestions], " reordered to: ", [s["_id"] for s in reordered_suggestions])
-        for index, suggestion in enumerate(reordered_suggestions):
-            # Special key to identify a suggestion
-            suggestion_id = suggestion["_id"]
+        print("[Himmelblau] evaluating suggestions: ", list(suggestions_by_id), " acquired in order: ", acquisition_order)
+        for index, suggestion_id in enumerate(acquisition_order):
+            suggestion = suggestions_by_id[suggestion_id]
             x1 = x1_data[index]
             x2 = x2_data[index]
             # Himmelblau function: has four global minima where value = 0
             outcomes.append({
                 "himmelblau_2d": (x1 ** 2 + x2 - 11) ** 2 + (x1 + x2 ** 2 - 7) ** 2,
-                "_id": suggestion_id
+                "_id": suggestion["_id"]
             })
         
         return outcomes

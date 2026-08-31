@@ -89,12 +89,13 @@ To access the data for optimization, you have to connect to a Tiled server insta
 Data Storage with Blop's Default Plans
 ---------------------------------------
 
-Blop provides a default acquisition plan (:func:`blop.plans.default_acquire`) that handle data acquisition. This plan:
+Blop provides a default acquisition plan (:func:`blop.plans.default_acquire`) that handles data acquisition. This plan:
 
 - Uses the **"primary" stream** to store all acquired data
-- Includes a default metadata key **blop_suggestions** which contains all of the suggestions (and their identifiers)
+- Includes **blop_acquisition_order** metadata containing suggestion IDs in acquired row order
+- Includes **blop_suggestions** metadata containing the routed suggestions for backwards compatibility
 
-When a custom acquisition plan is used, how the data is stored depends on the plan implementation. 
+When a custom acquisition plan is used, how the data is stored depends on the plan implementation.
 
 Creating an Evaluation Function
 --------------------------------
@@ -124,13 +125,15 @@ Here's an example evaluation function that reads data from Tiled for where all d
             if not isinstance(uid, str):
                 raise TypeError(f"TiledEvaluation requires a Bluesky run UID string, got {uid!r}")
             run = self.tiled_client[uid]
-            
+            acquisition_order = run.start["blop_acquisition_order"]
+            suggestions_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
+
             # Extract data columns
             motor_x_data = run["primary/motor_x"].read()
             outcomes = []
-            for suggestion in suggestions:
-                suggestion_id = suggestion["_id"]
-                motor_x = motor_x_data[suggestion_id % len(motor_x_data)]
+            for index, suggestion_id in enumerate(acquisition_order):
+                suggestion = suggestions_by_id[suggestion_id]
+                motor_x = motor_x_data[index]
                 outcome = {
                     "_id": suggestion["_id"],
                     "objective1": 0.1 * motor_x,

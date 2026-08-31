@@ -157,7 +157,7 @@ def default_acquire(suggestions, actuators, sensors, *, md=None):
         plan_args.append(actuator)
         plan_args.append(values)
 
-    _md = {"blop_suggestions": suggestions}
+    _md = {"blop_suggestions": suggestions, "blop_acquisition_order": [s["_id"] for s in suggestions]}
     if md:
         _md.update(md)
 
@@ -256,8 +256,11 @@ class HimmelblauEvaluation:
         # Read the detector values from the primary data stream
         himmel_values = self._wait_for_detector_data(run, "primary/himmel_det")
 
+        acquisition_order = run.metadata["start"]["blop_acquisition_order"]
+        suggestions_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
         outcomes = []
-        for idx, suggestion in enumerate(suggestions):
+        for idx, suggestion_id in enumerate(acquisition_order):
+            suggestion = suggestions_by_id[suggestion_id]
             outcomes.append({
                 "_id": suggestion["_id"],
                 "himmelblau": float(himmel_values[idx]),

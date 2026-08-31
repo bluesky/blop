@@ -201,16 +201,18 @@ class DetectorEvaluation(EvaluationFunction):
         # Read beam images from detector
         images = run[f"primary/{screen.name}"].read()
 
-        # Suggestion IDs stored in start document metadata
-        suggestion_ids = [suggestion["_id"] for suggestion in run.metadata["start"]["blop_suggestions"]]
+        # Match acquired images to the original suggestions by ID
+        acquisition_order = run.metadata["start"]["blop_acquisition_order"]
+        suggestions_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
 
         # Compute statistics from each image
-        for idx, sid in enumerate(suggestion_ids):
+        for idx, suggestion_id in enumerate(acquisition_order):
+            suggestion = suggestions_by_id[suggestion_id]
             image = images[idx]
             fwhm, intensity = self._compute_stats(image)
 
             outcome = {
-                "_id": sid,
+                "_id": suggestion["_id"],
                 "fwhm": fwhm,
                 # "intensity": intensity,
             }

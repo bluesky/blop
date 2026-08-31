@@ -39,8 +39,9 @@ A typical implementation is shown below:
             #
             # Typical responsibilities include:
             #   - Retrieving the data associated with the identifier
-            #   - Iterating over individual suggestions in the acquisition
-            #       - found in a run's start document under "blop_suggestions" when using default_acquire
+            #   - Matching each acquired sample to the suggestions argument
+            #       - IDs are stored in acquisition order under "blop_acquisition_order"
+            #         in the run's start document when using default_acquire
             #   - Constructing a per-suggestion analysis context
             #   - Calling a lower-level objective function for each sample or suggestion
 

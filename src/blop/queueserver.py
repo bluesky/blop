@@ -443,6 +443,7 @@ class QueueserverOptimizationRunner:
         md: dict[str, Any] = {
             CORRELATION_UID_KEY: self._state.current_uid,
             "blop_suggestions": self._state.current_suggestions,
+            "blop_acquisition_order": [suggestion[ID_KEY] for suggestion in self._state.current_suggestions],
         }
 
         return BPlan(

@@ -285,6 +285,20 @@ def test_runner_run_submits_suggestions_to_queueserver():
     assert not future.done()
 
 
+def test_runner_includes_acquisition_order_metadata(mock_optimization_problem):
+    """Submit suggestion IDs in the acquisition plan metadata."""
+    mock_client = MagicMock(spec=QueueserverClient)
+    runner = QueueserverOptimizationRunner(
+        optimization_problem=mock_optimization_problem,
+        queueserver_client=mock_client,
+    )
+
+    runner.run(iterations=1, num_points=1)
+    submitted_plan = mock_client.submit_plan.call_args[0][0]
+    assert submitted_plan.kwargs["md"]["blop_suggestions"] == mock_optimization_problem.optimizer.suggest.return_value
+    assert submitted_plan.kwargs["md"]["blop_acquisition_order"] == [0]
+
+
 def test_runner_run_passes_acquisition_plan_kwargs_to_bplan():
     """Test that acquisition_plan_kwargs are forwarded to the submitted BPlan."""
     mock_client = MagicMock(spec=QueueserverClient)
