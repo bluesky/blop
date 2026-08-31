@@ -37,7 +37,10 @@ def _maybe_checkpoint(optimizer: Optimizer, checkpoint_interval: int | None, ite
 def _infer_data_key(source: Source, value: ArrayLike) -> DataKey:
     """Infer the data key from the provided value."""
     numpy_array = np.array(value)
-    dtype_numpy = numpy_array.dtype.str
+    # Descriptions are cached across updates, so reserve enough space for UUIDs.
+    dtype_numpy = (
+        np.promote_types(numpy_array.dtype, np.dtype("<U36")).str if numpy_array.dtype.kind == "U" else numpy_array.dtype.str
+    )
     if len(numpy_array.shape) > 1 or (len(numpy_array.shape) == 1 and numpy_array.shape[0] > 1):
         dtype = "array"
         shape = list(numpy_array.shape)
