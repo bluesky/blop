@@ -240,6 +240,11 @@ def optimize_in_run(
 ) -> MsgGenerator[None]:
     """Solve an optimization problem by evaluating acquisition documents inside one run.
 
+    .. warning::
+
+        This plan is **experimental**. Its API is not yet stable and may change in
+        future releases without a deprecation period.
+
     Parameters
     ----------
     optimization_problem : OptimizationProblem

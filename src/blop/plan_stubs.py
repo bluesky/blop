@@ -239,6 +239,11 @@ def list_scan_in_run(
     and executes a Bluesky list scan without opening a child run. The list scan's stage and
     unstage messages are preserved.
 
+    .. warning::
+
+        The single-run optimization API is **experimental**. This plan may change in
+        future releases without a deprecation period.
+
     Parameters
     ----------
     suggestions : Sequence[Mapping]
