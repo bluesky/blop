@@ -23,7 +23,9 @@ translates optimization variables into the corresponding physical operations.
 The trade-off is that the custom plan becomes responsible for maintaining the
 association between optimizer suggestions and the acquired data within the
 chosen storage or event system, for example by storing suggestion IDs in
-acquisition order in the run metadata.
+actual acquisition order in the run metadata. The evaluator's ``suggestions``
+sequence is not an acquisition-order contract and must not be assumed to
+preserve the optimizer's generation order.
 
 The plan must return a hashable acquisition identifier. Blop passes that value
 unchanged to the evaluation function. A Bluesky run UID is the usual identifier,
@@ -62,8 +64,9 @@ coordinate schemes to keep default acquire's convenience. Just remember that
 systems like Tiled will report your converted coordinates in their suggestion 
 history during evaluation.
 
-``default_acquire`` also records those IDs under ``blop_acquisition_order`` so
-the evaluator can associate each acquired row with the original suggestion.
+``default_acquire`` records IDs in actual scan order under ``blop_acquisition_order``.
+Evaluators must use this ID sequence, not positions in ``suggestions``, to associate
+acquired rows. Custom plans that reorder points must record an equivalent sequence themselves.
 
 
 Virtual Coordinate Systems

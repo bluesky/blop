@@ -54,7 +54,8 @@ def default_acquire(
     Acquire data for optimization. Simply a list scan.
 
     Includes ``"blop_suggestions"`` metadata containing the routed suggestions for
-    backwards compatibility and ``"blop_acquisition_order"`` containing their IDs in scan order.
+    backwards compatibility and ``"blop_acquisition_order"`` containing IDs in actual scan order.
+    Use those IDs, rather than positions in ``suggestions``, to associate acquired rows.
 
     Parameters
     ----------

@@ -115,7 +115,7 @@ sensors = []
 
 ## Writing the evaluation function
 
-The **evaluation function** computes objective values from experimental data. Blop passes it the hashable identifier returned by the acquisition plan and the suggestions that were tried. This tutorial uses the default acquisition plan, so the identifier is a Bluesky run UID.
+The **evaluation function** computes objective values from experimental data. Blop passes it the hashable identifier returned by the acquisition plan and the suggestions that were tried. Suggestions are optional analysis context; do not assume their sequence matches acquired data or preserves optimizer generation order. This tutorial uses the default acquisition plan, so the identifier is a Bluesky run UID and `blop_acquisition_order` associates measurements with outcomes.
 
 ```{code-cell} ipython3
 from collections.abc import Hashable, Mapping, Sequence
@@ -130,19 +130,17 @@ class Himmelblau2DEvaluation():
         run = self.tiled_client[uid]
         outcomes = []
         acquisition_order = run.start["blop_acquisition_order"]
-        suggestions_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
         x1_data = run["primary/x1"].read()
         x2_data = run["primary/x2"].read()
 
-        print("[Himmelblau] evaluating suggestions: ", list(suggestions_by_id), " acquired in order: ", acquisition_order)
+        print("[Himmelblau] evaluating acquired order: ", acquisition_order)
         for index, suggestion_id in enumerate(acquisition_order):
-            suggestion = suggestions_by_id[suggestion_id]
             x1 = x1_data[index]
             x2 = x2_data[index]
             # Himmelblau function: has four global minima where value = 0
             outcomes.append({
                 "himmelblau_2d": (x1 ** 2 + x2 - 11) ** 2 + (x1 + x2 ** 2 - 7) ** 2,
-                "_id": suggestion["_id"]
+                "_id": suggestion_id
             })
         
         return outcomes

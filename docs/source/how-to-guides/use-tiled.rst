@@ -92,8 +92,12 @@ Data Storage with Blop's Default Plans
 Blop provides a default acquisition plan (:func:`blop.plans.default_acquire`) that handles data acquisition. This plan:
 
 - Uses the **"primary" stream** to store all acquired data
-- Includes **blop_acquisition_order** metadata containing suggestion IDs in acquired row order
+- Includes **blop_acquisition_order** metadata containing suggestion IDs in actual acquired-row order
 - Includes **blop_suggestions** metadata containing the routed suggestions for backwards compatibility
+
+The evaluator's ``suggestions`` sequence is optional context. Do not use its
+positions to align primary rows or infer an optimizer generation order; use
+``blop_acquisition_order`` instead.
 
 When a custom acquisition plan is used, how the data is stored depends on the plan implementation.
 
@@ -126,16 +130,15 @@ Here's an example evaluation function that reads data from Tiled for where all d
                 raise TypeError(f"TiledEvaluation requires a Bluesky run UID string, got {uid!r}")
             run = self.tiled_client[uid]
             acquisition_order = run.start["blop_acquisition_order"]
-            suggestions_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
 
+            # These IDs, not positions in suggestions, align the primary rows.
             # Extract data columns
             motor_x_data = run["primary/motor_x"].read()
             outcomes = []
             for index, suggestion_id in enumerate(acquisition_order):
-                suggestion = suggestions_by_id[suggestion_id]
                 motor_x = motor_x_data[index]
                 outcome = {
-                    "_id": suggestion["_id"],
+                    "_id": suggestion_id,
                     "objective1": 0.1 * motor_x,
                 }
                 outcomes.append(outcome)

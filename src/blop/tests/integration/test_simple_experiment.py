@@ -25,19 +25,15 @@ class HimmelblauEvaluation:
         self.uids.append(uid)
         run = self.tiled_client[uid]
         acquisition_order = run.start["blop_acquisition_order"]
-        suggestions_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
         x1_data = run["primary/x1"].read()
         x2_data = run["primary/x2"].read()
 
-        assert set(acquisition_order) == set(suggestions_by_id)
-
         outcomes = []
         for index, suggestion_id in enumerate(acquisition_order):
-            suggestion = suggestions_by_id[suggestion_id]
             x1 = x1_data[index]
             x2 = x2_data[index]
             value = (x1**2 + x2 - 11) ** 2 + (x1 + x2**2 - 7) ** 2
-            outcomes.append({"_id": suggestion["_id"], "himmelblau_2d": value})
+            outcomes.append({"_id": suggestion_id, "himmelblau_2d": value})
 
         self.outcomes.extend(outcomes)
         return outcomes

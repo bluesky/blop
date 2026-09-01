@@ -522,7 +522,7 @@ def test_default_acquire_merges_metadata(RE):
 
 
 def test_default_acquire_records_acquisition_order(RE):
-    """Store suggestion IDs in the order used by the scan."""
+    """Record IDs in scan order rather than incoming suggestion order."""
     movable = MovableSignal("x1", initial_value=-1.0)
     readable = ReadableSignal("objective")
     suggestions = [{"x1": 10.0, "_id": "far"}, {"x1": 0.0, "_id": "near"}]

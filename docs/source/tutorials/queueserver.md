@@ -157,6 +157,8 @@ def default_acquire(suggestions, actuators, sensors, *, md=None):
         plan_args.append(actuator)
         plan_args.append(values)
 
+    # This plan scans the input sequence in order. Plans that reorder points must
+    # construct this ID list after reordering.
     _md = {"blop_suggestions": suggestions, "blop_acquisition_order": [s["_id"] for s in suggestions]}
     if md:
         _md.update(md)
@@ -203,7 +205,7 @@ sensors = ["himmel_det"]
 
 ## Writing the Evaluation Function
 
-The evaluation function is called each time a plan completes. Its general contract accepts a hashable acquisition identifier and a sequence of suggestion mappings, and returns a sequence of outcome mappings. The queueserver runner uses the Bluesky run UID as its acquisition identifier, so this evaluator validates that it received a string before looking up the run in Tiled. Each outcome must contain the objective value(s) and an `_id` matching the suggestion.
+The evaluation function is called each time a plan completes. Its general contract accepts a hashable acquisition identifier and a sequence of suggestion mappings, and returns a sequence of outcome mappings. Suggestions are optional analysis context; do not assume their sequence matches acquired data or preserves optimizer generation order. This evaluator uses `blop_acquisition_order` to align detector values with their IDs. The queueserver runner uses the Bluesky run UID as its acquisition identifier, so this evaluator validates that it received a string before looking up the run in Tiled. Each outcome must contain the objective value(s) and an `_id` from that acquisition order.
 
 Because the agent and the ZMQ-Tiled bridge are separate subscribers to the same ZMQ stream, there is a race condition: the agent may receive the stop document before the bridge has finished writing data to Tiled. The evaluation function should poll Tiled until both the run and the detector data are available.
 
@@ -257,12 +259,10 @@ class HimmelblauEvaluation:
         himmel_values = self._wait_for_detector_data(run, "primary/himmel_det")
 
         acquisition_order = run.metadata["start"]["blop_acquisition_order"]
-        suggestions_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
         outcomes = []
         for idx, suggestion_id in enumerate(acquisition_order):
-            suggestion = suggestions_by_id[suggestion_id]
             outcomes.append({
-                "_id": suggestion["_id"],
+                "_id": suggestion_id,
                 "himmelblau": float(himmel_values[idx]),
             })
 

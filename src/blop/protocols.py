@@ -198,8 +198,9 @@ class EvaluationFunction(Protocol):
     Notes
     -----
     The evaluation function is called after data acquisition to compute outcomes.
-    It uses the acquisition identifier returned by the acquisition plan to retrieve
-    the relevant data and computes objective values and metrics for each suggestion.
+    Use the acquisition identifier to retrieve data and associate each row with a
+    suggestion by its ``"_id"``. The order of ``suggestions`` is not an
+    acquisition-order or optimizer-order contract.
 
     Examples
     --------
@@ -217,14 +218,16 @@ class EvaluationFunction(Protocol):
             The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,
             a tuple of event UIDs, or another hashable lookup key.
         suggestions: Sequence[Mapping]
-            A sequence of mappings, each containing the parameterization of a point to evaluate.
-            The "_id" key is optional and can be used to identify each suggestion.
+            A sequence of mappings, each containing a parameterization to evaluate.
+            Each mapping must contain a unique ``"_id"``. Do not assume its order
+            aligns with acquired data or preserves optimizer generation order.
 
         Returns
         -------
         Sequence[Mapping]
-            A sequence of mappings containing the outcomes of the acquisition, one for each suggested parameterization.
-            The "_id" key is optional and can be used to identify each outcome.
+            A sequence of mappings containing the outcomes of the acquisition, one for each
+            suggested parameterization. Each mapping must contain an ``"_id"`` identifying
+            its evaluated suggestion.
         """
         ...
 
@@ -249,6 +252,7 @@ class AcquisitionPlan(Protocol):
     The acquisition plan is a Bluesky plan that should move the actuators to each
     suggested position, acquire data from the sensors, and return a hashable
     identifier that the evaluation function can use to retrieve the acquired data.
+    When it may reorder points, it must record their IDs in actual acquisition order.
     """
 
     @plan
@@ -262,17 +266,17 @@ class AcquisitionPlan(Protocol):
         """
         Acquire data for optimization.
 
-        This should be a Bluesky plan that moves the actuators to each of their suggested positions
-        and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition
-        but it is the responsibility of the implementer to ensure fetching the data during
-        evaluation is feasible.
+        This should be a Bluesky plan that moves the actuators to each suggested position
+        and acquires data from the sensors. Its input sequence is not an acquisition-order
+        contract. If it records data in a different order, it must store each row's
+        ``"_id"`` in actual acquisition order (for example, under ``"blop_acquisition_order"``).
 
         Parameters
         ----------
         suggestions: Sequence[Mapping]
-            A sequence of mappings, each containing the parameterization of a point to evaluate.
-            The "_id" key is optional and can be used to identify each suggestion. It is suggested
-            to add "_id" values to the run metadata for later identification of the acquired data.
+            A sequence of mappings, each containing a parameterization to evaluate.
+            Each mapping must contain a unique ``"_id"``. Do not assume its order
+            matches acquisition order or preserves optimizer generation order.
         actuators: Sequence[Actuator]
             The actuators to move to their suggested positions.
         sensors: Sequence[Sensor], optional

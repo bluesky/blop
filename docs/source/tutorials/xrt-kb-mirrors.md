@@ -231,18 +231,16 @@ class DetectorEvaluation(EvaluationFunction):
         # Read beam images from detector
         images = run["primary/det_image"].read()
 
-        # Match acquired images to the original suggestions by ID
+        # These IDs, not positions in suggestions, are ordered to match acquired images.
         acquisition_order = run.metadata["start"]["blop_acquisition_order"]
-        suggestions_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
 
         # Compute statistics from each image
         for idx, suggestion_id in enumerate(acquisition_order):
-            suggestion = suggestions_by_id[suggestion_id]
             image = images[idx]
             fwhm, intensity = self._compute_stats(image)
 
             outcome = {
-                "_id": suggestion["_id"],
+                "_id": suggestion_id,
                 "fwhm": fwhm,
                 "intensity": intensity,
             }
