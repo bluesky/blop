@@ -5,40 +5,40 @@ from collections.abc import Hashable, Mapping, Sequence
 from itertools import count
 from typing import Any, Literal, cast
 
-import bluesky.plan_stubs as bps
 import bluesky.plans as bp
 import bluesky.preprocessors as bpp
 from bluesky.protocols import Readable
 from bluesky.utils import MsgGenerator, plan
 
-from .plan_stubs import read_step
+from .plan_stubs import list_scan_in_run, read_step, seq_read
 from .protocols import (
     ID_KEY,
     Actuator,
     CanRegisterSuggestions,
+    EvaluationFunction,
     OptimizationProblem,
     Sensor,
     SupportsStoppingCriteria,
     TrialFaultAware,
 )
-from .utils import InferredReadable, _maybe_checkpoint, collect_optimization_metadata, route_suggestions
+from .utils import (
+    InferredReadable,
+    _maybe_checkpoint,
+    _reject_child_run_messages,
+    _unpack_for_list_scan,
+    _validate_outcomes,
+    _validate_suggestions,
+    collect_optimization_metadata,
+    route_suggestions,
+)
 
 logger = logging.getLogger(__name__)
 
 _DEFAULT_ACQUIRE_RUN_KEY: Literal["default_acquire"] = "default_acquire"
 SAMPLE_SUGGESTIONS_RUN_KEY: Literal["sample_suggestions"] = "sample_suggestions"
 OPTIMIZE_RUN_KEY: Literal["optimize"] = "optimize"
-
-
-def _unpack_for_list_scan(suggestions: Sequence[Mapping], actuators: Sequence[Actuator]) -> list[Any]:
-    """Unpack the actuators and inputs into Bluesky list_scan plan arguments."""
-    actuators_and_inputs = {actuator: [suggestion[actuator.name] for suggestion in suggestions] for actuator in actuators}
-    unpacked_list = []
-    for actuator, values in actuators_and_inputs.items():
-        unpacked_list.append(actuator)
-        unpacked_list.append(values)
-
-    return unpacked_list
+OPTIMIZE_IN_RUN_KEY: Literal["optimize_in_run"] = "optimize_in_run"
+OPTIMIZE_IN_RUN_TRACKING_STREAM: Literal["optimization"] = "optimization"
 
 
 @plan
@@ -143,24 +143,17 @@ def optimize_step(
     optimizer = optimization_problem.optimizer
     actuators = optimization_problem.actuators
     suggestions = optimizer.suggest(n_points)
-    if any(ID_KEY not in suggestion for suggestion in suggestions):
-        raise ValueError(
-            f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes. Please review your "
-            f"optimizer implementation. Got suggestions: {suggestions}"
-        )
+    _validate_suggestions(suggestions)
     try:
         uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, *args, **kwargs)
-        outcomes = optimization_problem.evaluation_function(uid, suggestions)
+        evaluation_function: EvaluationFunction = optimization_problem.evaluation_function
+        outcomes = evaluation_function(uid, suggestions)
     except Exception:
         if isinstance(optimizer, TrialFaultAware):
             optimizer.register_failures(suggestions)
         raise
 
-    if any(ID_KEY not in outcome for outcome in outcomes):
-        raise ValueError(
-            f"All outcomes must contain an '{ID_KEY}' key that matches with the suggestions. Please review your "
-            f"evaluation function. Got suggestions: {suggestions} and outcomes: {outcomes}"
-        )
+    _validate_outcomes(outcomes, suggestions)
     optimizer.ingest(outcomes)
 
     return uid, suggestions, outcomes
@@ -255,6 +248,98 @@ def optimize(
 
 
 @plan
+def optimize_in_run(
+    optimization_problem: OptimizationProblem,
+    iterations: int = 1,
+    n_points: int = 1,
+    checkpoint_interval: int | None = None,
+    readable_cache: dict[str, InferredReadable] | None = None,
+    **kwargs: Any,
+) -> MsgGenerator[None]:
+    """Solve an optimization problem by evaluating acquisition documents inside one run.
+
+    .. warning::
+
+        This plan is **experimental**. Its API is not yet stable and may change in
+        future releases without a deprecation period.
+
+    Parameters
+    ----------
+    optimization_problem : OptimizationProblem
+        The optimization problem to solve.
+    iterations : int, optional
+        The number of optimization iterations to run.
+    n_points : int, optional
+        The number of points to suggest per iteration.
+    checkpoint_interval : int | None, optional
+        The number of iterations between optimizer checkpoints. If None, checkpoints
+        will not be saved. Optimizer must implement the
+        :class:`blop.protocols.Checkpointable` protocol.
+    readable_cache: dict[str, InferredReadable] | None = None
+        Cache of readable objects to store the suggestions and outcomes as optimization events.
+        If None, a new cache will be created.
+    **kwargs : Any
+        Additional keyword arguments to pass to the acquisition plan.
+    """
+    _md = collect_optimization_metadata(optimization_problem)
+    _md.update(
+        {
+            "plan_name": "optimize_in_run",
+            "iterations": iterations,
+            "n_points": n_points,
+            "checkpoint_interval": checkpoint_interval,
+            "run_key": OPTIMIZE_IN_RUN_KEY,
+            "optimization_stream": OPTIMIZE_IN_RUN_TRACKING_STREAM,
+        }
+    )
+    readable_cache = readable_cache or {}
+
+    optimizer = optimization_problem.optimizer
+    actuators = optimization_problem.actuators
+    acquisition_plan = optimization_problem.acquisition_plan or list_scan_in_run
+
+    @bpp.set_run_key_decorator(OPTIMIZE_IN_RUN_KEY)
+    @bpp.run_decorator(md=_md)
+    def _optimize_in_run() -> MsgGenerator[None]:
+        for i in range(iterations):
+            suggestions = optimizer.suggest(n_points)
+            _validate_suggestions(suggestions)
+            try:
+                uid = yield from _reject_child_run_messages(
+                    acquisition_plan(suggestions, actuators, optimization_problem.sensors, **kwargs)
+                )
+                outcomes = optimization_problem.evaluation_function(uid, suggestions)
+                _validate_outcomes(outcomes, suggestions)
+            except Exception:
+                if isinstance(optimizer, TrialFaultAware):
+                    # TODO: Is it possible to be more fine-grained than this?
+                    # Some suggestions may have been acquired/evaluated without issue.
+                    optimizer.register_failures(suggestions)
+                raise
+
+            optimizer.ingest(outcomes)
+            yield from read_step(
+                uid,
+                suggestions,
+                outcomes,
+                n_points,
+                readable_cache,
+                stream_name=OPTIMIZE_IN_RUN_TRACKING_STREAM,
+            )
+
+            if isinstance(optimizer, SupportsStoppingCriteria):
+                stop_now, stop_reason = optimizer.should_stop()
+                if stop_now:
+                    reason = stop_reason if stop_reason is not None else "No reason provided"
+                    logger.info(f"Global stopping triggered at iteration {i + 1}: {reason}")
+                    return
+
+            _maybe_checkpoint(optimizer, checkpoint_interval, i)
+
+    return (yield from _optimize_in_run())
+
+
+@plan
 def sample_suggestions(
     optimization_problem: OptimizationProblem,
     suggestions: Sequence[Mapping],
@@ -345,27 +430,6 @@ def sample_suggestions(
         return uid, suggestions, outcomes
 
     return (yield from _inner_sample_suggestions())
-
-
-@plan
-def seq_read(readables: Sequence[Readable], **kwargs: Any) -> MsgGenerator[dict[str, Any]]:
-    """
-    Read the current values of the given readables.
-
-    Parameters
-    ----------
-    readables : Sequence[Readable]
-        The readables to read.
-
-    Returns
-    -------
-    dict[str, Any]
-        A dictionary of the readable names and their current values.
-    """
-    results = {}
-    for readable in readables:
-        results[readable.name] = yield from bps.rd(readable, **kwargs)
-    return results
 
 
 def acquire_baseline(

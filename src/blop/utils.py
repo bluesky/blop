@@ -1,17 +1,19 @@
 """A set of useful helper utilities."""
 
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Hashable, Mapping, Sequence
 from enum import StrEnum
-from typing import Any
+from typing import Any, cast
 
+import bluesky.preprocessors as bpp
 import networkx as nx
 import numpy as np
 from bluesky.protocols import HasHints, HasParent, Hints, Readable, Reading
+from bluesky.utils import MsgGenerator
 from event_model import DataKey
 from numpy.typing import ArrayLike
 
-from .protocols import ID_KEY, Checkpointable, OptimizationProblem, Optimizer
+from .protocols import ID_KEY, Actuator, Checkpointable, OptimizationProblem, Optimizer
 
 
 class Source(StrEnum):
@@ -22,6 +24,87 @@ class Source(StrEnum):
     SUGGESTION_ID = "optimization-suggestion-id"
     ACQUISITION_UID = "optimization-acquisition-uid"
     OTHER = "optimization-other"
+
+
+def _unpack_for_list_scan(suggestions: Sequence[Mapping], actuators: Sequence[Actuator]) -> list[Any]:
+    """Unpack the actuators and inputs into Bluesky list_scan plan arguments."""
+    actuators_and_inputs = {actuator: [suggestion[actuator.name] for suggestion in suggestions] for actuator in actuators}
+    unpacked_list = []
+    for actuator, values in actuators_and_inputs.items():
+        unpacked_list.append(actuator)
+        unpacked_list.append(values)
+
+    return unpacked_list
+
+
+def _validate_ids_are_unique_and_hashable(records: Sequence[Mapping], label: str) -> None:
+    """Ensure record IDs can be used as opaque identity values."""
+    record_ids = []
+    for record in records:
+        record_id = record[ID_KEY]
+        try:
+            hash(record_id)
+        except TypeError as err:
+            raise TypeError(f"All {label} must contain hashable '{ID_KEY}' values. Got {record_id!r}.") from err
+        record_ids.append(record_id)
+    if len(record_ids) != len(set(record_ids)):
+        raise ValueError(f"All {label} must contain unique '{ID_KEY}' values. Got {record_ids!r}.")
+
+
+def _validate_suggestions(suggestions: Sequence[Mapping]) -> None:
+    """Ensure every suggestion can be matched to an evaluated outcome."""
+    if any(ID_KEY not in suggestion for suggestion in suggestions):
+        raise ValueError(
+            f"All suggestions must contain an '{ID_KEY}' key to later match with the outcomes. Please review your "
+            f"optimizer implementation. Got suggestions: {suggestions}"
+        )
+    _validate_ids_are_unique_and_hashable(suggestions, "suggestions")
+
+
+def _validate_outcomes(outcomes: Sequence[Mapping], suggestions: Sequence[Mapping]) -> None:
+    """Ensure every outcome can be matched to an optimizer suggestion."""
+    if any(ID_KEY not in outcome for outcome in outcomes):
+        raise ValueError(
+            f"All outcomes must contain an '{ID_KEY}' key that matches with the suggestions. Please review your "
+            f"evaluation function. Got suggestions: {suggestions} and outcomes: {outcomes}"
+        )
+    _validate_ids_are_unique_and_hashable(outcomes, "outcomes")
+    suggestion_ids = {suggestion[ID_KEY] for suggestion in suggestions}
+    outcome_ids = {outcome[ID_KEY] for outcome in outcomes}
+    if suggestion_ids != outcome_ids:
+        raise ValueError(
+            "The suggestions and outcomes must contain the same IDs. Got suggestions: "
+            f"{suggestion_ids} and outcomes: {outcome_ids}"
+        )
+
+
+def _suggestion_ids(suggestions: Sequence[Mapping]) -> tuple[Hashable, ...]:
+    """Return suggestion IDs as a hashable acquisition identifier."""
+    return tuple(cast(Hashable, suggestion[ID_KEY]) for suggestion in suggestions)
+
+
+def _drop_run_control_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
+    """Drop child-run messages while preserving hardware lifecycle messages."""
+
+    def _drop(msg: Any) -> Any | None:
+        if msg.command in {"open_run", "close_run"}:
+            return None
+        return msg
+
+    return (yield from bpp.msg_mutator(plan, _drop))
+
+
+def _reject_child_run_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
+    """Reject child-run messages inside the plan."""
+
+    def _reject(msg: Any) -> Any:
+        if msg.command in {"open_run", "close_run"}:
+            raise ValueError(
+                f"Custom acquisition plans must not issue {msg.command!r}; they run inside a Bluesky run already."
+            )
+        return msg
+
+    return (yield from bpp.msg_mutator(plan, _reject))
 
 
 def _maybe_checkpoint(optimizer: Optimizer, checkpoint_interval: int | None, iteration: int) -> None:

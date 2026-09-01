@@ -5,7 +5,14 @@ import pytest
 from bluesky.run_engine import RunEngine
 from bluesky.utils import plan
 
-from blop.plans import acquire_baseline, default_acquire, optimize, optimize_step
+from blop.plan_stubs import list_scan_in_run
+from blop.plans import (
+    acquire_baseline,
+    default_acquire,
+    optimize,
+    optimize_in_run,
+    optimize_step,
+)
 from blop.protocols import (
     AcquisitionPlan,
     EvaluationFunction,
@@ -15,7 +22,7 @@ from blop.protocols import (
     TrialFaultAware,
 )
 
-from .conftest import CheckpointableOptimizer, MovableSignal, ReadableSignal
+from .conftest import AlwaysSuccessfulStatus, CheckpointableOptimizer, MovableSignal, ReadableSignal
 
 
 @plan
@@ -50,6 +57,21 @@ def _custom_identifier_acquisition_plan(suggestions, actuators, sensors, *args, 
     return _CUSTOM_ACQUISITION_IDENTIFIER
 
 
+class StageableReadable(ReadableSignal):
+    def __init__(self, name: str) -> None:
+        super().__init__(name)
+        self.stage_count = 0
+        self.unstage_count = 0
+
+    def stage(self):
+        self.stage_count += 1
+        return [self]
+
+    def unstage(self):
+        self.unstage_count += 1
+        return [self]
+
+
 def _collect_optimize_events():
     """Return a callback and list that collect event docs from the outer optimize run."""
     events = []
@@ -66,6 +88,30 @@ def _collect_optimize_events():
             events.append(doc)
 
     return callback, events
+
+
+def _collect_documents():
+    """Return a callback and list that collect all RunEngine documents."""
+    documents = []
+
+    def callback(name, doc):
+        documents.append((name, dict(doc)))
+
+    return callback, documents
+
+
+def _events_by_stream(documents):
+    """Group event documents by descriptor stream name."""
+    descriptors = {doc["uid"]: doc["name"] for name, doc in documents if name == "descriptor"}
+    events = {}
+    for name, doc in documents:
+        if name == "event":
+            events.setdefault(descriptors[doc["descriptor"]], []).append(doc)
+    return events
+
+
+def _as_list(value):
+    return list(value) if hasattr(value, "__iter__") and not isinstance(value, str) else [value]
 
 
 @pytest.fixture(scope="function")
@@ -337,6 +383,354 @@ def test_optimize_with_non_checkpointable_optimizer(RE):
     )
     with pytest.raises(ValueError, match="optimizer is not checkpointable"):
         RE(optimize(optimization_problem, iterations=5, n_points=2, checkpoint_interval=1))
+
+
+def test_optimize_in_run_defaults_to_ordered_suggestion_ids(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 10.0, "_id": "far"}, {"x1": 1.0, "_id": "near"}]
+    movable = MovableSignal("x1", initial_value=0.0)
+    readable = ReadableSignal("objective")
+    captured = []
+
+    callback, documents = _collect_documents()
+    RE.subscribe(callback)
+
+    def evaluation_function(uid: tuple[str, ...], suggestions: list[dict]) -> list[dict]:
+        captured.append((uid, suggestions))
+        events_by_stream = _events_by_stream(documents)
+        primary_values = [event["data"]["x1"] for event in events_by_stream["primary"]]
+        assert uid == ("near", "far")
+        assert suggestions == [{"x1": 10.0, "_id": "far"}, {"x1": 1.0, "_id": "near"}]
+        assert primary_values == [1.0, 10.0]
+        return [{"objective": float(index), "_id": suggestion_id} for index, suggestion_id in enumerate(uid)]
+
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[movable],
+        sensors=[readable],
+        evaluation_function=evaluation_function,
+    )
+
+    try:
+        RE(optimize_in_run(optimization_problem, n_points=2))
+    finally:
+        RE.unsubscribe(callback)
+
+    assert captured == [(("near", "far"), [{"x1": 10.0, "_id": "far"}, {"x1": 1.0, "_id": "near"}])]
+    optimizer.ingest.assert_called_once_with([{"objective": 0.0, "_id": "near"}, {"objective": 1.0, "_id": "far"}])
+    start_docs = [doc for name, doc in documents if name == "start"]
+    assert len(start_docs) == 1
+    assert start_docs[0]["run_key"] == "optimize_in_run"
+    events_by_stream = _events_by_stream(documents)
+    assert len(events_by_stream["primary"]) == 2
+    assert len(events_by_stream["optimization"]) == 1
+    optimization_data = events_by_stream["optimization"][0]["data"]
+    assert _as_list(optimization_data["suggestion_ids"]) == ["far", "near"]
+    assert _as_list(optimization_data["acquisition_uid"]) == ["near", "far"]
+
+
+def test_list_scan_in_run_allows_custom_per_step_streams(RE):
+    def per_step(detectors, step, pos_cache):
+        yield from bps.one_nd_step(detectors, step, pos_cache)
+        yield from bps.trigger_and_read(detectors, name="monitor")
+        yield from bps.trigger_and_read(detectors, name="monitor")
+
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}, {"x1": 1.0, "_id": 1}]
+    readable = ReadableSignal("objective")
+
+    def evaluation_function(uid: tuple[int, ...], suggestions: list[dict]) -> list[dict]:
+        assert uid == (0, 1)
+        assert suggestions == [{"x1": 0.0, "_id": 0}, {"x1": 1.0, "_id": 1}]
+        return [{"objective": 0.0, "_id": 0}, {"objective": 1.0, "_id": 1}]
+
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[readable],
+        evaluation_function=evaluation_function,
+        acquisition_plan=list_scan_in_run,
+    )
+    callback, documents = _collect_documents()
+    RE.subscribe(callback)
+    try:
+        RE(optimize_in_run(optimization_problem, n_points=2, per_step=per_step))
+    finally:
+        RE.unsubscribe(callback)
+
+    optimizer.ingest.assert_called_once_with([{"objective": 0.0, "_id": 0}, {"objective": 1.0, "_id": 1}])
+    events_by_stream = _events_by_stream(documents)
+    assert len(events_by_stream["primary"]) == 2
+    assert len(events_by_stream["monitor"]) == 4
+    assert len(events_by_stream["optimization"]) == 1
+
+
+def test_list_scan_in_run_accepts_no_sensors(RE):
+    movable = MovableSignal("x1", initial_value=-1.0)
+    acquisition_ids = []
+
+    @plan
+    def in_run():
+        yield from bps.open_run()
+        acquisition_ids.append((yield from list_scan_in_run([{"x1": 0.0, "_id": "point"}], [movable], sensors=None)))
+        yield from bps.close_run()
+
+    RE(in_run())
+
+    assert acquisition_ids == [("point",)]
+    assert movable._value == 0.0
+
+
+def test_list_scan_in_run_ignores_non_readable_sensors(RE, caplog):
+    class NamedOnlySensor:
+        name = "not-readable"
+
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": 0}])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[NamedOnlySensor()],
+        evaluation_function=evaluation_function,
+    )
+
+    RE(optimize_in_run(optimization_problem))
+
+    assert "Some sensors are not readable and will be ignored" in caplog.text
+    optimizer.ingest.assert_called_once_with([{"objective": 0.0, "_id": 0}])
+
+
+def test_list_scan_in_run_routes_without_actuator_readback(RE):
+    class MoveOnlySignal:
+        def __init__(self, name, initial_value):
+            self.name = name
+            self.value = initial_value
+
+        @property
+        def parent(self):
+            return None
+
+        def set(self, value):
+            self.value = value
+            return AlwaysSuccessfulStatus()
+
+    def per_step(detectors, step, pos_cache):
+        yield from bps.move_per_step(step, pos_cache)
+
+    suggestions = [{"x1": 10.0, "_id": "far"}, {"x1": 1.0, "_id": "near"}]
+    movable = MoveOnlySignal("x1", initial_value=0.0)
+    acquisition_ids = []
+
+    @plan
+    def in_run():
+        yield from bps.open_run()
+        acquisition_ids.append((yield from list_scan_in_run(suggestions, [movable], [], per_step=per_step)))
+        yield from bps.close_run()
+
+    RE(in_run())
+
+    assert set(acquisition_ids[0]) == {"far", "near"}
+    suggestion_by_id = {suggestion["_id"]: suggestion for suggestion in suggestions}
+    assert movable.value == suggestion_by_id[acquisition_ids[0][-1]]["x1"]
+
+
+def test_list_scan_in_run_preserves_stage_lifecycle(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    readable = StageableReadable("objective")
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[readable],
+        evaluation_function=MagicMock(return_value=[{"objective": 0.0, "_id": 0}]),
+    )
+
+    RE(optimize_in_run(optimization_problem))
+
+    assert readable.stage_count == 1
+    assert readable.unstage_count == 1
+
+
+def test_optimize_in_run_rejects_child_run_control(RE):
+    @plan
+    def acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+        yield from bps.open_run(md={"run_key": "child"})
+        yield from bps.trigger_and_read(sensors or [])
+        yield from bps.close_run()
+        return "child-run"
+
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": 0}])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=acquisition_plan,
+    )
+
+    with pytest.raises(ValueError, match="must not issue 'open_run'"):
+        RE(optimize_in_run(optimization_problem))
+
+    evaluation_function.assert_not_called()
+    optimizer.ingest.assert_not_called()
+
+
+def test_optimize_in_run_rejects_unhashable_suggestion_ids(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": ["not-hashable"]}]
+    evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": ["not-hashable"]}])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+    )
+
+    with pytest.raises(TypeError, match="hashable '_id'"):
+        RE(optimize_in_run(optimization_problem))
+
+    evaluation_function.assert_not_called()
+    optimizer.ingest.assert_not_called()
+
+
+def test_optimize_in_run_rejects_duplicate_suggestion_ids(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": "same"}, {"x1": 1.0, "_id": "same"}]
+    evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": "same"}])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+    )
+
+    with pytest.raises(ValueError, match="unique '_id'"):
+        RE(optimize_in_run(optimization_problem, n_points=2))
+
+    evaluation_function.assert_not_called()
+    optimizer.ingest.assert_not_called()
+
+
+def test_optimize_in_run_registers_failures(RE):
+    class FaultAwareOptimizer(Optimizer, TrialFaultAware): ...
+
+    suggestions = [{"x1": 0.0, "_id": 0}]
+    optimizer = MagicMock(spec=FaultAwareOptimizer)
+    optimizer.suggest.return_value = suggestions
+    evaluation_function = MagicMock(side_effect=RuntimeError("evaluation failed"))
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=_test_acquisition_plan,
+    )
+
+    with pytest.raises(RuntimeError, match="evaluation failed"):
+        RE(optimize_in_run(optimization_problem))
+
+    optimizer.register_failures.assert_called_once_with(suggestions)
+    optimizer.ingest.assert_not_called()
+
+
+def test_optimize_step_rejects_suggestion_without_id(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0}]
+    evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": 0}])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=_test_acquisition_plan,
+    )
+
+    with pytest.raises(ValueError, match="All suggestions must contain an '_id' key"):
+        RE(optimize_step(optimization_problem))
+
+    evaluation_function.assert_not_called()
+    optimizer.ingest.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    ("outcomes", "error_type", "message"),
+    [
+        ([{"objective": 0.0}, {"objective": 1.0, "_id": "b"}], ValueError, "All outcomes must contain an '_id' key"),
+        (
+            [{"objective": 0.0, "_id": []}, {"objective": 1.0, "_id": "b"}],
+            TypeError,
+            "hashable '_id'",
+        ),
+        (
+            [{"objective": 0.0, "_id": "a"}, {"objective": 1.0, "_id": "a"}],
+            ValueError,
+            "unique '_id'",
+        ),
+        (
+            [{"objective": 0.0, "_id": "a"}, {"objective": 1.0, "_id": "c"}],
+            ValueError,
+            "same IDs",
+        ),
+    ],
+)
+def test_optimize_step_rejects_invalid_outcome_ids(RE, outcomes, error_type, message):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": "a"}, {"x1": 1.0, "_id": "b"}]
+    evaluation_function = MagicMock(return_value=outcomes)
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=_test_acquisition_plan,
+    )
+
+    with pytest.raises(error_type, match=message):
+        RE(optimize_step(optimization_problem, n_points=2))
+
+    evaluation_function.assert_called_once()
+    optimizer.ingest.assert_not_called()
+
+
+def test_optimize_in_run_stops_early(RE):
+    class StoppingOptimizer(Optimizer, SupportsStoppingCriteria): ...
+
+    optimizer = MagicMock(spec=StoppingOptimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    optimizer.should_stop.side_effect = [(False, None), (True, "converged")]
+    evaluation_function = MagicMock(return_value=[{"objective": 0.0, "_id": 0}])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=_test_acquisition_plan,
+    )
+
+    RE(optimize_in_run(optimization_problem, iterations=5))
+
+    assert optimizer.suggest.call_count == 2
+    assert optimizer.ingest.call_count == 2
+    assert optimizer.should_stop.call_count == 2
+
+
+def test_optimize_in_run_checkpoints(RE):
+    optimizer = MagicMock(spec=CheckpointableOptimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=MagicMock(return_value=[{"objective": 0.0, "_id": 0}]),
+        acquisition_plan=_test_acquisition_plan,
+    )
+
+    RE(optimize_in_run(optimization_problem, iterations=3, checkpoint_interval=2))
+
+    assert optimizer.checkpoint.call_count == 1
 
 
 def test_optimize_step_default(RE):
