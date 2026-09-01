@@ -28,6 +28,8 @@ class HimmelblauEvaluation:
         x1_data = run["primary/x1"].read()
         x2_data = run["primary/x2"].read()
 
+        assert set(acquisition_order) == {suggestion["_id"] for suggestion in suggestions}
+
         outcomes = []
         for index, suggestion_id in enumerate(acquisition_order):
             x1 = x1_data[index]
