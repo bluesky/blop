@@ -275,7 +275,6 @@ agent = Agent(
     outcome_constraints=outcome_constraints,
     name="xrt-blop-demo",
     description="A demo of the Blop agent with XRT simulated beamline",
-    experiment_type="demo",
 )
 
 # Register intensity as a tracking metric (monitored but not optimized)
