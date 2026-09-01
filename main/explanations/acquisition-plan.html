@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Acquisition Plans &#8212; blop 1.1.1.dev4 documentation</title>
+    <title>Acquisition Plans &#8212; blop 1.1.1.dev5 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=7f7490b3"></script>
+    <script src="../_static/documentation_options.js?v=db0c14aa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Ax Integration" href="ax-integration.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev4" />
+  <meta name="docsearch:version" content="1.1.1.dev5" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -537,8 +537,10 @@ association between optimizer suggestions and the acquired data within the
 chosen storage or event system (typically stashing the suggestions in proper
 order in storage or tagging the run markdown).</p>
 <p>The plan must return a hashable acquisition identifier. Blop passes that value
-unchanged to the evaluation function. A Bluesky run UID is the usual identifier,
-but a tuple of event UIDs can identify acquisitions performed within one run.</p>
+unchanged to the evaluation function. A Bluesky run UID is the usual identifier
+for run-owning acquisitions. The in-run default returns suggestion IDs in the
+order they were executed, but custom plans may return any hashable key their
+matching evaluation function understands.</p>
 <p>A simple example that optimizes in a subspace while executing measurements in
 the full physical coordinate system is shown below.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>

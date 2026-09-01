@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Protocols &#8212; blop 1.1.1.dev4 documentation</title>
+    <title>Protocols &#8212; blop 1.1.1.dev5 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=7f7490b3"></script>
+    <script src="../_static/documentation_options.js?v=db0c14aa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Plan Stubs" href="plan_stubs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev4" />
+  <meta name="docsearch:version" content="1.1.1.dev5" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -561,12 +561,15 @@ we do not want to require <cite>HasHints</cite> on the movable.</p>
 <p>A protocol for custom data acquisition plans.</p>
 <p>This protocol defines how to acquire data from the beamline. Most users will use
 the default <a class="reference internal" href="plans.html#blop.plans.default_acquire" title="blop.plans.default_acquire"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.plans.default_acquire()</span></code></a> plan, which performs a list scan
-over the suggested points. Custom implementations are only needed for specialized
-acquisition strategies (e.g., fly scans, complex detector configurations).</p>
+in its own Bluesky run, or <a class="reference internal" href="plan_stubs.html#blop.plan_stubs.list_scan_in_run" title="blop.plan_stubs.list_scan_in_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.plan_stubs.list_scan_in_run()</span></code></a>, which performs
+a list scan inside an already-open optimization run. Custom implementations are only
+needed for specialized acquisition strategies (e.g., fly scans, complex detector configurations).</p>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <dl class="simple">
-<dt><a class="reference internal" href="plans.html#blop.plans.default_acquire" title="blop.plans.default_acquire"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blop.plans.default_acquire</span></code></a></dt><dd><p>Default acquisition plan implementation.</p>
+<dt><a class="reference internal" href="plans.html#blop.plans.default_acquire" title="blop.plans.default_acquire"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blop.plans.default_acquire</span></code></a></dt><dd><p>Default run-owning acquisition plan implementation.</p>
+</dd>
+<dt><a class="reference internal" href="plan_stubs.html#blop.plan_stubs.list_scan_in_run" title="blop.plan_stubs.list_scan_in_run"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blop.plan_stubs.list_scan_in_run</span></code></a></dt><dd><p>Default in-run acquisition plan implementation.</p>
 </dd>
 <dt><a class="reference internal" href="ax/agent.html#blop.ax.Agent" title="blop.ax.Agent"><code class="xref py py-obj docutils literal notranslate"><span class="pre">blop.ax.Agent</span></code></a></dt><dd><p>Accepts an optional acquisition plan during initialization.</p>
 </dd>
@@ -581,15 +584,15 @@ identifier that the evaluation function can use to retrieve the acquired data.</
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suggestions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actuators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">md</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/protocols.html#AcquisitionPlan.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.protocols.AcquisitionPlan.__call__" title="Link to this definition">#</a></dt>
 <dd><p>Acquire data for optimization.</p>
 <p>This should be a Bluesky plan that moves the actuators to each of their suggested positions
-and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition
-but it is the responsibility of the implementer to ensure fetching the data during
-evaluation is feasible.</p>
+and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition,
+but it is the responsibility of the implementer to return an identifier that lets the matching
+evaluation function correlate acquired data with suggestion IDs.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>suggestions: Sequence[Mapping]</strong></dt><dd><p>A sequence of mappings, each containing the parameterization of a point to evaluate.
-The “_id” key is optional and can be used to identify each suggestion. It is suggested
-to add “_id” values to the run metadata for later identification of the acquired data.</p>
+The “_id” key is optional and can be used to identify each suggestion. When present, “_id”
+values used by Blop optimization plans must be unique within a batch and hashable.</p>
 </dd>
 <dt><strong>actuators: Sequence[Actuator]</strong></dt><dd><p>The actuators to move to their suggested positions.</p>
 </dd>
@@ -601,8 +604,8 @@ to add “_id” values to the run metadata for later identification of the acqu
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>Hashable</dt><dd><p>The identifier passed unchanged to the evaluation function. Examples include a Bluesky run UID
-or a tuple of event UIDs.</p>
+<dt>Hashable</dt><dd><p>The identifier passed unchanged to the evaluation function. Examples include a Bluesky run UID,
+a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.</p>
 </dd>
 </dl>
 </dd>
@@ -644,17 +647,17 @@ the relevant data and computes objective values and metrics for each suggestion.
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>uid: Hashable</strong></dt><dd><p>The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,
-a tuple of event UIDs, or another hashable lookup key.</p>
+a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.</p>
 </dd>
-<dt><strong>suggestions: Sequence[Mapping]</strong></dt><dd><p>A sequence of mappings, each containing the parameterization of a point to evaluate.
-The “_id” key is optional and can be used to identify each suggestion.</p>
+<dt><strong>suggestions: Sequence[Mapping]</strong></dt><dd><p>A sequence of mappings, each containing the optimizer-provided parameterization of a point to evaluate.
+This sequence is not guaranteed to be in acquisition order. Match data and outcomes by “_id”.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt>Sequence[Mapping]</dt><dd><p>A sequence of mappings containing the outcomes of the acquisition, one for each suggested parameterization.
-The “_id” key is optional and can be used to identify each outcome.</p>
+The “_id” key is optional and can be used to identify each outcome; when present, it must match a suggestion ID.</p>
 </dd>
 </dl>
 </dd>
@@ -688,7 +691,8 @@ via Ax. Custom implementations are only needed for specialized optimization algo
 <span class="sig-name descname"><span class="pre">suggest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/protocols.html#Optimizer.suggest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.protocols.Optimizer.suggest" title="Link to this definition">#</a></dt>
 <dd><p>Suggest a set of points in the input space, to be evaulated next.</p>
 <p>The “_id” key is optional and can be used to identify suggested trials for later evaluation
-and ingestion.</p>
+and ingestion. When optimization plans require IDs, each “_id” value must be unique within
+the batch and hashable.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -699,7 +703,7 @@ and ingestion.</p>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt>Sequence[Mapping]</dt><dd><p>A sequence of mappings, each containing a parameterization of a point to evaluate next.
-Each mapping must contain a unique “_id” key to identify each parameterization.</p>
+Each mapping must contain a unique, hashable “_id” key to identify each parameterization.</p>
 </dd>
 </dl>
 </dd>

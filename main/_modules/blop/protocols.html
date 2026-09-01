@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.protocols &#8212; blop 1.1.1.dev4 documentation</title>
+    <title>blop.protocols &#8212; blop 1.1.1.dev5 documentation</title>
   
   
   
@@ -42,12 +42,14 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=7f7490b3"></script>
+    <script src="../../_static/documentation_options.js?v=db0c14aa"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
     <script src="../../_static/copybutton.js?v=f281be69"></script>
     <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
+
+
 
 
 
@@ -418,7 +420,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev4" />
+  <meta name="docsearch:version" content="1.1.1.dev5" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -1003,7 +1005,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Suggest a set of points in the input space, to be evaulated next.</span>
 
 <span class="sd">        The "_id" key is optional and can be used to identify suggested trials for later evaluation</span>
-<span class="sd">        and ingestion.</span>
+<span class="sd">        and ingestion. When optimization plans require IDs, each "_id" value must be unique within</span>
+<span class="sd">        the batch and hashable.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -1014,7 +1017,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        -------</span>
 <span class="sd">        Sequence[Mapping]</span>
 <span class="sd">            A sequence of mappings, each containing a parameterization of a point to evaluate next.</span>
-<span class="sd">            Each mapping must contain a unique "_id" key to identify each parameterization.</span>
+<span class="sd">            Each mapping must contain a unique, hashable "_id" key to identify each parameterization.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
 
@@ -1095,16 +1098,16 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        ----------</span>
 <span class="sd">        uid: Hashable</span>
 <span class="sd">            The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,</span>
-<span class="sd">            a tuple of event UIDs, or another hashable lookup key.</span>
+<span class="sd">            a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.</span>
 <span class="sd">        suggestions: Sequence[Mapping]</span>
-<span class="sd">            A sequence of mappings, each containing the parameterization of a point to evaluate.</span>
-<span class="sd">            The "_id" key is optional and can be used to identify each suggestion.</span>
+<span class="sd">            A sequence of mappings, each containing the optimizer-provided parameterization of a point to evaluate.</span>
+<span class="sd">            This sequence is not guaranteed to be in acquisition order. Match data and outcomes by "_id".</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Sequence[Mapping]</span>
 <span class="sd">            A sequence of mappings containing the outcomes of the acquisition, one for each suggested parameterization.</span>
-<span class="sd">            The "_id" key is optional and can be used to identify each outcome.</span>
+<span class="sd">            The "_id" key is optional and can be used to identify each outcome; when present, it must match a suggestion ID.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>
@@ -1120,12 +1123,14 @@ window.runMermaid = runMermaid;</script>
 
 <span class="sd">    This protocol defines how to acquire data from the beamline. Most users will use</span>
 <span class="sd">    the default :func:`blop.plans.default_acquire` plan, which performs a list scan</span>
-<span class="sd">    over the suggested points. Custom implementations are only needed for specialized</span>
-<span class="sd">    acquisition strategies (e.g., fly scans, complex detector configurations).</span>
+<span class="sd">    in its own Bluesky run, or :func:`blop.plan_stubs.list_scan_in_run`, which performs</span>
+<span class="sd">    a list scan inside an already-open optimization run. Custom implementations are only</span>
+<span class="sd">    needed for specialized acquisition strategies (e.g., fly scans, complex detector configurations).</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
-<span class="sd">    blop.plans.default_acquire : Default acquisition plan implementation.</span>
+<span class="sd">    blop.plans.default_acquire : Default run-owning acquisition plan implementation.</span>
+<span class="sd">    blop.plan_stubs.list_scan_in_run : Default in-run acquisition plan implementation.</span>
 <span class="sd">    blop.ax.Agent : Accepts an optional acquisition plan during initialization.</span>
 
 <span class="sd">    Notes</span>
@@ -1149,16 +1154,16 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Acquire data for optimization.</span>
 
 <span class="sd">        This should be a Bluesky plan that moves the actuators to each of their suggested positions</span>
-<span class="sd">        and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition</span>
-<span class="sd">        but it is the responsibility of the implementer to ensure fetching the data during</span>
-<span class="sd">        evaluation is feasible.</span>
+<span class="sd">        and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition,</span>
+<span class="sd">        but it is the responsibility of the implementer to return an identifier that lets the matching</span>
+<span class="sd">        evaluation function correlate acquired data with suggestion IDs.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        suggestions: Sequence[Mapping]</span>
 <span class="sd">            A sequence of mappings, each containing the parameterization of a point to evaluate.</span>
-<span class="sd">            The "_id" key is optional and can be used to identify each suggestion. It is suggested</span>
-<span class="sd">            to add "_id" values to the run metadata for later identification of the acquired data.</span>
+<span class="sd">            The "_id" key is optional and can be used to identify each suggestion. When present, "_id"</span>
+<span class="sd">            values used by Blop optimization plans must be unique within a batch and hashable.</span>
 <span class="sd">        actuators: Sequence[Actuator]</span>
 <span class="sd">            The actuators to move to their suggested positions.</span>
 <span class="sd">        sensors: Sequence[Sensor], optional</span>
@@ -1169,8 +1174,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Hashable</span>
-<span class="sd">            The identifier passed unchanged to the evaluation function. Examples include a Bluesky run UID</span>
-<span class="sd">            or a tuple of event UIDs.</span>
+<span class="sd">            The identifier passed unchanged to the evaluation function. Examples include a Bluesky run UID,</span>
+<span class="sd">            a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>

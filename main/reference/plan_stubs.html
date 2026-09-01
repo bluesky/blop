@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Plan Stubs &#8212; blop 1.1.1.dev4 documentation</title>
+    <title>Plan Stubs &#8212; blop 1.1.1.dev5 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=7f7490b3"></script>
+    <script src="../_static/documentation_options.js?v=db0c14aa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Plans" href="plans.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev4" />
+  <meta name="docsearch:version" content="1.1.1.dev5" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -523,6 +523,52 @@
   <section id="plan-stubs">
 <h1>Plan Stubs<a class="headerlink" href="#plan-stubs" title="Link to this heading">#</a></h1>
 <dl class="py function">
+<dt class="sig sig-object py" id="blop.plan_stubs.list_scan_in_run">
+<span class="sig-prename descclassname"><span class="pre">blop.plan_stubs.</span></span><span class="sig-name descname"><span class="pre">list_scan_in_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suggestions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actuators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">per_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/plan_stubs.html#list_scan_in_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.plan_stubs.list_scan_in_run" title="Link to this definition">#</a></dt>
+<dd><p>Acquire suggestions inside an already-open Bluesky run.</p>
+<p>This plan moves through the suggestions, optionally reordering them for efficient motion,
+and executes a Bluesky list scan without opening a child run. The list scan’s stage and
+unstage messages are preserved.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The single-run optimization API is <strong>experimental</strong>. This plan may change in
+future releases without a deprecation period.</p>
+</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>suggestions</strong><span class="classifier">Sequence[Mapping]</span></dt><dd><p>Suggested parameterizations to execute. Each suggestion must contain a hashable <code class="docutils literal notranslate"><span class="pre">_id</span></code>.</p>
+</dd>
+<dt><strong>actuators</strong><span class="classifier">Sequence[Actuator]</span></dt><dd><p>Actuators to move to the suggested positions.</p>
+</dd>
+<dt><strong>sensors</strong><span class="classifier">Sequence[Sensor] | None, optional</span></dt><dd><p>Sensors that produce data to evaluate. Non-readable sensors are ignored.</p>
+</dd>
+<dt><strong>per_step</strong><span class="classifier">bp.PerStep | None, optional</span></dt><dd><p>Bluesky list-scan step hook. Custom hooks may emit any number of events into any streams.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">Any</span></dt><dd><p>Additional keyword arguments to pass to <a class="reference external" href="https://blueskyproject.io/bluesky/main/generated/bluesky.plans.list_scan.html#bluesky.plans.list_scan" title="(in bluesky v1.15.2.dev76+g79e2d45e2)"><code class="xref py py-func docutils literal notranslate"><span class="pre">bluesky.plans.list_scan()</span></code></a>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>tuple[Hashable, …]</dt><dd><p>Suggestion IDs in the order the suggestions were executed.</p>
+<p>This identifier intentionally does not encode stream names, event UIDs, event counts, or
+per-stream offsets. Custom <code class="docutils literal notranslate"><span class="pre">per_step</span></code> hooks may emit any number of events into any number
+of streams. The matching evaluation function is responsible for interpreting those documents
+and correlating them with these ordered suggestion IDs.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-odd">Yields<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>Msg</dt><dd><p>Bluesky messages.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="blop.plan_stubs.navigate_to_best">
 <span class="sig-prename descclassname"><span class="pre">blop.plan_stubs.</span></span><span class="sig-name descname"><span class="pre">navigate_to_best</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">actuators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameterization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/plan_stubs.html#navigate_to_best"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.plan_stubs.navigate_to_best" title="Link to this definition">#</a></dt>
 <dd><p>Move actuators to the best point found during optimization.</p>
@@ -556,7 +602,7 @@ explicit <code class="docutils literal notranslate"><span class="pre">parameteri
 
 <dl class="py function">
 <dt class="sig sig-object py" id="blop.plan_stubs.read_step">
-<span class="sig-prename descclassname"><span class="pre">blop.plan_stubs.</span></span><span class="sig-name descname"><span class="pre">read_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggestions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcomes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readable_cache</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/plan_stubs.html#read_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.plan_stubs.read_step" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">blop.plan_stubs.</span></span><span class="sig-name descname"><span class="pre">read_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suggestions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcomes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readable_cache</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'primary'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/plan_stubs.html#read_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.plan_stubs.read_step" title="Link to this definition">#</a></dt>
 <dd><p>Plan stub to read the suggestions and outcomes of a single optimization step.</p>
 <p>If fewer suggestions are returned than n_points arrays are padded to n_points length
 with np.nan to ensure consistent shapes for event-model specification.</p>
@@ -574,6 +620,8 @@ Other hashable identifiers are represented by <code class="docutils literal notr
 <dt><strong>n_points</strong><span class="classifier">int</span></dt><dd><p>Expected number of suggestions. Arrays will be padded to this length if needed.</p>
 </dd>
 <dt><strong>readable_cache</strong><span class="classifier">dict[str, InferredReadable]</span></dt><dd><p>Cache of InferredReadable objects to reuse across iterations.</p>
+</dd>
+<dt><strong>stream_name</strong><span class="classifier">str, optional</span></dt><dd><p>Event stream name for the optimization tracking event.</p>
 </dd>
 </dl>
 </dd>
@@ -629,6 +677,7 @@ Other hashable identifiers are represented by <code class="docutils literal notr
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.plan_stubs.list_scan_in_run"><code class="docutils literal notranslate"><span class="pre">list_scan_in_run()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.plan_stubs.navigate_to_best"><code class="docutils literal notranslate"><span class="pre">navigate_to_best()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.plan_stubs.read_step"><code class="docutils literal notranslate"><span class="pre">read_step()</span></code></a></li>
 </ul>

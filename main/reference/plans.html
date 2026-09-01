@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Plans &#8212; blop 1.1.1.dev4 documentation</title>
+    <title>Plans &#8212; blop 1.1.1.dev5 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=7f7490b3"></script>
+    <script src="../_static/documentation_options.js?v=db0c14aa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Xopt Optimizer" href="xopt/optimizer.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev4" />
+  <meta name="docsearch:version" content="1.1.1.dev5" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -570,6 +570,38 @@ If None, a new cache will be created.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="blop.plans.optimize_in_run">
+<span class="sig-prename descclassname"><span class="pre">blop.plans.</span></span><span class="sig-name descname"><span class="pre">optimize_in_run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimization_problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">readable_cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/plans.html#optimize_in_run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.plans.optimize_in_run" title="Link to this definition">#</a></dt>
+<dd><p>Solve an optimization problem by evaluating acquisition documents inside one run.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>This plan is <strong>experimental</strong>. Its API is not yet stable and may change in
+future releases without a deprecation period.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>optimization_problem</strong><span class="classifier">OptimizationProblem</span></dt><dd><p>The optimization problem to solve.</p>
+</dd>
+<dt><strong>iterations</strong><span class="classifier">int, optional</span></dt><dd><p>The number of optimization iterations to run.</p>
+</dd>
+<dt><strong>n_points</strong><span class="classifier">int, optional</span></dt><dd><p>The number of points to suggest per iteration.</p>
+</dd>
+<dt><strong>checkpoint_interval</strong><span class="classifier">int | None, optional</span></dt><dd><p>The number of iterations between optimizer checkpoints. If None, checkpoints
+will not be saved. Optimizer must implement the
+<a class="reference internal" href="protocols.html#blop.protocols.Checkpointable" title="blop.protocols.Checkpointable"><code class="xref py py-class docutils literal notranslate"><span class="pre">blop.protocols.Checkpointable</span></code></a> protocol.</p>
+</dd>
+<dt><strong>readable_cache: dict[str, InferredReadable] | None = None</strong></dt><dd><p>Cache of readable objects to store the suggestions and outcomes as optimization events.
+If None, a new cache will be created.</p>
+</dd>
+<dt><strong>**kwargs</strong><span class="classifier">Any</span></dt><dd><p>Additional keyword arguments to pass to the acquisition plan.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="blop.plans.optimize_step">
 <span class="sig-prename descclassname"><span class="pre">blop.plans.</span></span><span class="sig-name descname"><span class="pre">optimize_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimization_problem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/plans.html#optimize_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.plans.optimize_step" title="Link to this definition">#</a></dt>
 <dd><p>Single step of the optimization loop.</p>
@@ -757,6 +789,7 @@ Supports both optimizer-generated suggestions (with “_id”) and manual points
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.plans.optimize"><code class="docutils literal notranslate"><span class="pre">optimize()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.plans.optimize_in_run"><code class="docutils literal notranslate"><span class="pre">optimize_in_run()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.plans.optimize_step"><code class="docutils literal notranslate"><span class="pre">optimize_step()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.plans.default_acquire"><code class="docutils literal notranslate"><span class="pre">default_acquire()</span></code></a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blop.plans.acquire_baseline"><code class="docutils literal notranslate"><span class="pre">acquire_baseline()</span></code></a></li>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>The Evaluation Function &#8212; blop 1.1.1.dev4 documentation</title>
+    <title>The Evaluation Function &#8212; blop 1.1.1.dev5 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=7f7490b3"></script>
+    <script src="../_static/documentation_options.js?v=db0c14aa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Protocols for Optimization" href="protocols.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev4" />
+  <meta name="docsearch:version" content="1.1.1.dev5" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -522,7 +522,7 @@ plan returns a hashable identifier, and Blop passes that same identifier to the 
 commonly used at beamlines while also supporting data acquired within a single Bluesky run.</p>
 <section id="anatomy-of-an-evaluation-function">
 <h2>Anatomy of an Evaluation Function<a class="headerlink" href="#anatomy-of-an-evaluation-function" title="Link to this heading">#</a></h2>
-<p>An evaluation function is a callable that accepts a hashable acquisition identifier and a sequence of suggestion mappings, then returns a sequence of outcome mappings. The identifier may be a Bluesky run UID, a tuple of event UIDs, or another hashable key understood by the evaluator.</p>
+<p>An evaluation function is a callable that accepts a hashable acquisition identifier and a sequence of suggestion mappings, then returns a sequence of outcome mappings. The identifier may be a Bluesky run UID, suggestion IDs in executed order, a tuple of event UIDs, or another hashable key understood by the evaluator. The suggestion sequence is optimizer-provided and is not guaranteed to be in acquisition order; match data and outcomes by <code class="docutils literal notranslate"><span class="pre">_id</span></code>.</p>
 <p>A typical implementation is shown below:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 
@@ -546,7 +546,7 @@ commonly used at beamlines while also supporting data acquired within a single B
         <span class="c1"># Typical responsibilities include:</span>
         <span class="c1">#   - Retrieving the data associated with the identifier</span>
         <span class="c1">#   - Iterating over individual suggestions in the acquisition</span>
-        <span class="c1">#       - found in a run's start document under "blop_suggestions" when using default_acquire</span>
+        <span class="c1">#       - using the acquisition plan's documented order/correlation key</span>
         <span class="c1">#   - Constructing a per-suggestion analysis context</span>
         <span class="c1">#   - Calling a lower-level objective function for each sample or suggestion</span>
 </pre></div>

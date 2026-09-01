@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Protocols for Optimization &#8212; blop 1.1.1.dev4 documentation</title>
+    <title>Protocols for Optimization &#8212; blop 1.1.1.dev5 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=7f7490b3"></script>
+    <script src="../_static/documentation_options.js?v=db0c14aa"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Explanation" href="../explanation.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev4" />
+  <meta name="docsearch:version" content="1.1.1.dev5" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -532,9 +532,9 @@ Bluesky plans. Immutability is important to ensure that the optimization problem
 <h2>Data Flow<a class="headerlink" href="#data-flow" title="Link to this heading">#</a></h2>
 <p>The data flow for a typical optimization workflow is as follows:</p>
 <ol class="arabic simple">
-<li><p>The optimizer suggests a sequence of mappings describing points to evaluate.</p></li>
+<li><p>The optimizer suggests a sequence of mappings describing points to evaluate. When suggestions include <code class="docutils literal notranslate"><span class="pre">_id</span></code> values used by Blop optimization plans, those values must be unique within a batch and hashable.</p></li>
 <li><p>The acquisition plan acquires data and returns a hashable acquisition identifier.</p></li>
-<li><p>Blop passes that identifier unchanged to the evaluation function, which transforms the acquired data into a sequence of outcome mappings.</p></li>
+<li><p>Blop passes that identifier unchanged to the evaluation function, which transforms the acquired data into a sequence of outcome mappings. The suggestion sequence passed to the evaluator is optimizer-provided, not necessarily acquisition-ordered.</p></li>
 <li><p>The optimizer ingests the outcomes to inform future suggestions.</p></li>
 </ol>
 <a class="reference internal image-reference" href="../_images/protocol-data-flow.png"><img alt="Data Flow Diagram" class="align-center" src="../_images/protocol-data-flow.png" style="width: 100%;" />
@@ -548,7 +548,7 @@ Bluesky plans. Immutability is important to ensure that the optimization problem
 <h2>Blop optimizers and acquisition plans<a class="headerlink" href="#blop-optimizers-and-acquisition-plans" title="Link to this heading">#</a></h2>
 <p>This protocol design allows you to pick and choose only the components you care about with regard to your optimization workflow. While Blop provides a default optimizer and acquisition plan, you are free to implement your own!</p>
 <p>Blop provides built-in optimizers for common beamline optimization use cases, such as Bayesian optimization with <a class="reference external" href="https://ax.dev">Ax</a>.</p>
-<p>Similarly, Blop provides a <a class="reference internal" href="../reference/plans.html#blop.plans.default_acquire" title="blop.plans.default_acquire"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.plans.default_acquire()</span></code></a> acquisition plan that is compatible with most beamline optimization use cases.</p>
+<p>Similarly, Blop provides <a class="reference internal" href="../reference/plans.html#blop.plans.default_acquire" title="blop.plans.default_acquire"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.plans.default_acquire()</span></code></a> for run-owning acquisitions and <a class="reference internal" href="../reference/plan_stubs.html#blop.plan_stubs.list_scan_in_run" title="blop.plan_stubs.list_scan_in_run"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.plan_stubs.list_scan_in_run()</span></code></a> for acquisition inside one optimization run.</p>
 </section>
 </section>
 
