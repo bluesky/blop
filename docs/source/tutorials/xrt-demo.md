@@ -226,7 +226,6 @@ agent = Agent(
     evaluation_function=DetectorEvaluation(tiled_client),
     name="xrt-blop-demo",
     description="A demo of the Blop agent with XRT simulated beamline",
-    experiment_type="demo",
 )
 ```
 

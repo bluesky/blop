@@ -28,8 +28,10 @@ sequence is not an acquisition-order contract and must not be assumed to
 preserve the optimizer's generation order.
 
 The plan must return a hashable acquisition identifier. Blop passes that value
-unchanged to the evaluation function. A Bluesky run UID is the usual identifier,
-but a tuple of event UIDs can identify acquisitions performed within one run.
+unchanged to the evaluation function. A Bluesky run UID is the usual identifier
+for run-owning acquisitions. The in-run default returns suggestion IDs in the
+order they were executed, but custom plans may return any hashable key their
+matching evaluation function understands.
 
 A simple example that optimizes in a subspace while executing measurements in
 the full physical coordinate system is shown below. 

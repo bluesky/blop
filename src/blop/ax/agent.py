@@ -445,7 +445,7 @@ class Agent(_AxAgentMixin):
         """
         yield from acquire_baseline(self.to_optimization_problem(), parameterization=parameterization)
 
-    def optimize(self, iterations: int = 1, n_points: int = 1) -> MsgGenerator[None]:
+    def optimize(self, iterations: int | None = 1, n_points: int = 1) -> MsgGenerator[None]:
         """
         Run Bayesian optimization.
 
@@ -455,9 +455,10 @@ class Agent(_AxAgentMixin):
 
         Parameters
         ----------
-        iterations : int, optional
-            The number of optimization iterations to run. Default is 1. Each iteration
-            suggests, evaluates, and learns from n_points.
+        iterations : int | None, optional
+            The maximum number of optimization iterations to run. If None, run until
+            the configured stopping strategy's criterion is met. Default is 1. Each
+            iteration suggests, evaluates, and learns from n_points.
         n_points : int, optional
             The number of points to evaluate per iteration. Default is 1. Higher values
             enable batch optimization but may reduce optimization efficiency per iteration.
@@ -466,6 +467,11 @@ class Agent(_AxAgentMixin):
         ------
         Msg
             Bluesky messages for the run engine.
+
+        Raises
+        ------
+        ValueError
+            If ``iterations`` is None and the optimizer does not support stopping criteria.
 
         See Also
         --------

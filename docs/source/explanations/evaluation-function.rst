@@ -43,6 +43,7 @@ A typical implementation is shown below:
             #       - IDs are stored in actual acquisition order under "blop_acquisition_order"
             #         in the run's start document when using default_acquire
             #   - Treating suggestions as optional context, never matching by list position
+            #   - Constructing a per-suggestion analysis context
             #   - Calling a lower-level objective function for each sample or suggestion
 
 Although the interface is intentionally minimal, separating setup from
