@@ -12,7 +12,7 @@ commonly used at beamlines while also supporting data acquired within a single B
 Anatomy of an Evaluation Function
 ---------------------------------
 
-An evaluation function is a callable that accepts a hashable acquisition identifier and a sequence of suggestion mappings, then returns a sequence of outcome mappings. Suggestions are optional analysis context, and their order is neither an acquisition-order contract nor a guaranteed optimizer-generation order. The identifier may be a Bluesky run UID, a tuple of event UIDs, or another hashable key understood by the evaluator.
+An evaluation function is a callable that accepts a hashable acquisition identifier and a sequence of suggestion mappings, then returns a sequence of outcome mappings. Suggestions are optional analysis context and are not guaranteed to match the order of the acquired data. The identifier may be a Bluesky run UID, a tuple of event UIDs, or another hashable key understood by the evaluator.
 
 A typical implementation is shown below:
 

@@ -200,8 +200,7 @@ class EvaluationFunction(Protocol):
     -----
     The evaluation function is called after data acquisition to compute outcomes.
     Use the acquisition identifier to retrieve data and associate each row with a
-    suggestion by its ``"_id"``. The order of ``suggestions`` is not an
-    acquisition-order or optimizer-order contract.
+    suggestion by its ``"_id"``.
 
     Examples
     --------

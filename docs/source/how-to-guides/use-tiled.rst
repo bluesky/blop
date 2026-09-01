@@ -95,10 +95,6 @@ Blop provides a default acquisition plan (:func:`blop.plans.default_acquire`) th
 - Includes **blop_acquisition_order** metadata containing suggestion IDs in actual acquired-row order
 - Includes **blop_suggestions** metadata containing the routed suggestions for backwards compatibility
 
-The evaluator's ``suggestions`` sequence is optional context. Do not use its
-positions to align primary rows or infer an optimizer generation order; use
-``blop_acquisition_order`` instead.
-
 When a custom acquisition plan is used, how the data is stored depends on the plan implementation.
 
 Creating an Evaluation Function

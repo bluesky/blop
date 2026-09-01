@@ -123,7 +123,7 @@ sensors = []
 
 ## Writing the evaluation function
 
-The **evaluation function** computes objective values from experimental data. Blop passes it the hashable identifier returned by the acquisition plan and the suggestions that were tried. Suggestions are optional analysis context; do not assume their sequence matches acquired data or preserves optimizer generation order. This tutorial uses the default acquisition plan, so the identifier is a Bluesky run UID and `blop_acquisition_order` associates measurements with outcomes.
+The **evaluation function** computes objective values from experimental data. Blop passes it the hashable identifier returned by the acquisition plan and the suggestions that were tried. This tutorial uses the default acquisition plan, so the identifier is a Bluesky run UID and `blop_acquisition_order` associates measurements with outcomes.
 
 ```{code-cell} ipython3
 from collections.abc import Hashable, Mapping, Sequence
