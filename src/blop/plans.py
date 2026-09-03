@@ -54,15 +54,16 @@ def default_acquire(
     """
     Acquire data for optimization. Simply a list scan.
 
-    Includes a default metadata key "blop_suggestions" which can be used to identify
-    the suggestions that were acquired for each step of the scan.
+    Includes ``"blop_suggestions"`` metadata containing the routed suggestions for
+    backwards compatibility and ``"blop_acquisition_order"`` containing IDs in actual scan order.
+    Use those IDs, rather than positions in ``suggestions``, to associate acquired rows.
 
     Parameters
     ----------
     suggestions: Sequence[Mapping]
         A sequence of mappings, each containing the parameterization of a point to evaluate.
-        The "_id" key is optional and can be used to identify each suggestion. It is suggested
-        to add "_id" values to the run metadata for later identification of the acquired data.
+        Each mapping must contain a unique ``"_id"`` key used to associate the acquired
+        data with its suggestion.
     actuators: Sequence[Actuator]
         The actuators to move and the inputs to move them to.
     sensors: Sequence[Sensor]
@@ -97,7 +98,13 @@ def default_acquire(
         suggestions = route_suggestions(suggestions, starting_position=current_position)
 
     run_md = dict(md or {})
-    run_md.update({"blop_suggestions": suggestions, "run_key": _DEFAULT_ACQUIRE_RUN_KEY})
+    run_md.update(
+        {
+            "blop_suggestions": suggestions,
+            "blop_acquisition_order": [suggestion[ID_KEY] for suggestion in suggestions],
+            "run_key": _DEFAULT_ACQUIRE_RUN_KEY,
+        }
+    )
     plan_args = _unpack_for_list_scan(suggestions, actuators)
     return (
         # TODO: fix argument type in bluesky.plans.list_scan

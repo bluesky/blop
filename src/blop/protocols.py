@@ -199,8 +199,8 @@ class EvaluationFunction(Protocol):
     Notes
     -----
     The evaluation function is called after data acquisition to compute outcomes.
-    It uses the acquisition identifier returned by the acquisition plan to retrieve
-    the relevant data and computes objective values and metrics for each suggestion.
+    Use the acquisition identifier to retrieve data and associate each row with a
+    suggestion by its ``"_id"``.
 
     Examples
     --------
@@ -218,14 +218,16 @@ class EvaluationFunction(Protocol):
             The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,
             a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.
         suggestions: Sequence[Mapping]
-            A sequence of mappings, each containing the optimizer-provided parameterization of a point to evaluate.
-            This sequence is not guaranteed to be in acquisition order. Match data and outcomes by "_id".
+            A sequence of mappings, each containing a parameterization to evaluate.
+            Each mapping must contain a unique ``"_id"``. Do not assume its order
+            aligns with acquired data or preserves optimizer generation order.
 
         Returns
         -------
         Sequence[Mapping]
-            A sequence of mappings containing the outcomes of the acquisition, one for each suggested parameterization.
-            The "_id" key is optional and can be used to identify each outcome; when present, it must match a suggestion ID.
+            A sequence of mappings containing the outcomes of the acquisition, one for each
+            suggested parameterization. Each mapping must contain an ``"_id"`` identifying
+            its evaluated suggestion.
         """
         ...
 
@@ -252,6 +254,7 @@ class AcquisitionPlan(Protocol):
     The acquisition plan is a Bluesky plan that should move the actuators to each
     suggested position, acquire data from the sensors, and return a hashable
     identifier that the evaluation function can use to retrieve the acquired data.
+    When it may reorder points, it must record their IDs in actual acquisition order.
     """
 
     @plan
