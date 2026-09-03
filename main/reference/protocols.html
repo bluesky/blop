@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Protocols &#8212; blop 1.1.1.dev5 documentation</title>
+    <title>Protocols &#8212; blop 1.1.1.dev6 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=db0c14aa"></script>
+    <script src="../_static/documentation_options.js?v=ecf49ec0"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Plan Stubs" href="plan_stubs.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev5" />
+  <meta name="docsearch:version" content="1.1.1.dev6" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -539,7 +539,7 @@ we do not want to require <cite>HasHints</cite> on the movable.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="blop.protocols.Actuator">
 <span class="sig-prename descclassname"><span class="pre">blop.protocols.</span></span><span class="sig-name descname"><span class="pre">Actuator</span></span><a class="headerlink" href="#blop.protocols.Actuator" title="Link to this definition">#</a></dt>
-<dd><p>alias of <a class="reference internal" href="#blop.protocols.MovableHasName" title="blop.protocols.MovableHasName"><code class="xref py py-class docutils literal notranslate"><span class="pre">MovableHasName</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Flyable" title="(in bluesky v1.15.2.dev76+g79e2d45e2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flyable</span></code></a></p>
+<dd><p>alias of <a class="reference internal" href="#blop.protocols.MovableHasName" title="blop.protocols.MovableHasName"><code class="xref py py-class docutils literal notranslate"><span class="pre">MovableHasName</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Flyable" title="(in bluesky v1.15.2.dev77+g6a82217aa)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flyable</span></code></a></p>
 </dd></dl>
 
 </section>
@@ -548,7 +548,7 @@ we do not want to require <cite>HasHints</cite> on the movable.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="blop.protocols.Sensor">
 <span class="sig-prename descclassname"><span class="pre">blop.protocols.</span></span><span class="sig-name descname"><span class="pre">Sensor</span></span><a class="headerlink" href="#blop.protocols.Sensor" title="Link to this definition">#</a></dt>
-<dd><p>alias of <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Readable" title="(in bluesky v1.15.2.dev76+g79e2d45e2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventCollectable" title="(in bluesky v1.15.2.dev76+g79e2d45e2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventCollectable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventPageCollectable" title="(in bluesky v1.15.2.dev76+g79e2d45e2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPageCollectable</span></code></a></p>
+<dd><p>alias of <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Readable" title="(in bluesky v1.15.2.dev77+g6a82217aa)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventCollectable" title="(in bluesky v1.15.2.dev77+g6a82217aa)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventCollectable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventPageCollectable" title="(in bluesky v1.15.2.dev77+g6a82217aa)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPageCollectable</span></code></a></p>
 </dd></dl>
 
 </section>
@@ -578,7 +578,8 @@ needed for specialized acquisition strategies (e.g., fly scans, complex detector
 <p class="rubric">Notes</p>
 <p>The acquisition plan is a Bluesky plan that should move the actuators to each
 suggested position, acquire data from the sensors, and return a hashable
-identifier that the evaluation function can use to retrieve the acquired data.</p>
+identifier that the evaluation function can use to retrieve the acquired data.
+When it may reorder points, it must record their IDs in actual acquisition order.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="blop.protocols.AcquisitionPlan.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">suggestions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actuators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">md</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/protocols.html#AcquisitionPlan.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.protocols.AcquisitionPlan.__call__" title="Link to this definition">#</a></dt>
@@ -634,8 +635,8 @@ data translates into the outcomes you want to optimize.</p>
 </div>
 <p class="rubric">Notes</p>
 <p>The evaluation function is called after data acquisition to compute outcomes.
-It uses the acquisition identifier returned by the acquisition plan to retrieve
-the relevant data and computes objective values and metrics for each suggestion.</p>
+Use the acquisition identifier to retrieve data and associate each row with a
+suggestion by its <code class="docutils literal notranslate"><span class="pre">&quot;_id&quot;</span></code>.</p>
 <p class="rubric">Examples</p>
 <p>See the tutorial documentation for complete examples of evaluation functions:
 <a class="reference internal" href="../tutorials/simple-experiment.html"><span class="doc">Your first Bayesian optimization with Blop</span></a></p>
@@ -649,15 +650,17 @@ the relevant data and computes objective values and metrics for each suggestion.
 <dt><strong>uid: Hashable</strong></dt><dd><p>The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,
 a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.</p>
 </dd>
-<dt><strong>suggestions: Sequence[Mapping]</strong></dt><dd><p>A sequence of mappings, each containing the optimizer-provided parameterization of a point to evaluate.
-This sequence is not guaranteed to be in acquisition order. Match data and outcomes by “_id”.</p>
+<dt><strong>suggestions: Sequence[Mapping]</strong></dt><dd><p>A sequence of mappings, each containing a parameterization to evaluate.
+Each mapping must contain a unique <code class="docutils literal notranslate"><span class="pre">&quot;_id&quot;</span></code>. Do not assume its order
+aligns with acquired data or preserves optimizer generation order.</p>
 </dd>
 </dl>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>Sequence[Mapping]</dt><dd><p>A sequence of mappings containing the outcomes of the acquisition, one for each suggested parameterization.
-The “_id” key is optional and can be used to identify each outcome; when present, it must match a suggestion ID.</p>
+<dt>Sequence[Mapping]</dt><dd><p>A sequence of mappings containing the outcomes of the acquisition, one for each
+suggested parameterization. Each mapping must contain an <code class="docutils literal notranslate"><span class="pre">&quot;_id&quot;</span></code> identifying
+its evaluated suggestion.</p>
 </dd>
 </dl>
 </dd>
@@ -806,7 +809,7 @@ Users should use the concrete subclasses <a class="reference internal" href="#bl
 <dl class="py class">
 <dt class="sig sig-object py" id="blop.protocols.OptimizationProblem">
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">blop.protocols.</span></span><span class="sig-name descname"><span class="pre">OptimizationProblem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">optimizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">actuators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sensors</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evaluation_function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acquisition_plan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/blop/protocols.html#OptimizationProblem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#blop.protocols.OptimizationProblem" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#blop.protocols.BaseOptimizationProblem" title="blop.protocols.BaseOptimizationProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOptimizationProblem</span></code></a>[<a class="reference internal" href="#blop.protocols.MovableHasName" title="blop.protocols.MovableHasName"><code class="xref py py-class docutils literal notranslate"><span class="pre">MovableHasName</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Flyable" title="(in bluesky v1.15.2.dev76+g79e2d45e2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flyable</span></code></a>, <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Readable" title="(in bluesky v1.15.2.dev76+g79e2d45e2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventCollectable" title="(in bluesky v1.15.2.dev76+g79e2d45e2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventCollectable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventPageCollectable" title="(in bluesky v1.15.2.dev76+g79e2d45e2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPageCollectable</span></code></a>, <a class="reference internal" href="#blop.protocols.AcquisitionPlan" title="blop.protocols.AcquisitionPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">AcquisitionPlan</span></code></a>]</p>
+<dd><p>Bases: <a class="reference internal" href="#blop.protocols.BaseOptimizationProblem" title="blop.protocols.BaseOptimizationProblem"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseOptimizationProblem</span></code></a>[<a class="reference internal" href="#blop.protocols.MovableHasName" title="blop.protocols.MovableHasName"><code class="xref py py-class docutils literal notranslate"><span class="pre">MovableHasName</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Flyable" title="(in bluesky v1.15.2.dev77+g6a82217aa)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Flyable</span></code></a>, <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.Readable" title="(in bluesky v1.15.2.dev77+g6a82217aa)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Readable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventCollectable" title="(in bluesky v1.15.2.dev77+g6a82217aa)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventCollectable</span></code></a> | <a class="reference external" href="https://blueskyproject.io/bluesky/main/hardware.html#bluesky.protocols.EventPageCollectable" title="(in bluesky v1.15.2.dev77+g6a82217aa)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPageCollectable</span></code></a>, <a class="reference internal" href="#blop.protocols.AcquisitionPlan" title="blop.protocols.AcquisitionPlan"><code class="xref py py-class docutils literal notranslate"><span class="pre">AcquisitionPlan</span></code></a>]</p>
 <p>An optimization problem to solve. Immutable once initialized.</p>
 <p>This dataclass encapsulates all components needed for optimization into a single
 immutable structure. It is typically created via <a class="reference internal" href="ax/agent.html#blop.ax.Agent.to_optimization_problem" title="blop.ax.Agent.to_optimization_problem"><code class="xref py py-meth docutils literal notranslate"><span class="pre">blop.ax.Agent.to_optimization_problem()</span></code></a>

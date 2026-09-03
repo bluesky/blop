@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Your first Scipy optimization with Blop &#8212; blop 1.1.1.dev5 documentation</title>
+    <title>Your first Scipy optimization with Blop &#8212; blop 1.1.1.dev6 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=db0c14aa"></script>
+    <script src="../_static/documentation_options.js?v=ecf49ec0"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Your first Bayesian optimization with Blop" href="simple-experiment.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev5" />
+  <meta name="docsearch:version" content="1.1.1.dev6" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -554,9 +554,6 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Tiled version 0.2.17
-</pre></div>
-</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0
 </pre></div>
 </div>
@@ -644,7 +641,7 @@
 </section>
 <section id="writing-the-evaluation-function">
 <h2>Writing the evaluation function<a class="headerlink" href="#writing-the-evaluation-function" title="Link to this heading">#</a></h2>
-<p>The <strong>evaluation function</strong> computes objective values from experimental data. Blop passes it the hashable identifier returned by the acquisition plan and the suggestions that were tried. This tutorial uses the default acquisition plan, so the identifier is a Bluesky run UID.</p>
+<p>The <strong>evaluation function</strong> computes objective values from experimental data. Blop passes it the hashable identifier returned by the acquisition plan and the suggestions that were tried. This tutorial uses the default acquisition plan, so the identifier is a Bluesky run UID and <code class="docutils literal notranslate"><span class="pre">blop_acquisition_order</span></code> associates measurements with outcomes.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
@@ -658,19 +655,12 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Himmelblau2DEvaluation requires a Bluesky run UID string, got </span><span class="si">{</span><span class="n">uid</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tiled_client</span><span class="p">[</span><span class="n">uid</span><span class="p">]</span>
         <span class="n">outcomes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">reordered_suggestions</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="s2">"blop_suggestions"</span><span class="p">]</span>
+        <span class="n">acquisition_order</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="s2">"blop_acquisition_order"</span><span class="p">]</span>
         <span class="n">x1_data</span> <span class="o">=</span> <span class="n">run</span><span class="p">[</span><span class="s2">"primary/x1"</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">x2_data</span> <span class="o">=</span> <span class="n">run</span><span class="p">[</span><span class="s2">"primary/x2"</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="s2">"[Himmelblau] evaluating suggestions: "</span><span class="p">,</span>
-            <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">],</span>
-            <span class="s2">" reordered to: "</span><span class="p">,</span>
-            <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">reordered_suggestions</span><span class="p">],</span>
-        <span class="p">)</span>
-        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reordered_suggestions</span><span class="p">):</span>
-            <span class="c1"># Special key to identify a suggestion</span>
-            <span class="n">suggestion_id</span> <span class="o">=</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"[Himmelblau] evaluating acquired order: "</span><span class="p">,</span> <span class="n">acquisition_order</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">suggestion_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">acquisition_order</span><span class="p">):</span>
             <span class="n">x1</span> <span class="o">=</span> <span class="n">x1_data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
             <span class="n">x2</span> <span class="o">=</span> <span class="n">x2_data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
             <span class="c1"># Himmelblau function: has four global minima where value = 0</span>
@@ -708,54 +698,34 @@
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Actuators  </span>x1, x2                                                                                               <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Sensors    </span>N/A                                                                                                  <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Iterations </span>10                                                                                                   <span style="color: #000080; text-decoration-color: #000080">│</span>
-<span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Run UID    </span>b23bcefb-b095-4685-9c92-7111a7029d87                                                                 <span style="color: #000080; text-decoration-color: #000080">│</span>
+<span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Run UID    </span>f4f606fa-94b2-4939-8c4b-42a2fdb285f1                                                                 <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
-</div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Himmelblau] evaluating suggestions:
+</div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Himmelblau] evaluating acquired order:
 [0]
- reordered to:
-[0]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [1]
- reordered to:
-[1]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [2]
- reordered to:
-[2]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [3]
- reordered to:
-[3]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [4]
- reordered to:
-[4]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [5]
- reordered to:
-[5]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [6]
- reordered to:
-[6]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [7]
- reordered to:
-[7]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [8]
- reordered to:
-[8]
-[Himmelblau] evaluating suggestions:
-[9]
- reordered to:
+[Himmelblau] evaluating acquired order:
 [9]
 </pre></div>
 </div>
 <div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>2633e1f8-e1f1-44a6-ab9f-2e50dc8853fc
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>7b0e2031-2b74-411f-b1b6-3c6361529261
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━┳━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -768,7 +738,7 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>b81e8f58-ed3e-428f-aa98-fecf4bd51958
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>a754b492-ec6a-4386-80da-95a23ad5295a
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">    x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -781,7 +751,7 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>456bd232-10e5-4855-9738-6229d967c4e8
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>8ca3c4cb-b704-40e0-987b-75d8bcf948c0
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━┳━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">    x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -794,7 +764,7 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>307fc295-b964-418b-add2-32221dace73a
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>b3e6d932-058f-45ff-a149-ed66aae403b1
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━┳━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -807,7 +777,7 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>3bfa767c-6dec-4343-b15a-fb01c93a111b
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>5f6c5d6a-e02b-421c-b8c0-bafcdeef83b6
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━┳━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -820,7 +790,7 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">6</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>328870c3-a9d1-43f9-8f16-94fb2d9a97c5
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>8ca9fa98-73d7-4a1a-9a66-cf62c8e1ad90
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━┳━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -833,7 +803,7 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">7</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>50f01766-007f-45f1-96cc-9996b653a4eb
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>37830f33-80e9-499d-88bf-87d1d4d7e594
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -846,7 +816,7 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>618639eb-ed70-4106-b7c9-1970b3cfa1ef
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>88e8f5c3-462b-492b-8465-5bd2bd64551d
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -859,7 +829,7 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">9</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>f54f473b-8782-4885-a385-ffcc4eff1d77
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>f4057703-076e-4a0b-bc44-6f3073e9c05a
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -872,7 +842,7 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span><span style="color: #000080; text-decoration-color: #000080"> ────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>3334fb87-5d86-431c-9216-08641aea6cde
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>30450d9b-eb4c-41c9-94d8-a6f2013462e3
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -898,17 +868,17 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 </pre>
-</div><div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>('b23bcefb-b095-4685-9c92-7111a7029d87',
- '2633e1f8-e1f1-44a6-ab9f-2e50dc8853fc',
- 'b81e8f58-ed3e-428f-aa98-fecf4bd51958',
- '456bd232-10e5-4855-9738-6229d967c4e8',
- '307fc295-b964-418b-add2-32221dace73a',
- '3bfa767c-6dec-4343-b15a-fb01c93a111b',
- '328870c3-a9d1-43f9-8f16-94fb2d9a97c5',
- '50f01766-007f-45f1-96cc-9996b653a4eb',
- '618639eb-ed70-4106-b7c9-1970b3cfa1ef',
- 'f54f473b-8782-4885-a385-ffcc4eff1d77',
- '3334fb87-5d86-431c-9216-08641aea6cde')
+</div><div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>('f4f606fa-94b2-4939-8c4b-42a2fdb285f1',
+ '7b0e2031-2b74-411f-b1b6-3c6361529261',
+ 'a754b492-ec6a-4386-80da-95a23ad5295a',
+ '8ca3c4cb-b704-40e0-987b-75d8bcf948c0',
+ 'b3e6d932-058f-45ff-a149-ed66aae403b1',
+ '5f6c5d6a-e02b-421c-b8c0-bafcdeef83b6',
+ '8ca9fa98-73d7-4a1a-9a66-cf62c8e1ad90',
+ '37830f33-80e9-499d-88bf-87d1d4d7e594',
+ '88e8f5c3-462b-492b-8465-5bd2bd64551d',
+ 'f4057703-076e-4a0b-bc44-6f3073e9c05a',
+ '30450d9b-eb4c-41c9-94d8-a6f2013462e3')
 </pre></div>
 </div>
 </div>
@@ -938,94 +908,54 @@
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Actuators  </span>x1, x2                                                                                               <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Sensors    </span>N/A                                                                                                  <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Iterations </span>20  <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Points/iter </span>2                                                                                    <span style="color: #000080; text-decoration-color: #000080">│</span>
-<span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Run UID    </span>9dac225b-8a98-4a97-ad9d-73fbdca25a32                                                                 <span style="color: #000080; text-decoration-color: #000080">│</span>
+<span style="color: #000080; text-decoration-color: #000080">│</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">Run UID    </span>37f633ac-0a1c-4da8-8692-c6883bb6f1a6                                                                 <span style="color: #000080; text-decoration-color: #000080">│</span>
 <span style="color: #000080; text-decoration-color: #000080">╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯</span>
 </pre>
-</div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Himmelblau] evaluating suggestions:
+</div><div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[Himmelblau] evaluating acquired order:
 [0]
- reordered to:
-[0]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [1]
- reordered to:
-[1]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [2]
- reordered to:
-[2]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [3]
- reordered to:
-[3]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [4]
- reordered to:
-[4]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [5]
- reordered to:
-[5]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [6, 7]
- reordered to:
-[6, 7]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [8]
- reordered to:
-[8]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [9, 10]
- reordered to:
-[10, 9]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [11]
- reordered to:
-[11]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [12, 13]
- reordered to:
-[12, 13]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [14]
- reordered to:
-[14]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [15, 16]
- reordered to:
-[15, 16]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [17]
- reordered to:
-[17]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [18, 19]
- reordered to:
-[18, 19]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [20]
- reordered to:
-[20]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [21, 22]
- reordered to:
-[21, 22]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [23]
- reordered to:
-[23]
-[Himmelblau] evaluating suggestions:
+[Himmelblau] evaluating acquired order:
 [24, 25]
- reordered to:
-[24, 25]
-[Himmelblau] evaluating suggestions:
-[26]
- reordered to:
+[Himmelblau] evaluating acquired order:
 [26]
 </pre></div>
 </div>
 <div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">1</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>0ccb5246-2acc-4e99-be6f-961163fb53e2
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>cbd8bd13-3706-4b0e-8de8-6fe5121b7c9e
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━┳━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
@@ -1038,41 +968,41 @@
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>63fc2393-9003-40a8-b3e1-69bfa91ee995
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             1 │</span><span style="color: #008080; text-decoration-color: #008080"> 3.3108 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -0.300555 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       13.0668 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴────────┴───────────┴───────────────┘</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>13.0668<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>170<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>91.5334
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (2 pts sampled)</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
-</pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>7897b6af-2acb-474e-becc-33339770eb82
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>5c334e0e-8a23-4a27-95de-024db289f95d
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             2 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.8683 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.52034 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       6.93178 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             1 │</span><span style="color: #008080; text-decoration-color: #008080"> 1.74791 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.59792 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       78.0762 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>6.93178<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>170<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>63.3329
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>78.0762<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>170<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>124.038
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (2 pts sampled)</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>719ae46f-46b3-4a4d-922c-4628542efbee
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             2 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.36391 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.11978 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       29.8617 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
+</pre>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>29.8617<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>170<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>92.646
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (3 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>b3afe676-4ffe-4f70-96ab-ff9971076c87
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>71fdc2a9-c2a4-406d-8f77-dc57960c3cd6
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             3 │</span><span style="color: #008080; text-decoration-color: #008080"> -0.28675 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.52034 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       80.7937 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             3 │</span><span style="color: #008080; text-decoration-color: #008080"> -4.41474 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.11978 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       195.589 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>6.93178<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>170<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>67.6981
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>29.8617<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>195.589<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>118.382
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (4 pts sampled)</span>
 </pre>
 </div><div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/blop/blop/.pixi/envs/docs/lib/python3.13/site-packages/scipy/optimize/_dual_annealing.py:434: OptimizeWarning: Unknown solver options: max_iter
@@ -1081,229 +1011,229 @@
 </div>
 <div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">5</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>95ce4f62-4345-4b92-abd4-d866df62d72c
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>6a0b8c66-1181-4504-be5d-14b2b8408464
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             4 │</span><span style="color: #008080; text-decoration-color: #008080"> -0.28675 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 0.515372 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       157.506 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             4 │</span><span style="color: #008080; text-decoration-color: #008080"> -4.41474 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -1.93127 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       102.075 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴──────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>6.93178<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>170<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>85.6597
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>29.8617<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>195.589<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>115.12
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (5 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">6</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>1482c30f-e127-4638-89ae-bf4b51d377f4
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>3e669abe-005b-42cc-996d-7a1979ff18a2
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             5 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.8683 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.52034 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       6.93178 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             5 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.36391 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.11978 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       29.8617 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>6.93178<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>170<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>72.5384
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>29.8617<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>195.589<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>100.911
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (6 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">7</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>e0abce31-f4de-4fd0-96f7-d9fc3e9cefb7
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>c7c40135-9488-4e30-9ccd-1813b92c66a5
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             6 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.7683 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.52034 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       6.92172 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │             7 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.8683 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.62034 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       11.2065 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             6 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.46391 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.11978 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        25.284 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │             7 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.36391 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.21978 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       27.4855 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>6.92172<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>170<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>56.6698
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>25.284<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>195.589<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>82.2791
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (8 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">8</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ─────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>29685b30-9da1-4d20-8e20-e22906f91d9f
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>824b210a-0e57-4c95-9979-c7d6d0e2f834
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             8 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.76765 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       301.582 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━┳━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━╇━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │             8 │</span><span style="color: #008080; text-decoration-color: #008080">  5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">           890 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴────┴────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>6.92172<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>301.582<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>83.8823
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>25.284<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>172.026
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (9 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">9</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ───────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>6c004a9e-ffc7-44e0-a201-1745bea08845
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>e74f3275-44bc-4dfb-8a2e-cd1d71924d5f
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">   x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            10 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.76765 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> -4.9 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       270.744 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │             9 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.66765 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   -5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">           314 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴──────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━┳━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">  x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">  x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━╇━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            10 │</span><span style="color: #008080; text-decoration-color: #008080">   5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 4.9 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        841.65 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │             9 │</span><span style="color: #008080; text-decoration-color: #008080"> 4.9 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">   5 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        848.77 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────┴─────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>6.92172<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>121.789
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>25.284<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>294.423
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (11 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">10</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>3c0a225b-fd5a-4b07-98e6-098eae686269
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>bd36dcd4-ae6a-4392-a090-022693d88bd8
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            11 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.82724 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 0.0439555 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       105.315 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴───────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            11 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.82269 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.79509 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">         2.443 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>6.92172<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>120.417
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>2.443<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>270.091
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (12 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">11</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ──────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>8a6dc265-03bf-4179-a8c7-8503fce877fc
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>5158f48a-3093-4976-9d27-66d7d9cf2858
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">        x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            12 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.82724 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080">  0.143955 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       104.363 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            13 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.72724 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 0.0439555 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       106.959 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴───────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            12 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.82269 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.89509 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">        1.6369 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            13 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.92269 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.79509 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       1.17029 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>6.92172<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>118.309
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>1.17029<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>231.707
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (14 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">12</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>1674578e-99a6-485f-be74-a0b5d79271c9
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>6d13be83-a605-44b4-871b-b031284b390f
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            14 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.86204 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 2.9903 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.879611 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            14 │</span><span style="color: #008080; text-decoration-color: #008080"> 3.00338 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 2.13331 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.330935 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.879611<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>110.48
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.330935<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>216.282
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (15 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">13</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ──────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>55194045-bc0c-4944-8d06-ef390ce19695
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>b5111adc-4eb4-45e3-a1e9-797f12fe683e
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            15 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.86204 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.0903 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.176678 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            16 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.76204 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 2.9903 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.817636 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            15 │</span><span style="color: #008080; text-decoration-color: #008080"> 3.10338 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 2.13331 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       1.01234 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            16 │</span><span style="color: #008080; text-decoration-color: #008080"> 3.00338 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 2.23331 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">       1.04649 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.176678<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>97.5409
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.330935<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>190.958
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (17 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">14</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>e7161c50-45b6-40b8-889e-78907aa2a450
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>6ccc4325-a968-4e0c-8fba-d2f0e20c56a7
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            17 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.85711 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.06502 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.266139 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴─────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            17 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.94086 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.97363 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.169523 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.176678<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>92.1367
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.169523<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>180.359
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (18 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">15</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ──────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>1df74a87-f359-4db1-9e39-63bf2a49ca03
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>56aba4dc-5307-498f-baac-07d1e71424fb
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            18 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.85711 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.16502 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.133323 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            19 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.75711 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.06502 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.242691 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴─────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            18 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.94086 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 2.07363 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.135107 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            19 │</span><span style="color: #008080; text-decoration-color: #008080"> 3.04086 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.97363 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">     0.0526939 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.133323<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>82.9419
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.0526939<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>162.333
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (20 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">16</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>d0af0d84-c244-410d-8d48-a89facf808eb
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>c8b4b3ff-f56a-4131-a21a-a44b63d31039
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            20 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.85406 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.08243 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.176401 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴─────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            20 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.95082 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.9801 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.114178 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.133323<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>79.0006
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.0526939<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>154.608
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (21 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">17</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ──────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>5765d4a3-0cb0-453e-8f83-7b67a31e342d
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>3d74646e-3c75-414d-8f51-82b5502501d7
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            21 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.85406 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.18243 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.182588 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            22 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.75406 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.08243 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.174575 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴─────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            21 │</span><span style="color: #008080; text-decoration-color: #008080"> 3.05082 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.9801 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">     0.0835195 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            22 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.95082 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 2.0801 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.122266 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.133323<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>72.1466
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.0526939<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>141.173
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (23 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">18</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>6489483f-d5a7-4acc-9586-1f6da64fde45
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>37822853-4a60-4345-abff-f609b9c0f4ad
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            23 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.85384 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.08166 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.178695 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴─────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            23 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.95469 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.9782 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.102458 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.133323<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>69.1479
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.0526939<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>135.295
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (24 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">19</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span>  <span style="font-weight: bold">(</span><span style="color: #008080; text-decoration-color: #008080; font-weight: bold">2</span> points<span style="font-weight: bold">)</span><span style="color: #000080; text-decoration-color: #000080"> ──────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>0d189bf0-e66a-4543-88ec-d18b88d23bb5
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>a030b246-d514-4df7-9c48-4890c32da3c2
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            24 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.75384 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.08166 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.178193 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            25 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.85384 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.18166 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.178735 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴─────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            24 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.95469 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 2.0782 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.111569 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     1 │            25 │</span><span style="color: #008080; text-decoration-color: #008080"> 3.05469 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.9782 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">     0.0967211 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.133323<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>63.8425
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.0526939<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>124.895
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (26 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #000080; text-decoration-color: #000080">──────────────────────────────────────────────── </span>Iteration <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span> <span style="color: #800080; text-decoration-color: #800080">/</span> <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">20</span><span style="color: #000080; text-decoration-color: #000080"> ────────────────────────────────────────────────</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>b6280edd-6008-4f41-ab79-6d13726b133c
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  Acquire UID  </span>725a9f30-cb49-4af2-891e-a21876ef5c80
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            26 │</span><span style="color: #008080; text-decoration-color: #008080"> -2.85405 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 3.08243 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.176409 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴──────────┴─────────┴───────────────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Event </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Suggestion ID </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x1 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      x2 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> himmelblau_2d </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│     0 │            26 │</span><span style="color: #008080; text-decoration-color: #008080"> 2.95639 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008080; text-decoration-color: #008080"> 1.97537 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span><span style="color: #008000; text-decoration-color: #008000">      0.100887 </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────┴───────────────┴─────────┴─────────┴───────────────┘</span>
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.133323<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>314<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>61.4845
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">  <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  min: </span>0.0526939<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  max: </span>890<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  mean: </span>120.273
 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">  (27 pts sampled)</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace">
 </pre>
-</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">                             Summary Statistics                              </span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┓</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Name          </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Type    </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">      Min </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     Max </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     Mean </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     Std </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Count </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━┩</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008080; text-decoration-color: #008080">x1           </span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ param   │</span>  -2.8683 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>  3.3108 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> -2.29466 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 1.40051 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    27 │</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008080; text-decoration-color: #008080">x2           </span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ param   │</span>       -5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 3.62034 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>    1.607 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 2.71272 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    27 │</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ outcome │</span> 0.133323 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>     314 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>  61.4845 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 99.0107 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    27 │</span>
-<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────────────┴─────────┴──────────┴─────────┴──────────┴─────────┴───────┘</span>
+</div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">                           Summary Statistics                            </span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┏━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━┳━━━━━┳━━━━━━━━━┳━━━━━━━━━┳━━━━━━━┓</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Name          </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Type    </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">       Min </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Max </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">    Mean </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold">     Std </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span><span style="font-weight: bold"> Count </span><span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┃</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">┡━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━╇━━━━━╇━━━━━━━━━╇━━━━━━━━━╇━━━━━━━┩</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008080; text-decoration-color: #008080">x1           </span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ param   │</span>  -4.41474 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>   5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 2.40177 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 2.18454 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    27 │</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008080; text-decoration-color: #008080">x2           </span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ param   │</span>  -1.93127 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span>   5 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 2.01192 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 1.41868 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    27 │</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> <span style="color: #008000; text-decoration-color: #008000">himmelblau_2d</span> <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│ outcome │</span> 0.0526939 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 890 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 120.273 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│</span> 271.546 <span style="color: #7f7f7f; text-decoration-color: #7f7f7f">│    27 │</span>
+<span style="color: #7f7f7f; text-decoration-color: #7f7f7f">└───────────────┴─────────┴───────────┴─────┴─────────┴─────────┴───────┘</span>
 </pre>
 </div><div class="output text_html"><pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="color: #008000; text-decoration-color: #008000">────────────────────────────────────────────── </span><span style="font-weight: bold">Optimization Complete</span><span style="color: #008000; text-decoration-color: #008000"> ──────────────────────────────────────────────</span>
 </pre>
@@ -1350,7 +1280,7 @@
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Text(0.5, 1.0, "Visualizing Scipy's traversal of Himmelblau")
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="../_images/0020fed03f39afa3dd2c296c8ee09be063f229dc51a600253a3214afe27170f2.png"><img alt="../_images/0020fed03f39afa3dd2c296c8ee09be063f229dc51a600253a3214afe27170f2.png" class="align-center" src="../_images/0020fed03f39afa3dd2c296c8ee09be063f229dc51a600253a3214afe27170f2.png" style="width: 100%;" />
+<a class="reference internal image-reference" href="../_images/3ea9c8f25e51aa8ad6faba1cad5595d90645181f40d612e25646d09cec3f9d86.png"><img alt="../_images/3ea9c8f25e51aa8ad6faba1cad5595d90645181f40d612e25646d09cec3f9d86.png" class="align-center" src="../_images/3ea9c8f25e51aa8ad6faba1cad5595d90645181f40d612e25646d09cec3f9d86.png" style="width: 100%;" />
 </a>
 </div>
 </div>
@@ -1397,184 +1327,184 @@
     <tr>
       <th>1</th>
       <td>1.0</td>
-      <td>3.310802</td>
-      <td>-0.300555</td>
-      <td>13.066841</td>
+      <td>1.747914</td>
+      <td>3.597915</td>
+      <td>78.076207</td>
     </tr>
     <tr>
       <th>2</th>
       <td>2.0</td>
-      <td>-2.868303</td>
-      <td>3.520339</td>
-      <td>6.931782</td>
+      <td>2.363908</td>
+      <td>1.119784</td>
+      <td>29.861719</td>
     </tr>
     <tr>
       <th>3</th>
       <td>3.0</td>
-      <td>-0.286750</td>
-      <td>3.520339</td>
-      <td>80.793667</td>
+      <td>-4.414742</td>
+      <td>1.119784</td>
+      <td>195.589253</td>
     </tr>
     <tr>
       <th>4</th>
       <td>4.0</td>
-      <td>-0.286750</td>
-      <td>0.515372</td>
-      <td>157.506405</td>
+      <td>-4.414742</td>
+      <td>-1.931267</td>
+      <td>102.074716</td>
     </tr>
     <tr>
       <th>5</th>
       <td>5.0</td>
-      <td>-2.868303</td>
-      <td>3.520339</td>
-      <td>6.931782</td>
+      <td>2.363908</td>
+      <td>1.119784</td>
+      <td>29.861719</td>
     </tr>
     <tr>
       <th>6</th>
       <td>6.0</td>
-      <td>-2.768303</td>
-      <td>3.520339</td>
-      <td>6.921717</td>
+      <td>2.463908</td>
+      <td>1.119784</td>
+      <td>25.284014</td>
     </tr>
     <tr>
       <th>7</th>
       <td>7.0</td>
-      <td>-2.868303</td>
-      <td>3.620339</td>
-      <td>11.206481</td>
+      <td>2.363908</td>
+      <td>1.219784</td>
+      <td>27.485457</td>
     </tr>
     <tr>
       <th>8</th>
       <td>8.0</td>
-      <td>-2.767653</td>
-      <td>-5.000000</td>
-      <td>301.581635</td>
+      <td>5.000000</td>
+      <td>5.000000</td>
+      <td>890.000000</td>
     </tr>
     <tr>
       <th>9</th>
       <td>10.0</td>
-      <td>-2.767653</td>
-      <td>-4.900000</td>
-      <td>270.743668</td>
+      <td>5.000000</td>
+      <td>4.900000</td>
+      <td>841.650100</td>
     </tr>
     <tr>
       <th>10</th>
       <td>9.0</td>
-      <td>-2.667653</td>
-      <td>-5.000000</td>
-      <td>313.999726</td>
+      <td>4.900000</td>
+      <td>5.000000</td>
+      <td>848.770100</td>
     </tr>
     <tr>
       <th>11</th>
       <td>11.0</td>
-      <td>-2.827237</td>
-      <td>0.043955</td>
-      <td>105.314658</td>
+      <td>2.822687</td>
+      <td>1.795089</td>
+      <td>2.442996</td>
     </tr>
     <tr>
       <th>12</th>
       <td>12.0</td>
-      <td>-2.827237</td>
-      <td>0.143955</td>
-      <td>104.363199</td>
+      <td>2.822687</td>
+      <td>1.895089</td>
+      <td>1.636899</td>
     </tr>
     <tr>
       <th>13</th>
       <td>13.0</td>
-      <td>-2.727237</td>
-      <td>0.043955</td>
-      <td>106.959451</td>
+      <td>2.922687</td>
+      <td>1.795089</td>
+      <td>1.170290</td>
     </tr>
     <tr>
       <th>14</th>
       <td>14.0</td>
-      <td>-2.862042</td>
-      <td>2.990303</td>
-      <td>0.879611</td>
+      <td>3.003381</td>
+      <td>2.133308</td>
+      <td>0.330935</td>
     </tr>
     <tr>
       <th>15</th>
       <td>15.0</td>
-      <td>-2.862042</td>
-      <td>3.090303</td>
-      <td>0.176678</td>
+      <td>3.103381</td>
+      <td>2.133308</td>
+      <td>1.012343</td>
     </tr>
     <tr>
       <th>16</th>
       <td>16.0</td>
-      <td>-2.762042</td>
-      <td>2.990303</td>
-      <td>0.817636</td>
+      <td>3.003381</td>
+      <td>2.233308</td>
+      <td>1.046486</td>
     </tr>
     <tr>
       <th>17</th>
       <td>17.0</td>
-      <td>-2.857106</td>
-      <td>3.065025</td>
-      <td>0.266139</td>
+      <td>2.940862</td>
+      <td>1.973632</td>
+      <td>0.169523</td>
     </tr>
     <tr>
       <th>18</th>
       <td>18.0</td>
-      <td>-2.857106</td>
-      <td>3.165025</td>
-      <td>0.133323</td>
+      <td>2.940862</td>
+      <td>2.073632</td>
+      <td>0.135107</td>
     </tr>
     <tr>
       <th>19</th>
       <td>19.0</td>
-      <td>-2.757106</td>
-      <td>3.065025</td>
-      <td>0.242691</td>
+      <td>3.040862</td>
+      <td>1.973632</td>
+      <td>0.052694</td>
     </tr>
     <tr>
       <th>20</th>
       <td>20.0</td>
-      <td>-2.854055</td>
-      <td>3.082429</td>
-      <td>0.176401</td>
+      <td>2.950820</td>
+      <td>1.980101</td>
+      <td>0.114178</td>
     </tr>
     <tr>
       <th>21</th>
       <td>21.0</td>
-      <td>-2.854055</td>
-      <td>3.182429</td>
-      <td>0.182588</td>
+      <td>3.050819</td>
+      <td>1.980101</td>
+      <td>0.083519</td>
     </tr>
     <tr>
       <th>22</th>
       <td>22.0</td>
-      <td>-2.754055</td>
-      <td>3.082429</td>
-      <td>0.174575</td>
+      <td>2.950820</td>
+      <td>2.080101</td>
+      <td>0.122266</td>
     </tr>
     <tr>
       <th>23</th>
       <td>23.0</td>
-      <td>-2.853837</td>
-      <td>3.081660</td>
-      <td>0.178695</td>
+      <td>2.954692</td>
+      <td>1.978200</td>
+      <td>0.102458</td>
     </tr>
     <tr>
       <th>24</th>
       <td>24.0</td>
-      <td>-2.753837</td>
-      <td>3.081660</td>
-      <td>0.178193</td>
+      <td>2.954692</td>
+      <td>2.078200</td>
+      <td>0.111569</td>
     </tr>
     <tr>
       <th>25</th>
       <td>25.0</td>
-      <td>-2.853837</td>
-      <td>3.181660</td>
-      <td>0.178735</td>
+      <td>3.054692</td>
+      <td>1.978200</td>
+      <td>0.096721</td>
     </tr>
     <tr>
       <th>26</th>
       <td>26.0</td>
-      <td>-2.854054</td>
-      <td>3.082426</td>
-      <td>0.176409</td>
+      <td>2.956395</td>
+      <td>1.975370</td>
+      <td>0.100887</td>
     </tr>
   </tbody>
 </table>
@@ -1587,7 +1517,7 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[22, {'x1': np.float64(-2.854054386929009), 'x2': np.float64(3.082425825794918)}, {'himmelblau_2d': np.float64(0.1764005455399746)}]
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[25, {'x1': np.float64(2.956394972606685), 'x2': np.float64(1.9753701699329131)}, {'himmelblau_2d': np.float64(0.10245832147786835)}]
 </pre></div>
 </div>
 </div>

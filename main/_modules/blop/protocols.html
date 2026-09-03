@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.protocols &#8212; blop 1.1.1.dev5 documentation</title>
+    <title>blop.protocols &#8212; blop 1.1.1.dev6 documentation</title>
   
   
   
@@ -42,7 +42,7 @@
   <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../../_static/documentation_options.js?v=db0c14aa"></script>
+    <script src="../../_static/documentation_options.js?v=ecf49ec0"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -420,7 +420,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev5" />
+  <meta name="docsearch:version" content="1.1.1.dev6" />
   
     
     <script src="../../_static/searchtools.js"></script>
@@ -1079,8 +1079,8 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    The evaluation function is called after data acquisition to compute outcomes.</span>
-<span class="sd">    It uses the acquisition identifier returned by the acquisition plan to retrieve</span>
-<span class="sd">    the relevant data and computes objective values and metrics for each suggestion.</span>
+<span class="sd">    Use the acquisition identifier to retrieve data and associate each row with a</span>
+<span class="sd">    suggestion by its ``"_id"``.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -1100,14 +1100,16 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">            The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,</span>
 <span class="sd">            a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.</span>
 <span class="sd">        suggestions: Sequence[Mapping]</span>
-<span class="sd">            A sequence of mappings, each containing the optimizer-provided parameterization of a point to evaluate.</span>
-<span class="sd">            This sequence is not guaranteed to be in acquisition order. Match data and outcomes by "_id".</span>
+<span class="sd">            A sequence of mappings, each containing a parameterization to evaluate.</span>
+<span class="sd">            Each mapping must contain a unique ``"_id"``. Do not assume its order</span>
+<span class="sd">            aligns with acquired data or preserves optimizer generation order.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Sequence[Mapping]</span>
-<span class="sd">            A sequence of mappings containing the outcomes of the acquisition, one for each suggested parameterization.</span>
-<span class="sd">            The "_id" key is optional and can be used to identify each outcome; when present, it must match a suggestion ID.</span>
+<span class="sd">            A sequence of mappings containing the outcomes of the acquisition, one for each</span>
+<span class="sd">            suggested parameterization. Each mapping must contain an ``"_id"`` identifying</span>
+<span class="sd">            its evaluated suggestion.</span>
 <span class="sd">        """</span>
         <span class="o">...</span></div>
 </div>
@@ -1138,6 +1140,7 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    The acquisition plan is a Bluesky plan that should move the actuators to each</span>
 <span class="sd">    suggested position, acquire data from the sensors, and return a hashable</span>
 <span class="sd">    identifier that the evaluation function can use to retrieve the acquired data.</span>
+<span class="sd">    When it may reorder points, it must record their IDs in actual acquisition order.</span>
 <span class="sd">    """</span>
 
 <div class="viewcode-block" id="AcquisitionPlan.__call__">

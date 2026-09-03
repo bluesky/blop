@@ -22,8 +22,8 @@ In these situations, users can implement a custom acquisition plan that
 translates optimization variables into the corresponding physical operations.
 The trade-off is that the custom plan becomes responsible for maintaining the
 association between optimizer suggestions and the acquired data within the
-chosen storage or event system (typically stashing the suggestions in proper 
-order in storage or tagging the run markdown).
+chosen storage or event system, for example by storing suggestion IDs in
+actual acquisition order in the run metadata.
 
 The plan must return a hashable acquisition identifier. Blop passes that value
 unchanged to the evaluation function. A Bluesky run UID is the usual identifier
@@ -51,7 +51,7 @@ the full physical coordinate system is shown below.
             md: Mapping[str, Any] | None = None,
         ) -> MsgGenerator[Hashable]:
 
-            coords = [subspace_to_real(s) for s in suggestions]
+            coords = [{**subspace_to_real(s), "_id": s["_id"]} for s in suggestions]
             return (yield from default_acquire(
                 coords,
                 actuators,
@@ -63,6 +63,10 @@ Wrapping the default acquire function is completely acceptable for coordinate to
 coordinate schemes to keep default acquire's convenience. Just remember that 
 systems like Tiled will report your converted coordinates in their suggestion 
 history during evaluation.
+
+``default_acquire`` also records those IDs under ``blop_acquisition_order`` so
+the evaluator can associate each acquired row with the original suggestion.
+
 
 Virtual Coordinate Systems
 --------------------------

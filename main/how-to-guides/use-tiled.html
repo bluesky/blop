@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Tiled with Blop &#8212; blop 1.1.1.dev5 documentation</title>
+    <title>Tiled with Blop &#8212; blop 1.1.1.dev6 documentation</title>
   
   
   
@@ -43,7 +43,7 @@
   <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
 <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
 
-    <script src="../_static/documentation_options.js?v=db0c14aa"></script>
+    <script src="../_static/documentation_options.js?v=ecf49ec0"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -65,7 +65,7 @@
     <link rel="prev" title="Acquire a baseline reading (for relative outcome constraints)" href="acquire-baseline.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev5" />
+  <meta name="docsearch:version" content="1.1.1.dev6" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -540,10 +540,11 @@
 </section>
 <section id="data-storage-with-blop-s-default-plans">
 <h2>Data Storage with Blop’s Default Plans<a class="headerlink" href="#data-storage-with-blop-s-default-plans" title="Link to this heading">#</a></h2>
-<p>Blop provides a default acquisition plan (<a class="reference internal" href="../reference/plans.html#blop.plans.default_acquire" title="blop.plans.default_acquire"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.plans.default_acquire()</span></code></a>) that handle data acquisition. This plan:</p>
+<p>Blop provides a default acquisition plan (<a class="reference internal" href="../reference/plans.html#blop.plans.default_acquire" title="blop.plans.default_acquire"><code class="xref py py-func docutils literal notranslate"><span class="pre">blop.plans.default_acquire()</span></code></a>) that handles data acquisition. This plan:</p>
 <ul class="simple">
 <li><p>Uses the <strong>“primary” stream</strong> to store all acquired data</p></li>
-<li><p>Includes a default metadata key <strong>blop_suggestions</strong> which contains all of the suggestions (and their identifiers)</p></li>
+<li><p>Includes <strong>blop_acquisition_order</strong> metadata containing suggestion IDs in actual acquired-row order</p></li>
+<li><p>Includes <strong>blop_suggestions</strong> metadata containing the routed suggestions for backwards compatibility</p></li>
 </ul>
 <p>When a custom acquisition plan is used, how the data is stored depends on the plan implementation.</p>
 </section>
@@ -570,15 +571,16 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"TiledEvaluation requires a Bluesky run UID string, got </span><span class="si">{</span><span class="n">uid</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
         <span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tiled_client</span><span class="p">[</span><span class="n">uid</span><span class="p">]</span>
+        <span class="n">acquisition_order</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">start</span><span class="p">[</span><span class="s2">"blop_acquisition_order"</span><span class="p">]</span>
 
+        <span class="c1"># These IDs, not positions in suggestions, align the primary rows.</span>
         <span class="c1"># Extract data columns</span>
         <span class="n">motor_x_data</span> <span class="o">=</span> <span class="n">run</span><span class="p">[</span><span class="s2">"primary/motor_x"</span><span class="p">]</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">outcomes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">suggestion</span> <span class="ow">in</span> <span class="n">suggestions</span><span class="p">:</span>
-            <span class="n">suggestion_id</span> <span class="o">=</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">]</span>
-            <span class="n">motor_x</span> <span class="o">=</span> <span class="n">motor_x_data</span><span class="p">[</span><span class="n">suggestion_id</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">motor_x_data</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">suggestion_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">acquisition_order</span><span class="p">):</span>
+            <span class="n">motor_x</span> <span class="o">=</span> <span class="n">motor_x_data</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
             <span class="n">outcome</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">"_id"</span><span class="p">:</span> <span class="n">suggestion</span><span class="p">[</span><span class="s2">"_id"</span><span class="p">],</span>
+                <span class="s2">"_id"</span><span class="p">:</span> <span class="n">suggestion_id</span><span class="p">,</span>
                 <span class="s2">"objective1"</span><span class="p">:</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">motor_x</span><span class="p">,</span>
             <span class="p">}</span>
             <span class="n">outcomes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
