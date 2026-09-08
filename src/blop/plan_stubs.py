@@ -31,7 +31,7 @@ _ACQUISITION_UID_KEY: Literal["acquisition_uid"] = "acquisition_uid"
 _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
 
 
-def _is_array_like_identifier(uid: object) -> bool:
+def _is_array_like_identifier(uid: Any) -> bool:
     try:
         numpy_array = np.array(uid)
     except (TypeError, ValueError):
@@ -39,7 +39,7 @@ def _is_array_like_identifier(uid: object) -> bool:
     return numpy_array.dtype != object
 
 
-def _json_serializable_dict(uid: object) -> dict[str, Any] | None:
+def _json_serializable_dict(uid: Any) -> dict[str, Any] | None:
     """Return a JSON-compatible dict for mapping or dataclass UIDs, if possible."""
     if isinstance(uid, Mapping):
         candidate = dict(uid)
@@ -54,7 +54,7 @@ def _json_serializable_dict(uid: object) -> dict[str, Any] | None:
         return None
 
 
-def _acquisition_identifier_value(uid: object) -> Any:
+def _acquisition_identifier_value(uid: Any) -> Any:
     """Convert an acquisition UID to an event-readable value."""
     if _is_array_like_identifier(uid):
         return cast(ArrayLike, uid)
@@ -86,7 +86,7 @@ def seq_read(readables: Sequence[Readable], **kwargs: Any) -> MsgGenerator[dict[
 
 @plan
 def read_step(
-    uid: object,
+    uid: Any,
     suggestions: Sequence[Mapping],
     outcomes: Sequence[Mapping],
     n_points: int,
@@ -103,7 +103,7 @@ def read_step(
 
     Parameters
     ----------
-    uid : object
+    uid : Any
         The acquisition UID returned by the acquisition plan.
     suggestions : Sequence[Mapping]
         Sequence of suggestion mappings, each containing an ID_KEY.
