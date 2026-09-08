@@ -54,9 +54,9 @@ but the contents are optimization-focused.
     values, and outcome values. For batched optimization, these values may be
     arrays.
 
-For ``acquisition_uid``, native array-like identifiers such as a tuple of event
-UIDs are stored directly. Other hashable identifiers are stored using their
-``repr``; the evaluation function still receives the original identifier.
+For ``acquisition_uid``, native array-like UIDs are stored directly. Mapping and
+dataclass UIDs that serialize to JSON are stored as dictionaries. Other UIDs are
+stored using their ``repr``; the evaluation function still receives the original value.
 
 ``stop``
     Completion status and reason, useful for summaries or cleanup.

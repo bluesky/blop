@@ -1,8 +1,10 @@
 """Bluesky plan stubs for optimization."""
 
+import json
 import logging
 from collections import defaultdict
 from collections.abc import Hashable, Mapping, MutableMapping, Sequence
+from dataclasses import asdict, is_dataclass
 from typing import Any, Literal, cast
 
 import bluesky.plan_stubs as bps
@@ -29,7 +31,7 @@ _ACQUISITION_UID_KEY: Literal["acquisition_uid"] = "acquisition_uid"
 _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
 
 
-def _is_array_like_identifier(uid: Hashable) -> bool:
+def _is_array_like_identifier(uid: object) -> bool:
     try:
         numpy_array = np.array(uid)
     except (TypeError, ValueError):
@@ -37,10 +39,27 @@ def _is_array_like_identifier(uid: Hashable) -> bool:
     return numpy_array.dtype != object
 
 
-def _acquisition_identifier_value(uid: Hashable) -> ArrayLike:
-    """Convert a hashable acquisition identifier to an event-readable value."""
+def _json_serializable_dict(uid: object) -> dict[str, Any] | None:
+    """Return a JSON-compatible dict for mapping or dataclass UIDs, if possible."""
+    if isinstance(uid, Mapping):
+        candidate = dict(uid)
+    elif is_dataclass(uid) and not isinstance(uid, type):
+        candidate = asdict(uid)
+    else:
+        return None
+
+    try:
+        return json.loads(json.dumps(candidate, allow_nan=False))
+    except (TypeError, ValueError):
+        return None
+
+
+def _acquisition_identifier_value(uid: object) -> Any:
+    """Convert an acquisition UID to an event-readable value."""
     if _is_array_like_identifier(uid):
         return cast(ArrayLike, uid)
+    if (json_dict := _json_serializable_dict(uid)) is not None:
+        return json_dict
     return repr(uid)
 
 
@@ -67,7 +86,7 @@ def seq_read(readables: Sequence[Readable], **kwargs: Any) -> MsgGenerator[dict[
 
 @plan
 def read_step(
-    uid: Hashable,
+    uid: object,
     suggestions: Sequence[Mapping],
     outcomes: Sequence[Mapping],
     n_points: int,
@@ -79,13 +98,13 @@ def read_step(
     If fewer suggestions are returned than n_points arrays are padded to n_points length
     with np.nan to ensure consistent shapes for event-model specification.
 
-    The emitted ``acquisition_uid`` field retains native array-like identifiers.
-    Other hashable identifiers are represented by ``repr(uid)``.
+    The emitted ``acquisition_uid`` field retains native array-like identifiers. Mapping and dataclass UIDs
+    that serialize to JSON are stored as dictionaries; other UIDs are represented by ``repr(uid)``.
 
     Parameters
     ----------
-    uid : Hashable
-        The acquisition identifier returned by the acquisition plan.
+    uid : object
+        The acquisition UID returned by the acquisition plan.
     suggestions : Sequence[Mapping]
         Sequence of suggestion mappings, each containing an ID_KEY.
     outcomes : Sequence[Mapping]
@@ -146,7 +165,7 @@ def read_step(
         )
     else:
         readable_cache[_SUGGESTION_IDS_KEY].update(sorted_sids)
-    # Need to normalize the value here since `Hashable` is very broad
+    # Normalize the acquisition UID for event-model storage.
     normalized_uid = _acquisition_identifier_value(uid)
     if _ACQUISITION_UID_KEY not in readable_cache:
         readable_cache[_ACQUISITION_UID_KEY] = InferredReadable(

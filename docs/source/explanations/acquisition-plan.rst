@@ -25,18 +25,18 @@ association between optimizer suggestions and the acquired data within the
 chosen storage or event system (typically stashing the suggestions in proper 
 order in storage or tagging the run markdown).
 
-The plan must return a hashable acquisition identifier. Blop passes that value
-unchanged to the evaluation function. A Bluesky run UID is the usual identifier
-for run-owning acquisitions. The in-run default returns suggestion IDs in the
-order they were executed, but custom plans may return any hashable key their
-matching evaluation function understands.
+The plan must return a uid. Blop passes that value unchanged to the evaluation
+function. A Bluesky run UID is the usual value for run-owning acquisitions. The
+in-run default returns suggestion IDs in the order they were executed, but
+custom plans may return any concrete uid type their matching evaluation
+function understands.
 
 A simple example that optimizes in a subspace while executing measurements in
 the full physical coordinate system is shown below. 
 
 .. code-block:: python
 
-    from collections.abc import Hashable, Mapping, Sequence
+    from collections.abc import Mapping, Sequence
     from typing import Any
 
     from bluesky.utils import MsgGenerator
@@ -49,7 +49,7 @@ the full physical coordinate system is shown below.
             actuators: Sequence[Actuator],
             sensors: Sequence[Sensor] | None = None,
             md: Mapping[str, Any] | None = None,
-        ) -> MsgGenerator[Hashable]:
+        ) -> MsgGenerator[str]:
 
             coords = [subspace_to_real(s) for s in suggestions]
             return (yield from default_acquire(

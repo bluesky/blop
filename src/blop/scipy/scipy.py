@@ -1,7 +1,7 @@
 """Scipy optimization power class for fast start QOL and Ax like agent behavior."""
 
 from collections.abc import Mapping, Sequence
-from typing import Any, cast
+from typing import Any, Generic, TypeVar, cast
 
 import bluesky.preprocessors as bpp
 from bluesky.callbacks import CallbackBase
@@ -21,8 +21,10 @@ from blop.scipy.inverter import InteractiveOptimizer
 from blop.scipy.normalizers import SHGO, DualAnnealing, Minimize
 from blop.utils import InferredReadable
 
+TAcquisition = TypeVar("TAcquisition")
 
-class Scipy:
+
+class Scipy(Generic[TAcquisition]):
     """
     A convenience interface associated with running optimizations with Scipy, providing similar syntax to the Ax Agent
     (allowing drop in swapping as much as possible).
@@ -34,8 +36,8 @@ class Scipy:
         self,
         sensors: Sequence[Sensor],
         config: ScipyCFG,
-        evaluation_function: EvaluationFunction,
-        acquisition_plan: AcquisitionPlan | None = None,
+        evaluation_function: EvaluationFunction[TAcquisition],
+        acquisition_plan: AcquisitionPlan[TAcquisition] | None = None,
         **kwargs: Any,
     ):
         if config.optimizer not in list(SCP):
@@ -68,8 +70,8 @@ class Scipy:
         sensors: Sequence[Sensor],
         dofs: Sequence[RangeDOF],
         objectives: Sequence[Objective],
-        evaluation_function: EvaluationFunction,
-        acquisition_plan: AcquisitionPlan | None = None,
+        evaluation_function: EvaluationFunction[TAcquisition],
+        acquisition_plan: AcquisitionPlan[TAcquisition] | None = None,
         optimizer: SCP = SCP.Default,
         # dof_constraints: Sequence[DOFConstraint] | None = None,  #implemented in future iterations? make to match ax?
         # outcome_constraints: Sequence[OutcomeConstraint] | None = None,
@@ -128,12 +130,12 @@ class Scipy:
         return self._actuators
 
     @property
-    def evaluation_function(self) -> EvaluationFunction:
+    def evaluation_function(self) -> EvaluationFunction[TAcquisition]:
         """The function used to evaluate acquired data and produce outcomes."""
         return self._evaluation_function
 
     @property
-    def acquisition_plan(self) -> AcquisitionPlan | None:
+    def acquisition_plan(self) -> AcquisitionPlan[TAcquisition] | None:
         """The acquisition plan for acquiring data, or ``None`` if using the default."""
         return self._acquisition_plan
 
@@ -182,7 +184,7 @@ class Scipy:
         """
         self._callbacks.remove(callback)
 
-    def to_optimization_problem(self) -> OptimizationProblem:
+    def to_optimization_problem(self) -> OptimizationProblem[TAcquisition]:
         """
         Construct an optimization problem from the Scipy Base class.
 

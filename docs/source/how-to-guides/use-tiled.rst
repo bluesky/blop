@@ -102,7 +102,7 @@ Creating an Evaluation Function
 To access data from Tiled within your evaluation function, create a class that:
 
 1. Accepts a client instance in its ``__init__`` method
-2. Accepts the hashable acquisition identifier and validates that this default-acquisition example received a string run UID
+2. Accepts the string uid returned by the default acquisition plan
 3. Processes the data to compute optimization objectives
 
 Evaluation Function with Tiled
@@ -112,7 +112,7 @@ Here's an example evaluation function that reads data from Tiled for where all d
 
 .. testcode::
 
-    from collections.abc import Hashable, Mapping, Sequence
+    from collections.abc import Mapping, Sequence
 
     from tiled.client.container import Container
 
@@ -120,11 +120,9 @@ Here's an example evaluation function that reads data from Tiled for where all d
         def __init__(self, tiled_client: Container):
             self.tiled_client = tiled_client
 
-        def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
-            if not isinstance(uid, str):
-                raise TypeError(f"TiledEvaluation requires a Bluesky run UID string, got {uid!r}")
+        def __call__(self, uid: str, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
             run = self.tiled_client[uid]
-            
+
             # Extract data columns
             motor_x_data = run["primary/motor_x"].read()
             outcomes = []

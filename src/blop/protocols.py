@@ -1,6 +1,6 @@
 """Protocols that bridge between optimizer backends and Bluesky."""
 
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any, Generic, Literal, Protocol, TypeVar, runtime_checkable
 
@@ -32,6 +32,12 @@ TSensor = TypeVar("TSensor")
 """Sensor generic type"""
 TPlan = TypeVar("TPlan")
 """Plan generic type"""
+TAcquisition = TypeVar("TAcquisition")
+"""Acquisition UID generic type"""
+TAcquisition_contra = TypeVar("TAcquisition_contra", contravariant=True)
+"""Acquisition UID input type"""
+TAcquisition_co = TypeVar("TAcquisition_co", covariant=True)
+"""Acquisition UID output type"""
 
 
 @runtime_checkable
@@ -184,7 +190,7 @@ class Optimizer(Protocol):
 
 
 @runtime_checkable
-class EvaluationFunction(Protocol):
+class EvaluationFunction(Protocol[TAcquisition_contra]):
     """
     A protocol for transforming acquired data into measurable outcomes.
 
@@ -199,8 +205,10 @@ class EvaluationFunction(Protocol):
     Notes
     -----
     The evaluation function is called after data acquisition to compute outcomes.
-    It uses the acquisition identifier returned by the acquisition plan to retrieve
-    the relevant data and computes objective values and metrics for each suggestion.
+    It uses the uid returned by the acquisition plan to retrieve or identify
+    the relevant data and computes objective values and metrics for each
+    suggestion. The uid type is evaluator-defined; it may be a Bluesky run UID,
+    ordered suggestion IDs, event UIDs, or a backend-specific object.
 
     Examples
     --------
@@ -208,15 +216,14 @@ class EvaluationFunction(Protocol):
     :doc:`/tutorials/simple-experiment`
     """
 
-    def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
+    def __call__(self, uid: TAcquisition_contra, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """
         Evaluate the acquired data and produce outcomes.
 
         Parameters
         ----------
-        uid: Hashable
-            The acquisition identifier returned by the acquisition plan. This may be a Bluesky run UID,
-            a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.
+        uid: TAcquisition_contra
+            The acquisition UID returned by the acquisition plan.
         suggestions: Sequence[Mapping]
             A sequence of mappings, each containing the optimizer-provided parameterization of a point to evaluate.
             This sequence is not guaranteed to be in acquisition order. Match data and outcomes by "_id".
@@ -231,7 +238,7 @@ class EvaluationFunction(Protocol):
 
 
 @runtime_checkable
-class AcquisitionPlan(Protocol):
+class AcquisitionPlan(Protocol[TAcquisition_co]):
     """
     A protocol for custom data acquisition plans.
 
@@ -250,8 +257,8 @@ class AcquisitionPlan(Protocol):
     Notes
     -----
     The acquisition plan is a Bluesky plan that should move the actuators to each
-    suggested position, acquire data from the sensors, and return a hashable
-    identifier that the evaluation function can use to retrieve the acquired data.
+    suggested position, acquire data from the sensors, and return a uid that the
+    evaluation function can use to retrieve or identify the acquired data.
     """
 
     @plan
@@ -261,13 +268,13 @@ class AcquisitionPlan(Protocol):
         actuators: Sequence[Actuator],
         sensors: Sequence[Sensor] | None = None,
         md: Mapping[str, Any] | None = None,
-    ) -> MsgGenerator[Hashable]:
+    ) -> MsgGenerator[TAcquisition_co]:
         """
         Acquire data for optimization.
 
         This should be a Bluesky plan that moves the actuators to each of their suggested positions
         and acquires data from the sensors. Suggestions may be re-ordered for more efficient acquisition,
-        but it is the responsibility of the implementer to return an identifier that lets the matching
+        but it is the responsibility of the implementer to return a uid that lets the matching
         evaluation function correlate acquired data with suggestion IDs.
 
         Parameters
@@ -285,15 +292,15 @@ class AcquisitionPlan(Protocol):
 
         Returns
         -------
-        Hashable
-            The identifier passed unchanged to the evaluation function. Examples include a Bluesky run UID,
-            a tuple of suggestion IDs in executed order, a tuple of event UIDs, or another hashable lookup key.
+        TAcquisition_co
+            The uid passed unchanged to the evaluation function. Examples include a Bluesky run UID,
+            ordered suggestion IDs, event UIDs, or a backend-specific acquisition object.
         """
         ...
 
 
 @dataclass(frozen=True)
-class BaseOptimizationProblem(Generic[TActuator, TSensor, TPlan]):
+class BaseOptimizationProblem(Generic[TActuator, TSensor, TAcquisition, TPlan]):
     """Base class for optimization problem definitions.
 
     Provides the common structure shared by all optimization problem types.
@@ -309,12 +316,14 @@ class BaseOptimizationProblem(Generic[TActuator, TSensor, TPlan]):
     optimizer: Optimizer
     actuators: Sequence[TActuator]
     sensors: Sequence[TSensor]
-    evaluation_function: EvaluationFunction
+    evaluation_function: EvaluationFunction[TAcquisition]
     acquisition_plan: TPlan | None = None
 
 
 @dataclass(frozen=True)
-class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionPlan]):
+class OptimizationProblem(
+    BaseOptimizationProblem[Actuator, Sensor, TAcquisition, AcquisitionPlan[TAcquisition]], Generic[TAcquisition]
+):
     """
     An optimization problem to solve. Immutable once initialized.
 
@@ -331,9 +340,9 @@ class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionP
         A subset of the actuators' names must match the names of suggested parameterizations.
     sensors: Sequence[Sensor]
         Objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.
-    evaluation_function: EvaluationFunction
-        A callable that uses an acquisition identifier to retrieve acquired data and produce outcomes.
-    acquisition_plan: AcquisitionPlan, optional
+    evaluation_function: EvaluationFunction[TAcquisition]
+        A callable that uses an acquisition UID to retrieve acquired data and produce outcomes.
+    acquisition_plan: AcquisitionPlan[TAcquisition], optional
         A Bluesky plan to acquire data from the beamline. If not provided, a default plan will be used.
 
     See Also
@@ -346,7 +355,7 @@ class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, AcquisitionP
 
 
 @dataclass(frozen=True)
-class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
+class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str, str]):
     """
     An optimization problem to solve. Immutable once initialized.
 
@@ -365,8 +374,8 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str]):
         A subset of the actuators' names must match the names of suggested parameterizations.
     sensors: Sequence[str]
         Names of objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.
-    evaluation_function: EvaluationFunction
-        A callable that uses an acquisition identifier to retrieve acquired data and produce outcomes.
+    evaluation_function: EvaluationFunction[str]
+        A callable that uses a Bluesky run UID to retrieve acquired data and produce outcomes.
     acquisition_plan: str, optional
         The name of a Bluesky plan to acquire data. If not provided, a default plan name will be used.
         The plan must match the arguments of :class:`AcquisitionPlan`.
