@@ -205,7 +205,7 @@ sensors = ["himmel_det"]
 
 ## Writing the Evaluation Function
 
-The evaluation function is called each time a plan completes. Its general contract accepts a uid and a sequence of suggestion mappings, and returns a sequence of outcome mappings. This evaluator uses ``blop_acquisition_order`` to align detector values with IDs. The queueserver runner uses the Bluesky run UID, so this evaluator types ``uid`` as ``str`` before looking up the run in Tiled. Each outcome must contain the objective value(s) and an ``_id`` from that acquisition order.
+The evaluation function is called each time a plan completes. Its general contract accepts a uid and a sequence of suggestion mappings, and returns a sequence of outcome mappings. This evaluator uses `blop_acquisition_order` to align detector values with IDs. The queueserver runner uses the Bluesky run UID, so this evaluator types `uid` as `str` before looking up the run in Tiled. Each outcome must contain the objective value(s) and an `_id` from that acquisition order.
 
 Because the agent and the ZMQ-Tiled bridge are separate subscribers to the same ZMQ stream, there is a race condition: the agent may receive the stop document before the bridge has finished writing data to Tiled. The evaluation function should poll Tiled until both the run and the detector data are available.
 

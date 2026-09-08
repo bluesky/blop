@@ -123,7 +123,7 @@ sensors = []
 
 ## Writing the evaluation function
 
-The **evaluation function** computes objective values from experimental data. Blop passes it the uid returned by the acquisition plan and the suggestions that were tried. This tutorial uses the default acquisition plan, so the uid is a Bluesky run UID and ``blop_acquisition_order`` associates measurements with outcomes.
+The **evaluation function** computes objective values from experimental data. Blop passes it the uid returned by the acquisition plan and the suggestions that were tried. This tutorial uses the default acquisition plan, so the uid is a Bluesky run UID and `blop_acquisition_order` associates measurements with outcomes.
 
 ```{code-cell} ipython3
 from collections.abc import Mapping, Sequence
