@@ -41,7 +41,7 @@ OPTIMIZE_IN_RUN_KEY: Literal["optimize_in_run"] = "optimize_in_run"
 OPTIMIZE_IN_RUN_TRACKING_STREAM: Literal["optimization"] = "optimization"
 
 
-TAcquisition = TypeVar("TAcquisition")
+TUid = TypeVar("TUid")
 
 
 @plan
@@ -57,15 +57,16 @@ def default_acquire(
     """
     Acquire data for optimization. Simply a list scan.
 
-    Includes a default metadata key "blop_suggestions" which can be used to identify
-    the suggestions that were acquired for each step of the scan.
+    Includes ``"blop_suggestions"`` metadata containing the routed suggestions for
+    backwards compatibility and ``"blop_acquisition_order"`` containing IDs in actual scan order.
+    Use those IDs, rather than positions in ``suggestions``, to associate acquired rows.
 
     Parameters
     ----------
     suggestions: Sequence[Mapping]
         A sequence of mappings, each containing the parameterization of a point to evaluate.
-        The "_id" key is optional and can be used to identify each suggestion. It is suggested
-        to add "_id" values to the run metadata for later identification of the acquired data.
+        Each mapping must contain a unique ``"_id"`` key used to associate the acquired
+        data with its suggestion.
     actuators: Sequence[Actuator]
         The actuators to move and the inputs to move them to.
     sensors: Sequence[Sensor]
@@ -100,7 +101,13 @@ def default_acquire(
         suggestions = route_suggestions(suggestions, starting_position=current_position)
 
     run_md = dict(md or {})
-    run_md.update({"blop_suggestions": suggestions, "run_key": _DEFAULT_ACQUIRE_RUN_KEY})
+    run_md.update(
+        {
+            "blop_suggestions": suggestions,
+            "blop_acquisition_order": [suggestion[ID_KEY] for suggestion in suggestions],
+            "run_key": _DEFAULT_ACQUIRE_RUN_KEY,
+        }
+    )
     plan_args = _unpack_for_list_scan(suggestions, actuators)
     return (
         # TODO: fix argument type in bluesky.plans.list_scan
@@ -119,11 +126,11 @@ def default_acquire(
 
 @plan
 def optimize_step(
-    optimization_problem: OptimizationProblem[TAcquisition],
+    optimization_problem: OptimizationProblem[TUid],
     n_points: int = 1,
     *args: Any,
     **kwargs: Any,
-) -> MsgGenerator[tuple[TAcquisition, Sequence[Mapping], Sequence[Mapping]]]:
+) -> MsgGenerator[tuple[TUid, Sequence[Mapping], Sequence[Mapping]]]:
     """
     Single step of the optimization loop.
 
@@ -136,11 +143,11 @@ def optimize_step(
 
     Returns
     -------
-    tuple[TAcquisition, Sequence[Mapping], Sequence[Mapping]]
+    tuple[TUid, Sequence[Mapping], Sequence[Mapping]]
         The acquisition UID, suggestions, and outcomes of the step.
     """
     if optimization_problem.acquisition_plan is None:
-        acquisition_plan = cast(AcquisitionPlan[TAcquisition], default_acquire)
+        acquisition_plan = cast(AcquisitionPlan[TUid], default_acquire)
     else:
         acquisition_plan = optimization_problem.acquisition_plan
     optimizer = optimization_problem.optimizer
@@ -163,7 +170,7 @@ def optimize_step(
 
 @plan
 def optimize(
-    optimization_problem: OptimizationProblem[TAcquisition],
+    optimization_problem: OptimizationProblem[TUid],
     iterations: int | None = 1,
     n_points: int = 1,
     checkpoint_interval: int | None = None,
@@ -251,7 +258,7 @@ def optimize(
 
 @plan
 def optimize_in_run(
-    optimization_problem: OptimizationProblem[TAcquisition],
+    optimization_problem: OptimizationProblem[TUid],
     iterations: int = 1,
     n_points: int = 1,
     checkpoint_interval: int | None = None,
@@ -299,7 +306,7 @@ def optimize_in_run(
     optimizer = optimization_problem.optimizer
     actuators = optimization_problem.actuators
     acquisition_plan = (
-        cast(AcquisitionPlan[TAcquisition], list_scan_in_run)
+        cast(AcquisitionPlan[TUid], list_scan_in_run)
         if optimization_problem.acquisition_plan is None
         else optimization_problem.acquisition_plan
     )
@@ -347,11 +354,11 @@ def optimize_in_run(
 
 @plan
 def sample_suggestions(
-    optimization_problem: OptimizationProblem[TAcquisition],
+    optimization_problem: OptimizationProblem[TUid],
     suggestions: Sequence[Mapping],
     readable_cache: dict[str, InferredReadable] | None = None,
     **kwargs: Any,
-) -> MsgGenerator[tuple[TAcquisition, Sequence[Mapping], Sequence[Mapping]]]:
+) -> MsgGenerator[tuple[TUid, Sequence[Mapping], Sequence[Mapping]]]:
     """
     Evaluate specific parameter combinations.
 
@@ -376,7 +383,7 @@ def sample_suggestions(
 
     Returns
     -------
-    uid : TAcquisition
+    uid : TUid
         The acquisition UID returned by the acquisition plan.
     suggestions : Sequence[Mapping]
         Suggestions with "_id" keys.
@@ -417,11 +424,11 @@ def sample_suggestions(
 
     @bpp.set_run_key_decorator(SAMPLE_SUGGESTIONS_RUN_KEY)
     @bpp.run_decorator(md=_md)
-    def _inner_sample_suggestions() -> MsgGenerator[tuple[TAcquisition, Sequence[Mapping], Sequence[Mapping]]]:
+    def _inner_sample_suggestions() -> MsgGenerator[tuple[TUid, Sequence[Mapping], Sequence[Mapping]]]:
 
         # Acquire data, evaluate, and ingest outcomes
         if optimization_problem.acquisition_plan is None:
-            acquisition_plan = cast(AcquisitionPlan[TAcquisition], default_acquire)
+            acquisition_plan = cast(AcquisitionPlan[TUid], default_acquire)
         else:
             acquisition_plan = optimization_problem.acquisition_plan
         uid = yield from acquisition_plan(
@@ -439,7 +446,7 @@ def sample_suggestions(
 
 
 def acquire_baseline(
-    optimization_problem: OptimizationProblem[TAcquisition],
+    optimization_problem: OptimizationProblem[TUid],
     parameterization: Mapping[str, Any] | None = None,
     **kwargs: Any,
 ) -> MsgGenerator[None]:
@@ -470,7 +477,7 @@ def acquire_baseline(
         parameterization_copy[ID_KEY] = "baseline"
     optimizer = optimization_problem.optimizer
     if optimization_problem.acquisition_plan is None:
-        acquisition_plan = cast(AcquisitionPlan[TAcquisition], default_acquire)
+        acquisition_plan = cast(AcquisitionPlan[TUid], default_acquire)
     else:
         acquisition_plan = optimization_problem.acquisition_plan
     uid = yield from acquisition_plan([parameterization_copy], actuators, optimization_problem.sensors, **kwargs)

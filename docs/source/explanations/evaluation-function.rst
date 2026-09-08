@@ -11,7 +11,7 @@ plan returns a uid, and Blop passes that same value to the evaluation function. 
 Anatomy of an Evaluation Function
 ---------------------------------
 
-An evaluation function is a callable that accepts a uid and a sequence of suggestion mappings, then returns a sequence of outcome mappings. The uid may be a Bluesky run UID, suggestion IDs in executed order, a tuple of event UIDs, or a backend-specific type understood by the evaluator. The suggestion sequence is optimizer-provided and is not guaranteed to be in acquisition order; match data and outcomes by ``_id``.
+An evaluation function is a callable that accepts a uid and a sequence of suggestion mappings, then returns a sequence of outcome mappings. The uid may be a Bluesky run UID, suggestion IDs in executed order, a tuple of event UIDs, or a backend-specific UID type understood by the evaluator. Suggestions are analysis context and may not match acquisition order; match data and outcomes by ``_id``.
 
 A run-owning acquisition plan usually returns a string run UID:
 
@@ -26,7 +26,8 @@ A run-owning acquisition plan usually returns a string run UID:
 
         def __call__(self, uid: str, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
             run = self.tiled_client[uid]
-            return analyze_run(run, suggestions)
+            acquisition_order = run.start["blop_acquisition_order"]
+            return analyze_run(run, acquisition_order)
 
 For a custom plan that returns a richer UID, use that concrete type in both the plan and evaluator:
 

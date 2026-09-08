@@ -65,7 +65,9 @@ def default_acquire(suggestions, actuators, sensors, *, md=None):
         plan_args.append(actuator)
         plan_args.append(values)
 
-    _md = {"blop_suggestions": suggestions}
+    # This plan scans the input sequence in order. Plans that reorder points must
+    # construct this ID list after reordering.
+    _md = {"blop_suggestions": suggestions, "blop_acquisition_order": [s["_id"] for s in suggestions]}
     if md:
         _md.update(md)
 

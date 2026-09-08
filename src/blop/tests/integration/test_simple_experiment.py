@@ -25,20 +25,18 @@ class HimmelblauEvaluation:
     def __call__(self, uid: str, suggestions: list[dict]) -> list[dict]:
         self.uids.append(uid)
         run = self.tiled_client[uid]
-        reordered_suggestions = run.start["blop_suggestions"]
+        acquisition_order = run.start["blop_acquisition_order"]
         x1_data = run["primary/x1"].read()
         x2_data = run["primary/x2"].read()
 
-        assert {suggestion["_id"] for suggestion in reordered_suggestions} == {
-            suggestion["_id"] for suggestion in suggestions
-        }
+        assert set(acquisition_order) == {suggestion["_id"] for suggestion in suggestions}
 
         outcomes = []
-        for index, suggestion in enumerate(reordered_suggestions):
+        for index, suggestion_id in enumerate(acquisition_order):
             x1 = x1_data[index]
             x2 = x2_data[index]
             value = (x1**2 + x2 - 11) ** 2 + (x1 + x2**2 - 7) ** 2
-            outcomes.append({"_id": suggestion["_id"], "himmelblau_2d": value})
+            outcomes.append({"_id": suggestion_id, "himmelblau_2d": value})
 
         self.outcomes.extend(outcomes)
         return outcomes
