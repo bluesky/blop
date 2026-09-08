@@ -1,7 +1,7 @@
 """Scipy optimization power class for fast start QOL and Ax like agent behavior."""
 
 from collections.abc import Mapping, Sequence
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, cast
 
 import bluesky.preprocessors as bpp
 from bluesky.callbacks import CallbackBase
@@ -15,13 +15,12 @@ from blop.protocols import (
     EvaluationFunction,
     OptimizationProblem,
     Sensor,
+    TUid,
 )
 from blop.scipy.configs import SCP, Objective, RangeDOF, ScipyCFG
 from blop.scipy.inverter import InteractiveOptimizer
 from blop.scipy.normalizers import SHGO, DualAnnealing, Minimize
 from blop.utils import InferredReadable
-
-TUid = TypeVar("TUid")
 
 
 class Scipy(Generic[TUid]):

@@ -3,7 +3,7 @@
 import logging
 from collections.abc import Mapping, Sequence
 from itertools import count
-from typing import Any, Literal, TypeVar, cast
+from typing import Any, Literal, cast
 
 import bluesky.plans as bp
 import bluesky.preprocessors as bpp
@@ -20,6 +20,7 @@ from .protocols import (
     Sensor,
     SupportsStoppingCriteria,
     TrialFaultAware,
+    TUid,
 )
 from .utils import (
     InferredReadable,
@@ -39,9 +40,6 @@ SAMPLE_SUGGESTIONS_RUN_KEY: Literal["sample_suggestions"] = "sample_suggestions"
 OPTIMIZE_RUN_KEY: Literal["optimize"] = "optimize"
 OPTIMIZE_IN_RUN_KEY: Literal["optimize_in_run"] = "optimize_in_run"
 OPTIMIZE_IN_RUN_TRACKING_STREAM: Literal["optimization"] = "optimization"
-
-
-TUid = TypeVar("TUid")
 
 
 @plan

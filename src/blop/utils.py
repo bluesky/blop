@@ -3,7 +3,7 @@
 import time
 from collections.abc import Hashable, Mapping, Sequence
 from enum import StrEnum
-from typing import Any, TypeVar, cast
+from typing import Any, cast
 
 import bluesky.preprocessors as bpp
 import networkx as nx
@@ -14,8 +14,6 @@ from event_model import DataKey
 from numpy.typing import ArrayLike
 
 from .protocols import ID_KEY, Actuator, Checkpointable, OptimizationProblem, Optimizer
-
-T = TypeVar("T")
 
 
 class Source(StrEnum):
@@ -85,7 +83,7 @@ def _suggestion_ids(suggestions: Sequence[Mapping]) -> tuple[Hashable, ...]:
     return tuple(cast(Hashable, suggestion[ID_KEY]) for suggestion in suggestions)
 
 
-def _drop_run_control_messages(plan: MsgGenerator[T]) -> MsgGenerator[T]:
+def _drop_run_control_messages(plan: MsgGenerator[Any]) -> MsgGenerator[Any]:
     """Drop child-run messages while preserving hardware lifecycle messages."""
 
     def _drop(msg: Any) -> Any | None:
@@ -96,7 +94,7 @@ def _drop_run_control_messages(plan: MsgGenerator[T]) -> MsgGenerator[T]:
     return (yield from bpp.msg_mutator(plan, _drop))
 
 
-def _reject_child_run_messages(plan: MsgGenerator[T]) -> MsgGenerator[T]:
+def _reject_child_run_messages(plan: MsgGenerator[Any]) -> MsgGenerator[Any]:
     """Reject child-run messages inside the plan."""
 
     def _reject(msg: Any) -> Any:

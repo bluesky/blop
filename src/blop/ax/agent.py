@@ -2,7 +2,7 @@
 
 import logging
 from collections.abc import Mapping, Sequence
-from typing import Any, Generic, TypeVar, cast
+from typing import Any, Generic, cast
 
 import bluesky.preprocessors as bpp
 from ax import Client, TOutcome, TParameterization
@@ -23,6 +23,7 @@ from ..protocols import (
     EvaluationFunction,
     OptimizationProblem,
     Sensor,
+    TUid,
 )
 from ..utils import InferredReadable
 from .dof import DOF, DOFConstraint
@@ -30,7 +31,6 @@ from .objective import Objective, OutcomeConstraint, ScalarizedObjective, to_ax_
 from .optimizer import AxOptimizer
 
 logger = logging.getLogger(__name__)
-TUid = TypeVar("TUid")
 
 
 class _AxAgentMixin:
