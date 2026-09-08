@@ -39,8 +39,8 @@ def _is_array_like_identifier(uid: Any) -> bool:
     return numpy_array.dtype != object
 
 
-def _json_serializable_dict(uid: Any) -> dict[str, Any] | None:
-    """Return a JSON-compatible dict for mapping or dataclass UIDs, if possible."""
+def _json_serialized_mapping(uid: Any) -> str | None:
+    """Return a canonical JSON string for mapping or dataclass UIDs, if possible."""
     if isinstance(uid, Mapping):
         candidate = dict(uid)
     elif is_dataclass(uid) and not isinstance(uid, type):
@@ -49,7 +49,7 @@ def _json_serializable_dict(uid: Any) -> dict[str, Any] | None:
         return None
 
     try:
-        return json.loads(json.dumps(candidate, allow_nan=False))
+        return json.dumps(candidate, allow_nan=False, separators=(",", ":"), sort_keys=True)
     except (TypeError, ValueError):
         return None
 
@@ -58,8 +58,8 @@ def _acquisition_identifier_value(uid: Any) -> Any:
     """Convert an acquisition UID to an event-readable value."""
     if _is_array_like_identifier(uid):
         return cast(ArrayLike, uid)
-    if (json_dict := _json_serializable_dict(uid)) is not None:
-        return json_dict
+    if (json_uid := _json_serialized_mapping(uid)) is not None:
+        return json_uid
     return repr(uid)
 
 
@@ -99,7 +99,7 @@ def read_step(
     with np.nan to ensure consistent shapes for event-model specification.
 
     The emitted ``acquisition_uid`` field retains native array-like identifiers. Mapping and dataclass UIDs
-    that serialize to JSON are stored as dictionaries; other UIDs are represented by ``repr(uid)``.
+    that serialize to JSON are stored as canonical JSON strings; other UIDs are represented by ``repr(uid)``.
 
     Parameters
     ----------

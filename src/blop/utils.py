@@ -119,8 +119,6 @@ def _maybe_checkpoint(optimizer: Optimizer, checkpoint_interval: int | None, ite
 
 def _infer_data_key(source: Source, value: Any) -> DataKey:
     """Infer the data key from the provided value."""
-    if isinstance(value, Mapping):
-        return DataKey(source=source.value, dtype="string", shape=[])
     numpy_array = np.array(value)
     # Descriptions are cached across updates, so reserve enough space for UUIDs.
     dtype_numpy = (
@@ -193,9 +191,7 @@ class InferredReadable(Readable, HasHints, HasParent):
         """Describe the properties of this readable."""
         if not self._data_key:
             # Use stored dtype if available, otherwise infer
-            if isinstance(self._value, Mapping):
-                value = self._value
-            elif self._dtype is not None:
+            if self._dtype is not None:
                 value = np.array(self._value, dtype=self._dtype)
             else:
                 value = np.array(self._value)

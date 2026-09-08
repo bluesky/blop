@@ -918,8 +918,8 @@ def test_optimize_with_custom_hashable_acquisition_identifier_uses_repr(RE):
     assert events[0]["data"]["acquisition_uid"] == repr(_CUSTOM_ACQUISITION_IDENTIFIER)
 
 
-def test_optimize_with_serializable_acquisition_uid_uses_dict(RE):
-    """Store a JSON-serializable dataclass acquisition UID as a dictionary."""
+def test_optimize_with_serializable_acquisition_uid_uses_json_string(RE):
+    """Store a JSON-serializable dataclass acquisition UID as a JSON string."""
     suggestion = {"x1": 0.5, "_id": 0}
     outcome = {"objective": 1.25, "_id": 0}
     optimizer = MagicMock(spec=Optimizer)
@@ -944,12 +944,10 @@ def test_optimize_with_serializable_acquisition_uid_uses_dict(RE):
 
     evaluation_function.assert_called_once_with(_SERIALIZABLE_ACQUISITION_UID, [suggestion])
     assert len(events) == 1
-    assert events[0]["data"]["acquisition_uid"] == {
-        "correlation_uid": "correlation-123",
-        "item_uid": None,
-        "plan_name": "count",
-        "metadata": {"stream": "primary"},
-    }
+    assert (
+        events[0]["data"]["acquisition_uid"]
+        == '{"correlation_uid":"correlation-123","item_uid":null,"metadata":{"stream":"primary"},"plan_name":"count"}'
+    )
 
 
 def test_optimize_step_custom_acquisition_plan(RE):

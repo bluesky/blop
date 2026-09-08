@@ -55,7 +55,7 @@ but the contents are optimization-focused.
     arrays.
 
 For ``acquisition_uid``, native array-like UIDs are stored directly. Mapping and
-dataclass UIDs that serialize to JSON are stored as dictionaries. Other UIDs are
+dataclass UIDs that serialize to JSON are stored as JSON strings. Other UIDs are
 stored using their ``repr``; the evaluation function still receives the original value.
 
 ``stop``
