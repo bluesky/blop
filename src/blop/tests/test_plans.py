@@ -60,14 +60,14 @@ def _custom_identifier_acquisition_plan(suggestions, actuators, sensors, *args, 
 
 
 @dataclass
-class _SerializableAcquisitionUID:
+class _DataclassAcquisitionUID:
     correlation_uid: str
     item_uid: str | None
     plan_name: str
     metadata: dict[str, object]
 
 
-_SERIALIZABLE_ACQUISITION_UID = _SerializableAcquisitionUID(
+_DATACLASS_ACQUISITION_UID = _DataclassAcquisitionUID(
     correlation_uid="correlation-123",
     item_uid=None,
     plan_name="count",
@@ -76,10 +76,28 @@ _SERIALIZABLE_ACQUISITION_UID = _SerializableAcquisitionUID(
 
 
 @plan
-def _serializable_uid_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
-    """Acquisition plan that returns a JSON-serializable dataclass UID."""
+def _dataclass_uid_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+    """Acquisition plan that returns a dataclass UID."""
     yield from bps.null()
-    return _SERIALIZABLE_ACQUISITION_UID
+    return _DATACLASS_ACQUISITION_UID
+
+
+class _ArrayRejectingAcquisitionUID:
+    def __array__(self, dtype=None, copy=None):
+        raise TypeError("Not array-like")
+
+    def __repr__(self):
+        return "ArrayRejectingAcquisitionUID()"
+
+
+_ARRAY_REJECTING_ACQUISITION_UID = _ArrayRejectingAcquisitionUID()
+
+
+@plan
+def _array_rejecting_uid_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+    """Acquisition plan that returns a UID that rejects NumPy coercion."""
+    yield from bps.null()
+    return _ARRAY_REJECTING_ACQUISITION_UID
 
 
 class _UnhashableAcquisitionReference:
@@ -918,16 +936,16 @@ def test_optimize_with_custom_hashable_acquisition_identifier_uses_repr(RE):
     assert events[0]["data"]["acquisition_uid"] == repr(_CUSTOM_ACQUISITION_IDENTIFIER)
 
 
-def test_optimize_with_serializable_acquisition_uid_uses_json_string(RE):
-    """Store a JSON-serializable dataclass acquisition UID as a JSON string."""
+def test_optimize_with_dataclass_acquisition_uid_uses_repr(RE):
+    """Store a dataclass acquisition UID via its repr."""
     suggestion = {"x1": 0.5, "_id": 0}
     outcome = {"objective": 1.25, "_id": 0}
     optimizer = MagicMock(spec=Optimizer)
     optimizer.suggest.return_value = [suggestion]
     evaluation_function = MagicMock(spec=EvaluationFunction, return_value=[outcome])
-    typed_evaluation_function = cast(EvaluationFunction[_SerializableAcquisitionUID], evaluation_function)
-    typed_acquisition_plan = cast(AcquisitionPlan[_SerializableAcquisitionUID], _serializable_uid_acquisition_plan)
-    optimization_problem: OptimizationProblem[_SerializableAcquisitionUID] = OptimizationProblem(
+    typed_evaluation_function = cast(EvaluationFunction[_DataclassAcquisitionUID], evaluation_function)
+    typed_acquisition_plan = cast(AcquisitionPlan[_DataclassAcquisitionUID], _dataclass_uid_acquisition_plan)
+    optimization_problem: OptimizationProblem[_DataclassAcquisitionUID] = OptimizationProblem(
         optimizer=optimizer,
         actuators=[MovableSignal("x1", initial_value=-1.0)],
         sensors=[ReadableSignal("objective")],
@@ -942,12 +960,35 @@ def test_optimize_with_serializable_acquisition_uid_uses_json_string(RE):
     finally:
         RE.unsubscribe(callback)
 
-    evaluation_function.assert_called_once_with(_SERIALIZABLE_ACQUISITION_UID, [suggestion])
+    evaluation_function.assert_called_once_with(_DATACLASS_ACQUISITION_UID, [suggestion])
     assert len(events) == 1
-    assert (
-        events[0]["data"]["acquisition_uid"]
-        == '{"correlation_uid":"correlation-123","item_uid":null,"metadata":{"stream":"primary"},"plan_name":"count"}'
+    assert events[0]["data"]["acquisition_uid"] == repr(_DATACLASS_ACQUISITION_UID)
+
+
+def test_optimize_with_array_rejecting_uid_uses_repr(RE):
+    """Fall back to repr when a UID rejects NumPy array coercion."""
+    suggestion = {"x1": 0.5, "_id": 0}
+    outcome = {"objective": 1.25, "_id": 0}
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [suggestion]
+    evaluation_function = MagicMock(spec=EvaluationFunction, return_value=[outcome])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=_array_rejecting_uid_acquisition_plan,
     )
+
+    callback, events = _collect_optimize_events()
+    RE.subscribe(callback)
+    try:
+        RE(optimize(optimization_problem))
+    finally:
+        RE.unsubscribe(callback)
+
+    evaluation_function.assert_called_once_with(_ARRAY_REJECTING_ACQUISITION_UID, [suggestion])
+    assert events[0]["data"]["acquisition_uid"] == "ArrayRejectingAcquisitionUID()"
 
 
 def test_optimize_step_custom_acquisition_plan(RE):

@@ -54,8 +54,7 @@ but the contents are optimization-focused.
     values, and outcome values. For batched optimization, these values may be
     arrays.
 
-For ``acquisition_uid``, native array-like UIDs are stored directly. Mapping and
-dataclass UIDs that serialize to JSON are stored as JSON strings. Other UIDs are
+For ``acquisition_uid``, native array-like UIDs are stored directly. Other UIDs are
 stored using their ``repr``; the evaluation function still receives the original value.
 
 ``stop``

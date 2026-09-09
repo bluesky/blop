@@ -1,10 +1,8 @@
 """Bluesky plan stubs for optimization."""
 
-import json
 import logging
 from collections import defaultdict
 from collections.abc import Hashable, Mapping, MutableMapping, Sequence
-from dataclasses import asdict, is_dataclass
 from typing import Any, Literal, cast
 
 import bluesky.plan_stubs as bps
@@ -39,27 +37,10 @@ def _is_array_like_identifier(uid: Any) -> bool:
     return numpy_array.dtype != object
 
 
-def _json_serialized_mapping(uid: Any) -> str | None:
-    """Return a canonical JSON string for mapping or dataclass UIDs, if possible."""
-    if isinstance(uid, Mapping):
-        candidate = dict(uid)
-    elif is_dataclass(uid) and not isinstance(uid, type):
-        candidate = asdict(uid)
-    else:
-        return None
-
-    try:
-        return json.dumps(candidate, allow_nan=False, separators=(",", ":"), sort_keys=True)
-    except (TypeError, ValueError):
-        return None
-
-
 def _acquisition_identifier_value(uid: Any) -> Any:
     """Convert an acquisition UID to an event-readable value."""
     if _is_array_like_identifier(uid):
         return cast(ArrayLike, uid)
-    if (json_uid := _json_serialized_mapping(uid)) is not None:
-        return json_uid
     return repr(uid)
 
 
@@ -98,8 +79,8 @@ def read_step(
     If fewer suggestions are returned than n_points arrays are padded to n_points length
     with np.nan to ensure consistent shapes for event-model specification.
 
-    The emitted ``acquisition_uid`` field retains native array-like identifiers. Mapping and dataclass UIDs
-    that serialize to JSON are stored as canonical JSON strings; other UIDs are represented by ``repr(uid)``.
+    The emitted ``acquisition_uid`` field retains native array-like identifiers.
+    Other acquisition UIDs are represented by ``repr(uid)``.
 
     Parameters
     ----------
