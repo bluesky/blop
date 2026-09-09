@@ -1,8 +1,9 @@
 """A set of useful helper utilities."""
 
 import time
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Callable, Hashable, Mapping, Sequence
 from enum import StrEnum
+from functools import partial
 from typing import Any, cast
 
 import bluesky.preprocessors as bpp
@@ -240,43 +241,6 @@ def _validate_route_index(index: Sequence[int], num_points: int) -> list[int]:
     return route
 
 
-def _get_route_index(points: np.ndarray, starting_point: np.ndarray | None = None) -> list[int]:
-    num_suggestions = len(points)
-    if num_suggestions < 2:
-        return list(range(num_suggestions))
-
-    graph = nx.DiGraph()
-    for i, i_point in enumerate(points):
-        for j, j_point in enumerate(points):
-            if i == j:
-                continue
-            d = np.sqrt(np.sum(np.square(i_point - j_point)))
-            graph.add_edge(i, j, weight=d)
-
-    anchor_node = num_suggestions
-    for i, point in enumerate(points):
-        d = 0.0 if starting_point is None else np.sqrt(np.sum(np.square(starting_point - point)))
-        graph.add_edge(anchor_node, i, weight=d)
-        graph.add_edge(i, anchor_node, weight=0.0)
-
-    cycle = nx.approximation.simulated_annealing_tsp(graph, init_cycle="greedy", source=anchor_node, seed=0)
-    index = list(cycle[1:-1])
-
-    return _validate_route_index(index, num_suggestions)
-
-
-def route_suggestions(suggestions: Sequence[Mapping], starting_position: dict | None = None):
-    """Route suggestions through a shortest open path over routed dimensions."""
-    if len(suggestions) == 1:
-        return suggestions
-
-    dims_to_route = [dim for dim, value in suggestions[0].items() if (dim != ID_KEY) and isinstance(value, float)]
-    points = np.array([[s[dim] for dim in dims_to_route] for s in suggestions])
-    starting_point = np.array([starting_position[dim] for dim in dims_to_route]) if starting_position else None
-
-    return [suggestions[i] for i in _get_route_index(points=points, starting_point=starting_point)]
-
-
 def collect_optimization_metadata(optimization_problem: OptimizationProblem) -> dict[str, Any]:
     """Collect the metadata for the optimization problem."""
     if hasattr(optimization_problem.evaluation_function, "__name__"):
@@ -294,3 +258,51 @@ def collect_optimization_metadata(optimization_problem: OptimizationProblem) -> 
         "sensors": [sensor.name for sensor in optimization_problem.sensors],
         "actuators": [actuator.name for actuator in optimization_problem.actuators],
     }
+
+
+DistanceMetric = Callable[[np.ndarray, np.ndarray], float]
+
+
+def minkowski(a, b, exponent=2.0):
+    """Standardized minkowski distance metric upon two numpy vectors."""
+    return np.sum(np.abs(a - b) ** exponent) ** (1.0 / exponent)
+
+
+euclidean = partial(minkowski, exponent=2.0)
+manhattan = partial(minkowski, exponent=1.0)
+weak_chebyshev = partial(minkowski, exponent=10.0)
+
+
+def route_suggestions(
+    suggestions: Sequence[Mapping],
+    starting_position: dict | None = None,
+    distance_metric: DistanceMetric = euclidean,
+    scaling: Mapping[str, float | int] | None = None,
+):
+    """Route suggestions through a shortest open path over provided metric space."""
+    num_suggestions = len(suggestions)
+    if num_suggestions == 1:
+        return suggestions
+
+    scale = scaling or {}
+    dims_to_route = [dim for dim, value in suggestions[0].items() if (dim != ID_KEY) and isinstance(value, float)]
+    points = np.array([[s[dim] * scale.get(dim, 1.0) for dim in dims_to_route] for s in suggestions])
+    starting_point = np.array([starting_position[dim] for dim in dims_to_route]) if starting_position else None
+
+    graph = nx.DiGraph()
+    for i, i_point in enumerate(points):
+        for j, j_point in enumerate(points):
+            if i == j:
+                continue
+            d = distance_metric(i_point, j_point)
+            graph.add_edge(i, j, weight=d)
+
+    anchor_node = num_suggestions
+    for i, point in enumerate(points):
+        d = 0.0 if starting_point is None else distance_metric(starting_point, point)
+        graph.add_edge(anchor_node, i, weight=d)
+        graph.add_edge(i, anchor_node, weight=0.0)
+
+    cycle = nx.approximation.simulated_annealing_tsp(graph, init_cycle="greedy", source=anchor_node, seed=0)
+
+    return [suggestions[i] for i in _validate_route_index(list(cycle[1:-1]), num_suggestions)]

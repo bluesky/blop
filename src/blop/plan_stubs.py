@@ -3,6 +3,7 @@
 import logging
 from collections import defaultdict
 from collections.abc import Hashable, Mapping, MutableMapping, Sequence
+from functools import partial, wraps
 from typing import Any, Literal, cast
 
 import bluesky.plan_stubs as bps
@@ -12,15 +13,20 @@ from bluesky.protocols import Readable
 from bluesky.utils import MsgGenerator, plan
 from numpy.typing import ArrayLike
 
-from .protocols import ID_KEY, Actuator, Optimizer, Sensor
+from .protocols import ID_KEY, AcquisitionPlan, Actuator, Optimizer, Sensor
 from .utils import (
+    DistanceMetric,
     InferredReadable,
     Source,
     _drop_run_control_messages,
     _suggestion_ids,
     _unpack_for_list_scan,
     _validate_suggestions,
+    euclidean,
+    manhattan,
+    minkowski,
     route_suggestions,
+    weak_chebyshev,
 )
 
 logger = logging.getLogger(__name__)
@@ -299,3 +305,66 @@ def list_scan_in_run(
     )
 
     return suggestion_ids
+
+
+def preroute(
+    distance_metric: DistanceMetric,
+    *,
+    scaling: Mapping[str, float | int] | None = None,
+):
+    """
+    Create a Decorator for acquisition functions which helps offload route optimization for the supplied distance metric.
+
+    See Also
+    --------
+    Route_suggestions
+    """  # ruff: ignore[non-imperative-mood]
+
+    def deco(f: AcquisitionPlan):
+        @wraps(f)
+        def prerouter(
+            suggestions: Sequence[Mapping],
+            actuators: Sequence[Actuator],
+            **kwargs: Any,
+        ) -> MsgGenerator[Hashable]:
+
+            if len(suggestions) > 1:
+                if all(isinstance(actuator, Readable) for actuator in actuators):
+                    current_position = yield from seq_read(cast(Sequence[Readable], actuators))
+                else:
+                    current_position = None
+
+                suggestions = route_suggestions(
+                    suggestions=suggestions,
+                    starting_position=current_position,
+                    distance_metric=distance_metric,
+                    scaling=scaling,
+                )
+
+            yield from f(suggestions, actuators, **kwargs)
+
+        return prerouter
+
+    return deco
+
+
+def _preroute_minkowski(exponent=2.0, scaling: Mapping[str, float | int] | None = None):
+    return preroute(partial(minkowski, exponent=exponent), scaling=scaling)
+
+
+def _preroute_euclidean(scaling: Mapping[str, float | int] | None = None):
+    return preroute(euclidean, scaling=scaling)
+
+
+def _preroute_manhattan(scaling: Mapping[str, float | int] | None = None):
+    return preroute(manhattan, scaling=scaling)
+
+
+def _preroute_weak_chebyshev(scaling: Mapping[str, float | int] | None = None):
+    return preroute(weak_chebyshev, scaling=scaling)
+
+
+preroute.minkowski = _preroute_minkowski  # pyright: ignore[reportFunctionMemberAccess]
+preroute.euclidean = _preroute_euclidean  # pyright: ignore[reportFunctionMemberAccess]
+preroute.manhattan = _preroute_manhattan  # pyright: ignore[reportFunctionMemberAccess]
+preroute.weak_chebyshev = _preroute_weak_chebyshev  # pyright: ignore[reportFunctionMemberAccess]

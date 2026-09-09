@@ -1,10 +1,11 @@
+from types import GeneratorType
 from unittest.mock import MagicMock
 
 import pytest
 from bluesky.run_engine import RunEngine
 
-from blop.plan_stubs import navigate_to_best
-from blop.protocols import Optimizer
+from blop.plan_stubs import navigate_to_best, preroute
+from blop.protocols import AcquisitionPlan, Optimizer
 
 from .conftest import MovableSignal
 
@@ -67,3 +68,17 @@ def test_navigate_ignores_unknown_params(RE):
     RE(navigate_to_best([x1], optimizer))
 
     assert x1._value == 5.0
+
+
+def test_prerouting():
+    """test that prerouting returns same spec as an evaluation function and modifies order of plan points"""
+    acquistion_plan = MagicMock(spec=AcquisitionPlan)
+    wrapped = preroute.euclidean()(acquistion_plan)
+    x1 = MovableSignal("x1", initial_value=0.0)
+    x2 = MovableSignal("x2", initial_value=0.0)
+    suggestions = [{"_id": i, "x1": ((-1.1) ** i) % 1.0, "x2": ((-1.2) ** i) % 1.0} for i in range(4)]
+    plan = wrapped(suggestions, [x1, x2])
+    assert isinstance(plan, GeneratorType)
+    [None for _ in plan]
+    order = [s["_id"] for s in acquistion_plan.call_args.args[0]]
+    assert order != [*range(4)]
