@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from typing import cast
 from unittest.mock import MagicMock, patch
 
 import bluesky.plan_stubs as bps
@@ -55,6 +57,64 @@ def _custom_identifier_acquisition_plan(suggestions, actuators, sensors, *args, 
     """Acquisition plan that returns a custom hashable acquisition identifier."""
     yield from bps.null()
     return _CUSTOM_ACQUISITION_IDENTIFIER
+
+
+@dataclass
+class _DataclassAcquisitionUID:
+    correlation_uid: str
+    item_uid: str | None
+    plan_name: str
+    metadata: dict[str, object]
+
+
+_DATACLASS_ACQUISITION_UID = _DataclassAcquisitionUID(
+    correlation_uid="correlation-123",
+    item_uid=None,
+    plan_name="count",
+    metadata={"stream": "primary"},
+)
+
+
+@plan
+def _dataclass_uid_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+    """Acquisition plan that returns a dataclass UID."""
+    yield from bps.null()
+    return _DATACLASS_ACQUISITION_UID
+
+
+class _ArrayRejectingAcquisitionUID:
+    def __array__(self, dtype=None, copy=None):
+        raise TypeError("Not array-like")
+
+    def __repr__(self):
+        return "ArrayRejectingAcquisitionUID()"
+
+
+_ARRAY_REJECTING_ACQUISITION_UID = _ArrayRejectingAcquisitionUID()
+
+
+@plan
+def _array_rejecting_uid_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+    """Acquisition plan that returns a UID that rejects NumPy coercion."""
+    yield from bps.null()
+    return _ARRAY_REJECTING_ACQUISITION_UID
+
+
+class _UnhashableAcquisitionReference:
+    __hash__ = None
+
+    def __repr__(self):
+        return "UnhashableAcquisitionReference()"
+
+
+_UNHASHABLE_ACQUISITION_REFERENCE = _UnhashableAcquisitionReference()
+
+
+@plan
+def _unhashable_reference_acquisition_plan(suggestions, actuators, sensors, *args, **kwargs):
+    """Acquisition plan that returns an unhashable acquisition UID."""
+    yield from bps.null()
+    return _UNHASHABLE_ACQUISITION_REFERENCE
 
 
 class StageableReadable(ReadableSignal):
@@ -151,6 +211,40 @@ def test_optimize(RE):
     assert data["x1"] == 0.0
     assert data["objective"] == 0.0
     assert data["acquisition_uid"] and isinstance(data["acquisition_uid"], str)
+
+
+def test_optimize_accepts_unhashable_acquisition_reference(RE):
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [{"x1": 0.0, "_id": 0}]
+    captured = []
+
+    def evaluation_function(uid: _UnhashableAcquisitionReference, suggestions: list[dict]) -> list[dict]:
+        captured.append(uid)
+        return [{"objective": 1.0, "_id": suggestions[0]["_id"]}]
+
+    typed_evaluation_function = cast(EvaluationFunction[_UnhashableAcquisitionReference], evaluation_function)
+    typed_acquisition_plan = cast(AcquisitionPlan[_UnhashableAcquisitionReference], _unhashable_reference_acquisition_plan)
+    optimization_problem: OptimizationProblem[_UnhashableAcquisitionReference] = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=typed_evaluation_function,
+        acquisition_plan=typed_acquisition_plan,
+    )
+
+    with pytest.raises(TypeError):
+        hash(_UNHASHABLE_ACQUISITION_REFERENCE)
+
+    callback, events = _collect_optimize_events()
+    RE.subscribe(callback)
+    try:
+        RE(optimize(optimization_problem))
+    finally:
+        RE.unsubscribe(callback)
+
+    assert captured == [_UNHASHABLE_ACQUISITION_REFERENCE]
+    optimizer.ingest.assert_called_once_with([{"objective": 1.0, "_id": 0}])
+    assert events[0]["data"]["acquisition_uid"] == repr(_UNHASHABLE_ACQUISITION_REFERENCE)
 
 
 def test_optimization_failure(RE):
@@ -840,6 +934,61 @@ def test_optimize_with_custom_hashable_acquisition_identifier_uses_repr(RE):
     evaluation_function.assert_called_once_with(_CUSTOM_ACQUISITION_IDENTIFIER, [suggestion])
     assert len(events) == 1
     assert events[0]["data"]["acquisition_uid"] == repr(_CUSTOM_ACQUISITION_IDENTIFIER)
+
+
+def test_optimize_with_dataclass_acquisition_uid_uses_repr(RE):
+    """Store a dataclass acquisition UID via its repr."""
+    suggestion = {"x1": 0.5, "_id": 0}
+    outcome = {"objective": 1.25, "_id": 0}
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [suggestion]
+    evaluation_function = MagicMock(spec=EvaluationFunction, return_value=[outcome])
+    typed_evaluation_function = cast(EvaluationFunction[_DataclassAcquisitionUID], evaluation_function)
+    typed_acquisition_plan = cast(AcquisitionPlan[_DataclassAcquisitionUID], _dataclass_uid_acquisition_plan)
+    optimization_problem: OptimizationProblem[_DataclassAcquisitionUID] = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=typed_evaluation_function,
+        acquisition_plan=typed_acquisition_plan,
+    )
+
+    callback, events = _collect_optimize_events()
+    RE.subscribe(callback)
+    try:
+        RE(optimize(optimization_problem))
+    finally:
+        RE.unsubscribe(callback)
+
+    evaluation_function.assert_called_once_with(_DATACLASS_ACQUISITION_UID, [suggestion])
+    assert len(events) == 1
+    assert events[0]["data"]["acquisition_uid"] == repr(_DATACLASS_ACQUISITION_UID)
+
+
+def test_optimize_with_array_rejecting_uid_uses_repr(RE):
+    """Fall back to repr when a UID rejects NumPy array coercion."""
+    suggestion = {"x1": 0.5, "_id": 0}
+    outcome = {"objective": 1.25, "_id": 0}
+    optimizer = MagicMock(spec=Optimizer)
+    optimizer.suggest.return_value = [suggestion]
+    evaluation_function = MagicMock(spec=EvaluationFunction, return_value=[outcome])
+    optimization_problem = OptimizationProblem(
+        optimizer=optimizer,
+        actuators=[MovableSignal("x1", initial_value=-1.0)],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=evaluation_function,
+        acquisition_plan=_array_rejecting_uid_acquisition_plan,
+    )
+
+    callback, events = _collect_optimize_events()
+    RE.subscribe(callback)
+    try:
+        RE(optimize(optimization_problem))
+    finally:
+        RE.unsubscribe(callback)
+
+    evaluation_function.assert_called_once_with(_ARRAY_REJECTING_ACQUISITION_UID, [suggestion])
+    assert events[0]["data"]["acquisition_uid"] == "ArrayRejectingAcquisitionUID()"
 
 
 def test_optimize_step_custom_acquisition_plan(RE):

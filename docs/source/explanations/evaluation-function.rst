@@ -4,47 +4,45 @@ The Evaluation Function
 The evaluation function is the primary interface between **blop** and your experimental data analysis pipeline. It is responsible for retrieving
 experimental data, performing any required post-processing, and computing the objective values returned to the optimizer.
 
-Rather than prescribing a particular processing framework or directly managing data, **blop** uses an identifier-driven workflow. The acquisition
-plan returns a hashable identifier, and Blop passes that same identifier to the evaluation function. This mirrors event-based processing patterns
-commonly used at beamlines while also supporting data acquired within a single Bluesky run.
+Rather than prescribing a particular processing framework or directly managing data, **blop** uses a uid-driven workflow. The acquisition
+plan returns a uid, and Blop passes that same value to the evaluation function. The uid must uniquely identify the acquisition.
 
 
 Anatomy of an Evaluation Function
 ---------------------------------
 
-An evaluation function is a callable that accepts a hashable acquisition identifier and a sequence of suggestion mappings, then returns a sequence of outcome mappings. Suggestions are optional analysis context and are not guaranteed to match the order of the acquired data. The identifier may be a Bluesky run UID, a tuple of event UIDs, or another hashable key understood by the evaluator.
+An evaluation function is a callable that accepts a uid and a sequence of suggestion mappings, then returns a sequence of outcome mappings. The uid may be a Bluesky run UID, suggestion IDs in executed order, a tuple of event UIDs, or a backend-specific UID type understood by the evaluator. Suggestions are analysis context and may not match acquisition order; match data and outcomes by ``_id``.
 
-A typical implementation is shown below:
+A run-owning acquisition plan usually returns a string run UID:
 
 .. code-block:: python
 
-    from collections.abc import Hashable, Mapping, Sequence
+    from collections.abc import Mapping, Sequence
 
-    class GenericEvaluation(EvaluationFunction):
-        """Inheriting from EvaluationFunction is optional but provides
-        a useful typing protocol."""
+    from blop.protocols import EvaluationFunction
 
-        def __init__(self, **meta_parameters):
-            # Perform one-time setup before passing the evaluator to
-            # the optimizer.
-            #
-            # Typical responsibilities include:
-            #   - stashing storage clients within self (e.g. Tiled)
-            #   - Initializing analysis resources (dask distributed is considered but yet unexplored in our support)
-            #   - Configuring optimization-specific parameters 
-            #       - (perhaps varying of exponents in loss combinations, selecting between L1 and L2 norm...)
+    class RunUidEvaluation(EvaluationFunction[str]):
+        """Evaluator for acquisition plans that return Bluesky run UID strings."""
 
-        def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
-            # Invoked with the identifier returned by the acquisition plan.
-            #
-            # Typical responsibilities include:
-            #   - Retrieving the data associated with the identifier
-            #   - Matching each acquired sample to its optimizer trial ID
-            #       - IDs are stored in actual acquisition order under "blop_acquisition_order"
-            #         in the run's start document when using default_acquire
-            #   - Treating suggestions as optional context, never matching by list position
-            #   - Constructing a per-suggestion analysis context
-            #   - Calling a lower-level objective function for each sample or suggestion
+        def __call__(self, uid: str, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
+            run = self.tiled_client[uid]
+            acquisition_order = run.start["blop_acquisition_order"]
+            return analyze_run(run, acquisition_order)
+
+For a custom plan that returns a richer UID, use that concrete type in both the plan and evaluator:
+
+.. code-block:: python
+
+    from dataclasses import dataclass
+
+    @dataclass(frozen=True)
+    class QueueAcquisitionUID:
+        correlation_uid: str
+        item_uid: str | None
+
+    class QueueEvaluation(EvaluationFunction[QueueAcquisitionUID]):
+        def __call__(self, uid: QueueAcquisitionUID, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
+            return analyze_queue_data(uid, suggestions)
 
 Although the interface is intentionally minimal, separating setup from
 execution is recommended.
@@ -54,7 +52,7 @@ execution is recommended.
     loading analysis resources, and configuring reusable analysis parameters.
 
 ``__call__``
-    Retrieve the data associated with the acquisition identifier, iterate over the
+    Retrieve the data associated with the uid, iterate over the
     individual suggestions or samples, and orchestrate the analysis workflow.
 
 Where possible, keep the actual objective calculation in a separate function
