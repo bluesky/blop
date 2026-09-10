@@ -192,7 +192,7 @@ import pandas as pd
 
 res_client = tiled_client[res_uid[0]]
 data = res_client["primary/internal"].read()
-raise ValueError(data)
+raise ValueError(res_client['primary'].read().to_dataframe())
 cols = ["suggestion_ids", "x1", "x2", "himmelblau_2d"]
 vec = data[cols]
 res = []
