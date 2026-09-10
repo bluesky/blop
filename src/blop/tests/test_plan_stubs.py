@@ -70,10 +70,12 @@ def test_navigate_ignores_unknown_params(RE):
     assert x1._value == 5.0
 
 
-def test_prerouting():
-    """test that prerouting returns same spec as an evaluation function and modifies order of plan points"""
+@pytest.mark.parametrize("router", [preroute.euclidean, preroute.manhattan, preroute.weak_chebyshev])
+def test_prerouting(router):
+    """test that prerouting returns same spec as an acquisition plan and modifies order of plan points"""
     acquistion_plan = MagicMock(spec=AcquisitionPlan)
-    wrapped = preroute.euclidean()(acquistion_plan)
+    wrapped = router()(acquistion_plan)
+    assert isinstance(wrapped, AcquisitionPlan)
     x1 = MovableSignal("x1", initial_value=0.0)
     x2 = MovableSignal("x2", initial_value=0.0)
     suggestions = [{"_id": i, "x1": ((-1.1) ** i) % 1.0, "x2": ((-1.2) ** i) % 1.0} for i in range(4)]

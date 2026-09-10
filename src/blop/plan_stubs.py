@@ -307,11 +307,7 @@ def list_scan_in_run(
     return suggestion_ids
 
 
-def preroute(
-    distance_metric: DistanceMetric,
-    *,
-    scaling: Mapping[str, float | int] | None = None,
-):
+def preroute(distance_metric: DistanceMetric, *, scaling: Mapping[str, float | int] | None = None, **cargs):
     """
     Create a Decorator for acquisition functions which helps offload route optimization for the supplied distance metric.
 
@@ -348,20 +344,20 @@ def preroute(
     return deco
 
 
-def _preroute_minkowski(exponent=2.0, scaling: Mapping[str, float | int] | None = None):
-    return preroute(partial(minkowski, exponent=exponent), scaling=scaling)
+def _preroute_minkowski(exponent=2.0, **kwargs):
+    return preroute(partial(minkowski, exponent=exponent), **kwargs)
 
 
-def _preroute_euclidean(scaling: Mapping[str, float | int] | None = None):
-    return preroute(euclidean, scaling=scaling)
+def _preroute_euclidean(**kwargs):
+    return preroute(euclidean, **kwargs)
 
 
-def _preroute_manhattan(scaling: Mapping[str, float | int] | None = None):
-    return preroute(manhattan, scaling=scaling)
+def _preroute_manhattan(**kwargs):
+    return preroute(manhattan, **kwargs)
 
 
-def _preroute_weak_chebyshev(scaling: Mapping[str, float | int] | None = None):
-    return preroute(weak_chebyshev, scaling=scaling)
+def _preroute_weak_chebyshev(**kwargs):
+    return preroute(weak_chebyshev, **kwargs)
 
 
 preroute.minkowski = _preroute_minkowski  # pyright: ignore[reportFunctionMemberAccess]
