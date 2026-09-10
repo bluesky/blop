@@ -80,11 +80,11 @@ def _validate_outcomes(outcomes: Sequence[Mapping], suggestions: Sequence[Mappin
 
 
 def _suggestion_ids(suggestions: Sequence[Mapping]) -> tuple[Hashable, ...]:
-    """Return suggestion IDs as a hashable acquisition identifier."""
+    """Return suggestion IDs as an in-run acquisition UID."""
     return tuple(cast(Hashable, suggestion[ID_KEY]) for suggestion in suggestions)
 
 
-def _drop_run_control_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
+def _drop_run_control_messages(plan: MsgGenerator[Any]) -> MsgGenerator[Any]:
     """Drop child-run messages while preserving hardware lifecycle messages."""
 
     def _drop(msg: Any) -> Any | None:
@@ -95,7 +95,7 @@ def _drop_run_control_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Has
     return (yield from bpp.msg_mutator(plan, _drop))
 
 
-def _reject_child_run_messages(plan: MsgGenerator[Hashable]) -> MsgGenerator[Hashable]:
+def _reject_child_run_messages(plan: MsgGenerator[Any]) -> MsgGenerator[Any]:
     """Reject child-run messages inside the plan."""
 
     def _reject(msg: Any) -> Any:
@@ -118,7 +118,7 @@ def _maybe_checkpoint(optimizer: Optimizer, checkpoint_interval: int | None, ite
         optimizer.checkpoint()
 
 
-def _infer_data_key(source: Source, value: ArrayLike) -> DataKey:
+def _infer_data_key(source: Source, value: Any) -> DataKey:
     """Infer the data key from the provided value."""
     numpy_array = np.array(value)
     # Descriptions are cached across updates, so reserve enough space for UUIDs.
@@ -193,10 +193,10 @@ class InferredReadable(Readable, HasHints, HasParent):
         if not self._data_key:
             # Use stored dtype if available, otherwise infer
             if self._dtype is not None:
-                numpy_array = np.array(self._value, dtype=self._dtype)
+                value = np.array(self._value, dtype=self._dtype)
             else:
-                numpy_array = np.array(self._value)
-            self._data_key = _infer_data_key(self._source, numpy_array)
+                value = np.array(self._value)
+            self._data_key = _infer_data_key(self._source, value)
         return {self.name: self._data_key}
 
     def update(self, value: ArrayLike) -> None:

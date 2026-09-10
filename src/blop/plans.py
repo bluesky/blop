@@ -1,7 +1,7 @@
 """Bluesky plans for optimization."""
 
 import logging
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from itertools import count
 from typing import Any, Literal, cast
 
@@ -13,13 +13,14 @@ from bluesky.utils import MsgGenerator, plan
 from .plan_stubs import list_scan_in_run, read_step, seq_read
 from .protocols import (
     ID_KEY,
+    AcquisitionPlan,
     Actuator,
     CanRegisterSuggestions,
-    EvaluationFunction,
     OptimizationProblem,
     Sensor,
     SupportsStoppingCriteria,
     TrialFaultAware,
+    TUid,
 )
 from .utils import (
     InferredReadable,
@@ -123,11 +124,11 @@ def default_acquire(
 
 @plan
 def optimize_step(
-    optimization_problem: OptimizationProblem,
+    optimization_problem: OptimizationProblem[TUid],
     n_points: int = 1,
     *args: Any,
     **kwargs: Any,
-) -> MsgGenerator[tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]]:
+) -> MsgGenerator[tuple[TUid, Sequence[Mapping], Sequence[Mapping]]]:
     """
     Single step of the optimization loop.
 
@@ -140,11 +141,11 @@ def optimize_step(
 
     Returns
     -------
-    tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]
-        The acquisition identifier, suggestions, and outcomes of the step.
+    tuple[TUid, Sequence[Mapping], Sequence[Mapping]]
+        The acquisition UID, suggestions, and outcomes of the step.
     """
     if optimization_problem.acquisition_plan is None:
-        acquisition_plan = default_acquire
+        acquisition_plan = cast(AcquisitionPlan[TUid], default_acquire)
     else:
         acquisition_plan = optimization_problem.acquisition_plan
     optimizer = optimization_problem.optimizer
@@ -153,8 +154,7 @@ def optimize_step(
     _validate_suggestions(suggestions)
     try:
         uid = yield from acquisition_plan(suggestions, actuators, optimization_problem.sensors, *args, **kwargs)
-        evaluation_function: EvaluationFunction = optimization_problem.evaluation_function
-        outcomes = evaluation_function(uid, suggestions)
+        outcomes = optimization_problem.evaluation_function(uid, suggestions)
     except Exception:
         if isinstance(optimizer, TrialFaultAware):
             optimizer.register_failures(suggestions)
@@ -168,7 +168,7 @@ def optimize_step(
 
 @plan
 def optimize(
-    optimization_problem: OptimizationProblem,
+    optimization_problem: OptimizationProblem[TUid],
     iterations: int | None = 1,
     n_points: int = 1,
     checkpoint_interval: int | None = None,
@@ -256,7 +256,7 @@ def optimize(
 
 @plan
 def optimize_in_run(
-    optimization_problem: OptimizationProblem,
+    optimization_problem: OptimizationProblem[TUid],
     iterations: int = 1,
     n_points: int = 1,
     checkpoint_interval: int | None = None,
@@ -303,7 +303,11 @@ def optimize_in_run(
 
     optimizer = optimization_problem.optimizer
     actuators = optimization_problem.actuators
-    acquisition_plan = optimization_problem.acquisition_plan or list_scan_in_run
+    acquisition_plan = (
+        cast(AcquisitionPlan[TUid], list_scan_in_run)
+        if optimization_problem.acquisition_plan is None
+        else optimization_problem.acquisition_plan
+    )
 
     @bpp.set_run_key_decorator(OPTIMIZE_IN_RUN_KEY)
     @bpp.run_decorator(md=_md)
@@ -348,11 +352,11 @@ def optimize_in_run(
 
 @plan
 def sample_suggestions(
-    optimization_problem: OptimizationProblem,
+    optimization_problem: OptimizationProblem[TUid],
     suggestions: Sequence[Mapping],
     readable_cache: dict[str, InferredReadable] | None = None,
     **kwargs: Any,
-) -> MsgGenerator[tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]]:
+) -> MsgGenerator[tuple[TUid, Sequence[Mapping], Sequence[Mapping]]]:
     """
     Evaluate specific parameter combinations.
 
@@ -377,8 +381,8 @@ def sample_suggestions(
 
     Returns
     -------
-    uid : Hashable
-        The acquisition identifier returned by the acquisition plan.
+    uid : TUid
+        The acquisition UID returned by the acquisition plan.
     suggestions : Sequence[Mapping]
         Suggestions with "_id" keys.
     outcomes : Sequence[Mapping]
@@ -418,11 +422,11 @@ def sample_suggestions(
 
     @bpp.set_run_key_decorator(SAMPLE_SUGGESTIONS_RUN_KEY)
     @bpp.run_decorator(md=_md)
-    def _inner_sample_suggestions() -> MsgGenerator[tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]]:
+    def _inner_sample_suggestions() -> MsgGenerator[tuple[TUid, Sequence[Mapping], Sequence[Mapping]]]:
 
         # Acquire data, evaluate, and ingest outcomes
         if optimization_problem.acquisition_plan is None:
-            acquisition_plan = default_acquire
+            acquisition_plan = cast(AcquisitionPlan[TUid], default_acquire)
         else:
             acquisition_plan = optimization_problem.acquisition_plan
         uid = yield from acquisition_plan(
@@ -440,7 +444,7 @@ def sample_suggestions(
 
 
 def acquire_baseline(
-    optimization_problem: OptimizationProblem,
+    optimization_problem: OptimizationProblem[TUid],
     parameterization: Mapping[str, Any] | None = None,
     **kwargs: Any,
 ) -> MsgGenerator[None]:
@@ -471,7 +475,7 @@ def acquire_baseline(
         parameterization_copy[ID_KEY] = "baseline"
     optimizer = optimization_problem.optimizer
     if optimization_problem.acquisition_plan is None:
-        acquisition_plan = default_acquire
+        acquisition_plan = cast(AcquisitionPlan[TUid], default_acquire)
     else:
         acquisition_plan = optimization_problem.acquisition_plan
     uid = yield from acquisition_plan([parameterization_copy], actuators, optimization_problem.sensors, **kwargs)

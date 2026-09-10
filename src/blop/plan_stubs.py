@@ -35,7 +35,7 @@ _ACQUISITION_UID_KEY: Literal["acquisition_uid"] = "acquisition_uid"
 _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
 
 
-def _is_array_like_identifier(uid: Hashable) -> bool:
+def _is_array_like_identifier(uid: Any) -> bool:
     try:
         numpy_array = np.array(uid)
     except (TypeError, ValueError):
@@ -43,8 +43,8 @@ def _is_array_like_identifier(uid: Hashable) -> bool:
     return numpy_array.dtype != object
 
 
-def _acquisition_identifier_value(uid: Hashable) -> ArrayLike:
-    """Convert a hashable acquisition identifier to an event-readable value."""
+def _acquisition_identifier_value(uid: Any) -> Any:
+    """Convert an acquisition UID to an event-readable value."""
     if _is_array_like_identifier(uid):
         return cast(ArrayLike, uid)
     return repr(uid)
@@ -73,7 +73,7 @@ def seq_read(readables: Sequence[Readable], **kwargs: Any) -> MsgGenerator[dict[
 
 @plan
 def read_step(
-    uid: Hashable,
+    uid: Any,
     suggestions: Sequence[Mapping],
     outcomes: Sequence[Mapping],
     n_points: int,
@@ -86,12 +86,12 @@ def read_step(
     with np.nan to ensure consistent shapes for event-model specification.
 
     The emitted ``acquisition_uid`` field retains native array-like identifiers.
-    Other hashable identifiers are represented by ``repr(uid)``.
+    Other acquisition UIDs are represented by ``repr(uid)``.
 
     Parameters
     ----------
-    uid : Hashable
-        The acquisition identifier returned by the acquisition plan.
+    uid : Any
+        The acquisition UID returned by the acquisition plan.
     suggestions : Sequence[Mapping]
         Sequence of suggestion mappings, each containing an ID_KEY.
     outcomes : Sequence[Mapping]
@@ -152,7 +152,7 @@ def read_step(
         )
     else:
         readable_cache[_SUGGESTION_IDS_KEY].update(sorted_sids)
-    # Need to normalize the value here since `Hashable` is very broad
+    # Normalize the acquisition UID for event-model storage.
     normalized_uid = _acquisition_identifier_value(uid)
     if _ACQUISITION_UID_KEY not in readable_cache:
         readable_cache[_ACQUISITION_UID_KEY] = InferredReadable(

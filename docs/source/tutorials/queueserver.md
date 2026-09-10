@@ -205,12 +205,12 @@ sensors = ["himmel_det"]
 
 ## Writing the Evaluation Function
 
-The evaluation function is called each time a plan completes. Its general contract accepts a hashable acquisition identifier and a sequence of suggestion mappings, and returns a sequence of outcome mappings. This evaluator uses `blop_acquisition_order` to align detector values with their IDs. The queueserver runner uses the Bluesky run UID as its acquisition identifier, so this evaluator validates that it received a string before looking up the run in Tiled. Each outcome must contain the objective value(s) and an `_id` from that acquisition order.
+The evaluation function is called each time a plan completes. Its general contract accepts a uid and a sequence of suggestion mappings, and returns a sequence of outcome mappings. This evaluator uses `blop_acquisition_order` to align detector values with IDs. The queueserver runner uses the Bluesky run UID, so this evaluator types `uid` as `str` before looking up the run in Tiled. Each outcome must contain the objective value(s) and an `_id` from that acquisition order.
 
 Because the agent and the ZMQ-Tiled bridge are separate subscribers to the same ZMQ stream, there is a race condition: the agent may receive the stop document before the bridge has finished writing data to Tiled. The evaluation function should poll Tiled until both the run and the detector data are available.
 
 ```{code-cell} ipython3
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 
 import numpy as np
 from tiled.client.container import Container
@@ -250,9 +250,7 @@ class HimmelblauEvaluation:
             "The ZMQ-Tiled bridge may still be writing the run."
         )
 
-    def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
-        if not isinstance(uid, str):
-            raise TypeError(f"HimmelblauEvaluation requires a Bluesky run UID string, got {uid!r}")
+    def __call__(self, uid: str, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         run = self._wait_for_run(uid)
 
         # Read the detector values from the primary data stream

@@ -70,10 +70,10 @@
     motor_x = MovableSignal("motor_x")
     motor_y = MovableSignal("motor_y")
 
-    from collections.abc import Hashable, Mapping, Sequence
+    from collections.abc import Mapping, Sequence
 
     # Mock evaluation function for examples
-    def evaluation_function(uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
+    def evaluation_function(uid: str, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """Mock evaluation function that returns constant outcomes."""
         outcomes = []
         for suggestion in suggestions:

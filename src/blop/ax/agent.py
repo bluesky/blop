@@ -1,8 +1,8 @@
 """Agent interface for optimization with Ax as the backend."""
 
 import logging
-from collections.abc import Hashable, Mapping, Sequence
-from typing import Any, cast
+from collections.abc import Mapping, Sequence
+from typing import Any, Generic, cast
 
 import bluesky.preprocessors as bpp
 from ax import Client, TOutcome, TParameterization
@@ -23,6 +23,7 @@ from ..protocols import (
     EvaluationFunction,
     OptimizationProblem,
     Sensor,
+    TUid,
 )
 from ..utils import InferredReadable
 from .dof import DOF, DOFConstraint
@@ -200,7 +201,7 @@ class _AxAgentMixin:
         self._optimizer.reconfigure_search_space({dof.parameter_name: update for dof, update in dof_mappings.items()})
 
 
-class Agent(_AxAgentMixin):
+class Agent(_AxAgentMixin, Generic[TUid]):
     """
     An interface that uses Ax as the backend for optimization and experiment tracking.
 
@@ -255,8 +256,8 @@ class Agent(_AxAgentMixin):
         sensors: Sequence[Sensor],
         dofs: Sequence[DOF],
         objectives: Sequence[Objective] | ScalarizedObjective,
-        evaluation_function: EvaluationFunction,
-        acquisition_plan: AcquisitionPlan | None = None,
+        evaluation_function: EvaluationFunction[TUid],
+        acquisition_plan: AcquisitionPlan[TUid] | None = None,
         dof_constraints: Sequence[DOFConstraint] | None = None,
         outcome_constraints: Sequence[OutcomeConstraint] | None = None,
         checkpoint_path: str | None = None,
@@ -293,9 +294,9 @@ class Agent(_AxAgentMixin):
         checkpoint_path: str,
         actuators: Sequence[Actuator],
         sensors: Sequence[Sensor],
-        evaluation_function: EvaluationFunction,
-        acquisition_plan: AcquisitionPlan | None = None,
-    ) -> "Agent":
+        evaluation_function: EvaluationFunction[TUid],
+        acquisition_plan: AcquisitionPlan[TUid] | None = None,
+    ) -> "Agent[TUid]":
         """
         Load an agent from the optimizer's checkpoint file.
 
@@ -386,16 +387,16 @@ class Agent(_AxAgentMixin):
         return self._actuators
 
     @property
-    def evaluation_function(self) -> EvaluationFunction:
+    def evaluation_function(self) -> EvaluationFunction[TUid]:
         """The function used to evaluate acquired data and produce outcomes."""
         return self._evaluation_function
 
     @property
-    def acquisition_plan(self) -> AcquisitionPlan | None:
+    def acquisition_plan(self) -> AcquisitionPlan[TUid] | None:
         """The acquisition plan for acquiring data, or ``None`` if using the default."""
         return self._acquisition_plan
 
-    def to_optimization_problem(self) -> OptimizationProblem:
+    def to_optimization_problem(self) -> OptimizationProblem[TUid]:
         """
         Construct an optimization problem from the agent.
 
@@ -499,7 +500,7 @@ class Agent(_AxAgentMixin):
 
     def sample_suggestions(
         self, suggestions: Sequence[Mapping]
-    ) -> MsgGenerator[tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]]:
+    ) -> MsgGenerator[tuple[TUid, Sequence[Mapping], Sequence[Mapping]]]:
         """
         Evaluate specific parameter combinations.
 
@@ -513,8 +514,8 @@ class Agent(_AxAgentMixin):
 
         Returns
         -------
-        tuple[Hashable, Sequence[Mapping], Sequence[Mapping]]
-            Acquisition identifier, suggestions with "_id", and outcomes.
+        tuple[TUid, Sequence[Mapping], Sequence[Mapping]]
+            Acquisition UID, suggestions with "_id", and outcomes.
 
         See Also
         --------
