@@ -368,8 +368,8 @@ def test_optimize_multiple_with_n_points(RE):
         assert "objective" in data
 
         assert int(data["suggestion_ids"]) in {0, 1}
-        assert data['x1'] in {0.0, 0.1}
-        assert data['objective'] in {0.0, 0.1}
+        assert data["x1"] in {0.0, 0.1}
+        assert data["objective"] in {0.0, 0.1}
 
 
 def test_optimize_complex_case(RE):
