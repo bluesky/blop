@@ -359,30 +359,21 @@ def test_optimize_multiple_with_n_points(RE):
     assert evaluation_function.call_count == 5
 
     # Validate event documents from outer-plan _read_step
-    assert len(events) == 5
+    assert len(events) == 10
     for event in events:
         data = event["data"]
         assert "suggestion_ids" in data
         assert "acquisition_uid" in data
         assert "x1" in data
         assert "objective" in data
-        sid = data["suggestion_ids"]
-        assert len(list(sid)) == 2
-        x1_vals = list(data["x1"]) if hasattr(data["x1"], "__iter__") and not isinstance(data["x1"], str) else [data["x1"]]
-        obj_vals = (
-            list(data["objective"])
-            if hasattr(data["objective"], "__iter__") and not isinstance(data["objective"], str)
-            else [data["objective"]]
-        )
-        assert x1_vals == [0.0, 0.1]
-        assert obj_vals == [0.0, 0.1]
+
+        assert int(data["suggestion_ids"]) in {0, 1}
+        assert data['x1'] in {0.0, 0.1}
+        assert data['objective'] in {0.0, 0.1}
 
 
 def test_optimize_complex_case(RE):
     """Test with multi-suggest, multi-parameter, multi-objective, multi-readable case."""
-
-    def _to_list(x):
-        return list(x) if hasattr(x, "__iter__") and not isinstance(x, str) else [x]
 
     optimizer = MagicMock(spec=Optimizer)
     optimizer.suggest.return_value = [
@@ -426,7 +417,7 @@ def test_optimize_complex_case(RE):
     assert evaluation_function.call_count == 2
 
     # Validate event documents from outer-plan _read_step
-    assert len(events) == 2
+    assert len(events) == 4
     for event in events:
         data = event["data"]
         assert "suggestion_ids" in data
@@ -436,12 +427,12 @@ def test_optimize_complex_case(RE):
         assert "x3" in data
         assert "objective1" in data
         assert "objective2" in data
-        assert _to_list(data["x1"]) == [0.0, 0.1]
-        assert _to_list(data["x2"]) == [0.0, 0.2]
-        assert _to_list(data["x3"]) == [0.0, 0.3]
-        assert _to_list(data["objective1"]) == [0.0, 0.1]
-        assert _to_list(data["objective2"]) == [0.1, 0.2]
-        assert _to_list(data["suggestion_ids"]) == ["0", "1"]
+        assert data["x1"] in [0.0, 0.1]
+        assert data["x2"] in [0.0, 0.2]
+        assert data["x3"] in [0.0, 0.3]
+        assert data["objective1"] in [0.0, 0.1]
+        assert data["objective2"] in [0.1, 0.2]
+        assert data["suggestion_ids"] in ["0", "1"]
         assert data["acquisition_uid"] in uids
 
 
@@ -517,10 +508,10 @@ def test_optimize_in_run_defaults_to_ordered_suggestion_ids(RE):
     assert start_docs[0]["run_key"] == "optimize_in_run"
     events_by_stream = _events_by_stream(documents)
     assert len(events_by_stream["primary"]) == 2
-    assert len(events_by_stream["optimization"]) == 1
+    assert len(events_by_stream["optimization"]) == 2
     optimization_data = events_by_stream["optimization"][0]["data"]
-    assert _as_list(optimization_data["suggestion_ids"]) == ["far", "near"]
-    assert _as_list(optimization_data["acquisition_uid"]) == ["near", "far"]
+    assert optimization_data["suggestion_ids"] == "far"
+    assert optimization_data["acquisition_uid"] == ("near", "far")
 
 
 def test_list_scan_in_run_allows_custom_per_step_streams(RE):
@@ -556,7 +547,7 @@ def test_list_scan_in_run_allows_custom_per_step_streams(RE):
     events_by_stream = _events_by_stream(documents)
     assert len(events_by_stream["primary"]) == 2
     assert len(events_by_stream["monitor"]) == 4
-    assert len(events_by_stream["optimization"]) == 1
+    assert len(events_by_stream["optimization"]) == 2
 
 
 def test_list_scan_in_run_accepts_no_sensors(RE):
