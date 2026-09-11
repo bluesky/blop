@@ -97,6 +97,19 @@ def test_route_suggestions_visits_each_reported_suggestion_once():
     assert set(routed_ids) == {suggestion[ID_KEY] for suggestion in suggestions}
 
 
+def test_route_suggestions_properly_scales():
+    suggestions = [
+        {ID_KEY: 0, "big_r": 0.1, "small_r": 0.5},
+        {ID_KEY: 1, "big_r": 0.0, "small_r": 1.0},
+    ]
+    start = {"big_r": 0.0, "small_r": 0.0}
+    scaling = {"big_r": 100.0, "small_r": 1.0}  # proposing big_r is a much larger and slower device than small_r
+
+    result = route_suggestions(suggestions, starting_position=start, scaling=scaling)
+    routed_ids = [suggestion[ID_KEY] for suggestion in result]
+    assert routed_ids == [1, 0]
+
+
 # _infer_data_key source value tests
 
 
