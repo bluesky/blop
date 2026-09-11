@@ -10,6 +10,31 @@ Compatibility Notes
 * ``EvaluationFunction`` and ``AcquisitionPlan`` are now generic over the uid type, allowing
   evaluators to accept richer backend-specific objects without requiring them to be hashable
   (`#369 <https://github.com/bluesky/blop/issues/369>`_).
+* The experimental Queue Server API no longer requires or accepts a dispatcher in
+  ``QueueserverAgent`` or ``QueueserverClient``. Evaluators receive a hashable
+  ``QueueserverAcquisition`` token immediately after submission and own data readiness;
+  ``OptimizationResult.uids`` now contains those tokens, not Bluesky run UIDs.
+  Existing run-UID evaluators must explicitly opt into ``DocumentStreamEvaluator``
+  with an application-managed dispatcher and close its subscription after consuming
+  the optimization future. ``QueueserverClient.submit_plan()`` returns the Queue
+  Server item UID. Worker errors, including suggestion and submission failures,
+  propagate through ``future.result()``; admission and environment errors remain
+  synchronous (`#368 <https://github.com/bluesky/blop/issues/368>`_).
+
+Bug Fixes
+.........
+* Queue Server ``stop()`` now prevents later submissions without completing the future
+  while evaluation is still running. The future remains running through ingestion,
+  checkpointing, and pending failure notification; stopping does not abort Queue Server
+  or close the evaluator.
+* Queue Server checkpoints now follow the requested completed-iteration cadence, such
+  as iterations 2 and 4 for an interval of 2, rather than iterations 1 and 3.
+* Interrupted Queue Server startup now preserves a single future-settlement owner,
+  preventing premature completion and double settlement. Late-starting workers cannot
+  submit acquisitions after the launcher has failed the run.
+* Secondary failure-notification exceptions, including ``SystemExit`` and
+  ``KeyboardInterrupt``, are logged with their tracebacks without replacing an
+  existing primary error.
 
 v1.1.0 (2026-08-26)
 -------------------

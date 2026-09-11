@@ -204,11 +204,13 @@ class EvaluationFunction(Protocol[_TUid_contra]):
 
     Notes
     -----
-    The evaluation function is called after data acquisition to compute outcomes.
-    It uses the uid returned by the acquisition plan to retrieve or identify
-    the relevant data and associate each acquired row with a suggestion by its
-    ``"_id"``. The uid type is evaluator-defined; it may be a Bluesky run UID,
-    ordered suggestion IDs, event UIDs, or a backend-specific UID type.
+    Local optimization passes the acquisition plan's return value to the evaluator.
+    Queue Server optimization instead passes a submission token immediately after
+    the plan is accepted, potentially before data exists. The evaluator owns data
+    readiness and uses the UID to retrieve or identify the relevant data and
+    associate each acquired row with a suggestion by its ``"_id"``. The UID type
+    is evaluator-defined; it may be a Bluesky run UID, ordered suggestion IDs,
+    event UIDs, or a backend-specific UID type.
 
     Examples
     --------
@@ -223,7 +225,9 @@ class EvaluationFunction(Protocol[_TUid_contra]):
         Parameters
         ----------
         uid: _TUid_contra
-            The acquisition UID returned by the acquisition plan.
+            The local acquisition plan's return value or a Queue Server submission
+            token. For submission tokens, wait for the required data to be ready
+            before returning outcomes.
         suggestions: Sequence[Mapping]
             A sequence of mappings, each containing a parameterization to evaluate.
             Each mapping must contain a unique ``"_id"``. Do not assume its order
@@ -356,7 +360,7 @@ class OptimizationProblem(BaseOptimizationProblem[Actuator, Sensor, TUid, Acquis
 
 
 @dataclass(frozen=True)
-class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str, str]):
+class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, TUid, str], Generic[TUid]):
     """
     An optimization problem to solve. Immutable once initialized.
 
@@ -375,8 +379,9 @@ class QueueserverOptimizationProblem(BaseOptimizationProblem[str, str, str, str]
         A subset of the actuators' names must match the names of suggested parameterizations.
     sensors: Sequence[str]
         Names of objects that can produce data to acquire data from the beamline using the Bluesky RunEngine.
-    evaluation_function: EvaluationFunction[str]
-        A callable that uses a Bluesky run UID to retrieve acquired data and produce outcomes.
+    evaluation_function: EvaluationFunction[TUid]
+        A callable that uses an acquisition UID to retrieve data when ready and produce outcomes.
+        The Queue Server runner supplies :class:`blop.queueserver.QueueserverAcquisition` tokens.
     acquisition_plan: str, optional
         The name of a Bluesky plan to acquire data. If not provided, a default plan name will be used.
         The plan must match the arguments of :class:`AcquisitionPlan`.

@@ -23,13 +23,13 @@ In this tutorial, you will learn how to run Blop optimization against a remote [
 
 - The experiment hardware is controlled by a shared instrument server
 - You want the optimizer to run in a separate process from the RunEngine
-- You need asynchronous, non-blocking optimization (the agent submits plans and reacts to completions)
+- You need asynchronous, non-blocking optimization (the agent submits plans and delegates data readiness to an evaluator)
 
 We will optimize the same Himmelblau function from the [simple experiment tutorial](./simple-experiment.md), but now the devices live inside a remote queueserver process rather than in the same Python session as the agent.
 
 ## Architecture
 
-The distributed system has five components:
+The application uses five infrastructure components:
 
 ```{mermaid}
 flowchart
@@ -46,22 +46,22 @@ flowchart
         bridge -->|writes| tiled
     end
 
-    agent["Blop QueueserverAgent<br/>(suggests points, listens for completions, evaluates data)"]
+    agent["Blop QueueserverAgent<br/>(suggests points, submits plans, evaluates data)"]
 
     agent -->|submit plans via REManagerAPI| rem
-    zmqp -->|document stream| agent
-    tiled -->|read data| agent
+    tiled -->|correlation lookup and data readiness| agent
 ```
 
 **Data flow:**
 
-1. The agent suggests parameter values and submits an acquisition plan to the RE Manager
-1. The RE Manager executes the plan (moves motors, reads detectors)
-1. Bluesky documents are published via ZMQ to the proxy
-1. The ZMQ-Tiled bridge persists documents to the Tiled server (using [bluesky-tiled-plugins](https://blueskyproject.io/bluesky-tiled-plugins)'s `TiledWriter` callback)
-1. The agent's ZMQ listener detects plan completion
-1. The agent's evaluation function reads results from Tiled and computes objectives
-1. The optimizer ingests outcomes and suggests the next point
+1. The agent suggests parameter values and submits an acquisition plan with a Blop correlation UID to the RE Manager.
+1. As soon as submission succeeds, the agent calls its evaluator with a `QueueserverAcquisition` token and the suggestions. The token identifies the submission; data may not exist yet.
+1. Independently, the RE Manager executes the plan (moves motors, reads detectors) and publishes Bluesky documents via ZMQ to the proxy.
+1. The ZMQ-Tiled bridge persists documents to Tiled using [bluesky-tiled-plugins](https://blueskyproject.io/bluesky-tiled-plugins)'s `TiledWriter` callback.
+1. The evaluator searches Tiled by the token's correlation UID and waits for the expected detector rows before computing objectives. It does not wait for a stop document.
+1. The optimizer ingests the outcomes, finishes any checkpoint, and suggests the next batch.
+
+The agent needs no document-stream subscriber. The independent ZMQ-Tiled bridge is still required to store the data that this evaluator reads.
 
 ## Prerequisites
 
@@ -89,16 +89,13 @@ You should see all services in a "healthy" or "running" state. The services expo
 | Service | Port | Purpose |
 |---------|------|---------|
 | RE Manager | 60615 | ZMQ control channel (REManagerAPI connects here) |
-| ZMQ Proxy (out) | 5578 | Document stream (agent listens for plan completions) |
+| ZMQ Proxy (out) | 5578 | Document stream (the ZMQ-Tiled bridge subscribes for persistence) |
 | Tiled | 8000 | Data access (evaluation function reads results) |
 | Redis | 6379 | Internal message broker for queueserver |
 
 Once the containers are up, proceed with the tutorial below.
 
 ```{code-cell} ipython3
-import time
-
-from bluesky.callbacks.zmq import RemoteDispatcher
 from bluesky_queueserver_api.zmq import REManagerAPI
 
 RM = REManagerAPI(zmq_control_addr="tcp://localhost:60615")
@@ -205,15 +202,21 @@ sensors = ["himmel_det"]
 
 ## Writing the Evaluation Function
 
-The evaluation function is called each time a plan completes. Its general contract accepts a uid and a sequence of suggestion mappings, and returns a sequence of outcome mappings. This evaluator uses `blop_acquisition_order` to align detector values with IDs. The queueserver runner uses the Bluesky run UID, so this evaluator types `uid` as `str` before looking up the run in Tiled. Each outcome must contain the objective value(s) and an `_id` from that acquisition order.
+The evaluation function is called immediately after a successful plan submission, before data necessarily exists. It accepts a `QueueserverAcquisition` token and a sequence of suggestion mappings, and returns a sequence of outcome mappings. The token's `correlation_uid` is injected into the plan's `blop_correlation_uid` metadata; its `item_uid` identifies the Queue Server item, and its `plan_name` names the submitted plan. None of these fields is a Bluesky run UID. Tokens are immutable and hashable, so they can also key evaluator-side caches.
 
-Because the agent and the ZMQ-Tiled bridge are separate subscribers to the same ZMQ stream, there is a race condition: the agent may receive the stop document before the bridge has finished writing data to Tiled. The evaluation function should poll Tiled until both the run and the detector data are available.
+This evaluator owns readiness: it polls Tiled for exactly one run matching the correlation UID, then waits for the detector array to contain exactly the expected number of rows. The tutorial's plan emits one run per acquisition; multiple matching runs are an error rather than an arbitrary choice. Once the run is available, its `blop_acquisition_order` provides the expected row count and maps detector values to suggestion IDs. Suggestions alone do not determine acquisition order. Each outcome must contain the objective value(s) and an `_id` from that acquisition order.
+
+Both waits are bounded by the evaluator's timeout. Missing or incomplete data may become ready while the plan is still running, so no stop document is required. Other backends can implement their own readiness policy without constructing a dispatcher.
 
 ```{code-cell} ipython3
 from collections.abc import Mapping, Sequence
+import time
 
 import numpy as np
 from tiled.client.container import Container
+from tiled.queries import Eq
+
+from blop.queueserver import QueueserverAcquisition
 
 
 class HimmelblauEvaluation:
@@ -224,39 +227,47 @@ class HimmelblauEvaluation:
         self.timeout = timeout
         self.poll_interval = poll_interval
 
-    def _wait_for_run(self, uid: str):
-        """Poll Tiled until the run with the given UID is available."""
+    def _wait_for_run(self, uid: QueueserverAcquisition) -> Container:
+        """Poll Tiled until exactly one run matches the acquisition correlation."""
         deadline = time.time() + self.timeout
         while time.time() < deadline:
-            try:
-                return self.tiled_client[uid]
-            except KeyError:
-                time.sleep(self.poll_interval)
+            matches = self.tiled_client.search(Eq("start.blop_correlation_uid", uid.correlation_uid))
+            count = len(matches)
+            if count == 1:
+                return next(iter(matches.values()))
+            if count > 1:
+                raise RuntimeError(f"Expected one run for acquisition {uid.correlation_uid!r}, found {count}.")
+            time.sleep(self.poll_interval)
         raise TimeoutError(
-            f"Run '{uid}' not found in Tiled after {self.timeout}s. "
-            "The ZMQ-Tiled bridge may not be running."
+            f"Acquisition {uid.correlation_uid!r} was not found in Tiled after {self.timeout}s."
         )
 
-    def _wait_for_detector_data(self, run, path: str):
-        """Poll Tiled until the detector data path is readable."""
+    def _wait_for_detector_data(self, run: Container, path: str, expected_rows: int) -> np.ndarray:
+        """Poll Tiled until the detector array contains all expected rows."""
         deadline = time.time() + self.timeout
         while time.time() < deadline:
             try:
-                return run[path].read()
+                data = run[path].read()
             except KeyError:
-                time.sleep(self.poll_interval)
+                pass
+            else:
+                if len(data) == expected_rows:
+                    return data
+                if len(data) > expected_rows:
+                    raise ValueError(f"Expected {expected_rows} rows at {path!r}, got {len(data)}.")
+            time.sleep(self.poll_interval)
         raise TimeoutError(
             f"Data path '{path}' for run '{run.metadata['start']['uid']}' was not readable after {self.timeout}s. "
             "The ZMQ-Tiled bridge may still be writing the run."
         )
 
-    def __call__(self, uid: str, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
+    def __call__(self, uid: QueueserverAcquisition, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         run = self._wait_for_run(uid)
 
-        # Read the detector values from the primary data stream
-        himmel_values = self._wait_for_detector_data(run, "primary/himmel_det")
-
         acquisition_order = run.metadata["start"]["blop_acquisition_order"]
+
+        # Wait for every detector row before associating values with acquired IDs.
+        himmel_values = self._wait_for_detector_data(run, "primary/himmel_det", len(acquisition_order))
         outcomes = []
         for idx, suggestion_id in enumerate(acquisition_order):
             outcomes.append({
@@ -272,15 +283,11 @@ class HimmelblauEvaluation:
 Now we bring everything together. The `QueueserverAgent` needs:
 
 - `re_manager_api`: how to communicate with the queueserver (submit plans, check status)
-- `document_dispatcher`: a `RemoteDispatcher` that subscribes to the Bluesky document stream
 - The DOFs, objectives, sensors, and evaluation function
 
 ```{code-cell} ipython3
-document_dispatcher = RemoteDispatcher(("localhost", 5578))
-
 agent = QueueserverAgent(
     re_manager_api=RM,
-    document_dispatcher=document_dispatcher,
     sensors=sensors,
     dofs=dofs,
     objectives=objectives,
@@ -292,14 +299,42 @@ agent = QueueserverAgent(
 ```{note}
 The `re_manager_api` argument also accepts an HTTP-based client
 (`bluesky_queueserver_api.http.REManagerAPI`) for deployments that expose the
-queueserver over HTTP rather than ZMQ. Construct the `RemoteDispatcher` with
-whatever arguments your document stream requires, such as a ZMQ address or
-message prefix.
+queueserver over HTTP rather than ZMQ. This native-token evaluator needs only
+Tiled access, not a document dispatcher. Queue Server enforces plan and device
+permissions; the agent does not maintain a separate local allowlist.
 ```
+
+### Optional migration for run-UID evaluators
+
+If an existing evaluator expects a Bluesky run UID string, explicitly wrap it in `DocumentStreamEvaluator`. This optional adapter waits for a correlated successful start/stop pair and passes the real run UID to the wrapped evaluator. It is a single-run adapter, not a multi-run aggregation policy. Failed or aborted runs raise an error instead of calling the wrapped evaluator; the configured timeout bounds the document wait, not the wrapped evaluation.
+
+In the illustrative example below, `document_dispatcher` is an application-owned Bluesky `Dispatcher` (such as a `RemoteDispatcher`) whose transport is already running, and `existing_run_uid_evaluator` is your existing callable. Construct the adapter before submitting any acquisitions so it can buffer early documents. Neither the agent nor the adapter starts or stops the transport, and there is no implicit evaluator adaptation.
+
+```python
+from contextlib import closing
+
+from blop.queueserver import DocumentStreamEvaluator
+
+with closing(DocumentStreamEvaluator(document_dispatcher, existing_run_uid_evaluator, timeout=30.0)) as evaluation_function:
+    stream_agent = QueueserverAgent(
+        re_manager_api=RM,
+        sensors=sensors,
+        dofs=dofs,
+        objectives=objectives,
+        evaluation_function=evaluation_function,
+        acquisition_plan="default_acquire",
+    )
+    stream_future = stream_agent.run(iterations=10, n_points=1)
+    stream_result = stream_future.result()
+```
+
+Keep `future.result()` inside the `closing` scope so completion or an exception releases the adapter's owned subscription and buffered documents. Other dispatcher subscribers are unaffected. `stream_agent.stop()` does not close the adapter: wait for the in-flight evaluation to finish before leaving its scope. The application remains responsible for the dispatcher transport's lifecycle. The primary tutorial below continues to use the native Tiled evaluator, without this adapter.
 
 ## Running the Optimization
 
-The `run()` method is **non-blocking** — it submits the first plan and returns immediately. The agent reacts asynchronously to plan completions via ZMQ callbacks.
+The `run()` method is **non-blocking**: after synchronous preflight checks, it reserves the run and returns a running `Future`. A worker performs even the first suggestion and submission, then calls the token evaluator, ingests its outcomes, and finishes any checkpoint before continuing. `submit_suggestions()` uses the same worker for a single manual batch.
+
+Preflight failures, such as an unavailable worker environment or an optimization already in progress, are raised by `run()` or `submit_suggestions()` itself. After launch, suggestion, registration, submission, evaluation, ingestion, and checkpoint errors are raised by `future.result()`. Queue Server request and transport errors are not replaced by local permission checks.
 
 ```{code-cell} ipython3
 future = agent.run(iterations=10, n_points=1)
@@ -314,10 +349,14 @@ print(f"Iterations completed : {result.iterations_completed}")
 print(f"Points per iteration : {result.num_points}")
 print(f"Total acquisitions   : {len(result.uids)}")
 print()
-print("Run UIDs:")
+print("Acquisition tokens:")
 for uid in result.uids:
     print(f"  {uid}")
 ```
+
+`result.uids` is an ordered tuple of `QueueserverAcquisition` tokens for successfully evaluated and ingested acquisitions, not a list of run UIDs for direct Tiled lookup. Use the correlation UID to locate a run as shown above. The future remains running through evaluation, ingestion, checkpointing, and any pending failure notification.
+
+To prevent later acquisitions, call `agent.stop()`. It may wait for an already-started submission to return, but does not wait for the evaluator, interrupt the current acquisition, or issue a Queue Server stop/abort. Once submitted, that acquisition still evaluates and ingests, or its error propagates through the future. The future stays pending until this work finishes; `future.cancel()` cannot cancel a running optimization. New `run()` and `submit_suggestions()` calls are rejected during this interval. After completion the agent can be reused, and calling `stop()` again does not change the completed result.
 
 ## Viewing Results
 
@@ -336,9 +375,10 @@ The Himmelblau function has four global minima (all with value 0). The optimizer
 
 ## Cleanup
 
-When you're done, close the RE environment and stop the Docker services:
+When you're done, wait for the RE Manager to become idle before closing its environment: the optimization future may finish as soon as the final detector data is ready, while the acquisition plan is still cleaning up. Then stop the Docker services:
 
 ```{code-cell} ipython3
+RM.wait_for_idle(timeout=30)
 RM.environment_close()
 RM.wait_for_idle(timeout=30)
 RM.close()
@@ -351,10 +391,11 @@ docker compose down
 
 ## What You Learned
 
-- **Distributed architecture**: The queueserver separates experiment execution from optimization logic, connected via ZMQ and Tiled
+- **Distributed architecture**: Queue Server separates experiment execution from optimization logic; the independent ZMQ-Tiled bridge persists data without an agent-side document subscriber
 - **String-based device references**: Since devices live in the remote process, DOFs, sensors, and plans are referenced by name
-- **Asynchronous operation**: `agent.run()` is non-blocking; the agent reacts to events via ZMQ callbacks
-- **Evaluation function**: Reads from Tiled (not direct device access) to compute objectives after each plan completes
+- **Asynchronous operation**: `agent.run()` returns a future; its worker submits plans and waits for evaluator-defined readiness, ingestion, and checkpoint completion
+- **Evaluation function**: Receives an acquisition token immediately after submission and polls Tiled for complete, ID-associated data without requiring a stop document
+- **Optional document streams**: Existing run-UID evaluators can opt into `DocumentStreamEvaluator`, with application-managed transport and explicit subscription cleanup
 
 ## Next Steps
 
