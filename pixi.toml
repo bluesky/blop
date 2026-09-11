@@ -45,7 +45,7 @@ opencv-python = "*"
 
 [feature.integration.pypi-dependencies]
 tiled = { version = ">=0.2.0", extras = ["all"] }
-bluesky-tiled-plugins = "<=2.0.10"
+bluesky-tiled-plugins = "*"
 
 [feature.py311.dependencies]
 python = "3.11.*"
