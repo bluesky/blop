@@ -11,6 +11,25 @@ These classes implement the distributed optimization backend that connects
 Blop to a remote `Bluesky Queueserver <https://blueskyproject.io/bluesky-queueserver/>`_.
 See the :doc:`/tutorials/queueserver` tutorial for a full worked example.
 
+Evaluators receive a submission token immediately after a plan is queued and own
+waiting for the data they need. No document dispatcher is required. Existing
+run-UID evaluators can opt into ``DocumentStreamEvaluator`` with an
+application-managed transport and explicit subscription cleanup.
+
+QueueserverAcquisition
+---------------------
+
+.. autoclass:: blop.queueserver.QueueserverAcquisition
+   :members:
+   :undoc-members:
+
+DocumentStreamEvaluator
+-----------------------
+
+.. autoclass:: blop.queueserver.DocumentStreamEvaluator
+   :members:
+   :undoc-members:
+
 OptimizationResult
 ------------------
 
