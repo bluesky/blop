@@ -202,7 +202,7 @@ sensors = ["himmel_det"]
 
 ## Writing the Evaluation Function
 
-The evaluation function is called immediately after a successful plan submission, before data necessarily exists. It accepts a `QueueserverAcquisition` token and a sequence of suggestion mappings, and returns a sequence of outcome mappings. The token's `correlation_uid` is injected into the plan's `blop_correlation_uid` metadata; its `item_uid` identifies the Queue Server item, and its `plan_name` names the submitted plan. None of these fields is a Bluesky run UID. Tokens are immutable and hashable, so they can also key evaluator-side caches.
+The evaluation function is called immediately after a successful plan submission, before data necessarily exists. It accepts a `QueueserverAcquisition` token and a sequence of suggestion mappings, and returns a sequence of outcome mappings. The token's `correlation_uid` is injected into the plan's `blop_correlation_uid` metadata, while its `item_uid` identifies the authoritative Queue Server item. Neither field is a Bluesky run UID. Tokens are immutable and hashable, so they can also key evaluator-side caches.
 
 This evaluator owns readiness: it polls Tiled for exactly one run matching the correlation UID, then waits for the detector array to contain exactly the expected number of rows. The tutorial's plan emits one run per acquisition; multiple matching runs are an error rather than an arbitrary choice. Once the run is available, its `blop_acquisition_order` provides the expected row count and maps detector values to suggestion IDs. Suggestions alone do not determine acquisition order. Each outcome must contain the objective value(s) and an `_id` from that acquisition order.
 

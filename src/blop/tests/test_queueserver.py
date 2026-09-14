@@ -145,7 +145,7 @@ def test_document_stream_evaluator_accepts_early_completion():
     suggestions = [{"_id": 7, "motor": 3.0}]
     outcomes = [{"_id": 7, "objective": 9.0}]
     evaluate = MagicMock(return_value=outcomes)
-    uid = QueueserverAcquisition("target", "item-1", "acquire")
+    uid = QueueserverAcquisition("target", "item-1")
 
     with closing(DocumentStreamEvaluator(dispatcher, evaluate, timeout=0)) as adapter:
         _dispatch_completion(dispatcher, None, "non-blop", exit_status="fail")
@@ -162,7 +162,7 @@ def test_document_stream_evaluator_accepts_early_completion():
 def test_document_stream_evaluator_requires_matching_completion():
     dispatcher = Dispatcher()
     evaluate = MagicMock(return_value=[{"_id": 1, "objective": 2.0}])
-    uid = QueueserverAcquisition("target", None, "acquire")
+    uid = QueueserverAcquisition("target", "item-target")
 
     with closing(DocumentStreamEvaluator(dispatcher, evaluate, timeout=0)) as adapter:
         _dispatch_completion(dispatcher, None, "non-blop")
@@ -179,7 +179,7 @@ def test_document_stream_evaluator_requires_matching_completion():
 def test_document_stream_evaluator_rejects_unsuccessful_stop(exit_status, reason):
     dispatcher = Dispatcher()
     evaluate = MagicMock()
-    uid = QueueserverAcquisition("target", None, "acquire")
+    uid = QueueserverAcquisition("target", "item-target")
 
     with closing(DocumentStreamEvaluator(dispatcher, evaluate, timeout=0)) as adapter:
         _dispatch_completion(dispatcher, uid.correlation_uid, "failed-run", exit_status=exit_status, reason=reason)
@@ -195,7 +195,7 @@ def test_document_stream_evaluator_preserves_wrapped_error():
     dispatcher = Dispatcher()
     error = ValueError("Invalid acquired data")
     evaluate = MagicMock(side_effect=error)
-    uid = QueueserverAcquisition("target", None, "acquire")
+    uid = QueueserverAcquisition("target", "item-target")
 
     with closing(DocumentStreamEvaluator(dispatcher, evaluate, timeout=0)) as adapter:
         _dispatch_completion(dispatcher, uid.correlation_uid, "completed-run")
@@ -208,7 +208,7 @@ def test_document_stream_evaluator_close_releases_waiter():
     dispatcher = Dispatcher()
     evaluate = MagicMock()
     adapter = DocumentStreamEvaluator(dispatcher, evaluate)
-    uid = QueueserverAcquisition("target", None, "acquire")
+    uid = QueueserverAcquisition("target", "item-target")
     entered = threading.Event()
 
     def wait_for_acquisition():
@@ -234,7 +234,7 @@ def test_document_stream_evaluator_close_preserves_other_subscribers():
     dispatcher.subscribe(lambda name, doc: documents.append((name, doc)))
     evaluate = MagicMock()
     adapter = DocumentStreamEvaluator(dispatcher, evaluate, timeout=0)
-    uid = QueueserverAcquisition("target", None, "acquire")
+    uid = QueueserverAcquisition("target", "item-target")
     _dispatch_completion(dispatcher, uid.correlation_uid, "buffered-run")
     documents.clear()
 
@@ -260,7 +260,7 @@ def test_document_stream_evaluator_close_does_not_interrupt_wrapped_evaluation()
         return outcomes
 
     adapter = DocumentStreamEvaluator(dispatcher, evaluate)
-    uid = QueueserverAcquisition("target", None, "acquire")
+    uid = QueueserverAcquisition("target", "item-target")
     _dispatch_completion(dispatcher, uid.correlation_uid, "completed-run")
 
     with background_call(adapter, uid, [{"_id": 1}]) as future:
@@ -500,9 +500,7 @@ def test_runner_run_full_cycle(mock_optimization_problem, mock_re_manager_api):
                 plan = mock_re_manager_api.item_add.call_args_list[index].args[0]
                 payload = json.loads(json.dumps(plan.to_dict()))
                 token = tokens[index]
-                assert token == QueueserverAcquisition(
-                    payload["kwargs"]["md"][CORRELATION_UID_KEY], f"item-{index + 1}", "my_acquire"
-                )
+                assert token == QueueserverAcquisition(payload["kwargs"]["md"][CORRELATION_UID_KEY], f"item-{index + 1}")
                 assert payload["name"] == "my_acquire"
                 assert payload["args"] == [batches[index], ["motor1", "motor2"], ["detector"]]
                 assert payload["kwargs"] == {

@@ -71,7 +71,6 @@ def test_queueserver_agent_submit_suggestions(mock_re_manager_api):
     ]
     acquisition = next(iter(outcomes_by_acquisition))
     assert acquisition.item_uid == "item-manual"
-    assert acquisition.plan_name == plan.name
     assert plan.kwargs == {
         "exposure_time": 0.5,
         "num_frames": 10,
@@ -127,7 +126,6 @@ def test_queueserver_agent_run_with_checkpoint_interval(mock_re_manager_api, mon
     plans = [call.args[0] for call in mock_re_manager_api.item_add.call_args_list]
     assert [[point["motor"] for point in plan.args[0]] for plan in plans] == [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]
     assert [uid.item_uid for uid in acquisitions] == ["item-1", "item-2", "item-3"]
-    assert all(uid.plan_name == "default_acquire" for uid in acquisitions)
     assert result == OptimizationResult(iterations_completed=3, num_points=2, uids=tuple(acquisitions))
     assert agent.current_iteration == 3
 

@@ -12,7 +12,8 @@ Compatibility Notes
   (`#369 <https://github.com/bluesky/blop/issues/369>`_).
 * The experimental Queue Server API no longer requires or accepts a dispatcher in
   ``QueueserverAgent`` or ``QueueserverClient``. Evaluators receive a hashable
-  ``QueueserverAcquisition`` token immediately after submission and own data readiness;
+  ``QueueserverAcquisition`` token containing the Blop correlation UID and authoritative
+  Queue Server item UID immediately after submission and own data readiness;
   ``OptimizationResult.uids`` now contains those tokens, not Bluesky run UIDs.
   Existing run-UID evaluators must explicitly opt into ``DocumentStreamEvaluator``
   with an application-managed dispatcher and close its subscription after consuming

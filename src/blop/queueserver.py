@@ -52,20 +52,12 @@ class QueueserverAcquisition:
     ----------
     correlation_uid : str
         Blop correlation UID attached to the acquisition plan's metadata.
-    item_uid : str | None
-        Queue Server item UID, when known.
-    plan_name : str
-        Name of the submitted acquisition plan.
-
-    Notes
-    -----
-    None of these fields is implicitly a Bluesky run UID. This hashable token
-    is passed to the evaluator, never to the server plan or its metadata.
+    item_uid : str
+        Queue Server item UID assigned by the successful submission.
     """
 
     correlation_uid: str
-    item_uid: str | None
-    plan_name: str
+    item_uid: str
 
 
 @dataclass(frozen=True)
@@ -524,7 +516,7 @@ class QueueserverOptimizationRunner:
                         f"with correlation uid: {correlation_uid}"
                     )
                     item_uid = self._client.submit_plan(plan)
-                    acquisition = QueueserverAcquisition(correlation_uid, item_uid, self._plan_name)
+                    acquisition = QueueserverAcquisition(correlation_uid, item_uid)
 
                 outcomes = self._problem.evaluation_function(acquisition, suggestions)
                 self._problem.optimizer.ingest(outcomes)
