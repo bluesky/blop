@@ -8,7 +8,7 @@ from typing import Any, Literal, cast
 import bluesky.plans as bp
 import bluesky.preprocessors as bpp
 from bluesky.protocols import Readable
-from bluesky.utils import MsgGenerator, plan
+from bluesky.utils import Msg, MsgGenerator, plan
 
 from .plan_stubs import list_scan_in_run, read_step, seq_read
 from .protocols import (
@@ -108,15 +108,18 @@ def default_acquire(
     plan_args = _unpack_for_list_scan(suggestions, actuators)
     return (
         # TODO: fix argument type in bluesky.plans.list_scan
-        yield from bpp.set_run_key_wrapper(
-            bp.list_scan(
-                readables,
-                *plan_args,  # type: ignore[arg-type]
-                per_step=per_step,
-                md=run_md,
-                **kwargs,
+        yield from bpp.msg_mutator(
+            bpp.set_run_key_wrapper(
+                bp.list_scan(
+                    readables,
+                    *plan_args,  # type: ignore[arg-type]
+                    per_step=per_step,
+                    md=run_md,
+                    **kwargs,
+                ),
+                _DEFAULT_ACQUIRE_RUN_KEY,
             ),
-            _DEFAULT_ACQUIRE_RUN_KEY,
+            lambda msg: None if msg.command == "checkpoint" else msg,
         )
     )
 
@@ -249,6 +252,9 @@ def optimize(
 
             # Possibly take a checkpoint of the optimizer state
             _maybe_checkpoint(optimizer, checkpoint_interval, i)
+
+            # Bluesky checkpoint for mid-optimization pauses
+            yield Msg("checkpoint")
 
     # Start the optimization run
     return (yield from _optimize())
