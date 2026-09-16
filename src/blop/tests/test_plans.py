@@ -1129,8 +1129,8 @@ def test_default_acquire_checkpoint_removal(RE):
     readable = ReadableSignal("objective")
     commands = []
 
-    with patch.object(RE, "msg_hook", lambda msg: commands.append(msg.command)):
-        RE(default_acquire([{"x1": 0.0, "_id": 0}, {"x1": 0.1, "_id": 1}], [movable], [readable]))
+    RE.msg_hook = lambda msg: commands.append(msg.command)
+    RE(default_acquire([{"x1": 0.0, "_id": 0}, {"x1": 0.1, "_id": 1}], [movable], [readable]))
 
     assert "checkpoint" not in commands
 
