@@ -58,7 +58,7 @@ If you use a custom acquisition plan by implementing the :class:`blop.protocols.
 
 .. testcode::
 
-    from collections.abc import Hashable, Mapping, Sequence
+    from collections.abc import Mapping, Sequence
     from typing import Any
 
     import bluesky.plan_stubs as bps
@@ -74,7 +74,7 @@ If you use a custom acquisition plan by implementing the :class:`blop.protocols.
         actuators: Sequence[Actuator],
         sensors: Sequence[Sensor] | None = None,
         md: Mapping[str, Any] | None = None,
-    ) -> MsgGenerator[Hashable]:
+    ) -> MsgGenerator[str]:
         assert actuators[0].name == "signal1"
         assert sensors is not None
         assert sensors[0].name == "signal2"

@@ -90,6 +90,7 @@ nb_render_image_options = {
     "align": "center",
 }
 nb_execution_mode = "auto"
+nb_execution_show_tb = True
 if "doctest" in sys.argv or os.environ.get("BLOP_DOCS_NO_EXEC"):
     nb_execution_mode = "off"
 

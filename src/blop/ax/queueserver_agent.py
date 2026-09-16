@@ -81,7 +81,7 @@ class QueueserverAgent(_AxAgentMixin):
         sensors: Sequence[str],
         dofs: Sequence[DOF],
         objectives: Sequence[Objective],
-        evaluation_function: EvaluationFunction,
+        evaluation_function: EvaluationFunction[str],
         acquisition_plan: str | None = None,
         dof_constraints: Sequence[DOFConstraint] | None = None,
         outcome_constraints: Sequence[OutcomeConstraint] | None = None,
@@ -116,7 +116,7 @@ class QueueserverAgent(_AxAgentMixin):
         )
 
     @property
-    def evaluation_function(self) -> EvaluationFunction:
+    def evaluation_function(self) -> EvaluationFunction[str]:
         """Evaluation function mapping acquired data to outcomes."""
         return self._evaluation_function
 
