@@ -1341,7 +1341,7 @@ def test_optimize_emits_checkpoints_per_iteration(RE):
     )
     commands = []
 
-    with patch.object(RE, "msg_hook", lambda msg: commands.append(msg.command)):
-        RE(optimize(optimization_problem, iterations=5))
+    RE.msg_hook = lambda msg: commands.append(msg.command)
+    RE(optimize(optimization_problem, iterations=5))
 
     assert commands.count("checkpoint") == 5
