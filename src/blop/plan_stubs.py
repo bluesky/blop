@@ -1,7 +1,6 @@
 """Bluesky plan stubs for optimization."""
 
 import logging
-from collections import defaultdict
 from collections.abc import Hashable, Mapping, MutableMapping, Sequence
 from typing import Any, Literal, cast
 
@@ -97,7 +96,9 @@ def read_step(
     stream_name : str, optional
         Event stream name for the optimization tracking event.
     """
-    # Group by ID_KEY to get proper suggestion/outcome order
+    # Normalize the acquisition UID for event-model storage.
+    normalized_uid = _acquisition_identifier_value(uid)
+
     suggestion_by_id = {}
     outcome_by_id = {}
     for suggestion in suggestions:
@@ -108,65 +109,36 @@ def read_step(
         outcome_copy = dict(outcome)
         key = str(outcome_copy.pop(ID_KEY))
         outcome_by_id[key] = outcome_copy
+
     sids = {str(sid) for sid in suggestion_by_id.keys()}
+    sorted_sids = sorted(sids)
     if sids != set(outcome_by_id.keys()):
         raise ValueError(
             "The suggestions and outcomes must contain the same IDs. Got suggestions: "
             f"{set(suggestion_by_id.keys())} and outcomes: {set(outcome_by_id.keys())}"
         )
 
-    # Flatten the suggestions and outcomes into a single dictionary of lists
-    suggestions_flat: dict[str, list[Any]] = defaultdict(list)
-    outcomes_flat: dict[str, list[Any]] = defaultdict(list)
-    # Sort for deterministic ordering, not strictly necessary
-    sorted_sids = sorted(sids)
-    for key in sorted_sids:
-        for name, value in suggestion_by_id[key].items():
-            suggestions_flat[name].append(value)
-        for name, value in outcome_by_id[key].items():
-            outcomes_flat[name].append(value)
-
-    # Pad arrays to n_points if suggestions had fewer trials than expected
-    # TODO: Use awkward-array to handle this in the future
-    actual_n = len(sorted_sids)
-    if actual_n < n_points:
-        # Pad suggestion arrays with NaN
-        for name in suggestions_flat:
-            suggestions_flat[name].extend([np.nan] * (n_points - actual_n))
-        # Pad outcome arrays with NaN
-        for name in outcomes_flat:
-            outcomes_flat[name].extend([np.nan] * (n_points - actual_n))
-        # Pad suggestion IDs with empty string to maintain string dtype
-        sorted_sids.extend([""] * (n_points - actual_n))
-
-    # Create or update the InferredReadables for the suggestion_ids, step uid, suggestions, and outcomes
-    if _SUGGESTION_IDS_KEY not in readable_cache:
-        readable_cache[_SUGGESTION_IDS_KEY] = InferredReadable(
-            _SUGGESTION_IDS_KEY, source=Source.SUGGESTION_ID, initial_value=sorted_sids
-        )
-    else:
-        readable_cache[_SUGGESTION_IDS_KEY].update(sorted_sids)
-    # Normalize the acquisition UID for event-model storage.
-    normalized_uid = _acquisition_identifier_value(uid)
-    if _ACQUISITION_UID_KEY not in readable_cache:
-        readable_cache[_ACQUISITION_UID_KEY] = InferredReadable(
-            _ACQUISITION_UID_KEY, source=Source.ACQUISITION_UID, initial_value=normalized_uid
-        )
-    else:
-        readable_cache[_ACQUISITION_UID_KEY].update(normalized_uid)
-    for name, value in suggestions_flat.items():
-        if name not in readable_cache:
-            readable_cache[name] = InferredReadable(name, source=Source.PARAMETER, initial_value=value)
+    def _cache_update(key, element, source=Source.PARAMETER):
+        if key not in readable_cache:
+            readable_cache[key] = InferredReadable(key, source=source, initial_value=element)
         else:
-            readable_cache[name].update(value)
-    for name, value in outcomes_flat.items():
-        if name not in readable_cache:
-            readable_cache[name] = InferredReadable(name, source=Source.OUTCOME, initial_value=value)
-        else:
-            readable_cache[name].update(value)
+            readable_cache[key].update(element)
 
-    # Read and save to produce a single event
-    yield from bps.trigger_and_read(list(readable_cache.values()), name=stream_name)
+    for sid in sorted_sids:
+        suggestion = suggestion_by_id[sid]
+        outcome = outcome_by_id[sid]
+        # Create or update the InferredReadables for the suggestion_ids, step uid, suggestions, and outcomes
+        _cache_update(_SUGGESTION_IDS_KEY, sid, source=Source.SUGGESTION_ID)
+        _cache_update(_ACQUISITION_UID_KEY, normalized_uid, source=Source.ACQUISITION_UID)
+
+        for dof, value in suggestion.items():
+            _cache_update(dof, value, source=Source.PARAMETER)
+
+        for objective, value in outcome.items():
+            _cache_update(objective, value, source=Source.OUTCOME)
+
+        # Read and save to produce a single event
+        yield from bps.trigger_and_read(list(readable_cache.values()), name=stream_name)
 
 
 @plan

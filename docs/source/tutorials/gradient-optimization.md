@@ -191,25 +191,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 res_client = tiled_client[res_uid[0]]
-data = res_client["primary/internal"].read()
-cols = ["suggestion_ids", "x1", "x2", "himmelblau_2d"]
-vec = data[cols]
-res = []
-for _, row in vec.iterrows():
-    vic = [row.suggestion_ids, row.x1, row.x2, row.himmelblau_2d]
-    vic = [x.strip("[]").split() for x in vic]
-    for id, x, y, obj in zip(*vic, strict=True):
-        if id != "''":
-            res.append([int(id.strip("'")), float(x), float(y), float(obj)])
-res = np.array(res)
+data = res_client["primary"].read().to_dataframe()
 
 fig, ax = plt.subplots(figsize=(12, 8))
 
 xb, yb = np.random.uniform(-5, 5, (2, 1000))
 ax.tripcolor(xb, yb, (xb**2 + yb - 11) ** 2 + (xb + yb**2 - 7) ** 2, shading="gouraud")
 
-i, x, y, z = res.T
-ps = ax.scatter(x, y, c=range(len(x)), cmap="plasma", s=50)
+ps = ax.scatter(data.x1, data.x2, c=range(len(data.x1)), cmap="plasma", s=50)
 plt.colorbar(ps).set_label("sample index")
 plt.title("Visualizing Scipy's traversal of Himmelblau")
 ```
@@ -217,7 +206,7 @@ plt.title("Visualizing Scipy's traversal of Himmelblau")
 Seeing the sample history
 
 ```{code-cell} ipython3
-pd.DataFrame(data=res, columns=cols)
+data
 ```
 
 ```{code-cell} ipython3
