@@ -1117,6 +1117,17 @@ def test_default_acquire_multiple_movables_readables(RE):
     assert movable2.read()["x2"]["value"] == 0.1
 
 
+def test_default_acquire_checkpoint_removal(RE):
+    movable = MovableSignal("x1", initial_value=-1.0)
+    readable = ReadableSignal("objective")
+    commands = []
+
+    RE.msg_hook = lambda msg: commands.append(msg.command)
+    RE(default_acquire([{"x1": 0.0, "_id": 0}, {"x1": 0.1, "_id": 1}], [movable], [readable]))
+
+    assert "checkpoint" not in commands
+
+
 def test_acquire_baseline(RE):
     """Test acquiring a baseline reading from suggested parameterizations."""
     optimizer = MagicMock(spec=Optimizer)
@@ -1312,3 +1323,18 @@ def test_optimize_stops_when_change_is_within_tolerance(RE):
         RE.unsubscribe(callback)
 
     assert evaluation_function.call_count == 2
+
+
+def test_optimize_emits_checkpoints_per_iteration(RE):
+    optimization_problem = OptimizationProblem(
+        MagicMock(spec=Optimizer),
+        actuators=[MovableSignal("x1")],
+        sensors=[ReadableSignal("objective")],
+        evaluation_function=MagicMock(spec=EvaluationFunction),
+    )
+    commands = []
+
+    RE.msg_hook = lambda msg: commands.append(msg.command)
+    RE(optimize(optimization_problem, iterations=5))
+
+    assert commands.count("checkpoint") == 5
