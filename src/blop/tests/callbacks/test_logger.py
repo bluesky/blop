@@ -179,8 +179,9 @@ def test_event_batch_with_nan_padding(logger, console):
 def test_event_multiple_iterations(logger, console):
     """Successive events should accumulate without error."""
     _setup_descriptor(logger)
-    logger.event(_make_event(data={"x": 1.0, "y": 10.0}))
-    logger.event(_make_event(data={"x": 3.0, "y": 20.0}))
+    for _ in range(10):
+        logger.event(_make_event(data={"x": 1.0, "y": 10.0}))
+        logger.event(_make_event(data={"x": 3.0, "y": 20.0}))
     assert console.print.call_count >= 1
 
 
