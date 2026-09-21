@@ -69,8 +69,9 @@ class OptimizationLogger(CallbackBase):
     from the ``optimize`` plan and displays:
 
     - A header panel with optimizer configuration at run start
-    - A formatted table of parameter and outcome values for each iteration
-    - A compact inline summary of outcome statistics after each iteration
+    - A formatted table of parameter and outcome values for each step
+    - - a box coloring indicating sectioning by iteration
+    - A compact inline summary of outcome statistics after every 5 steps
     - A full summary statistics table at run completion
 
     Notes
@@ -91,8 +92,8 @@ class OptimizationLogger(CallbackBase):
         self._sorted_data_keys_by_source: dict[Source, list[str]] = {}
         self._total_iterations: int | None = 0
         self._seen_uids: set = set()
-        self._color_increment: int = 0
-        self._current_iteration = 0
+        self._current_iteration: int = 0
+        self._current_step: int = 0
         self._stats: dict[str, RunningStats] = {}
 
     def start(self, doc: RunStart) -> None:
@@ -191,7 +192,7 @@ class OptimizationLogger(CallbackBase):
         if not data:
             return doc
 
-        self._current_iteration += 1
+        self._current_step += 1
         parameter_keys = self._parameter_keys
         outcome_keys = self._outcome_keys
 
@@ -207,7 +208,7 @@ class OptimizationLogger(CallbackBase):
             acquire_uid = acquire_uid[0] if acquire_uid else ""
         if isinstance(acquire_uid, Hashable) and acquire_uid not in self._seen_uids:
             self._seen_uids.add(acquire_uid)
-            self._color_increment += 1
+            self._current_iteration += 1
 
         n_total = max(
             (len(v) for v in [*param_columns.values(), *outcome_columns.values()]),
@@ -228,7 +229,7 @@ class OptimizationLogger(CallbackBase):
         table = Table(
             show_header=False,
             header_style=_HEADER_STYLE,
-            border_style=_ITER_COLORS[self._color_increment % 5],
+            border_style=_ITER_COLORS[self._current_iteration % 5],
             box=_BOX_VERT,
             expand=True,
         )
@@ -260,7 +261,7 @@ class OptimizationLogger(CallbackBase):
 
         self._console.print(table)
 
-        if self._current_iteration % 5 == 4:
+        if self._current_step % 5 == 4:
             # Iteration header rule
             iter_label = f"Iteration {len(self._seen_uids)}"
             if self._total_iterations is not None:

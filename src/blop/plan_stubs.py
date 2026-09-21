@@ -75,8 +75,7 @@ def read_step(
 ) -> MsgGenerator[None]:
     """Plan stub to read the suggestions and outcomes of a single optimization step.
 
-    If fewer suggestions are returned than n_points arrays are padded to n_points length
-    with np.nan to ensure consistent shapes for event-model specification.
+    The plan is structured to read out point by point all suggestions given.
 
     The emitted ``acquisition_uid`` field retains native array-like identifiers.
     Other acquisition UIDs are represented by ``repr(uid)``.
