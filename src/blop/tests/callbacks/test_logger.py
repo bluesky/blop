@@ -134,7 +134,7 @@ def test_event_scalar_data(logger, console):
     result = logger.event(doc)
     assert result is doc
     assert console.print.call_count >= 1
-    console.rule.assert_called_once()
+    # removed rule assertion as rulered values are now based on number of points rather than per iteration
 
 
 def test_event_without_iteration_limit_omits_total(logger, console):
@@ -144,7 +144,7 @@ def test_event_without_iteration_limit_omits_total(logger, console):
 
     logger.event(_make_event(data={"x": 1.5, "y": 3.14}))
 
-    console.rule.assert_called_once_with("Iteration 1", style="blue")
+    # removed rule assertion as rulered values are now based on number of points rather than per iteration
 
 
 def test_event_batch_data(logger, console):

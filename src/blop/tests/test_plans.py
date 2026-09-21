@@ -360,16 +360,17 @@ def test_optimize_multiple_with_n_points(RE):
 
     # Validate event documents from outer-plan _read_step
     assert len(events) == 10
-    for event in events:
+    for ind, event in enumerate(events):
+        ard = ind % 2
         data = event["data"]
         assert "suggestion_ids" in data
         assert "acquisition_uid" in data
         assert "x1" in data
         assert "objective" in data
 
-        assert int(data["suggestion_ids"]) in {0, 1}
-        assert data["x1"] in {0.0, 0.1}
-        assert data["objective"] in {0.0, 0.1}
+        assert int(data["suggestion_ids"]) == [0, 1][ard]
+        assert data["x1"] == [0.0, 0.1][ard]
+        assert data["objective"] == [0.0, 0.1][ard]
 
 
 def test_optimize_complex_case(RE):
@@ -418,7 +419,8 @@ def test_optimize_complex_case(RE):
 
     # Validate event documents from outer-plan _read_step
     assert len(events) == 4
-    for event in events:
+    for ind, event in enumerate(events):
+        ard = ind % 2
         data = event["data"]
         assert "suggestion_ids" in data
         assert "acquisition_uid" in data
@@ -427,13 +429,13 @@ def test_optimize_complex_case(RE):
         assert "x3" in data
         assert "objective1" in data
         assert "objective2" in data
-        assert data["x1"] in [0.0, 0.1]
-        assert data["x2"] in [0.0, 0.2]
-        assert data["x3"] in [0.0, 0.3]
-        assert data["objective1"] in [0.0, 0.1]
-        assert data["objective2"] in [0.1, 0.2]
-        assert data["suggestion_ids"] in ["0", "1"]
-        assert data["acquisition_uid"] in uids
+        assert data["x1"] == [0.0, 0.1][ard]
+        assert data["x2"] == [0.0, 0.2][ard]
+        assert data["x3"] == [0.0, 0.3][ard]
+        assert data["objective1"] == [0.0, 0.1][ard]
+        assert data["objective2"] == [0.1, 0.2][ard]
+        assert data["suggestion_ids"] == ["0", "1"][ard]
+        assert data["acquisition_uid"] in uids  # uids not ordered
 
 
 @pytest.mark.parametrize("checkpoint_interval", [0, 1, 2, 3])
@@ -511,7 +513,7 @@ def test_optimize_in_run_defaults_to_ordered_suggestion_ids(RE):
     assert len(events_by_stream["optimization"]) == 2
     optimization_data = events_by_stream["optimization"][0]["data"]
     assert optimization_data["suggestion_ids"] == "far"
-    assert optimization_data["acquisition_uid"] == ("near", "far")
+    assert optimization_data["acquisition_uid"][0] == "near"
 
 
 def test_list_scan_in_run_allows_custom_per_step_streams(RE):

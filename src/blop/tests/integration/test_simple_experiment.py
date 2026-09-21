@@ -160,8 +160,8 @@ def test_optimize_in_run_tiled_round_trip() -> None:
         assert run.start["optimization_stream"] == "optimization"
         assert len(run["primary/x1"].read()) == 8
         assert len(run["primary/x2"].read()) == 8
-        assert len(run["optimization/suggestion_ids"].read()) == 2
-        assert len(run["optimization/acquisition_uid"].read()) == 2
+        assert len(run["optimization/suggestion_ids"].read()) == 8
+        assert len({tuple(uid) for uid in run["optimization/acquisition_uid"].read()}) == 2
         assert len(evaluation.acquisition_ids) == 2
         assert all(len(acquisition_ids) == 4 for acquisition_ids in evaluation.acquisition_ids)
         assert len(evaluation.primary_events) == 8

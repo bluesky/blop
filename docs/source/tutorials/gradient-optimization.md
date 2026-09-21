@@ -139,7 +139,6 @@ class Himmelblau2DEvaluation:
         x1_data = run["primary/x1"].read()
         x2_data = run["primary/x2"].read()
 
-        print("[Himmelblau] evaluating acquired order: ", acquisition_order)
         for index, suggestion_id in enumerate(acquisition_order):
             x1 = x1_data[index]
             x2 = x2_data[index]
@@ -198,7 +197,7 @@ fig, ax = plt.subplots(figsize=(12, 8))
 xb, yb = np.random.uniform(-5, 5, (2, 1000))
 ax.tripcolor(xb, yb, (xb**2 + yb - 11) ** 2 + (xb + yb**2 - 7) ** 2, shading="gouraud")
 
-ps = ax.scatter(data.x1, data.x2, c=range(len(data.x1)), cmap="plasma", s=50)
+ps = ax.scatter(data.x1, data.x2, marker='+', c=range(len(data.x1)), cmap="plasma", s=50)
 plt.colorbar(ps).set_label("sample index")
 plt.title("Visualizing Scipy's traversal of Himmelblau")
 ```

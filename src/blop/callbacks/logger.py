@@ -2,10 +2,12 @@
 
 import math
 from collections import defaultdict
+from collections.abc import Hashable
 from typing import Any, cast
 
 from bluesky.callbacks import CallbackBase
 from event_model import Event, EventDescriptor, RunStart, RunStop
+from rich.box import Box
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -21,6 +23,8 @@ _HEADER_STYLE = "bold"
 _DIM_STYLE = "dim"
 _ERROR_STYLE = "bold red"
 _ITERATION_RULE_STYLE = "blue"
+_ITER_COLORS = ["#E1C052", "#8FA88B", "#C78B94", "#7A93A6", "#9B8BA8"]
+_BOX_VERT = Box("┃ ┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┡-╇┩")
 
 
 def _format_value(value: Any) -> str:
@@ -86,6 +90,8 @@ class OptimizationLogger(CallbackBase):
         self._data_keys: dict = {}
         self._sorted_data_keys_by_source: dict[Source, list[str]] = {}
         self._total_iterations: int | None = 0
+        self._seen_uids: set = set()
+        self._color_increment: int = 0
         self._current_iteration = 0
         self._stats: dict[str, RunningStats] = {}
 
@@ -147,11 +153,24 @@ class OptimizationLogger(CallbackBase):
         """Cache data keys and group by their source."""
         data_keys = doc.get("data_keys", {})
         data_keys_by_source: dict[Source, list[str]] = defaultdict(list)
+        table = Table(expand=True)
         for key, data_key in data_keys.items():
+            # table.add_column(key, style="cyan", no_wrap=True, ratio=1)
             data_keys_by_source[cast(Source, data_key.get("source", Source.OTHER))].append(key)
 
         self._sorted_data_keys_by_source = {key: sorted(keys) for key, keys in data_keys_by_source.items()}
+
+        self._parameter_keys: list[str] = self._sorted_data_keys_by_source.get(Source.PARAMETER, [])
+        self._outcome_keys: list[str] = self._sorted_data_keys_by_source.get(Source.OUTCOME, [])
+        table.add_column("Suggestion ID", style=_DIM_STYLE, no_wrap=True, ratio=1)
+        for param in self._parameter_keys:
+            table.add_column(param, style=_PARAM_STYLE, no_wrap=True, ratio=1)
+
+        for outcome in self._outcome_keys:
+            table.add_column(outcome, style=_OUTCOME_STYLE, no_wrap=True, ratio=1)
+
         self._data_keys = data_keys
+        self._console.print(table)
 
     def _update_stats(self, columns: dict[str, list], valid_indices: list[int]) -> None:
         """Update running statistics for each key with the valid values from this event."""
@@ -173,9 +192,8 @@ class OptimizationLogger(CallbackBase):
             return doc
 
         self._current_iteration += 1
-
-        parameter_keys: list[str] = self._sorted_data_keys_by_source.get(Source.PARAMETER, [])
-        outcome_keys: list[str] = self._sorted_data_keys_by_source.get(Source.OUTCOME, [])
+        parameter_keys = self._parameter_keys
+        outcome_keys = self._outcome_keys
 
         # Extract values, normalizing to lists for uniform handling
         param_columns: dict[str, list] = {k: _to_list(data[k]) for k in parameter_keys if k in data}
@@ -187,6 +205,9 @@ class OptimizationLogger(CallbackBase):
         # Scalar string comes through as-is; ensure it's a plain string
         if isinstance(acquire_uid, list):
             acquire_uid = acquire_uid[0] if acquire_uid else ""
+        if isinstance(acquire_uid, Hashable) and acquire_uid not in self._seen_uids:
+            self._seen_uids.add(acquire_uid)
+            self._color_increment += 1
 
         n_total = max(
             (len(v) for v in [*param_columns.values(), *outcome_columns.values()]),
@@ -203,46 +224,28 @@ class OptimizationLogger(CallbackBase):
         self._update_stats(param_columns, valid_indices)
         self._update_stats(outcome_columns, valid_indices)
 
-        # Iteration header rule
-        iter_label = f"Iteration {self._current_iteration}"
-        if self._total_iterations is not None:
-            iter_label += f" / {self._total_iterations}"
-        if n_valid > 1:
-            iter_label += f"  ({n_valid} points)"
-        self._console.rule(iter_label, style=_ITERATION_RULE_STYLE)
-
-        # Show acquisition UID for this iteration
-        if acquire_uid:
-            uid_line = Text()
-            uid_line.append("  Acquire UID  ", style=_DIM_STYLE)
-            uid_line.append(str(acquire_uid))
-            self._console.print(uid_line)
-
         # Build the results table
         table = Table(
-            show_header=True,
+            show_header=False,
             header_style=_HEADER_STYLE,
-            border_style=_DIM_STYLE,
-            pad_edge=True,
-            padding=(0, 1),
+            border_style=_ITER_COLORS[self._color_increment % 5],
+            box=_BOX_VERT,
+            expand=True,
         )
 
         # Iteration and suggestion ID columns (always shown)
-        table.add_column("Event", style=_DIM_STYLE, justify="right", no_wrap=True)
-        table.add_column("Suggestion ID", style=_DIM_STYLE, justify="right", no_wrap=True)
+        table.add_column("Suggestion ID", style=_DIM_STYLE, justify="left", no_wrap=True, ratio=1)
 
         for key in parameter_keys:
             if key in param_columns:
-                table.add_column(key, style=_PARAM_STYLE, justify="right", no_wrap=True)
+                table.add_column(key, style=_PARAM_STYLE, justify="right", no_wrap=True, ratio=1)
         for key in outcome_keys:
             if key in outcome_columns:
-                table.add_column(key, style=_OUTCOME_STYLE, justify="right", no_wrap=True)
+                table.add_column(key, style=_OUTCOME_STYLE, justify="right", no_wrap=True, ratio=1)
 
-        # Populate rows
-        for row_idx, data_idx in enumerate(valid_indices):
+        # Populate rows (legacy, usually 1, but kept for continuity if custom usage of read step has retained behavior)
+        for _, data_idx in enumerate(valid_indices):
             row: list[str] = []
-            row.append(str(row_idx))
-            # Suggestion ID for this point
             sid = suggestion_ids[data_idx] if data_idx < len(suggestion_ids) else ""
             row.append(str(sid))
             for key in parameter_keys:
@@ -257,29 +260,40 @@ class OptimizationLogger(CallbackBase):
 
         self._console.print(table)
 
-        # Inline outcome summary
-        outcome_point_count = next(
-            (self._stats[k].count for k in outcome_keys if k in self._stats and self._stats[k].count > 0),
-            0,
-        )
-        trackable_outcomes = [k for k in outcome_keys if k in self._stats and self._stats[k].count > 0]
-        if trackable_outcomes and outcome_point_count > 0:
-            summary = Text()
-            summary.append("  ")
-            for i, key in enumerate(trackable_outcomes):
-                s = self._stats[key]
-                if i > 0:
-                    summary.append("\n  ", style=_DIM_STYLE)
-                summary.append(key, style=_OUTCOME_STYLE)
-                summary.append("  min: ", style=_DIM_STYLE)
-                summary.append(_format_stat(s.min))
-                summary.append("  max: ", style=_DIM_STYLE)
-                summary.append(_format_stat(s.max))
-                summary.append("  mean: ", style=_DIM_STYLE)
-                summary.append(_format_stat(s.mean))
-            summary.append(f"\n  ({outcome_point_count} pts sampled)", style=_DIM_STYLE)
-            self._console.print(summary)
+        if self._current_iteration % 5 == 4:
+            # Iteration header rule
+            iter_label = f"Iteration {len(self._seen_uids)}"
+            if self._total_iterations is not None:
+                iter_label += f" / {self._total_iterations}"
+            if n_valid > 1:
+                iter_label += f"  ({n_valid} points)"
+            self._console.rule(iter_label, style=_ITERATION_RULE_STYLE)
 
+            # Inline outcome summary
+            outcome_point_count = next(
+                (self._stats[k].count for k in outcome_keys if k in self._stats and self._stats[k].count > 0),
+                0,
+            )
+            trackable_outcomes = [k for k in outcome_keys if k in self._stats and self._stats[k].count > 0]
+            if trackable_outcomes and outcome_point_count > 0:
+                summary = Text()
+                summary.append("  ")
+                for i, key in enumerate(trackable_outcomes):
+                    s = self._stats[key]
+                    if i > 0:
+                        summary.append("\n  ", style=_DIM_STYLE)
+                    summary.append(key, style=_OUTCOME_STYLE)
+                    summary.append("  min: ", style=_DIM_STYLE)
+                    summary.append(_format_stat(s.min))
+                    summary.append("  max: ", style=_DIM_STYLE)
+                    summary.append(_format_stat(s.max))
+                    summary.append("  mean: ", style=_DIM_STYLE)
+                    summary.append(_format_stat(s.mean))
+                summary.append(f"\n  ({outcome_point_count} pts sampled)", style=_DIM_STYLE)
+                self._console.print(summary)
+
+            # closing rule
+            self._console.rule(style=_ITERATION_RULE_STYLE)
         return doc
 
     def stop(self, doc: RunStop) -> None:
