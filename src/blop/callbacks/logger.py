@@ -78,10 +78,6 @@ class OptimizationLogger(CallbackBase):
     -----
     Multiple consecutive optimization runs will accumulate iteration counts
     and statistics.
-
-    When ``n_points > 1``, each iteration is displayed as a multi-row table
-    showing the batch of points suggested together by the optimizer, with
-    NaN-padded entries (from incomplete batches) filtered out.
     """
 
     def __init__(self, console: Console | None = None, **kwargs: Any):
@@ -173,14 +169,13 @@ class OptimizationLogger(CallbackBase):
         self._data_keys = data_keys
         self._console.print(table)
 
-    def _update_stats(self, columns: dict[str, list], valid_indices: list[int]) -> None:
+    def _update_stats(self, columns: dict[str, Any]) -> None:
         """Update running statistics for each key with the valid values from this event."""
-        for key, values in columns.items():
-            for idx in valid_indices:
-                if idx < len(values) and _is_numeric(values[idx]):
-                    if key not in self._stats:
-                        self._stats[key] = RunningStats()
-                    self._stats[key].update(float(values[idx]))
+        for key, value in columns.items():
+            if _is_numeric(value):
+                if key not in self._stats:
+                    self._stats[key] = RunningStats()
+                self._stats[key].update(float(value))
 
     def event(self, doc: Event) -> Event:
         """
@@ -197,11 +192,11 @@ class OptimizationLogger(CallbackBase):
         outcome_keys = self._outcome_keys
 
         # Extract values, normalizing to lists for uniform handling
-        param_columns: dict[str, list] = {k: _to_list(data[k]) for k in parameter_keys if k in data}
-        outcome_columns: dict[str, list] = {k: _to_list(data[k]) for k in outcome_keys if k in data}
+        param_columns: dict[str, Any] = {k: data[k] for k in parameter_keys if k in data}
+        outcome_columns: dict[str, Any] = {k: data[k] for k in outcome_keys if k in data}
 
         # Extract suggestion IDs and acquisition identifier
-        suggestion_ids = _to_list(data.get("suggestion_ids", []))
+        suggestion_ids = data.get("suggestion_ids", [])
         acquire_uid = data.get("acquisition_uid", "")
         # Scalar string comes through as-is; ensure it's a plain string
         if isinstance(acquire_uid, list):
@@ -210,20 +205,9 @@ class OptimizationLogger(CallbackBase):
             self._seen_uids.add(acquire_uid)
             self._current_iteration += 1
 
-        n_total = max(
-            (len(v) for v in [*param_columns.values(), *outcome_columns.values()]),
-            default=1,
-        )
-        # Filter out NaN-padded entries: suggestion_ids padded with "" indicate padding
-        if suggestion_ids:
-            valid_indices = [i for i, sid in enumerate(suggestion_ids) if sid != "" and str(sid).strip() != ""]
-        else:
-            valid_indices = list(range(n_total))
-        n_valid = len(valid_indices) if valid_indices else n_total
-
         # Update running statistics
-        self._update_stats(param_columns, valid_indices)
-        self._update_stats(outcome_columns, valid_indices)
+        self._update_stats(param_columns)
+        self._update_stats(outcome_columns)
 
         # Build the results table
         table = Table(
@@ -233,32 +217,24 @@ class OptimizationLogger(CallbackBase):
             box=_BOX_VERT,
             expand=True,
         )
+        row: list[str] = []
 
         # Iteration and suggestion ID columns (always shown)
         table.add_column("Suggestion ID", style=_DIM_STYLE, justify="left", no_wrap=True, ratio=1)
+        row.append(str(suggestion_ids))
 
         for key in parameter_keys:
             if key in param_columns:
                 table.add_column(key, style=_PARAM_STYLE, justify="right", no_wrap=True, ratio=1)
+                val = param_columns[key]
+                row.append(_format_value(val))
         for key in outcome_keys:
             if key in outcome_columns:
                 table.add_column(key, style=_OUTCOME_STYLE, justify="right", no_wrap=True, ratio=1)
+                val = outcome_columns[key]
+                row.append(_format_value(val))
 
-        # Populate rows (legacy, usually 1, but kept for continuity if custom usage of read step has retained behavior)
-        for _, data_idx in enumerate(valid_indices):
-            row: list[str] = []
-            sid = suggestion_ids[data_idx] if data_idx < len(suggestion_ids) else ""
-            row.append(str(sid))
-            for key in parameter_keys:
-                if key in param_columns:
-                    vals = param_columns[key]
-                    row.append(_format_value(vals[data_idx] if data_idx < len(vals) else ""))
-            for key in outcome_keys:
-                if key in outcome_columns:
-                    vals = outcome_columns[key]
-                    row.append(_format_value(vals[data_idx] if data_idx < len(vals) else ""))
-            table.add_row(*row)
-
+        table.add_row(*row)
         self._console.print(table)
 
         if self._current_step % 5 == 4:
@@ -266,17 +242,10 @@ class OptimizationLogger(CallbackBase):
             iter_label = f"Iteration {len(self._seen_uids)}"
             if self._total_iterations is not None:
                 iter_label += f" / {self._total_iterations}"
-            if n_valid > 1:
-                iter_label += f"  ({n_valid} points)"
             self._console.rule(iter_label, style=_ITERATION_RULE_STYLE)
 
-            # Inline outcome summary
-            outcome_point_count = next(
-                (self._stats[k].count for k in outcome_keys if k in self._stats and self._stats[k].count > 0),
-                0,
-            )
             trackable_outcomes = [k for k in outcome_keys if k in self._stats and self._stats[k].count > 0]
-            if trackable_outcomes and outcome_point_count > 0:
+            if trackable_outcomes:
                 summary = Text()
                 summary.append("  ")
                 for i, key in enumerate(trackable_outcomes):
@@ -290,7 +259,7 @@ class OptimizationLogger(CallbackBase):
                     summary.append(_format_stat(s.max))
                     summary.append("  mean: ", style=_DIM_STYLE)
                     summary.append(_format_stat(s.mean))
-                summary.append(f"\n  ({outcome_point_count} pts sampled)", style=_DIM_STYLE)
+                summary.append(f"\n  ({self._current_step} pts sampled)", style=_DIM_STYLE)
                 self._console.print(summary)
 
             # closing rule

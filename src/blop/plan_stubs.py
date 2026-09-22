@@ -75,7 +75,7 @@ def read_step(
 ) -> MsgGenerator[None]:
     """Plan stub to read the suggestions and outcomes of a single optimization step.
 
-    The plan is structured to read out point by point all suggestions given.
+    The plan is structured to read out all suggestions given in a point by point basis.
 
     The emitted ``acquisition_uid`` field retains native array-like identifiers.
     Other acquisition UIDs are represented by ``repr(uid)``.
