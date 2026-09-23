@@ -248,7 +248,7 @@ def optimize(
                     return
 
             # Read the optimization step into the Bluesky and emit events for each suggestion and outcome
-            yield from read_step(uid, suggestions, outcomes, n_points, readable_cache)
+            yield from read_step(uid, suggestions, outcomes, iteration=i, readable_cache=readable_cache)
 
             # Possibly take a checkpoint of the optimizer state
             _maybe_checkpoint(optimizer, checkpoint_interval, i)
@@ -339,8 +339,8 @@ def optimize_in_run(
                 uid,
                 suggestions,
                 outcomes,
-                n_points,
-                readable_cache,
+                iteration=i,
+                readable_cache=readable_cache,
                 stream_name=OPTIMIZE_IN_RUN_TRACKING_STREAM,
             )
 

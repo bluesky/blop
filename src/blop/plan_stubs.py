@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 _ACQUISITION_UID_KEY: Literal["acquisition_uid"] = "acquisition_uid"
 _SUGGESTION_IDS_KEY: Literal["suggestion_ids"] = "suggestion_ids"
+_ITERATION_KEY: Literal["iteration"] = "iteration"
 
 
 def _is_array_like_identifier(uid: Any) -> bool:
@@ -69,7 +70,7 @@ def read_step(
     uid: Any,
     suggestions: Sequence[Mapping],
     outcomes: Sequence[Mapping],
-    n_points: int,
+    iteration: int,
     readable_cache: MutableMapping[str, InferredReadable],
     stream_name: str = "primary",
 ) -> MsgGenerator[None]:
@@ -88,8 +89,9 @@ def read_step(
         Sequence of suggestion mappings, each containing an ID_KEY.
     outcomes : Sequence[Mapping]
         Sequence of outcome mappings, each containing an ID_KEY matching suggestions.
-    n_points : int
-        Expected number of suggestions. Arrays will be padded to this length if needed.
+    iteration: int
+        iteration number passed by the optimization plan.
+        (this is a in run value, use a uid to aggregate across runs)
     readable_cache : dict[str, InferredReadable]
         Cache of InferredReadable objects to reuse across iterations.
     stream_name : str, optional
@@ -123,12 +125,14 @@ def read_step(
         else:
             readable_cache[key].update(element)
 
+    _cache_update(_ACQUISITION_UID_KEY, normalized_uid, source=Source.ACQUISITION_UID)
+    _cache_update(_ITERATION_KEY, iteration, source=Source.ITERATION)
+
     for sid in sorted_sids:
         suggestion = suggestion_by_id[sid]
         outcome = outcome_by_id[sid]
         # Create or update the InferredReadables for the suggestion_ids, step uid, suggestions, and outcomes
         _cache_update(_SUGGESTION_IDS_KEY, sid, source=Source.SUGGESTION_ID)
-        _cache_update(_ACQUISITION_UID_KEY, normalized_uid, source=Source.ACQUISITION_UID)
 
         for dof, value in suggestion.items():
             _cache_update(dof, value, source=Source.PARAMETER)

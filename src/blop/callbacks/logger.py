@@ -2,7 +2,6 @@
 
 import math
 from collections import defaultdict
-from collections.abc import Hashable
 from typing import Any, cast
 
 from bluesky.callbacks import CallbackBase
@@ -13,6 +12,7 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.text import Text
 
+from ..plan_stubs import _ACQUISITION_UID_KEY, _ITERATION_KEY, _SUGGESTION_IDS_KEY
 from ..utils import Source
 from .utils import RunningStats
 
@@ -24,7 +24,7 @@ _DIM_STYLE = "dim"
 _ERROR_STYLE = "bold red"
 _ITERATION_RULE_STYLE = "blue"
 _ITER_COLORS = ["#E1C052", "#8FA88B", "#C78B94", "#7A93A6", "#9B8BA8"]
-_BOX_VERT = Box("┃ ┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┡-╇┩")
+_BOX_VERT = Box("┃ ┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┃┃┃┃\n┡─╇┩")
 
 
 def _format_value(value: Any) -> str:
@@ -44,16 +44,6 @@ def _format_stat(value: float) -> str:
     if math.isnan(value) or math.isinf(value):
         return "--"
     return f"{value:.6g}"
-
-
-def _to_list(value: Any) -> list:
-    """Coerce a value into a list, handling scalars, numpy arrays, and iterables."""
-    if hasattr(value, "tolist"):
-        result = value.tolist()
-        return result if isinstance(result, list) else [result]
-    if isinstance(value, (list, tuple)):
-        return list(value)
-    return [value]
 
 
 def _is_numeric(value: Any) -> bool:
@@ -87,7 +77,7 @@ class OptimizationLogger(CallbackBase):
         self._data_keys: dict = {}
         self._sorted_data_keys_by_source: dict[Source, list[str]] = {}
         self._total_iterations: int | None = 0
-        self._seen_uids: set = set()
+        self._base_iteration: int = 0
         self._current_iteration: int = 0
         self._current_step: int = 0
         self._stats: dict[str, RunningStats] = {}
@@ -105,7 +95,7 @@ class OptimizationLogger(CallbackBase):
         sensors = doc.get("sensors", [])
         run_uid = doc.get("uid", "")
 
-        self._total_iterations = None if iterations is None else self._current_iteration + iterations
+        self._total_iterations = None if iterations is None else self._base_iteration + iterations
 
         # Build the header content
         lines = Text()
@@ -119,10 +109,10 @@ class OptimizationLogger(CallbackBase):
 
         if iterations is None:
             lines.append("Until stopping criterion")
-            if self._current_iteration > 0:
-                lines.append(f" ({self._current_iteration} completed)")
-        elif self._current_iteration > 0:
-            lines.append(f"{iterations} more ({self._current_iteration} completed, ")
+            if self._base_iteration > 0:
+                lines.append(f" ({self._base_iteration + 1} completed)")
+        elif self._base_iteration > 0:
+            lines.append(f"{iterations} more ({self._base_iteration} completed, ")
             lines.append(f"{self._total_iterations} total)")
         else:
             lines.append(f"{iterations}")
@@ -143,22 +133,21 @@ class OptimizationLogger(CallbackBase):
             border_style="blue",
             padding=(0, 1),
         )
-        self._console.print()
         self._console.print(panel)
 
     def descriptor(self, doc: EventDescriptor) -> None:
         """Cache data keys and group by their source."""
         data_keys = doc.get("data_keys", {})
         data_keys_by_source: dict[Source, list[str]] = defaultdict(list)
-        table = Table(expand=True)
         for key, data_key in data_keys.items():
-            # table.add_column(key, style="cyan", no_wrap=True, ratio=1)
             data_keys_by_source[cast(Source, data_key.get("source", Source.OTHER))].append(key)
 
         self._sorted_data_keys_by_source = {key: sorted(keys) for key, keys in data_keys_by_source.items()}
-
         self._parameter_keys: list[str] = self._sorted_data_keys_by_source.get(Source.PARAMETER, [])
         self._outcome_keys: list[str] = self._sorted_data_keys_by_source.get(Source.OUTCOME, [])
+
+        # build header item for iteratively generated table
+        table = Table(expand=True)
         table.add_column("Suggestion ID", style=_DIM_STYLE, no_wrap=True, ratio=1)
         for param in self._parameter_keys:
             table.add_column(param, style=_PARAM_STYLE, no_wrap=True, ratio=1)
@@ -191,19 +180,19 @@ class OptimizationLogger(CallbackBase):
         parameter_keys = self._parameter_keys
         outcome_keys = self._outcome_keys
 
-        # Extract values, normalizing to lists for uniform handling
+        # Extract values, normalizing to regular parametrization
         param_columns: dict[str, Any] = {k: data[k] for k in parameter_keys if k in data}
         outcome_columns: dict[str, Any] = {k: data[k] for k in outcome_keys if k in data}
 
         # Extract suggestion IDs and acquisition identifier
-        suggestion_ids = data.get("suggestion_ids", [])
-        acquire_uid = data.get("acquisition_uid", "")
+        suggestion_ids = data.get(_SUGGESTION_IDS_KEY, [])
+        acquire_uid = data.get(_ACQUISITION_UID_KEY, "")
+        run_iteration = data.get(_ITERATION_KEY, 0)
+        self._current_iteration = self._base_iteration + run_iteration + 1
+
         # Scalar string comes through as-is; ensure it's a plain string
         if isinstance(acquire_uid, list):
             acquire_uid = acquire_uid[0] if acquire_uid else ""
-        if isinstance(acquire_uid, Hashable) and acquire_uid not in self._seen_uids:
-            self._seen_uids.add(acquire_uid)
-            self._current_iteration += 1
 
         # Update running statistics
         self._update_stats(param_columns)
@@ -213,7 +202,7 @@ class OptimizationLogger(CallbackBase):
         table = Table(
             show_header=False,
             header_style=_HEADER_STYLE,
-            border_style=_ITER_COLORS[self._current_iteration % 5],
+            border_style=_ITER_COLORS[run_iteration % 5],
             box=_BOX_VERT,
             expand=True,
         )
@@ -236,10 +225,9 @@ class OptimizationLogger(CallbackBase):
 
         table.add_row(*row)
         self._console.print(table)
-
-        if self._current_step % 5 == 4:
+        if self._current_step % 5 == 0:
             # Iteration header rule
-            iter_label = f"Iteration {len(self._seen_uids)}"
+            iter_label = f"Iteration {self._current_iteration + 1}"
             if self._total_iterations is not None:
                 iter_label += f" / {self._total_iterations}"
             self._console.rule(iter_label, style=_ITERATION_RULE_STYLE)
@@ -277,6 +265,10 @@ class OptimizationLogger(CallbackBase):
 
         parameter_keys: list[str] = self._sorted_data_keys_by_source.get(Source.PARAMETER, [])
         outcome_keys: list[str] = self._sorted_data_keys_by_source.get(Source.OUTCOME, [])
+
+        # housekeeping iteration tracking
+        self._base_iteration = self._current_iteration
+        self._total_iterations = self._base_iteration if self._total_iterations else None
 
         # Build and print the summary statistics table
         trackable_keys = [k for k in [*parameter_keys, *outcome_keys] if k in self._stats and self._stats[k].count > 0]
@@ -329,5 +321,3 @@ class OptimizationLogger(CallbackBase):
             if reason:
                 label += f"  {reason}"
             self._console.rule(label, style="yellow")
-
-        self._console.print()
