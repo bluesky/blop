@@ -103,12 +103,14 @@ def _collect_iterations_from_header(call):
         return re.search(r"Iterations.*", header_text).group()
     return [int(i) if i else None for i in matching.groups()]
 
+
 def _collect_values_from_table(call):
     args, kwargs = call
     table = args[0]
     if not isinstance(table, Table):
         return None
-    
+    return np.array([[i if i else -np.inf for i in col.cells] for col in table.columns], dtype=float)
+
 
 def test_start_minimal(logger, console):
     logger.start(_make_start())
@@ -147,7 +149,7 @@ def test_event_empty_data_returns_early(logger, console):
     doc = _make_event(data={})
     result = logger.event(doc)
     assert result is doc
-    console.rule.assert_not_called()
+    assert console.print.call_count == 1
 
 
 def test_event_scalar_data(logger, console):
@@ -156,6 +158,18 @@ def test_event_scalar_data(logger, console):
     result = logger.event(doc)
     assert result is doc
     assert console.print.call_count >= 1
+
+
+def test_event_produces_table_containing_results(logger, console):
+    _setup_descriptor(logger)
+    for x in range(4):
+        data = {"x": 1.5 / (1 + x), "y": 3.14**-x}
+        doc = _make_event(data=data)
+        logger.event(doc)
+        call = console.print.call_args_list[-1]
+        table_vals = _collect_values_from_table(call)
+        for item in data.values():
+            assert np.any(np.isclose(table_vals, item, rtol=.001, atol=.001))
 
 
 def test_event_without_iteration_limit_omits_total(logger, console):

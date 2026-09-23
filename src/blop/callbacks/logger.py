@@ -185,7 +185,7 @@ class OptimizationLogger(CallbackBase):
         outcome_columns: dict[str, Any] = {k: data[k] for k in outcome_keys if k in data}
 
         # Extract suggestion IDs and acquisition identifier
-        suggestion_ids = data.get(_SUGGESTION_IDS_KEY, [])
+        suggestion_ids = data.get(_SUGGESTION_IDS_KEY, -1)
         acquire_uid = data.get(_ACQUISITION_UID_KEY, "")
         run_iteration = data.get(_ITERATION_KEY, 0)
         self._current_iteration = self._base_iteration + run_iteration + 1
