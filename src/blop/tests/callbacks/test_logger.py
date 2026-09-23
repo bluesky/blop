@@ -169,7 +169,7 @@ def test_event_produces_table_containing_results(logger, console):
         call = console.print.call_args_list[-1]
         table_vals = _collect_values_from_table(call)
         for item in data.values():
-            assert np.any(np.isclose(table_vals, item, rtol=.001, atol=.001))
+            assert np.any(np.isclose(table_vals, item, rtol=0.001, atol=0.001))
 
 
 def test_event_without_iteration_limit_omits_total(logger, console):
