@@ -146,10 +146,11 @@ def test_descriptor(logger):
 
 def test_event_empty_data_returns_early(logger, console):
     _setup_descriptor(logger)
+    cc = console.print.call_count
     doc = _make_event(data={})
     result = logger.event(doc)
     assert result is doc
-    assert console.print.call_count == 1
+    assert console.print.call_count == cc
 
 
 def test_event_scalar_data(logger, console):

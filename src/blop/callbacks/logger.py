@@ -227,7 +227,7 @@ class OptimizationLogger(CallbackBase):
         self._console.print(table)
         if self._current_step % 5 == 0:
             # Iteration header rule
-            iter_label = f"Iteration {self._current_iteration + 1}"
+            iter_label = f"Iteration {self._current_iteration}"
             if self._total_iterations is not None:
                 iter_label += f" / {self._total_iterations}"
             self._console.rule(iter_label, style=_ITERATION_RULE_STYLE)
