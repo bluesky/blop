@@ -59,7 +59,7 @@ class OptimizationLogger(CallbackBase):
     from the ``optimize`` plan and displays:
 
     - A header panel with optimizer configuration at run start
-    - A formatted table of parameter and outcome values for each step
+    - A formatted table of parameter and outcome values for each step event
     - - a box coloring indicating sectioning by iteration
     - A compact inline summary of outcome statistics after every 5 steps
     - A full summary statistics table at run completion
