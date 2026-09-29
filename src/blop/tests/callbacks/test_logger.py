@@ -91,17 +91,38 @@ def _collect_ruler_info(call):
     return args[0] if args else None
 
 
-def _collect_iterations_from_header(call):
+def _collect_data_from_header(call):
+    '''
+    A set of assertions about what should be in the structure of the run header.
+
+    Reports back nullable values so that specific tests can raise the assertion regarding presence value and structure
+    '''
     args, kwargs = call
     console_header = args[0]
     if not isinstance(console_header, Panel):
         return None
     header_text = str(console_header.renderable)
-    matching = re.search(r"Iterations (\d+)\s*(?:more \((\d+) completed, (\d+) total\))?", header_text)
-    if not matching:
-        print(header_text)
-        return re.search(r"Iterations.*", header_text).group()
-    return [int(i) if i else None for i in matching.groups()]
+    data_points = {}
+    data_points['optimizer'] = re.search(r"Optimizer\s+(\w+)", header_text).group()
+    data_points['actuators'] = re.search(r"Actuators((?:\s+\w+,?)+)", header_text).group()
+    data_points['sensors'] = re.search(r"Sensors((?:\s+\w+,?)+)", header_text).group()
+    data_points['iterations'] = (
+        re.search(r"Iterations (\d+)\s*(?:more \((\d+) completed, (\d+) total\))?", header_text)
+        or re.search(r"Iterations.*", header_text).group()
+    )
+    data_points['run_uid'] = re.search(r"Run UID\s+(\w+)", header_text).group()
+    return data_points
+
+
+def _collect_iterations_from_header(call):
+    data = _collect_data_from_header(call)
+    match data['iterations']:
+        case str() as st:
+            return st
+        case re.Match() as match_group:
+            return [int(i) if i else None for i in match_group.groups()]
+
+    return None
 
 
 def _collect_values_from_table(call):
@@ -118,16 +139,19 @@ def test_start_minimal(logger, console):
 
 
 def test_start_with_full_metadata(logger, console):
-    logger.start(
-        _make_start(
-            iterations=10,
-            n_points=3,
-            optimizer="BoTorch",
-            actuators=["mirror_x", "mirror_y"],
-            sensors=["detector"],
-        )
-    )
+    bdict = {
+        'iterations': 10,
+        'n_points': 3,
+        'optimizer': "BoTorch",
+        'actuators': ["mirror_x", "mirror_y"],
+        'sensors': ["detector"],
+    }
+    logger.start(_make_start(**bdict))
     assert console.print.call_count >= 1
+    data_points = _collect_data_from_header(console.print.call_args_list[0])
+    assert 'BoTorch' in data_points['optimizer']
+    assert all(act in data_points['actuators'] for act in bdict["actuators"])
+    assert all(sense in data_points['sensors'] for sense in bdict["sensors"])
 
 
 def test_descriptor(logger):
