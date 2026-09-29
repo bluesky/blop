@@ -110,7 +110,7 @@ class OptimizationLogger(CallbackBase):
         if iterations is None:
             lines.append("Until stopping criterion")
             if self._base_iteration > 0:
-                lines.append(f" ({self._base_iteration + 1} completed)")
+                lines.append(f" ({self._base_iteration} completed)")
         elif self._base_iteration > 0:
             lines.append(f"{iterations} more ({self._base_iteration} completed, ")
             lines.append(f"{self._total_iterations} total)")
