@@ -312,6 +312,10 @@ def test_multi_run_accumulates_iterations(logger, console):
     """Calling start() twice should bump the internal iteration bookkeeping by how many iterations have been recorded"""
     logger.start(_make_start(iterations=5))
     logger.descriptor(_make_descriptor())
+    logger.event(_make_event(data={"x": -1.5, "y": -3.14, _ITERATION_KEY: 0}))
+    logger.stop(_make_stop())
+    logger.start(_make_start(iterations=5))
+    # logger.descriptor(_make_descriptor())
     for i in range(3):
         doc = _make_event(data={"x": 1.5 * i, "y": 3.14, _ITERATION_KEY: i})
         logger.event(doc)
@@ -324,7 +328,7 @@ def test_multi_run_accumulates_iterations(logger, console):
     assert iter_metadata == [5, None, None]
 
     iter_metadata = _collect_iterations_from_header(call_list[-1])
-    assert iter_metadata == [3, 3, 6]
+    assert iter_metadata == [3, 4, 7]
 
 
 def test_running_stats_empty():

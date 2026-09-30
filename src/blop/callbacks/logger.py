@@ -188,7 +188,7 @@ class OptimizationLogger(CallbackBase):
         suggestion_ids = data.get(_SUGGESTION_IDS_KEY, -1)
         acquire_uid = data.get(_ACQUISITION_UID_KEY, "")
         run_iteration = data.get(_ITERATION_KEY)
-        if run_iteration:
+        if run_iteration is not None:
             self._current_iteration = self._base_iteration + run_iteration + 1
 
         # Scalar string comes through as-is; ensure it's a plain string
