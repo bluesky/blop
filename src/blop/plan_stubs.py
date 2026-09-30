@@ -71,7 +71,7 @@ def read_step(
     suggestions: Sequence[Mapping],
     outcomes: Sequence[Mapping],
     readable_cache: MutableMapping[str, InferredReadable],
-    iteration: int | None = None,
+    iteration: int = -1,
     stream_name: str = "primary",
 ) -> MsgGenerator[None]:
     """Plan stub to read the suggestions and outcomes of a single optimization step.

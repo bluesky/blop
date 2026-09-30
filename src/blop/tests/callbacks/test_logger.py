@@ -240,10 +240,11 @@ def test_event_non_numeric_data(logger, console):
 
 
 def test_event_null_iterations(logger, console):
-    logger.start(_make_start(iterations=8))
+    logger.start(_make_start(iterations=10))
     _setup_descriptor(logger)
-    for _ in range(8):
-        logger.event(_make_event(data={_ITERATION_KEY: None}))
+    for _ in range(5):
+        logger.event(_make_event(data={_ITERATION_KEY: -1}))
+        logger.event(_make_event(data={}))
     assert console.print.call_count >= 1
     assert console.rule.call_count >= 1
     rule_values = _collect_ruler_info(console.rule.call_args_list[0])
