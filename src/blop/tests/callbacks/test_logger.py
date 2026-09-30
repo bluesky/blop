@@ -1,15 +1,19 @@
 """Unit tests for the OptimizationLogger callback."""
 
 import math
+import re
 from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
 from event_model import Event, EventDescriptor, RunStart, RunStop
 from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
 
 from blop.callbacks.logger import OptimizationLogger
 from blop.callbacks.utils import RunningStats
+from blop.plan_stubs import _ITERATION_KEY
 from blop.utils import Source
 
 
@@ -69,6 +73,11 @@ def _make_stop(exit_status: str = "success", **overrides) -> RunStop:
     return RunStop(**doc)
 
 
+def _setup_descriptor(logger, data_keys=None):
+    """Feed a descriptor so the logger knows about param/outcome keys."""
+    logger.descriptor(_make_descriptor(data_keys=data_keys))
+
+
 def _run_to_stop(logger, exit_status="success", reason=""):
     """Feed start -> descriptor -> event -> stop so summary stats exist."""
     logger.start(_make_start(iterations=1))
@@ -77,28 +86,72 @@ def _run_to_stop(logger, exit_status="success", reason=""):
     logger.stop(_make_stop(exit_status=exit_status, reason=reason))
 
 
+def _collect_ruler_info(call):
+    args, kwargs = call
+    return args[0] if args else None
+
+
+def _collect_data_from_header(call):
+    """
+    A set of assertions about what should be in the structure of the run header.
+
+    Reports back nullable values so that specific tests can raise the assertion regarding presence value and structure
+    """
+    args, kwargs = call
+    console_header = args[0]
+    if not isinstance(console_header, Panel):
+        return None
+    header_text = str(console_header.renderable)
+    data_points = {}
+    data_points["optimizer"] = re.search(r"Optimizer\s+(\w+)", header_text).group()
+    data_points["actuators"] = re.search(r"Actuators((?:\s+\w+,?)+)", header_text).group()
+    data_points["sensors"] = re.search(r"Sensors((?:\s+\w+,?)+)", header_text).group()
+    data_points["iterations"] = (
+        re.search(r"Iterations (\d+)\s*(?:more \((\d+) completed, (\d+) total\))?", header_text)
+        or re.search(r"Iterations.*", header_text).group()
+    )
+    data_points["run_uid"] = re.search(r"Run UID\s+(\w+)", header_text).group()
+    return data_points
+
+
+def _collect_iterations_from_header(call):
+    data = _collect_data_from_header(call)
+    match data["iterations"]:
+        case str() as st:
+            return st
+        case re.Match() as match_group:
+            return [int(i) if i else None for i in match_group.groups()]
+
+    return None
+
+
+def _collect_values_from_table(call):
+    args, kwargs = call
+    table = args[0]
+    if not isinstance(table, Table):
+        return None
+    return np.array([[i if i else -np.inf for i in col.cells] for col in table.columns], dtype=float)
+
+
 def test_start_minimal(logger, console):
     logger.start(_make_start())
     assert console.print.call_count >= 1
 
 
 def test_start_with_full_metadata(logger, console):
-    logger.start(
-        _make_start(
-            iterations=10,
-            n_points=3,
-            optimizer="BoTorch",
-            actuators=["mirror_x", "mirror_y"],
-            sensors=["detector"],
-        )
-    )
+    bdict = {
+        "iterations": 10,
+        "n_points": 3,
+        "optimizer": "BoTorch",
+        "actuators": ["mirror_x", "mirror_y"],
+        "sensors": ["detector"],
+    }
+    logger.start(_make_start(**bdict))
     assert console.print.call_count >= 1
-
-
-def test_start_continuation_accumulates_iterations(logger, console):
-    """Calling start() twice should bump the internal iteration bookkeeping."""
-    logger.start(_make_start(iterations=5))
-    logger.start(_make_start(iterations=3))
+    data_points = _collect_data_from_header(console.print.call_args_list[0])
+    assert "BoTorch" in data_points["optimizer"]
+    assert all(act in data_points["actuators"] for act in bdict["actuators"])
+    assert all(sense in data_points["sensors"] for sense in bdict["sensors"])
 
 
 def test_descriptor(logger):
@@ -115,17 +168,13 @@ def test_descriptor(logger):
     )
 
 
-def _setup_descriptor(logger, data_keys=None):
-    """Feed a descriptor so the logger knows about param/outcome keys."""
-    logger.descriptor(_make_descriptor(data_keys=data_keys))
-
-
 def test_event_empty_data_returns_early(logger, console):
     _setup_descriptor(logger)
+    cc = console.print.call_count
     doc = _make_event(data={})
     result = logger.event(doc)
     assert result is doc
-    console.rule.assert_not_called()
+    assert console.print.call_count == cc
 
 
 def test_event_scalar_data(logger, console):
@@ -134,54 +183,46 @@ def test_event_scalar_data(logger, console):
     result = logger.event(doc)
     assert result is doc
     assert console.print.call_count >= 1
-    console.rule.assert_called_once()
+
+
+def test_event_produces_table_containing_results(logger, console):
+    _setup_descriptor(logger)
+    for x in range(4):
+        data = {"x": 1.5 / (1 + x), "y": 3.14**-x}
+        doc = _make_event(data=data)
+        logger.event(doc)
+        call = console.print.call_args_list[-1]
+        table_vals = _collect_values_from_table(call)
+        for item in data.values():
+            assert np.any(np.isclose(table_vals, item, rtol=0.001, atol=0.001))
 
 
 def test_event_without_iteration_limit_omits_total(logger, console):
     """An unbounded optimization should not display a misleading total."""
     logger.start(_make_start(iterations=None))
     _setup_descriptor(logger)
+    for _ in range(5):
+        logger.event(_make_event(data={"x": 1.5, "y": 3.14}))
 
-    logger.event(_make_event(data={"x": 1.5, "y": 3.14}))
-
-    console.rule.assert_called_once_with("Iteration 1", style="blue")
-
-
-def test_event_batch_data(logger, console):
-    """Array-valued data (n_points > 1) should be handled without error."""
-    _setup_descriptor(logger)
-    doc = _make_event(
-        data={
-            "x": [1.0, 2.0, 3.0],
-            "y": [10.0, 20.0, 30.0],
-            "suggestion_ids": ["s1", "s2", "s3"],
-        }
-    )
-    result = logger.event(doc)
-    assert result is doc
-    assert console.print.call_count >= 1
-
-
-def test_event_batch_with_nan_padding(logger, console):
-    """Empty suggestion IDs should be filtered out as NaN padding."""
-    _setup_descriptor(logger)
-    doc = _make_event(
-        data={
-            "x": [1.0, 2.0, float("nan")],
-            "y": [10.0, 20.0, float("nan")],
-            "suggestion_ids": ["s1", "s2", ""],
-        }
-    )
-    result = logger.event(doc)
-    assert result is doc
+    console_header = _collect_iterations_from_header(console.print.call_args_list[0])
+    assert "Until stopping criterion" in console_header
+    for call in console.rule.call_args_list:
+        title = _collect_ruler_info(call)
+        if title:
+            assert "/" not in title
 
 
 def test_event_multiple_iterations(logger, console):
-    """Successive events should accumulate without error."""
+    """Successive events should accumulate without error and runtime metadata should display"""
+    logger.start(_make_start(iterations=8))
     _setup_descriptor(logger)
-    logger.event(_make_event(data={"x": 1.0, "y": 10.0}))
-    logger.event(_make_event(data={"x": 3.0, "y": 20.0}))
+    for i in range(8):
+        logger.event(_make_event(data={_ITERATION_KEY: i}))
     assert console.print.call_count >= 1
+    assert console.rule.call_count >= 1
+    rule_values = _collect_ruler_info(console.rule.call_args_list[0])
+    assert "5" in rule_values
+    assert "8" in rule_values
 
 
 def test_event_non_numeric_data(logger, console):
@@ -198,19 +239,34 @@ def test_event_non_numeric_data(logger, console):
     assert result is doc
 
 
+def test_event_null_iterations(logger, console):
+    logger.start(_make_start(iterations=10))
+    _setup_descriptor(logger)
+    for _ in range(5):
+        logger.event(_make_event(data={_ITERATION_KEY: -1}))
+        logger.event(_make_event(data={}))
+    assert console.print.call_count >= 1
+    assert console.rule.call_count >= 1
+    rule_values = _collect_ruler_info(console.rule.call_args_list[0])
+    assert "INJECTED" in rule_values
+
+
 def test_stop_success(logger, console):
     _run_to_stop(logger, exit_status="success")
     assert console.rule.call_count >= 1
+    assert "Complete" in _collect_ruler_info(console.rule.call_args_list[-1])
 
 
 def test_stop_abort_with_reason(logger, console):
     _run_to_stop(logger, exit_status="abort", reason="user interrupt")
     assert console.rule.call_count >= 1
+    assert "Aborted" in _collect_ruler_info(console.rule.call_args_list[-1])
 
 
 def test_stop_other_status(logger, console):
     _run_to_stop(logger, exit_status="fail", reason="hardware fault")
     assert console.rule.call_count >= 1
+    assert "Stopped" in _collect_ruler_info(console.rule.call_args_list[-1])
 
 
 def test_stop_without_events(logger, console):
@@ -251,6 +307,29 @@ def test_full_lifecycle(logger, console):
 
     assert console.print.call_count >= 1
     assert console.rule.call_count >= 1
+
+
+def test_multi_run_accumulates_iterations(logger, console):
+    """Calling start() twice should bump the internal iteration bookkeeping by how many iterations have been recorded"""
+    logger.start(_make_start(iterations=5))
+    logger.descriptor(_make_descriptor())
+    logger.event(_make_event(data={"x": -1.5, "y": -3.14, _ITERATION_KEY: 0}))
+    logger.stop(_make_stop())
+    logger.start(_make_start(iterations=5))
+    # logger.descriptor(_make_descriptor())
+    for i in range(3):
+        doc = _make_event(data={"x": 1.5 * i, "y": 3.14, _ITERATION_KEY: i})
+        logger.event(doc)
+    logger.stop(_make_stop())
+    logger.start(_make_start(iterations=3))
+
+    call_list = console.print.call_args_list
+
+    iter_metadata = _collect_iterations_from_header(call_list[0])
+    assert iter_metadata == [5, None, None]
+
+    iter_metadata = _collect_iterations_from_header(call_list[-1])
+    assert iter_metadata == [3, 4, 7]
 
 
 def test_running_stats_empty():

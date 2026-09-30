@@ -23,6 +23,7 @@ class Source(StrEnum):
     PARAMETER = "optimization-parameter"
     SUGGESTION_ID = "optimization-suggestion-id"
     ACQUISITION_UID = "optimization-acquisition-uid"
+    ITERATION = "optimization-iteration"
     OTHER = "optimization-other"
 
 

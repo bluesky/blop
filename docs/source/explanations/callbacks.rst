@@ -51,8 +51,7 @@ but the contents are optimization-focused.
 
 ``event``
     Per-step values such as ``suggestion_ids``, ``acquisition_uid``, parameter
-    values, and outcome values. For batched optimization, these values may be
-    arrays.
+    values, and outcome values.
 
 For ``acquisition_uid``, native array-like UIDs are stored directly. Other UIDs are
 stored using their ``repr``; the evaluation function still receives the original value.
