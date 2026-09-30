@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -8,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Asynchronous Optimization with Bluesky Queueserver &#8212; blop 1.1.1.dev6 documentation</title>
+    <title>Asynchronous Optimization with Bluesky Queueserver &#8212; blop 1.1.1.dev17 documentation</title>
   
   
   
@@ -27,8 +26,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -38,12 +37,12 @@
     <link rel="stylesheet" type="text/css" href="../_static/css/styles.css?v=a24eef6b" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <script defer src="../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../_static/documentation_options.js?v=ecf49ec0"></script>
+    <script src="../_static/documentation_options.js?v=ce21d923"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -408,7 +407,7 @@ window.addEventListener("load", load);
 window.runMermaid = runMermaid;</script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'tutorials/queueserver';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.21.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://blueskyproject.io/blop/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -423,7 +422,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="prev" title="Your first Scipy optimization with Blop" href="gradient-optimization.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev6" />
+  <meta name="docsearch:version" content="1.1.1.dev17" />
   
     
     <script src="../_static/searchtools.js"></script>
@@ -471,7 +470,7 @@ window.runMermaid = runMermaid;</script>
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -594,7 +593,7 @@ window.runMermaid = runMermaid;</script>
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -605,15 +604,15 @@ window.runMermaid = runMermaid;</script>
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -650,7 +649,7 @@ window.runMermaid = runMermaid;</script>
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -659,7 +658,7 @@ window.runMermaid = runMermaid;</script>
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+    <button type="button" class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
     </button>
   
@@ -750,15 +749,15 @@ window.runMermaid = runMermaid;</script>
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -793,7 +792,7 @@ window.runMermaid = runMermaid;</script>
   </div>
   
     <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button type="button" id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar">
   <svg class="pst-icon" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
     <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
   </svg>
@@ -808,7 +807,7 @@ window.runMermaid = runMermaid;</script>
   <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="simple-experiment.html">Your first Bayesian optimization with Blop</a></li>
 <li class="toctree-l1"><a class="reference internal" href="gradient-optimization.html">Your first Scipy optimization with Blop</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Asynchronous Optimization with Bluesky Queueserver</a></li>
+<li class="toctree-l1 current active"><a aria-current="page" class="current reference internal" href="#">Asynchronous Optimization with Bluesky Queueserver</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrt-demo.html">Demonstrating “Bring Your Own Beamline” simulation with XRT</a></li>
 <li class="toctree-l1"><a class="reference internal" href="xrt-kb-mirrors.html">Optimizing KB Mirrors with Bayesian Optimization</a></li>
 </ul>
@@ -1092,7 +1091,7 @@ Worker environment exists: True
 <div class="cell_output docutils container">
 <div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>/home/runner/work/blop/blop/.pixi/envs/docs/lib/python3.13/site-packages/torch/jit/_script.py:1491: FutureWarning: `torch.jit.script` is deprecated. Please switch to `torch.compile` or `torch.export`.
   warnings.warn(
-[INFO 09-03 14:30:17] ax.storage.sqa_store.with_db_settings_base: Ax SQL storage initialized with SQLAlchemy 2.0.52
+[INFO 09-30 18:54:48] ax.storage.sqa_store.with_db_settings_base: Ax SQL storage initialized with SQLAlchemy 2.1.1
 </pre></div>
 </div>
 </div>
@@ -1100,11 +1099,11 @@ Worker environment exists: True
 </section>
 <section id="writing-the-evaluation-function">
 <h2>Writing the Evaluation Function<a class="headerlink" href="#writing-the-evaluation-function" title="Link to this heading">#</a></h2>
-<p>The evaluation function is called each time a plan completes. Its general contract accepts a hashable acquisition identifier and a sequence of suggestion mappings, and returns a sequence of outcome mappings. This evaluator uses <code class="docutils literal notranslate"><span class="pre">blop_acquisition_order</span></code> to align detector values with their IDs. The queueserver runner uses the Bluesky run UID as its acquisition identifier, so this evaluator validates that it received a string before looking up the run in Tiled. Each outcome must contain the objective value(s) and an <code class="docutils literal notranslate"><span class="pre">_id</span></code> from that acquisition order.</p>
+<p>The evaluation function is called each time a plan completes. Its general contract accepts a uid and a sequence of suggestion mappings, and returns a sequence of outcome mappings. This evaluator uses <code class="docutils literal notranslate"><span class="pre">blop_acquisition_order</span></code> to align detector values with IDs. The queueserver runner uses the Bluesky run UID, so this evaluator types <code class="docutils literal notranslate"><span class="pre">uid</span></code> as <code class="docutils literal notranslate"><span class="pre">str</span></code> before looking up the run in Tiled. Each outcome must contain the objective value(s) and an <code class="docutils literal notranslate"><span class="pre">_id</span></code> from that acquisition order.</p>
 <p>Because the agent and the ZMQ-Tiled bridge are separate subscribers to the same ZMQ stream, there is a race condition: the agent may receive the stop document before the bridge has finished writing data to Tiled. The evaluation function should poll Tiled until both the run and the detector data are available.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">tiled.client.container</span><span class="w"> </span><span class="kn">import</span> <span class="n">Container</span>
@@ -1144,9 +1143,7 @@ Worker environment exists: True
             <span class="s2">"The ZMQ-Tiled bridge may still be writing the run."</span>
         <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="n">Hashable</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">uid</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"HimmelblauEvaluation requires a Bluesky run UID string, got </span><span class="si">{</span><span class="n">uid</span><span class="si">!r}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uid</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">suggestions</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Mapping</span><span class="p">]:</span>
         <span class="n">run</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wait_for_run</span><span class="p">(</span><span class="n">uid</span><span class="p">)</span>
 
         <span class="c1"># Read the detector values from the primary data stream</span>
@@ -1210,8 +1207,8 @@ message prefix.</p>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 09-03 14:30:17] ax.api.client: GenerationStrategy(name='Center+Sobol+MBM:fast', nodes=[CenterGenerationNode(next_node_name='Sobol', use_existing_trials_for_initialization=True), GenerationNode(name='Sobol', generator_specs=[GeneratorSpec(generator_enum=Sobol, generator_key_override=None)], transition_criteria=[MinTrials(transition_to='MBM'), MinTrials(transition_to='MBM')], suggested_experiment_status=ExperimentStatus.INITIALIZATION, pausing_criteria=[MaxTrialsAwaitingData(threshold=5)]), GenerationNode(name='MBM', generator_specs=[GeneratorSpec(generator_enum=BoTorch, generator_key_override=None)], transition_criteria=None, suggested_experiment_status=ExperimentStatus.OPTIMIZATION, pausing_criteria=None)]) chosen based on user input and problem structure.
-[INFO 09-03 14:30:17] ax.api.client: Generated new trial 0 with parameters {'motor1': 0.0, 'motor2': 0.0} using GenerationNode CenterOfSearchSpace.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 09-30 18:54:48] ax.api.client: GenerationStrategy(name='Center+Sobol+MBM:fast', nodes=[CenterGenerationNode(next_node_name='Sobol', use_existing_trials_for_initialization=True), GenerationNode(name='Sobol', generator_specs=[GeneratorSpec(generator_enum=Sobol, generator_key_override=None)], transition_criteria=[MinTrials(transition_to='MBM'), MinTrials(transition_to='MBM')], suggested_experiment_status=ExperimentStatus.INITIALIZATION, pausing_criteria=[MaxTrialsAwaitingData(threshold=5)]), GenerationNode(name='MBM', generator_specs=[GeneratorSpec(generator_enum=BoTorch, generator_key_override=None)], transition_criteria=None, suggested_experiment_status=ExperimentStatus.OPTIMIZATION, pausing_criteria=None)]) chosen based on user input and problem structure.
+[INFO 09-30 18:54:48] ax.api.client: Generated new trial 0 with parameters {'motor1': 0.0, 'motor2': 0.0} using GenerationNode CenterOfSearchSpace.
 </pre></div>
 </div>
 </div>
@@ -1236,37 +1233,37 @@ message prefix.</p>
 Points per iteration : 1
 Total acquisitions   : 10
 Run UIDs:
-  40e58071-f697-469d-a2bf-c467971dbde6
-  df0d9dba-a40f-4a61-8654-439d4b6a5b91
-  4e94b32b-3e03-410a-ac6b-582f2e671988
-  c26f4b3e-6487-4fc2-88f4-17a6d2151e25
-  4b1b9425-12ba-45cd-8ec7-eeac66932f9f
-  e5d99542-03d3-465a-bf08-58422ef7dfc4
-  4e99ccaf-bbc0-4c41-8234-226ee2e44365
-  636cb876-bb07-47eb-b094-af56c6f89e82
-  8d0f52e8-e685-4e82-a75f-eede824fb5c5
-  db104f9e-bd5b-4f69-b9ce-602ca66f1739
+  77b6e460-76f0-45e7-b219-89f2cf8a5d6c
+  c8e7e0b1-86f5-43a4-8bf2-9fb365db7967
+  45d92f61-5393-4f53-af40-5dd8a59f992f
+  9e1af86d-d0b6-4a00-bffc-52db7f6edb98
+  640379c8-669a-4458-aff4-2421d475c723
+  19f29859-bf1f-4c7d-b693-7cda55371ad3
+  56446cc7-318c-4597-b4f1-bd78390fc881
+  26f49892-d63c-45ff-bdda-9b45dde99b08
+  af6bc487-f1bc-4131-abfc-d35eb135f133
+  0452afc1-b493-4fa5-862b-7f9185176c7d
 </pre></div>
 </div>
-<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 09-03 14:30:18] ax.api.client: Trial 0 marked COMPLETED.
-[INFO 09-03 14:30:18] ax.api.client: Generated new trial 1 with parameters {'motor1': 4.756082, 'motor2': 2.644393} using GenerationNode Sobol.
-[INFO 09-03 14:30:19] ax.api.client: Trial 1 marked COMPLETED.
-[INFO 09-03 14:30:19] ax.api.client: Generated new trial 2 with parameters {'motor1': -4.801378, 'motor2': -4.413255} using GenerationNode Sobol.
-[INFO 09-03 14:30:20] ax.api.client: Trial 2 marked COMPLETED.
-[INFO 09-03 14:30:20] ax.api.client: Generated new trial 3 with parameters {'motor1': -1.133586, 'motor2': 1.443717} using GenerationNode Sobol.
-[INFO 09-03 14:30:20] ax.api.client: Trial 3 marked COMPLETED.
-[INFO 09-03 14:30:20] ax.api.client: Generated new trial 4 with parameters {'motor1': 1.17892, 'motor2': -0.927347} using GenerationNode Sobol.
-[INFO 09-03 14:30:21] ax.api.client: Trial 4 marked COMPLETED.
-[INFO 09-03 14:30:23] ax.api.client: Generated new trial 5 with parameters {'motor1': -2.182018, 'motor2': 2.007372} using GenerationNode MBM.
-[INFO 09-03 14:30:23] ax.api.client: Trial 5 marked COMPLETED.
-[INFO 09-03 14:30:24] ax.api.client: Generated new trial 6 with parameters {'motor1': -2.388329, 'motor2': 3.750264} using GenerationNode MBM.
-[INFO 09-03 14:30:25] ax.api.client: Trial 6 marked COMPLETED.
-[INFO 09-03 14:30:25] ax.api.client: Generated new trial 7 with parameters {'motor1': -3.246276, 'motor2': 5.0} using GenerationNode MBM.
-[INFO 09-03 14:30:26] ax.api.client: Trial 7 marked COMPLETED.
-[INFO 09-03 14:30:27] ax.api.client: Generated new trial 8 with parameters {'motor1': -2.25282, 'motor2': 3.089217} using GenerationNode MBM.
-[INFO 09-03 14:30:28] ax.api.client: Trial 8 marked COMPLETED.
-[INFO 09-03 14:30:29] ax.api.client: Generated new trial 9 with parameters {'motor1': -1.021145, 'motor2': 3.492113} using GenerationNode MBM.
-[INFO 09-03 14:30:29] ax.api.client: Trial 9 marked COMPLETED.
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[INFO 09-30 18:54:49] ax.api.client: Trial 0 marked COMPLETED.
+[INFO 09-30 18:54:49] ax.api.client: Generated new trial 1 with parameters {'motor1': -2.035266, 'motor2': 3.340231} using GenerationNode Sobol.
+[INFO 09-30 18:54:50] ax.api.client: Trial 1 marked COMPLETED.
+[INFO 09-30 18:54:50] ax.api.client: Generated new trial 2 with parameters {'motor1': 4.775695, 'motor2': -4.486048} using GenerationNode Sobol.
+[INFO 09-30 18:54:50] ax.api.client: Trial 2 marked COMPLETED.
+[INFO 09-30 18:54:50] ax.api.client: Generated new trial 3 with parameters {'motor1': 1.036931, 'motor2': 0.130201} using GenerationNode Sobol.
+[INFO 09-30 18:54:51] ax.api.client: Trial 3 marked COMPLETED.
+[INFO 09-30 18:54:51] ax.api.client: Generated new trial 4 with parameters {'motor1': -3.312996, 'motor2': -1.406252} using GenerationNode Sobol.
+[INFO 09-30 18:54:52] ax.api.client: Trial 4 marked COMPLETED.
+[INFO 09-30 18:54:53] ax.api.client: Generated new trial 5 with parameters {'motor1': 0.13006, 'motor2': 3.332211} using GenerationNode MBM.
+[INFO 09-30 18:54:54] ax.api.client: Trial 5 marked COMPLETED.
+[INFO 09-30 18:54:54] ax.api.client: Generated new trial 6 with parameters {'motor1': -3.568415, 'motor2': 3.907539} using GenerationNode MBM.
+[INFO 09-30 18:54:55] ax.api.client: Trial 6 marked COMPLETED.
+[INFO 09-30 18:54:56] ax.api.client: Generated new trial 7 with parameters {'motor1': -3.484652, 'motor2': 2.683187} using GenerationNode MBM.
+[INFO 09-30 18:54:56] ax.api.client: Trial 7 marked COMPLETED.
+[INFO 09-30 18:54:57] ax.api.client: Generated new trial 8 with parameters {'motor1': 2.304649, 'motor2': 5.0} using GenerationNode MBM.
+[INFO 09-30 18:54:57] ax.api.client: Trial 8 marked COMPLETED.
+[INFO 09-30 18:54:58] ax.api.client: Generated new trial 9 with parameters {'motor1': -5.0, 'motor2': -2.481268} using GenerationNode MBM.
+[INFO 09-30 18:54:59] ax.api.client: Trial 9 marked COMPLETED.
 </pre></div>
 </div>
 </div>
@@ -1326,9 +1323,9 @@ Run UIDs:
       <td>1_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>226.034057</td>
-      <td>4.756082</td>
-      <td>2.644393</td>
+      <td>16.874902</td>
+      <td>-2.035266</td>
+      <td>3.340231</td>
     </tr>
     <tr>
       <th>2</th>
@@ -1336,9 +1333,9 @@ Run UIDs:
       <td>2_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>117.281667</td>
-      <td>-4.801378</td>
-      <td>-4.413255</td>
+      <td>374.021575</td>
+      <td>4.775695</td>
+      <td>-4.486048</td>
     </tr>
     <tr>
       <th>3</th>
@@ -1346,9 +1343,9 @@ Run UIDs:
       <td>3_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>105.007481</td>
-      <td>-1.133586</td>
-      <td>1.443717</td>
+      <td>131.289992</td>
+      <td>1.036931</td>
+      <td>0.130201</td>
     </tr>
     <tr>
       <th>4</th>
@@ -1356,9 +1353,9 @@ Run UIDs:
       <td>4_0</td>
       <td>COMPLETED</td>
       <td>Sobol</td>
-      <td>135.651409</td>
-      <td>1.178920</td>
-      <td>-0.927347</td>
+      <td>71.525539</td>
+      <td>-3.312996</td>
+      <td>-1.406252</td>
     </tr>
     <tr>
       <th>5</th>
@@ -1366,9 +1363,9 @@ Run UIDs:
       <td>5_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>44.452992</td>
-      <td>-2.182018</td>
-      <td>2.007372</td>
+      <td>76.459977</td>
+      <td>0.130060</td>
+      <td>3.332211</td>
     </tr>
     <tr>
       <th>6</th>
@@ -1376,9 +1373,9 @@ Run UIDs:
       <td>6_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>24.255292</td>
-      <td>-2.388329</td>
-      <td>3.750264</td>
+      <td>53.916484</td>
+      <td>-3.568415</td>
+      <td>3.907539</td>
     </tr>
     <tr>
       <th>7</th>
@@ -1386,9 +1383,9 @@ Run UIDs:
       <td>7_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>238.268599</td>
-      <td>-3.246276</td>
-      <td>5.000000</td>
+      <td>25.430440</td>
+      <td>-3.484652</td>
+      <td>2.683187</td>
     </tr>
     <tr>
       <th>8</th>
@@ -1396,9 +1393,9 @@ Run UIDs:
       <td>8_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>8.124900</td>
-      <td>-2.252820</td>
-      <td>3.089217</td>
+      <td>412.752948</td>
+      <td>2.304649</td>
+      <td>5.000000</td>
     </tr>
     <tr>
       <th>9</th>
@@ -1406,9 +1403,9 @@ Run UIDs:
       <td>9_0</td>
       <td>COMPLETED</td>
       <td>MBM</td>
-      <td>59.218002</td>
-      <td>-1.021145</td>
-      <td>3.492113</td>
+      <td>166.825440</td>
+      <td>-5.000000</td>
+      <td>-2.481268</td>
     </tr>
   </tbody>
 </table>
@@ -1551,8 +1548,8 @@ docker<span class="w"> </span>compose<span class="w"> </span>down
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1573,7 +1570,6 @@ docker<span class="w"> </span>compose<span class="w"> </span>down
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
   </p>
 </div>
       
@@ -1586,7 +1582,7 @@ docker<span class="w"> </span>compose<span class="w"> </span>down
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>

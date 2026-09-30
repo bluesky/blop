@@ -21,8 +21,8 @@ Data Flow
 The data flow for a typical optimization workflow is as follows:
 
 1. The optimizer suggests a sequence of mappings describing points to evaluate. When suggestions include ``_id`` values used by Blop optimization plans, those values must be unique within a batch and hashable.
-2. The acquisition plan acquires data and returns a hashable acquisition identifier.
-3. Blop passes that identifier unchanged to the evaluation function, which transforms the acquired data into a sequence of outcome mappings. The suggestion sequence passed to the evaluator is optimizer-provided, not necessarily acquisition-ordered.
+2. The acquisition plan acquires data and returns a uid.
+3. Blop passes that uid unchanged to the evaluation function, which transforms the acquired data into a sequence of outcome mappings. The suggestion sequence passed to the evaluator is optimizer-provided, not necessarily acquisition-ordered.
 4. The optimizer ingests the outcomes to inform future suggestions.
 
 .. image:: ../_static/protocol-data-flow.png

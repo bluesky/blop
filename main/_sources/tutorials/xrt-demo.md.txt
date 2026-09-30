@@ -121,7 +121,7 @@ objectives = [
 ```
 
 ```{code-cell} ipython3
-from collections.abc import Hashable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 
 class DetectorEvaluation(EvaluationFunction):
     def __init__(self, tiled_client: Container):
@@ -192,9 +192,7 @@ class DetectorEvaluation(EvaluationFunction):
 
         return float(fwhm), float(intensity)
 
-    def __call__(self, uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
-        if not isinstance(uid, str):
-            raise TypeError(f"DetectorEvaluation requires a Bluesky run UID string, got {uid!r}")
+    def __call__(self, uid: str, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         outcomes = []
         run = self.tiled_client[uid]
 

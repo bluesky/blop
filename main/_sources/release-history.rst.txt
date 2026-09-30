@@ -2,6 +2,15 @@
 Release History
 ===============
 
+Unreleased
+----------
+
+Compatibility Notes
+...................
+* ``EvaluationFunction`` and ``AcquisitionPlan`` are now generic over the uid type, allowing
+  evaluators to accept richer backend-specific objects without requiring them to be hashable
+  (`#369 <https://github.com/bluesky/blop/issues/369>`_).
+
 v1.1.0 (2026-08-26)
 -------------------
 

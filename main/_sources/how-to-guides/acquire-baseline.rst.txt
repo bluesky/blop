@@ -99,7 +99,7 @@ Here we configure an agent with three DOFs and two objectives. The second object
 
 .. testcode::
 
-    from collections.abc import Hashable, Mapping, Sequence
+    from collections.abc import Mapping, Sequence
 
     from blop.ax import Agent, RangeDOF, Objective, OutcomeConstraint
 
@@ -116,7 +116,7 @@ Here we configure an agent with three DOFs and two objectives. The second object
 
     outcome_constraints = [OutcomeConstraint("x >= baseline", x=objectives[1])]
 
-    def evaluation_function(uid: Hashable, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
+    def evaluation_function(uid: str, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:
         """Replace this with your own evaluation function."""
         outcomes = []
         for suggestion in suggestions:

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 
@@ -7,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>blop.callbacks.logger &#8212; blop 1.1.1.dev6 documentation</title>
+    <title>blop.callbacks.logger &#8212; blop 1.1.1.dev17 documentation</title>
   
   
   
@@ -26,8 +25,8 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=cb8930eaaf36d9849b67" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=64cc4de3f052d77215f0" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../../_static/plot_directive.css" />
@@ -37,12 +36,12 @@
     <link rel="stylesheet" type="text/css" href="../../../_static/css/styles.css?v=a24eef6b" />
   
   <!-- So that users can add custom icons -->
-  <script defer src="../../../_static/scripts/fontawesome.js?digest=cb8930eaaf36d9849b67"></script>
+  <script defer src="../../../_static/scripts/fontawesome.js?digest=64cc4de3f052d77215f0"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67" />
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0" />
 
-    <script src="../../../_static/documentation_options.js?v=ecf49ec0"></script>
+    <script src="../../../_static/documentation_options.js?v=ce21d923"></script>
     <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -407,7 +406,7 @@ window.addEventListener("load", load);
 window.runMermaid = runMermaid;</script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/blop/callbacks/logger';</script>
     <script>
-        DOCUMENTATION_OPTIONS.theme_version = '0.21.0';
+        DOCUMENTATION_OPTIONS.theme_version = '0.22.0';
         DOCUMENTATION_OPTIONS.theme_switcher_json_url = 'https://blueskyproject.io/blop/switcher.json';
         DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'main';
         DOCUMENTATION_OPTIONS.show_version_warning_banner =
@@ -420,7 +419,7 @@ window.runMermaid = runMermaid;</script>
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
-  <meta name="docsearch:version" content="1.1.1.dev6" />
+  <meta name="docsearch:version" content="1.1.1.dev17" />
   
     
     <script src="../../../_static/searchtools.js"></script>
@@ -468,7 +467,7 @@ window.runMermaid = runMermaid;</script>
   
     <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+  <button type="button" class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
   </button>
   
@@ -591,7 +590,7 @@ window.runMermaid = runMermaid;</script>
         <div class="navbar-item navbar-persistent--container">
           
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -602,15 +601,15 @@ window.runMermaid = runMermaid;</script>
         <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
       
@@ -647,7 +646,7 @@ window.runMermaid = runMermaid;</script>
   
     <div class="navbar-persistent--mobile">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<button type="button" class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
  <i class="fa-solid fa-magnifying-glass"></i>
  <span class="search-button__default-text">Search</span>
  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
@@ -745,15 +744,15 @@ window.runMermaid = runMermaid;</script>
           <div class="navbar-item">
 
 <div class="theme-switch-container dropdown pst-js-only" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Color mode">
-  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
+  <button type="button" class="btn btn-sm nav-link pst-navbar-icon theme-switch-button dropdown-toggle" aria-label="Color mode" data-bs-toggle="dropdown">
     <i class="theme-switch fa-solid fa-sun fa-lg fa-fw" data-mode="light" title="Light"></i>
     <i class="theme-switch fa-solid fa-moon fa-lg fa-fw" data-mode="dark" title="Dark"></i>
     <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg fa-fw" data-mode="auto" title="System Settings"></i>
   </button>
   <ul class="dropdown-menu dropdown-menu-end">
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
-    <li><button class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg fa-fw me-1"></i>System Settings</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="light"><i class="fa-solid fa-sun fa-lg fa-fw me-1"></i>Light</button></li>
+    <li><button type="button" class="dropdown-item d-flex align-items-center theme-change-button" data-mode="dark"><i class="fa-solid fa-moon fa-lg fa-fw me-1"></i>Dark</button></li>
   </ul>
 </div></div>
         
@@ -851,11 +850,13 @@ window.runMermaid = runMermaid;</script>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">bluesky.callbacks</span><span class="w"> </span><span class="kn">import</span> <span class="n">CallbackBase</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">event_model</span><span class="w"> </span><span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">EventDescriptor</span><span class="p">,</span> <span class="n">RunStart</span><span class="p">,</span> <span class="n">RunStop</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.box</span><span class="w"> </span><span class="kn">import</span> <span class="n">Box</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rich.panel</span><span class="w"> </span><span class="kn">import</span> <span class="n">Panel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rich.table</span><span class="w"> </span><span class="kn">import</span> <span class="n">Table</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rich.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">Text</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">..plan_stubs</span><span class="w"> </span><span class="kn">import</span> <span class="n">_ACQUISITION_UID_KEY</span><span class="p">,</span> <span class="n">_ITERATION_KEY</span><span class="p">,</span> <span class="n">_SUGGESTION_IDS_KEY</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">..utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">Source</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunningStats</span>
 
@@ -866,6 +867,8 @@ window.runMermaid = runMermaid;</script>
 <span class="n">_DIM_STYLE</span> <span class="o">=</span> <span class="s2">"dim"</span>
 <span class="n">_ERROR_STYLE</span> <span class="o">=</span> <span class="s2">"bold red"</span>
 <span class="n">_ITERATION_RULE_STYLE</span> <span class="o">=</span> <span class="s2">"blue"</span>
+<span class="n">_ITER_COLORS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"#E1C052"</span><span class="p">,</span> <span class="s2">"#8FA88B"</span><span class="p">,</span> <span class="s2">"#C78B94"</span><span class="p">,</span> <span class="s2">"#7A93A6"</span><span class="p">,</span> <span class="s2">"#9B8BA8"</span><span class="p">]</span>
+<span class="n">_BOX_VERT</span> <span class="o">=</span> <span class="n">Box</span><span class="p">(</span><span class="s2">"┃ ┃┃</span><span class="se">\n</span><span class="s2">┃┃┃┃</span><span class="se">\n</span><span class="s2">┃┃┃┃</span><span class="se">\n</span><span class="s2">┃┃┃┃</span><span class="se">\n</span><span class="s2">┃┃┃┃</span><span class="se">\n</span><span class="s2">┃┃┃┃</span><span class="se">\n</span><span class="s2">┃┃┃┃</span><span class="se">\n</span><span class="s2">┡─╇┩"</span><span class="p">)</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_format_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -887,16 +890,6 @@ window.runMermaid = runMermaid;</script>
     <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">value</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">"</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_to_list</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Coerce a value into a list, handling scalars, numpy arrays, and iterables."""</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="s2">"tolist"</span><span class="p">):</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">result</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">result</span><span class="p">]</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
-
-
 <span class="k">def</span><span class="w"> </span><span class="nf">_is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Check if a value is numeric (int or float)."""</span>
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span>
@@ -912,18 +905,15 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">    from the ``optimize`` plan and displays:</span>
 
 <span class="sd">    - A header panel with optimizer configuration at run start</span>
-<span class="sd">    - A formatted table of parameter and outcome values for each iteration</span>
-<span class="sd">    - A compact inline summary of outcome statistics after each iteration</span>
+<span class="sd">    - A formatted table of parameter and outcome values for each step event</span>
+<span class="sd">    - - a box coloring indicating sectioning by iteration</span>
+<span class="sd">    - A compact inline summary of outcome statistics after every 5 steps</span>
 <span class="sd">    - A full summary statistics table at run completion</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
 <span class="sd">    Multiple consecutive optimization runs will accumulate iteration counts</span>
 <span class="sd">    and statistics.</span>
-
-<span class="sd">    When ``n_points &gt; 1``, each iteration is displayed as a multi-row table</span>
-<span class="sd">    showing the batch of points suggested together by the optimizer, with</span>
-<span class="sd">    NaN-padded entries (from incomplete batches) filtered out.</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">console</span><span class="p">:</span> <span class="n">Console</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
@@ -933,7 +923,9 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_data_keys</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Source</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_base_iteration</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_step</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">RunningStats</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="OptimizationLogger.start">
@@ -951,7 +943,7 @@ window.runMermaid = runMermaid;</script>
         <span class="n">sensors</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"sensors"</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">run_uid</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"uid"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">+</span> <span class="n">iterations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_iteration</span> <span class="o">+</span> <span class="n">iterations</span>
 
         <span class="c1"># Build the header content</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="n">Text</span><span class="p">()</span>
@@ -965,10 +957,10 @@ window.runMermaid = runMermaid;</script>
 
         <span class="k">if</span> <span class="n">iterations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"Until stopping criterion"</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">" (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2"> completed)"</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2"> more (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2"> completed, "</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">" (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_iteration</span><span class="si">}</span><span class="s2"> completed)"</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_iteration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2"> more (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_base_iteration</span><span class="si">}</span><span class="s2"> completed, "</span><span class="p">)</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2"> total)"</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">iterations</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -989,7 +981,6 @@ window.runMermaid = runMermaid;</script>
             <span class="n">border_style</span><span class="o">=</span><span class="s2">"blue"</span><span class="p">,</span>
             <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">panel</span><span class="p">)</span></div>
 
 
@@ -1003,17 +994,29 @@ window.runMermaid = runMermaid;</script>
             <span class="n">data_keys_by_source</span><span class="p">[</span><span class="n">cast</span><span class="p">(</span><span class="n">Source</span><span class="p">,</span> <span class="n">data_key</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"source"</span><span class="p">,</span> <span class="n">Source</span><span class="o">.</span><span class="n">OTHER</span><span class="p">))]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">keys</span> <span class="ow">in</span> <span class="n">data_keys_by_source</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data_keys</span> <span class="o">=</span> <span class="n">data_keys</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Source</span><span class="o">.</span><span class="n">PARAMETER</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_outcome_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Source</span><span class="o">.</span><span class="n">OUTCOME</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="c1"># build header item for iteratively generated table</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Suggestion ID"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_keys</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_PARAM_STYLE</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcome_keys</span><span class="p">:</span>
+            <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">outcome</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_OUTCOME_STYLE</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_keys</span> <span class="o">=</span> <span class="n">data_keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">],</span> <span class="n">valid_indices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Update running statistics for each key with the valid values from this event."""</span>
-        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="n">valid_indices</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_is_numeric</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">idx</span><span class="p">]):</span>
-                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">RunningStats</span><span class="p">()</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">_is_numeric</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">RunningStats</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
 
 <div class="viewcode-block" id="OptimizationLogger.event">
 <a class="viewcode-back" href="../../../reference/callbacks.html#blop.callbacks.logger.OptimizationLogger.event">[docs]</a>
@@ -1027,114 +1030,83 @@ window.runMermaid = runMermaid;</script>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">doc</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_step</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">parameter_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parameter_keys</span>
+        <span class="n">outcome_keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_outcome_keys</span>
 
-        <span class="n">parameter_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Source</span><span class="o">.</span><span class="n">PARAMETER</span><span class="p">,</span> <span class="p">[])</span>
-        <span class="n">outcome_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Source</span><span class="o">.</span><span class="n">OUTCOME</span><span class="p">,</span> <span class="p">[])</span>
-
-        <span class="c1"># Extract values, normalizing to lists for uniform handling</span>
-        <span class="n">param_columns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">parameter_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="p">}</span>
-        <span class="n">outcome_columns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_to_list</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">outcome_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="p">}</span>
+        <span class="c1"># Extract values, normalizing to regular parametrization</span>
+        <span class="n">param_columns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">parameter_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="p">}</span>
+        <span class="n">outcome_columns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">outcome_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">data</span><span class="p">}</span>
 
         <span class="c1"># Extract suggestion IDs and acquisition identifier</span>
-        <span class="n">suggestion_ids</span> <span class="o">=</span> <span class="n">_to_list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"suggestion_ids"</span><span class="p">,</span> <span class="p">[]))</span>
-        <span class="n">acquire_uid</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"acquisition_uid"</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="n">suggestion_ids</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_SUGGESTION_IDS_KEY</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">acquire_uid</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_ACQUISITION_UID_KEY</span><span class="p">,</span> <span class="s2">""</span><span class="p">)</span>
+        <span class="n">run_iteration</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">_ITERATION_KEY</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">run_iteration</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_iteration</span> <span class="o">+</span> <span class="n">run_iteration</span> <span class="o">+</span> <span class="mi">1</span>
+
         <span class="c1"># Scalar string comes through as-is; ensure it's a plain string</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">acquire_uid</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="n">acquire_uid</span> <span class="o">=</span> <span class="n">acquire_uid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">acquire_uid</span> <span class="k">else</span> <span class="s2">""</span>
 
-        <span class="n">n_total</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
-            <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">[</span><span class="o">*</span><span class="n">param_columns</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span> <span class="o">*</span><span class="n">outcome_columns</span><span class="o">.</span><span class="n">values</span><span class="p">()]),</span>
-            <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="c1"># Filter out NaN-padded entries: suggestion_ids padded with "" indicate padding</span>
-        <span class="k">if</span> <span class="n">suggestion_ids</span><span class="p">:</span>
-            <span class="n">valid_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">sid</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">suggestion_ids</span><span class="p">)</span> <span class="k">if</span> <span class="n">sid</span> <span class="o">!=</span> <span class="s2">""</span> <span class="ow">and</span> <span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">""</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">valid_indices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n_total</span><span class="p">))</span>
-        <span class="n">n_valid</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_indices</span><span class="p">)</span> <span class="k">if</span> <span class="n">valid_indices</span> <span class="k">else</span> <span class="n">n_total</span>
-
         <span class="c1"># Update running statistics</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_stats</span><span class="p">(</span><span class="n">param_columns</span><span class="p">,</span> <span class="n">valid_indices</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_stats</span><span class="p">(</span><span class="n">outcome_columns</span><span class="p">,</span> <span class="n">valid_indices</span><span class="p">)</span>
-
-        <span class="c1"># Iteration header rule</span>
-        <span class="n">iter_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Iteration </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="si">}</span><span class="s2">"</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">iter_label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" / </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2">"</span>
-        <span class="k">if</span> <span class="n">n_valid</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">iter_label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"  (</span><span class="si">{</span><span class="n">n_valid</span><span class="si">}</span><span class="s2"> points)"</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">iter_label</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_ITERATION_RULE_STYLE</span><span class="p">)</span>
-
-        <span class="c1"># Show acquisition UID for this iteration</span>
-        <span class="k">if</span> <span class="n">acquire_uid</span><span class="p">:</span>
-            <span class="n">uid_line</span> <span class="o">=</span> <span class="n">Text</span><span class="p">()</span>
-            <span class="n">uid_line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  Acquire UID  "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-            <span class="n">uid_line</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">acquire_uid</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">uid_line</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_stats</span><span class="p">(</span><span class="n">param_columns</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_stats</span><span class="p">(</span><span class="n">outcome_columns</span><span class="p">)</span>
 
         <span class="c1"># Build the results table</span>
         <span class="n">table</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span>
-            <span class="n">show_header</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">show_header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">header_style</span><span class="o">=</span><span class="n">_HEADER_STYLE</span><span class="p">,</span>
-            <span class="n">border_style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span>
-            <span class="n">pad_edge</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">border_style</span><span class="o">=</span><span class="n">_ITER_COLORS</span><span class="p">[</span><span class="n">run_iteration</span> <span class="o">%</span> <span class="mi">5</span><span class="p">],</span>
+            <span class="n">box</span><span class="o">=</span><span class="n">_BOX_VERT</span><span class="p">,</span>
+            <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="n">row</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Iteration and suggestion ID columns (always shown)</span>
-        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Event"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Suggestion ID"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">"Suggestion ID"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"left"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">suggestion_ids</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameter_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">param_columns</span><span class="p">:</span>
-                <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_PARAM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_PARAM_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">param_columns</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_value</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">outcome_keys</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">outcome_columns</span><span class="p">:</span>
-                <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_OUTCOME_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">table</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_OUTCOME_STYLE</span><span class="p">,</span> <span class="n">justify</span><span class="o">=</span><span class="s2">"right"</span><span class="p">,</span> <span class="n">no_wrap</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">ratio</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">outcome_columns</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_value</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
 
-        <span class="c1"># Populate rows</span>
-        <span class="k">for</span> <span class="n">row_idx</span><span class="p">,</span> <span class="n">data_idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">valid_indices</span><span class="p">):</span>
-            <span class="n">row</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">row_idx</span><span class="p">))</span>
-            <span class="c1"># Suggestion ID for this point</span>
-            <span class="n">sid</span> <span class="o">=</span> <span class="n">suggestion_ids</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">suggestion_ids</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span>
-            <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sid</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">parameter_keys</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">param_columns</span><span class="p">:</span>
-                    <span class="n">vals</span> <span class="o">=</span> <span class="n">param_columns</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_value</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span><span class="p">))</span>
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">outcome_keys</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">outcome_columns</span><span class="p">:</span>
-                    <span class="n">vals</span> <span class="o">=</span> <span class="n">outcome_columns</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-                    <span class="n">row</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_value</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">data_idx</span><span class="p">]</span> <span class="k">if</span> <span class="n">data_idx</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="k">else</span> <span class="s2">""</span><span class="p">))</span>
-            <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">)</span>
-
+        <span class="n">table</span><span class="o">.</span><span class="n">add_row</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_step</span> <span class="o">%</span> <span class="mi">5</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Iteration header rule</span>
+            <span class="n">iter_label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"Iteration </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">run_iteration</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">'INJECTED'</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">iter_label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">" / </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span><span class="si">}</span><span class="s2">"</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">iter_label</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_ITERATION_RULE_STYLE</span><span class="p">)</span>
 
-        <span class="c1"># Inline outcome summary</span>
-        <span class="n">outcome_point_count</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
-            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">count</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">outcome_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span>
-            <span class="mi">0</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">trackable_outcomes</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">outcome_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">trackable_outcomes</span> <span class="ow">and</span> <span class="n">outcome_point_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">summary</span> <span class="o">=</span> <span class="n">Text</span><span class="p">()</span>
-            <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  "</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trackable_outcomes</span><span class="p">):</span>
-                <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">  "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_OUTCOME_STYLE</span><span class="p">)</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  min: "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_stat</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">min</span><span class="p">))</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  max: "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_stat</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  mean: "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_stat</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">mean</span><span class="p">))</span>
-            <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">  (</span><span class="si">{</span><span class="n">outcome_point_count</span><span class="si">}</span><span class="s2"> pts sampled)"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+            <span class="n">trackable_outcomes</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">outcome_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">trackable_outcomes</span><span class="p">:</span>
+                <span class="n">summary</span> <span class="o">=</span> <span class="n">Text</span><span class="p">()</span>
+                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  "</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">trackable_outcomes</span><span class="p">):</span>
+                    <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">  "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_OUTCOME_STYLE</span><span class="p">)</span>
+                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  min: "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_stat</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">min</span><span class="p">))</span>
+                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  max: "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_stat</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">max</span><span class="p">))</span>
+                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"  mean: "</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+                    <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_format_stat</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">mean</span><span class="p">))</span>
+                <span class="n">summary</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">  (</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_step</span><span class="si">}</span><span class="s2"> pts sampled)"</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="n">_DIM_STYLE</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
 
+            <span class="c1"># closing rule</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="n">_ITERATION_RULE_STYLE</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">doc</span></div>
 
 
@@ -1151,6 +1123,10 @@ window.runMermaid = runMermaid;</script>
 
         <span class="n">parameter_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Source</span><span class="o">.</span><span class="n">PARAMETER</span><span class="p">,</span> <span class="p">[])</span>
         <span class="n">outcome_keys</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sorted_data_keys_by_source</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">Source</span><span class="o">.</span><span class="n">OUTCOME</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="c1"># housekeeping iteration tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_base_iteration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_iteration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_iteration</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_iterations</span> <span class="k">else</span> <span class="kc">None</span>
 
         <span class="c1"># Build and print the summary statistics table</span>
         <span class="n">trackable_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="o">*</span><span class="n">parameter_keys</span><span class="p">,</span> <span class="o">*</span><span class="n">outcome_keys</span><span class="p">]</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_stats</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
@@ -1202,9 +1178,7 @@ window.runMermaid = runMermaid;</script>
             <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"[bold]Optimization Stopped[/bold]  (</span><span class="si">{</span><span class="n">exit_status</span><span class="si">}</span><span class="s2">)"</span>
             <span class="k">if</span> <span class="n">reason</span><span class="p">:</span>
                 <span class="n">label</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"  </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">"</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"yellow"</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">print</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_console</span><span class="o">.</span><span class="n">rule</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">"yellow"</span><span class="p">)</span></div>
 </div>
 
 </pre></div>
@@ -1236,8 +1210,8 @@ window.runMermaid = runMermaid;</script>
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../../_static/scripts/bootstrap.js?digest=cb8930eaaf36d9849b67"></script>
-<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=cb8930eaaf36d9849b67"></script>
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=64cc4de3f052d77215f0"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=64cc4de3f052d77215f0"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1258,7 +1232,6 @@ window.runMermaid = runMermaid;</script>
 
   <p class="sphinx-version">
     Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
-    <br/>
   </p>
 </div>
       
@@ -1271,7 +1244,7 @@ window.runMermaid = runMermaid;</script>
         <div class="footer-item">
 <p class="theme-version">
   <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.21.0.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.22.0.
 </p></div>
       
     </div>
