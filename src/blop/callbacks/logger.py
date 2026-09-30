@@ -187,8 +187,9 @@ class OptimizationLogger(CallbackBase):
         # Extract suggestion IDs and acquisition identifier
         suggestion_ids = data.get(_SUGGESTION_IDS_KEY, -1)
         acquire_uid = data.get(_ACQUISITION_UID_KEY, "")
-        run_iteration = data.get(_ITERATION_KEY, 0)
-        self._current_iteration = self._base_iteration + run_iteration + 1
+        run_iteration = data.get(_ITERATION_KEY)
+        if run_iteration:
+            self._current_iteration = self._base_iteration + run_iteration + 1
 
         # Scalar string comes through as-is; ensure it's a plain string
         if isinstance(acquire_uid, list):
@@ -202,7 +203,7 @@ class OptimizationLogger(CallbackBase):
         table = Table(
             show_header=False,
             header_style=_HEADER_STYLE,
-            border_style=_ITER_COLORS[run_iteration % 5],
+            border_style=_ITER_COLORS[(run_iteration or -1) % 5],
             box=_BOX_VERT,
             expand=True,
         )
@@ -227,7 +228,7 @@ class OptimizationLogger(CallbackBase):
         self._console.print(table)
         if self._current_step % 5 == 0:
             # Iteration header rule
-            iter_label = f"Iteration {self._current_iteration}"
+            iter_label = f"Iteration {self._current_iteration if run_iteration else 'INJECTED'}"
             if self._total_iterations is not None:
                 iter_label += f" / {self._total_iterations}"
             self._console.rule(iter_label, style=_ITERATION_RULE_STYLE)

@@ -70,8 +70,8 @@ def read_step(
     uid: Any,
     suggestions: Sequence[Mapping],
     outcomes: Sequence[Mapping],
-    iteration: int,
     readable_cache: MutableMapping[str, InferredReadable],
+    iteration: int | None = None,
     stream_name: str = "primary",
 ) -> MsgGenerator[None]:
     """Plan stub to read the suggestions and outcomes of a single optimization step.
@@ -89,8 +89,8 @@ def read_step(
         Sequence of suggestion mappings, each containing an ID_KEY.
     outcomes : Sequence[Mapping]
         Sequence of outcome mappings, each containing an ID_KEY matching suggestions.
-    iteration: int
-        iteration number passed by the optimization plan.
+    iteration: int | None
+        iteration number passed by the optimization plan. May be none if current points are not froms iterations
         (this is a in run value, use a uid to aggregate across runs)
     readable_cache : dict[str, InferredReadable]
         Cache of InferredReadable objects to reuse across iterations.

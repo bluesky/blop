@@ -442,7 +442,7 @@ def sample_suggestions(
         optimization_problem.optimizer.ingest(outcomes)
 
         # Emit a Bluesky event
-        yield from read_step(uid, suggestions, outcomes, iteration=-1, readable_cache=readable_cache or {})
+        yield from read_step(uid, suggestions, outcomes, readable_cache=readable_cache or {})
 
         return uid, suggestions, outcomes
 

@@ -239,6 +239,17 @@ def test_event_non_numeric_data(logger, console):
     assert result is doc
 
 
+def test_event_null_iterations(logger, console):
+    logger.start(_make_start(iterations=8))
+    _setup_descriptor(logger)
+    for _ in range(8):
+        logger.event(_make_event(data={_ITERATION_KEY: None}))
+    assert console.print.call_count >= 1
+    assert console.rule.call_count >= 1
+    rule_values = _collect_ruler_info(console.rule.call_args_list[0])
+    assert "INJECTED" in rule_values
+
+
 def test_stop_success(logger, console):
     _run_to_stop(logger, exit_status="success")
     assert console.rule.call_count >= 1
