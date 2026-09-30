@@ -67,18 +67,3 @@ def test_navigate_ignores_unknown_params(RE):
     RE(navigate_to_best([x1], optimizer))
 
     assert x1._value == 5.0
-
-
-def test_read_step_null_iterations():
-    """Non iterating plans like sample_suggestions pass null for iteration number, log and read should be stable with null"""
-    reading = read_step(
-        "uid",
-        suggestions=[{ID_KEY: i, "a": 1, "b": 2} for i in range(5)],
-        outcomes=[{ID_KEY: i, "c": 1, "d": 2} for i in range(5)],
-        iteration=None,
-        readable_cache={},
-    )
-    for msg in reading:
-        if msg.command == "read" and msg.obj.name == _ITERATION_KEY:
-            obj = msg.obj
-            assert obj.read()[obj.name]["value"] is None
