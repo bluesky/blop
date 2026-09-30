@@ -3,8 +3,8 @@ from unittest.mock import MagicMock
 import pytest
 from bluesky.run_engine import RunEngine
 
-from blop.plan_stubs import _ITERATION_KEY, navigate_to_best, read_step
-from blop.protocols import ID_KEY, Optimizer
+from blop.plan_stubs import navigate_to_best
+from blop.protocols import Optimizer
 
 from .conftest import MovableSignal
 
