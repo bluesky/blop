@@ -38,7 +38,7 @@ For a custom plan that returns a richer UID, use that concrete type in both the 
     @dataclass(frozen=True)
     class QueueAcquisitionUID:
         correlation_uid: str
-        item_uid: str | None
+        item_uid: str
 
     class QueueEvaluation(EvaluationFunction[QueueAcquisitionUID]):
         def __call__(self, uid: QueueAcquisitionUID, suggestions: Sequence[Mapping]) -> Sequence[Mapping]:

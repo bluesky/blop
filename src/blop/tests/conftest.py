@@ -1,4 +1,7 @@
+import threading
 import time
+from concurrent.futures import Future
+from contextlib import contextmanager
 from typing import Any
 
 from bluesky.protocols import HasHints, HasParent, Hints, NamedMovable, Readable, Status
@@ -61,3 +64,25 @@ class MovableSignal(ReadableSignal, NamedMovable):
     def set(self, value: float) -> Status:
         self._value = value
         return AlwaysSuccessfulStatus()
+
+
+@contextmanager
+def background_call(function, *args, **kwargs):
+    future = Future()
+
+    def invoke():
+        try:
+            result = function(*args, **kwargs)
+        except BaseException as error:
+            future.set_exception(error)
+        else:
+            future.set_result(result)
+
+    thread = threading.Thread(target=invoke, daemon=True)
+    thread.start()
+    try:
+        yield future
+    finally:
+        thread.join(timeout=5)
+        assert not thread.is_alive(), "Background public call did not finish"
+        future.exception(timeout=5)
