@@ -16,7 +16,10 @@
 | `import blop`, `from blop.ax import Agent` | `import bluesky_adaptive`, `from bluesky_adaptive.ax import Agent` |
 | <https://blueskyproject.io/blop> | <https://blueskyproject.io/bluesky-adaptive> |
 
-Extra names (`ax`, `queueserver`, `scipy`, `xopt`, `all`, `cpu`, `dev`) and the run metadata keys (`blop_suggestions`, `blop_acquisition_order`, `blop_correlation_uid`) are unchanged, so data recorded with Blop works with Bluesky Adaptive. See the [1.0.0 release notes](https://blueskyproject.io/bluesky-adaptive/v1.0.0/release-history.html).
+Extra names (`ax`, `queueserver`, `scipy`, `xopt`, `all`, `cpu`, `dev`) and the run 
+metadata keys (`blop_suggestions`, `blop_acquisition_order`, `blop_correlation_uid`) are unchanged, 
+so data recorded with Blop works with Bluesky Adaptive. See 
+the [1.0.0 release notes](https://blueskyproject.io/bluesky-adaptive/v1.0.0/release-history.html).
 
 To keep using Blop, pin `blop==1.2.0`.
 
