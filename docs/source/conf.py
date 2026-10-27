@@ -147,6 +147,10 @@ html_theme = "pydata_sphinx_theme"
 # documentation.
 #
 html_theme_options = {
+    "announcement": (
+        'Blop is now <a href="https://blueskyproject.io/bluesky-adaptive">Bluesky Adaptive</a>. '
+        "These docs cover Blop 1.2.0 and are no longer updated."
+    ),
     "github_url": "https://github.com/bluesky/blop",
     "switcher": {
         "json_url": "https://blueskyproject.io/blop/switcher.json",
